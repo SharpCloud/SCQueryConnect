@@ -3,34 +3,23 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
-using System.Data.Entity;
-using System.Data.Entity.Core.EntityClient;
 using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Net.Mime;
-using System.Reflection;
 using SC.API.ComInterop;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Resources;
 using System.Windows.Threading;
+using SC.Entities.Models;
+using SCQueryConnect.Helpers;
 using MessageBox = System.Windows.MessageBox;
+
 
 namespace SCQueryConnect
 {
@@ -50,7 +39,10 @@ namespace SCQueryConnect
                 OnPropertyChanged("UpdatingMessageVisibility");
             }
         }
+
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
+
+        public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
         public MainWindow()
         {
@@ -62,14 +54,62 @@ namespace SCQueryConnect
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ConnectionString.Text = RegRead("ConnectionString", "Server=.; Integrated Security=true; Database=demo");
-            SQLString.Text = RegRead("SQLString", "SELECT * FROM TABLE");
+            ConnectionString.Text = SaveHelper.RegRead("ConnectionString",
+                "Server=.; Integrated Security=true; Database=demo");
+            SQLString.Text = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
 
-            Url.Text = RegRead("URL", "https://my.sharpcloud.com");
-            Username.Text = RegRead("Username", "");
-            Password.Password = Encoding.Default.GetString(Convert.FromBase64String(RegRead("Password", "")));
-            StoryId.Text = RegRead("StoryID", "");
-            cbDatabase.SelectedIndex = Int32.Parse(RegRead("DBType", "0"));
+            Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
+            Username.Text = SaveHelper.RegRead("Username", "");
+            Password.Password = Encoding.Default.GetString(Convert.FromBase64String(SaveHelper.RegRead("Password", "")));
+            StoryId.Text = SaveHelper.RegRead("StoryID", "");
+            cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
+
+            LoadAllProfiles();
+            connectionList.ItemsSource = _connections;
+
+        }
+
+        private void LoadAllProfiles()
+        {
+            var localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
+            var file = localPath + "/connections.json";
+
+            if (File.Exists(file))
+            {
+                // load our previous settings
+                _connections = SaveHelper.DeserializeJSON<SmartObservableCollection<QueryData>>(File.ReadAllText(file));
+            }
+            else
+            {   // create some sample settings
+                if (SQLString.Text != "SELECT * FROM TABLE" && ConnectionString.Text != "Server=.; Integrated Security=true; Database=demo")
+                {
+                    // user papbably already has setting we should save from last time
+                    // create one based on old settings - whcih are already set up
+                    var pqd = CreateNewQueryData("Previous  Session");
+                    pqd.StoryId = StoryId.Text;
+                    _connections.Add(pqd);
+                }
+
+                // add some examples
+                _connections.Add(CreateNewQueryData("SQL Server Example", 0, "Server=.; Integrated Security=true; Database=demo", "SELECT * FROM TABLE"));
+                _connections.Add(CreateNewQueryData("ODBC Example", 1, "DSN=DatasourceName", "SELECT * FROM TABLE"));
+                _connections.Add(CreateNewQueryData("MS Access Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;", "SELECT * FROM TABLE"));
+                _connections.Add(CreateNewQueryData("Excel Spreadsheet Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:/myFolder/mySpreadsheet.xlsx;Extended Properties=\"Excel 12.0 Xml; HDR = YES\";", "SELECT * from [Sheet1$]"));
+            }
+
+            connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
+            BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
+        }
+
+        private QueryData CreateNewQueryData(string name, int dbType = -1, string connection = "", string query = "")
+        {
+            var qd = new QueryData(name)
+            {
+                ConnectionType = dbType == -1 ? cbDatabase.SelectedIndex : dbType,
+                ConnectionsString = connection == "" ? ConnectionString.Text : connection,
+                QueryString = query == "" ? SQLString.Text : query
+            };
+            return qd;
         }
 
         private void HelpButtonClick(object sender, RoutedEventArgs e)
@@ -92,23 +132,7 @@ Click YES to replace the current connection string text with the following sampl
                 ConnectionString.Focus();
             }
         }
-
-        private void EgButtonClick(object sender, RoutedEventArgs e)
-        {
-            switch (cbDatabase.SelectedIndex)
-            {
-                case 0:
-                    ShowConnectString("SQL example", "Server=.; Integrated Security=true; Database=demo");
-                    break;
-                case 1:
-                    ShowConnectString("ODBC example", "DSN=DatasourceName");
-                    break;
-                case 2:
-                    ShowConnectString("ADO example", "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;");
-                    break;
-            }
-        }
-
+        
         private DbConnection GetDb(string connectionString)
         {
             switch (cbDatabase.SelectedIndex)
@@ -191,8 +215,7 @@ Click YES to replace the current connection string text with the following sampl
             }
         }
 
-        const string RegKey = "SOFTWARE\\SharpCloud\\SQLUpdate";
-
+ 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
@@ -207,59 +230,6 @@ Click YES to replace the current connection string text with the following sampl
             }
         }
 
-        public static string RegRead(string KeyName, string defVal)
-        {
-            // Opening the registry key
-            RegistryKey rk = Registry.CurrentUser;
-            // Open a subKey as read-only
-            RegistryKey sk1 = rk.OpenSubKey(RegKey);
-            // If the RegistrySubKey doesn't exist -> (null)
-            {
-                try
-                {
-                    // If the RegistryKey exists I get its value
-                    // or null is returned.
-                    if (sk1 != null)
-                    {
-                        var ret = (string)sk1.GetValue(KeyName.ToUpper());
-                        if (ret == null)
-                            return defVal;
-                        return ret;
-                    }
-                }
-                catch (Exception e)
-                {
-                    // AAAAAAAAAAARGH, an error!
-                    //ShowErrorMessage(e, "Reading registry " + KeyName.ToUpper());
-                }
-            }
-            return defVal;
-        }
-
-        public static bool RegWrite(string KeyName, object Value)
-        {
-            try
-            {
-                // Setting
-                RegistryKey rk = Registry.CurrentUser;
-                // I have to use CreateSubKey 
-                // (create or open it if already exits), 
-                // 'cause OpenSubKey open a subKey as read-only
-                RegistryKey sk1 = rk.CreateSubKey(RegKey);
-                // Save the value
-                sk1.SetValue(KeyName.ToUpper(), Value);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                // AAAAAAAAAAARGH, an error!
-                //ShowErrorMessage(e, "Writing registry " + KeyName.ToUpper());
-                return false;
-            }
-        }
-
-
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             SaveSettings();
@@ -267,15 +237,40 @@ Click YES to replace the current connection string text with the following sampl
 
         private void SaveSettings()
         {
-            RegWrite("ConnectionString", ConnectionString.Text);
-            RegWrite("SQLString", SQLString.Text);
+            SaveHelper.RegWrite("URL", Url.Text);
+            SaveHelper.RegWrite("Username", Username.Text);
+            SaveHelper.RegWrite("Password", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
 
-            RegWrite("URL", Url.Text);
-            RegWrite("Username", Username.Text);
-            RegWrite("Password", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
-            RegWrite("StoryID", StoryId.Text);
-            RegWrite("DBType", cbDatabase.SelectedIndex.ToString());
+            SaveSettings(connectionList.SelectedItem as QueryData);
+            /*
+            SaveHelper.RegWrite("ConnectionString", ConnectionString.Text);
+            SaveHelper.RegWrite("SQLString", SQLString.Text);
+            SaveHelper.RegWrite("StoryID", StoryId.Text);
+            SaveHelper.RegWrite("DBType", cbDatabase.SelectedIndex.ToString());
+            */
+
+            var localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
+            Directory.CreateDirectory(localPath);
+            var s = SaveHelper.SerializeJSON(_connections);
+            File.WriteAllText(localPath + "/connections.json", s);
+
+            SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());
+            SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
+
         }
+
+        private void SaveSettings(QueryData qd)
+        {
+            if (qd != null)
+            {
+                qd.Name = ConnectionName.Text;
+                qd.ConnectionType = cbDatabase.SelectedIndex;
+                qd.ConnectionsString = ConnectionString.Text;
+                qd.QueryString = SQLString.Text;
+                qd.StoryId = StoryId.Text;
+            }
+        }
+
 
         private bool ValidateCreds()
         {
@@ -443,65 +438,56 @@ Click YES to replace the current connection string text with the following sampl
             if (!ValidateCreds())
                 return;
 
-            var dlg = new FolderBrowserDialog
+            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
+            folder += "/data";
+            Directory.CreateDirectory(folder);
+
+            var qd = connectionList.SelectedItem as QueryData;
+            folder += "/" + qd.Name;
+            Directory.CreateDirectory(folder);
+
+            try
             {
-                SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                Description = "Select or create a folder to store the batch files in"
-            };
-            var result = dlg.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                var folder = dlg.SelectedPath;
+                var configFilename = folder + "/SCSQLBatch.exe.config";
+
+                if (File.Exists(configFilename))
+                {
+                    if (MessageBox.Show("Config files alredy exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                        return;
+                }
 
                 try
                 {
-                    var configFilename = folder + "/SCSQLBatch.exe.config";
-
-                    if (File.Exists(configFilename))
-                    {
-                        if (MessageBox.Show("Config files alredy exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-                            return;
-                    }
-
-                    try
-                    {
-                        CopyResourceFile(folder, "SC.API.ComInterop.dll");
-                        CopyResourceFile(folder, "SC.Api.dll");
-                        CopyResourceFile(folder, "SCSQLBatch.exe");
-                        CopyResourceFile(folder, "SCSQLBatch.exe.config");
-                    }
-                    catch (Exception exception2)
-                    {
-                        MessageBox.Show("Sorry, we were unable to complete the process as we could not downlaod the files from the internet. Please make sure you have a working internet connection. " + exception2.Message, "NO CONNECTION");
-                        return;    
-                    }
-
-                    string [] dbTypes = { "SQL", "ODBC", "OLDDB"};
-                    // set up the config
-                    var content = File.ReadAllText(configFilename);
-                    content = content.Replace("USERID", Username.Text);
-                    content = content.Replace("PASSWORD", ""); // we keep the password hidden
-                    content = content.Replace("BASE64PWORD", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
-                    content = content.Replace("https://my.sharpcloud.com", Url.Text);
-                    content = content.Replace("00000000-0000-0000-0000-000000000000", StoryId.Text);
-                    if (cbDatabase.SelectedIndex != -1)
-                        content = content.Replace("SQL", dbTypes[cbDatabase.SelectedIndex]);
-                    content = content.Replace("CONNECTIONSTRING", ConnectionString.Text.Replace("\r", " ").Replace("\n", " "));
-                    content = content.Replace("QUERYSTRING", SQLString.Text.Replace("\r", " ").Replace("\n", " "));
-                    File.WriteAllText(configFilename, content);
-
-                    MessageBox.Show(@"The files to repeat the database update to the SharpCloud story have been saved in this folder.
-
-You can run the file SCSQLBatch.exe to run the update at any time.
-
-For repeated scheduled updates, use a process like 'Task Scheduler' to make updates every day, hour etc.
-", "INFORMATION");
-                    Process.Start(folder);
+                    CopyResourceFile(folder, "SC.API.ComInterop.dll");
+                    CopyResourceFile(folder, "SC.Api.dll");
+                    CopyResourceFile(folder, "SCSQLBatch.exe");
+                    CopyResourceFile(folder, "SCSQLBatch.exe.config");
                 }
-                catch (Exception exception)
+                catch (Exception exception2)
                 {
-                    MessageBox.Show(exception.Message);
+                    MessageBox.Show("Sorry, we were unable to complete the process as we could not downlaod the files from the internet. Please make sure you have a working internet connection. " + exception2.Message, "NO CONNECTION");
+                    return;    
                 }
+
+                string [] dbTypes = { "SQL", "ODBC", "OLDDB"};
+                // set up the config
+                var content = File.ReadAllText(configFilename);
+                content = content.Replace("USERID", Username.Text);
+                content = content.Replace("PASSWORD", ""); // we keep the password hidden
+                content = content.Replace("BASE64PWORD", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
+                content = content.Replace("https://my.sharpcloud.com", Url.Text);
+                content = content.Replace("00000000-0000-0000-0000-000000000000", StoryId.Text);
+                if (cbDatabase.SelectedIndex != -1)
+                    content = content.Replace("SQL", dbTypes[cbDatabase.SelectedIndex]);
+                content = content.Replace("CONNECTIONSTRING", ConnectionString.Text.Replace("\r", " ").Replace("\n", " "));
+                content = content.Replace("QUERYSTRING", SQLString.Text.Replace("\r", " ").Replace("\n", " "));
+                File.WriteAllText(configFilename, content);
+
+                Process.Start(folder);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
             }
         }
         
@@ -512,6 +498,76 @@ For repeated scheduled updates, use a process like 'Task Scheduler' to make upda
 
             WebClient Client = new WebClient();
             Client.DownloadFile(remote, local);
+        }
+
+        private void NewConnectionClick(object sender, RoutedEventArgs e)
+        {
+            var qd = connectionList.SelectedItem as QueryData;
+            _connections.Add(CreateNewQueryData(qd.Name + " Copy"));
+            connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
+        }
+        private void UpConnectionClick(object sender, RoutedEventArgs e)
+        {
+            int i = connectionList.SelectedIndex;
+            if (i > 0)
+            {
+                i--;
+                var qd = connectionList.SelectedItem as QueryData;
+                _connections.Remove(qd);
+                _connections.Insert(i, qd);
+                connectionList.SelectedIndex = i;
+            }
+
+        }
+        private void DownConnectionClick(object sender, RoutedEventArgs e)
+        {
+            int i = connectionList.SelectedIndex;
+            if (i < _connections.Count-1)
+            {
+                i++;
+                var qd = connectionList.SelectedItem as QueryData;
+                _connections.Remove(qd);
+                _connections.Insert(i, qd);
+                connectionList.SelectedIndex = i;
+            }
+        }
+        private void DeleteConnectionClick(object sender, RoutedEventArgs e)
+        {
+            int i = connectionList.SelectedIndex;
+            if (_connections.Count > 1)
+            {
+                var qd = connectionList.SelectedItem as QueryData;
+                _connections.Remove(qd);
+                connectionList.SelectedIndex = i;
+            }
+        }
+
+        private void connectionList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var qd = connectionList.SelectedItem as QueryData;
+            if (qd != null)
+            {
+                ConnectionName.Text = qd.Name;
+                cbDatabase.SelectedIndex = qd.ConnectionType;
+                ConnectionString.Text = qd.ConnectionsString;
+                SQLString.Text = qd.QueryString;
+                StoryId.Text = qd.StoryId;
+            }
+        }
+
+        private void ConnectionString_LostFocus(object sender, RoutedEventArgs e)
+        {
+            SaveSettings();
+        }
+        private void ConnectionString_LostFocusName(object sender, RoutedEventArgs e)
+        {
+            SaveSettings();
+
+            // refresh the list
+            var i = connectionList.SelectedIndex;
+            connectionList.ItemsSource = null;
+            connectionList.ItemsSource = _connections;
+            connectionList.SelectedIndex = i;
         }
     }
 }

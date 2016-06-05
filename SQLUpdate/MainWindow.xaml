@@ -4,81 +4,195 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQLUpdate"
-        mc:Ignorable="d" Background="#00AFFC"
+        mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
-        Title="SharpCloud QueryConnect v1.01" Height="350" Width="625" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+        Title="SharpCloud QueryConnect v2.01" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"></RowDefinition>
-                <RowDefinition Height="20"></RowDefinition>
-                <RowDefinition Height="5*"></RowDefinition>
-                <RowDefinition Height="20"></RowDefinition>
-                <RowDefinition Height="5*"></RowDefinition>
-                <RowDefinition Height="20"></RowDefinition>
-                <RowDefinition Height="2*"></RowDefinition>
-                <RowDefinition Height="20"></RowDefinition>
-                <RowDefinition Height="2*" MinHeight="40"></RowDefinition>
-            </Grid.RowDefinitions>
+            <Grid >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="140"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="3"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="DB Connection String:" TextAlignment="Right" Margin="5"></TextBlock>
-            <ComboBox x:Name="cbDatabase" Grid.Row="0" Grid.Column="1" Width="100" Margin="5" HorizontalAlignment="Left" Text="Connection Type">
-                <ComboBoxItem>MSSQL</ComboBoxItem>
-                <ComboBoxItem>ODBC</ComboBoxItem> 
-                <ComboBoxItem>ADO</ComboBoxItem>
-            </ComboBox>
-            <TextBox x:Name="ConnectionString" Grid.Row="0" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="110,5,5,5" FontFamily="Courier New"/>
-            <GridSplitter Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Height="5"></GridSplitter>
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5,0">
-                <Button Width="105" Click="TextConnectionClick">Test Connection</Button>
-            </StackPanel>
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Width="70" Margin="5,0,0,0" Click="EgButtonClick">Example</Button>
-                <Button Width="70" Margin="5,0,0,0" Click="HelpButtonClick">More Help</Button>
-            </StackPanel>
+            <GridSplitter Grid.Column="1"  Foreground="Red" HorizontalAlignment="Stretch" Width="3"></GridSplitter>
+            <ListBox Grid.Column="0" x:Name="connectionList" Background="Transparent" Foreground="white" SelectionChanged="connectionList_SelectionChanged" Margin="0,0,0,50" />
+                <Grid Background="Black" VerticalAlignment="Bottom" Height="50">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Button Click="NewConnectionClick" Grid.Row="0" Grid.Column="0" Height="40" VerticalAlignment="Top" Background="#00AFFC" FontSize="14" Foreground="White" Margin="5" >+ Copy</Button>
+                    <Button Click="UpConnectionClick" Grid.Row="0" Grid.Column="1" Height="40" VerticalAlignment="Top" Background="#666666" FontSize="14" Foreground="White"  Margin="5" >Up</Button>
+                    <Button Click="DownConnectionClick" Grid.Row="0" Grid.Column="2" Height="40" VerticalAlignment="Top" Background="#666666" FontSize="14" Foreground="White"  Margin="5" >Down</Button>
+                    <Button Click="DeleteConnectionClick" Grid.Row="0" Grid.Column="3" Height="40" VerticalAlignment="Top" Background="Red" FontSize="14" Foreground="White"  Margin="5" >Delete</Button>
+                </Grid>
+            <Grid Grid.Column="2" Background="Black">
+                    <TabControl  Background="#333333" x:Name="BrowserTabs" BorderBrush="Transparent" MinWidth="750">
+                            <TabControl.Resources>
+                                <Style TargetType="TabControl">
+                                    <Setter Property="IsTabStop" Value="False"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderBrush" Value="#404040"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="0"/>
 
-            
-            <GridSplitter Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Height="5"></GridSplitter>
-            <TextBlock Background="Red" Grid.Row="3" Grid.Column="1" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,0" Visibility="Collapsed"></TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Query String:" TextAlignment="Right" Margin="5"></TextBlock>
-            <TextBox x:Name="SQLString" Grid.Row="2" Grid.Column="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow"/>
-            <Button  Click="RunClick" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Width="120" Margin="5,0">Run (Results Below)</Button>
+                                </Style>
+                                <Style TargetType="TabItem">
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="TabItem">
+                                                <Grid x:Name="gdBorder" Background="#333333">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="2,0" Height="30">
+                                                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                ContentSource="Header" Margin="10,2"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <Border x:Name="selectedBorder" Height="2" VerticalAlignment="Bottom" Background="#FF00AFFC"></Border>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
+                                                        <Setter TargetName="gdBorder" Property="Background" Value="#333333" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="False">
+                                                        <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="gdBorder" Property="Background" Value="#111111" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TabControl.Resources>
+                            <TabItem Header="1. Database Connection">
+                            <Grid>
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="40"></RowDefinition>
+                                        <RowDefinition Height="40"></RowDefinition>
+                                        <RowDefinition Height="80"></RowDefinition>
+                                        <RowDefinition Height="50"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="50"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                                    <TextBox x:Name="ConnectionName" Grid.Row="0" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="DB Results:" TextAlignment="Right" Margin="5"></TextBlock>
-            <DataGrid x:Name="DataGrid" Grid.Row="4" Grid.Column="1" Margin="5"/>
-            <GridSplitter Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Height="5"></GridSplitter>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="DB Connection Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                                    <ComboBox x:Name="cbDatabase" Grid.Row="1" Grid.Column="1" Width="250" Height="40" Margin="5" HorizontalAlignment="Left" Text="Connection Type">
+                                        <ComboBoxItem>MSSQL</ComboBoxItem>
+                                        <ComboBoxItem>ODBC</ComboBoxItem>
+                                        <ComboBoxItem>ADO</ComboBoxItem>
+                                    </ComboBox>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                                    <TextBox x:Name="ConnectionString" Grid.Row="2" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
 
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="SharpCloud:" TextAlignment="Right" Margin="5"></TextBlock>
-            <WrapPanel Grid.Row="6" Grid.Column="1" Margin="5">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text ="URL:" TextAlignment="Right" Width="100"></TextBlock>
-                    <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="250"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text ="Username:" TextAlignment="Right" Width="100"></TextBlock>
-                    <TextBox x:Name="Username" Width="250"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text ="Password:" TextAlignment="Right" Width="100"></TextBlock>
-                    <PasswordBox x:Name="Password" Width="250"></PasswordBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text ="Story ID:" TextAlignment="Right" Width="100"></TextBlock>
-                    <TextBox x:Name="StoryId" Width="250"></TextBox>
-                </StackPanel>
-            </WrapPanel>
-            <GridSplitter Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Height="5"></GridSplitter>
-            <Button Grid.Row="7" Grid.Column="1" Click="UpdateSharpCloud"  HorizontalAlignment="Right" Width="120" Margin="5,0">Update Story Now..</Button>
-            <Button Grid.Row="7" Grid.Column="1" Click="GenerateBatchFile"  HorizontalAlignment="Left" Width="180" Margin="5,0">Generate Batch Files Now..</Button>
+                                    <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="TextConnectionClick">Test Connection</Button>
 
-            <TextBlock Grid.Row="8" Grid.Column="0" Text="Update Results:" TextAlignment="Right" Margin="5"></TextBlock>
-            <TextBox Grid.Row="8" x:Name="tbResults" Grid.Column="1" Width="Auto" Margin="5,0,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Background="#00AFFC" Foreground="#333333" > </TextBox>
-            <Grid x:Name="updatingMessageGrid" Grid.RowSpan="7" Grid.ColumnSpan="2"  Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility}">
-                <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center" ></TextBlock>
+                                    <TextBlock Margin="5" TextWrapping="WrapWithOverflow" Grid.Row="4" Grid.Column="1" Text="Connection strings allow you to connect to virtually any database.
+Connection string may be very simple or quite detailed including username/password and servername, IP address etc."></TextBlock>
+
+                                    <Button Grid.Row="5" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="HelpButtonClick">Help on Connections Strings</Button>
+
+                                </Grid>
+
+                            </Grid>
+
+                    </TabItem>
+                        <TabItem Header="2. Item Query" >
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                    <RowDefinition Height="2*"></RowDefinition>
+                                    <RowDefinition Height="3"></RowDefinition>
+                                    <RowDefinition Height="3*"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Query String:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
+                                <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+                                <Grid Grid.Row="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition ></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                    <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
+                                    <Button  Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="120" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Run</Button>
+                                    <DataGrid x:Name="DataGrid" Grid.Row="1" Margin="5"/>
+                                </Grid>
+                            </Grid>
+
+                        </TabItem>
+                        <TabItem Header="2a. Relationship Query" Visibility="Collapsed" >
+
+                        </TabItem>
+                        <TabItem Header="3. Update Story" >
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"></RowDefinition>
+                                    <RowDefinition Height="3"></RowDefinition>
+                                    <RowDefinition Height="1*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <TextBlock Text ="URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                        <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="250"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <TextBlock Text ="Username:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                        <TextBox x:Name="Username" Width="250"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <TextBlock Text ="Password:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                        <PasswordBox x:Name="Password" Width="250"></PasswordBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <TextBlock Text ="Story ID:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                        <TextBox x:Name="StoryId" Width="250" LostFocus="ConnectionString_LostFocus"></TextBox>
+                                    </StackPanel>
+                                    <Button Click="UpdateSharpCloud"  Width="250" Margin="114,10" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
+                                </StackPanel>
+                                <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+
+                                <Grid Grid.Row="2">
+                                    <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="#00AFFC"  Margin="5"></TextBlock>
+                                    <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="#00AFFC" Background="#333333" ></TextBox>
+                                </Grid>
+                            </Grid>
+
+                        </TabItem>
+                        <TabItem Header="4. Create batch files">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Generating batch files creates an executable file that can be scheduled to run automatically, allowing your story to be continually updated witout manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <Button Click="GenerateBatchFile"  Height="50" Width="200" Margin="5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Generate Batch Files Now..</Button>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="About">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="SharpCloud Query Connect v2.01." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <TextBlock Text="Source code availalble from https://github.com/SharpCloud/SCQueryConnect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <TextBlock Text="Ability to add relationships will be coming soon." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
             </Grid>
+            </Grid>
+        </Grid>
+        <Grid x:Name="updatingMessageGrid" Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility}">
+            <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center" ></TextBlock>
         </Grid>
     </Grid>
 </Window>
