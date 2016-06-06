@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SQLUpdate"
         mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
-        Title="SharpCloud QueryConnect v2.01" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+        Title="SharpCloud QueryConnect v2.03" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
             <Grid >
@@ -136,7 +136,29 @@ Connection string may be very simple or quite detailed including username/passwo
                             </Grid>
 
                         </TabItem>
-                        <TabItem Header="2a. Relationship Query" Visibility="Collapsed" >
+                        <TabItem Header="2a. Relationship Query" >
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                    <RowDefinition Height="2*"></RowDefinition>
+                                    <RowDefinition Height="3"></RowDefinition>
+                                    <RowDefinition Height="3*"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
+                                <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+                                <Grid Grid.Row="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition ></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                    <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
+                                    <Button  Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="120" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Run</Button>
+                                    <DataGrid x:Name="DataGridRels" Grid.Row="1" Margin="5"/>
+                                </Grid>
+                            </Grid>
 
                         </TabItem>
                         <TabItem Header="3. Update Story" >
@@ -149,21 +171,21 @@ Connection string may be very simple or quite detailed including username/passwo
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
-                                        <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="250"></TextBox>
+                                        <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="270"></TextBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Username:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
-                                        <TextBox x:Name="Username" Width="250"></TextBox>
+                                        <TextBox x:Name="Username" Width="270"></TextBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Password:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
-                                        <PasswordBox x:Name="Password" Width="250"></PasswordBox>
+                                        <PasswordBox x:Name="Password" Width="270"></PasswordBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Story ID:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
-                                        <TextBox x:Name="StoryId" Width="250" LostFocus="ConnectionString_LostFocus"></TextBox>
+                                        <TextBox x:Name="StoryId" Width="270" LostFocus="ConnectionString_LostFocus"></TextBox>
                                     </StackPanel>
-                                    <Button Click="UpdateSharpCloud"  Width="250" Margin="114,10" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
+                                    <Button Click="UpdateSharpCloud"  Width="270" Margin="114,10" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
                                 </StackPanel>
                                 <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
 
@@ -182,7 +204,7 @@ Connection string may be very simple or quite detailed including username/passwo
                         </TabItem>
                         <TabItem Header="About">
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="SharpCloud Query Connect v2.01." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
                                 <TextBlock Text="Source code availalble from https://github.com/SharpCloud/SCQueryConnect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
                                 <TextBlock Text="Ability to add relationships will be coming soon." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
                             </StackPanel>

@@ -20,6 +20,9 @@ namespace SCQueryConnect
         public string QueryString { get; set; }
         [DataMember]
         public string StoryId { get; set; }
+        [DataMember]
+        public string QueryStringRels { get; set; }
+
         public override string ToString()
         {
             return Name;
@@ -28,6 +31,8 @@ namespace SCQueryConnect
         public QueryData(string name="")
         {
             Name = name;
+            QueryStringRels = "SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE";
+
         }
     }
 }

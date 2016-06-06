@@ -5,7 +5,6 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using System.Windows;
-using Microsoft.Win32;
 using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.SqlClient;
@@ -14,10 +13,10 @@ using System.IO;
 using System.Net;
 using SC.API.ComInterop;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Threading;
-using SC.Entities.Models;
+using SC.API.ComInterop.Models;
 using SCQueryConnect.Helpers;
+using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
 
 
@@ -114,7 +113,7 @@ namespace SCQueryConnect
 
         private void HelpButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("http://www.connectionstrings.com/");
+            Process.Start("http://www.connectionstrings.com/");
         }
 
         private string _message = @"Connection strings allow you to connect to virtually any database.
@@ -180,9 +179,31 @@ Click YES to replace the current connection string text with the following sampl
                 else if (heading == "EXTERNALID")
                     bOK = true;
             }
-            txterr.Visibility = bOK? Visibility.Collapsed : Visibility.Visible;
+            txterr.Visibility = bOK ? Visibility.Collapsed : Visibility.Visible;
 
             return bOK;
+        }
+
+        private bool CheckDataIsOKRels(DbDataReader reader)
+        {
+            bool bOK1 = false;
+            bool bOK2 = false;
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                var heading = reader.GetName(i).ToUpper();
+                if (heading == "ITEM1")
+                    bOK1 = true;
+                if (heading == "ITEM2")
+                    bOK2 = true;
+                if (heading == "ITEM 1")
+                    bOK1 = true;
+                if (heading == "ITEM 2")
+                    bOK2 = true;
+            }
+            txterrRels.Visibility = (bOK1 && bOK2) ? Visibility.Collapsed : Visibility.Visible;
+
+            return bOK1 && bOK2;
         }
 
         private void RunClick(object sender, RoutedEventArgs e)
@@ -215,7 +236,36 @@ Click YES to replace the current connection string text with the following sampl
             }
         }
 
- 
+        private void RunClickRels(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (DbConnection connection = GetDb(ConnectionString.Text))
+                {
+                    connection.Open();
+                    using (DbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = SQLStringRels.Text;
+                        command.CommandType = CommandType.Text;
+
+                        using (DbDataReader reader = command.ExecuteReader())
+                        {
+                            CheckDataIsOKRels(reader);
+
+                            DataTable dt = new DataTable();
+                            dt.Load(reader);
+                            DataGridRels.ItemsSource = dt.DefaultView;
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("There was an error: " + ex.Message);
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
@@ -268,6 +318,7 @@ Click YES to replace the current connection string text with the following sampl
                 qd.ConnectionsString = ConnectionString.Text;
                 qd.QueryString = SQLString.Text;
                 qd.StoryId = StoryId.Text;
+                qd.QueryStringRels = SQLStringRels.Text;
             }
         }
 
@@ -321,7 +372,6 @@ Click YES to replace the current connection string text with the following sampl
             var url = Url.Text;
             var storyId = StoryId.Text;
             var connectionString = ConnectionString.Text;
-            var sqlString = SQLString.Text;
 
             try
             {
@@ -332,6 +382,7 @@ Click YES to replace the current connection string text with the following sampl
                 var story = sc.LoadStory(storyId);
                 tbResults.Text += "\nReading story '" + story.Name + "'";
                 tbResults.ScrollToEnd();
+                var sqlString = SQLString.Text;
                 await Task.Delay(20);
 
                 using (DbConnection connection = GetDb(connectionString))
@@ -359,12 +410,31 @@ Click YES to replace the current connection string text with the following sampl
                                 {
                                     if (o is DateTime?)
                                     {
-                                        var date = (DateTime)o;
+                                        // definately date time
+                                        var date = (DateTime) o;
                                         data.Add(date.ToString("yyyy MM dd"));
                                     }
                                     else
                                     {
-                                        data.Add(o.ToString());
+                                        DateTime date;
+                                        double dbl;
+                                        var s = o.ToString();
+                                        if (double.TryParse(s, out dbl))
+                                        {
+                                            data.Add($"{dbl:#.##}");
+                                        }
+                                        else if (DateTime.TryParse(s, out date))
+                                        {
+                                            data.Add(date.ToString("yyyy MM dd"));
+                                        }
+                                        else if (s.ToLower().Trim() == "null")
+                                        {
+                                            data.Add("");
+                                        }
+                                        else
+                                        { 
+                                            data.Add(s);
+                                        }
                                     }
                                 }
                                 tempArray.Add(data);
@@ -376,6 +446,7 @@ Click YES to replace the current connection string text with the following sampl
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
                                 arrayValues[0, i] = reader.GetName(i);
+                                Debug.Write(arrayValues[0, i] + '\t');
                             }
                             // add the data values
                             int row = 1;
@@ -385,9 +456,12 @@ Click YES to replace the current connection string text with the following sampl
                                 foreach (string s in list)
                                 {
                                     arrayValues[row, col++] = s;
+                                    Debug.Write(s+ '\t');
                                 }
+                                Debug.WriteLine("");
                                 row++;
                             }
+
                             tbResults.Text += "\nProcessing " + row.ToString() + " rows";
                             tbResults.ScrollToEnd();
                             await Task.Delay(20);
@@ -420,7 +494,8 @@ Click YES to replace the current connection string text with the following sampl
                                 tbResults.Text += "\nERROR: " + errorMessage;
                             }
                         }
-                    }
+                    } 
+                    //UpdateRels(connection, story);
                 }
                 UpdatingMessageVisibility = Visibility.Collapsed;
                 await Task.Delay(20);
@@ -430,6 +505,19 @@ Click YES to replace the current connection string text with the following sampl
                 MessageBox.Show("ERROR: " + ex.Message);
                 tbResults.Text += "\nERROR: " + ex.Message;
                 UpdatingMessageVisibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void UpdateItems(DbConnection connection, Story story)
+        {
+            var sqlString = SQLString.Text;
+
+            if (string.IsNullOrWhiteSpace(sqlString))
+            {
+                tbResults.Text += "\nNo script for Items - Ignoring this step";
+                tbResults.ScrollToEnd();
+                await Task.Delay(20);
+                return;
             }
         }
 
@@ -552,6 +640,7 @@ Click YES to replace the current connection string text with the following sampl
                 ConnectionString.Text = qd.ConnectionsString;
                 SQLString.Text = qd.QueryString;
                 StoryId.Text = qd.StoryId;
+                SQLStringRels.Text = qd.QueryStringRels;
             }
         }
 
