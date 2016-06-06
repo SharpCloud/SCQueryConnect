@@ -91,13 +91,19 @@
                                     <TextBox x:Name="ConnectionName" Grid.Row="0" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="DB Connection Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
-                                    <ComboBox x:Name="cbDatabase" Grid.Row="1" Grid.Column="1" Width="250" Height="40" Margin="5" HorizontalAlignment="Left" Text="Connection Type">
+                                    <ComboBox x:Name="cbDatabase" Grid.Row="1" Grid.Column="1" Width="250" Height="40" Margin="5" HorizontalAlignment="Left" Text="Connection Type" SelectionChanged="cbDatabase_SelectionChanged">
                                         <ComboBoxItem>MSSQL</ComboBoxItem>
                                         <ComboBoxItem>ODBC</ComboBoxItem>
                                         <ComboBoxItem>ADO</ComboBoxItem>
+                                        <ComboBoxItem>Excel</ComboBoxItem>
                                     </ComboBox>
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl1"></TextBlock>
                                     <TextBox x:Name="ConnectionString" Grid.Row="2" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Filename:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl2"></TextBlock>
+                                    <TextBox x:Name="FileName" Grid.Row="2" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
+                                    <Button Grid.Row="2" x:Name="BrowseBut" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Width="150" Foreground="White" Click="BrowseBut_Click">  Choose file...  </Button>
+
 
                                     <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="TextConnectionClick">Test Connection</Button>
 
@@ -170,7 +176,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                 </Grid.RowDefinitions>
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                        <TextBlock Text ="URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                        <TextBlock Text ="Server:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
                                         <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="270"></TextBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="2">
@@ -182,8 +188,8 @@ Connection string may be very simple or quite detailed including username/passwo
                                         <PasswordBox x:Name="Password" Width="270"></PasswordBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                        <TextBlock Text ="Story ID:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
-                                        <TextBox x:Name="StoryId" Width="270" LostFocus="ConnectionString_LostFocus"></TextBox>
+                                        <TextBlock Text ="Story ID or URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                        <TextBox x:Name="StoryId" Width="270" LostFocus="ConnectionString_LostFocusStoryID"></TextBox>
                                     </StackPanel>
                                     <Button Click="UpdateSharpCloud"  Width="270" Margin="114,10" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
                                 </StackPanel>

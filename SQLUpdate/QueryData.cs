@@ -22,6 +22,8 @@ namespace SCQueryConnect
         public string StoryId { get; set; }
         [DataMember]
         public string QueryStringRels { get; set; }
+        [DataMember]
+        public string FileName { get; set; }
 
         public override string ToString()
         {

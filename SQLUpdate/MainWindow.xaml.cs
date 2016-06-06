@@ -14,6 +14,7 @@ using System.Net;
 using SC.API.ComInterop;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Microsoft.Win32;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Helpers;
 using Directory = System.IO.Directory;
@@ -116,22 +117,6 @@ namespace SCQueryConnect
             Process.Start("http://www.connectionstrings.com/");
         }
 
-        private string _message = @"Connection strings allow you to connect to virtually any database.
-Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
-Click YES to replace the current connection string text with the following sample text:
-
-";
-        private void ShowConnectString(string title, string connectstring)
-        {
-            string str = _message + connectstring;
-            if (MessageBox.Show(str, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                ConnectionString.Text = connectstring;
-                ConnectionString.SelectAll();
-                ConnectionString.Focus();
-            }
-        }
-        
         private DbConnection GetDb(string connectionString)
         {
             switch (cbDatabase.SelectedIndex)
@@ -142,6 +127,7 @@ Click YES to replace the current connection string text with the following sampl
                 case 1:
                     return new OdbcConnection(connectionString);
                 case 2:
+                case 3:
                     return new OleDbConnection(connectionString);
             }
         }
@@ -192,13 +178,9 @@ Click YES to replace the current connection string text with the following sampl
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 var heading = reader.GetName(i).ToUpper();
-                if (heading == "ITEM1")
+                if (heading == "ITEM1" || heading == "ITEM 1" || heading == "EXTERNALID1" || heading == "EXTERNALID1")
                     bOK1 = true;
-                if (heading == "ITEM2")
-                    bOK2 = true;
-                if (heading == "ITEM 1")
-                    bOK1 = true;
-                if (heading == "ITEM 2")
+                if (heading == "ITEM 1" || heading == "ITEM 2" || heading == "EXTERNALID2" || heading == "EXTERNALID 2")
                     bOK2 = true;
             }
             txterrRels.Visibility = (bOK1 && bOK2) ? Visibility.Collapsed : Visibility.Visible;
@@ -292,12 +274,6 @@ Click YES to replace the current connection string text with the following sampl
             SaveHelper.RegWrite("Password", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
 
             SaveSettings(connectionList.SelectedItem as QueryData);
-            /*
-            SaveHelper.RegWrite("ConnectionString", ConnectionString.Text);
-            SaveHelper.RegWrite("SQLString", SQLString.Text);
-            SaveHelper.RegWrite("StoryID", StoryId.Text);
-            SaveHelper.RegWrite("DBType", cbDatabase.SelectedIndex.ToString());
-            */
 
             var localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
             Directory.CreateDirectory(localPath);
@@ -319,6 +295,7 @@ Click YES to replace the current connection string text with the following sampl
                 qd.QueryString = SQLString.Text;
                 qd.StoryId = StoryId.Text;
                 qd.QueryStringRels = SQLStringRels.Text;
+                qd.FileName = FileName.Text;
             }
         }
 
@@ -359,6 +336,7 @@ Click YES to replace the current connection string text with the following sampl
             return true;
         }
 
+
         private async void UpdateSharpCloud(object sender, RoutedEventArgs e)
         {
             if (!ValidateCreds())
@@ -367,6 +345,42 @@ Click YES to replace the current connection string text with the following sampl
             await Task.Delay(20);
             SaveSettings();
 
+            tbResults.Text += ""; // clear
+            tbResults.ScrollToEnd();
+            await Task.Delay(20);
+
+
+            var sqlString = SQLString.Text;
+
+            if (string.IsNullOrWhiteSpace(sqlString))
+            {
+                tbResults.Text += "\nNo script for Items - Ignoring this step";
+                tbResults.ScrollToEnd();
+            }
+            else
+            {
+               await UpdateItems();
+            }
+
+            var sqlStringRels = SQLStringRels.Text;
+
+            if (string.IsNullOrWhiteSpace(sqlStringRels))
+            {
+                tbResults.Text += "\nNo script for Rellationships - Ignoring this step";
+                tbResults.ScrollToEnd();
+            }
+            else
+            {
+                await UpdateRelationships();
+            }
+
+            UpdatingMessageVisibility = Visibility.Collapsed;
+            await Task.Delay(20);
+
+        }
+
+        private async Task UpdateItems()
+        {
             var username = Username.Text;
             var password = Password.Password;
             var url = Url.Text;
@@ -411,7 +425,7 @@ Click YES to replace the current connection string text with the following sampl
                                     if (o is DateTime?)
                                     {
                                         // definately date time
-                                        var date = (DateTime) o;
+                                        var date = (DateTime)o;
                                         data.Add(date.ToString("yyyy MM dd"));
                                     }
                                     else
@@ -432,7 +446,7 @@ Click YES to replace the current connection string text with the following sampl
                                             data.Add("");
                                         }
                                         else
-                                        { 
+                                        {
                                             data.Add(s);
                                         }
                                     }
@@ -456,7 +470,7 @@ Click YES to replace the current connection string text with the following sampl
                                 foreach (string s in list)
                                 {
                                     arrayValues[row, col++] = s;
-                                    Debug.Write(s+ '\t');
+                                    Debug.Write(s + '\t');
                                 }
                                 Debug.WriteLine("");
                                 row++;
@@ -494,32 +508,174 @@ Click YES to replace the current connection string text with the following sampl
                                 tbResults.Text += "\nERROR: " + errorMessage;
                             }
                         }
-                    } 
-                    //UpdateRels(connection, story);
+                    }
                 }
-                UpdatingMessageVisibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ERROR: " + ex.Message);
+                tbResults.Text += "\nERROR: " + ex.Message;
+            }
+        }
+
+        private async Task UpdateRelationships()
+        {
+            var username = Username.Text;
+            var password = Password.Password;
+            var url = Url.Text;
+            var storyId = StoryId.Text;
+            var connectionString = ConnectionString.Text;
+
+            try
+            {
+                tbResults.Text += "Connecting to Sharpcloud " + url;
+                tbResults.ScrollToEnd();
+                await Task.Delay(20);
+                var sc = new SharpCloudApi(username, password, url);
+                var story = sc.LoadStory(storyId);
+                tbResults.Text += "\nReading story '" + story.Name + "'";
+                tbResults.ScrollToEnd();
+                var sqlString = SQLStringRels.Text;
+                await Task.Delay(20);
+
+                string strItem1 = "ITEM1";
+                bool bItemName1 = true;
+                string strItem2 = "ITEM2";
+                bool bItemName2 = true;
+                bool bDirection = false;
+                bool bComment = false;
+                bool bTags = false;
+
+                using (DbConnection connection = GetDb(connectionString))
+                {
+                    connection.Open();
+                    using (DbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sqlString;
+                        command.CommandType = CommandType.Text;
+
+                        tbResults.Text += "\nReading database";
+                        tbResults.ScrollToEnd();
+                        await Task.Delay(20);
+                        using (DbDataReader reader = command.ExecuteReader())
+                        {
+                            if (!CheckDataIsOKRels(reader))
+                            {
+                                tbResults.Text += "\nERROR: Invalid SQL";
+                                return;
+                            }
+
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                var col = reader.GetName(i).ToUpper();
+                                if (col == "ITEM 1")
+                                    strItem1 = "ITEM 1";
+                                else if (col == "EXTERNALID1")
+                                {
+                                    bItemName1 = false;
+                                    strItem1 = "EXTERNALID1";
+                                }
+                                else if (col == "EXTERNALID 1")
+                                {
+                                    bItemName1 = false;
+                                    strItem1 = "EXTERNALID 1";
+                                }
+                                else if (col == "ITEM 2")
+                                    strItem2 = "ITEM 2";
+                                else if (col == "EXTERNALID2")
+                                {
+                                    bItemName2 = false;
+                                    strItem2 = "EXTERNALID2";
+                                }
+                                else if (col == "EXTERNALID 2")
+                                {
+                                    bItemName2 = false;
+                                    strItem2 = "EXTERNALID 2";
+                                }
+                                else if (col == "COMMENT")
+                                    bComment = true;
+                                else if (col == "DIRECTION")
+                                    bDirection = true;
+                                else if (col == "TAGS")
+                                    bTags = true;
+                            }
+
+                            int row = 1;
+                            while (reader.Read())
+                            {
+                                var t1 = reader[strItem1].ToString();
+                                var t2 = reader[strItem2].ToString();
+
+                                var i1 = (bItemName1) ? story.Item_FindByName(t1) : story.Item_FindByExternalId(t1);
+                                var i2 = (bItemName2) ? story.Item_FindByName(t2) : story.Item_FindByExternalId(t2);
+
+                                if (i1 == null || i2 == null)
+                                {
+                                    tbResults.Text += $"\nERROR: Could not find items '{t1}' or '{t2}' on {row}.";
+                                }
+                                else
+                                {
+                                    var rel = story.Relationship_FindByItems(i1, i2) ??
+                                              story.Relationship_AddNew(i1, i2);
+                                    if (bComment)
+                                        rel.Comment = reader["COMMENT"].ToString();
+                                    if (bDirection)
+                                    {
+                                        var txt = reader["DIRECTION"].ToString().Replace(" ", "").ToUpper();
+                                        if (txt.Contains("BOTH"))
+                                            rel.Direction = Relationship.RelationshipDirection.Both;
+                                        else if (txt.Contains("ATOB") || txt.Contains("1TO2"))
+                                            rel.Direction = Relationship.RelationshipDirection.AtoB;
+                                        else if (txt.Contains("BTOA") || txt.Contains("2TO1"))
+                                            rel.Direction = Relationship.RelationshipDirection.Both;
+                                        else 
+                                            rel.Direction = Relationship.RelationshipDirection.None;
+                                    }
+                                    if (bTags)
+                                    {
+                                        // TODO - delete tags - needs implementing in the SDK        
+                                        var tags = reader["TAGS"].ToString();
+                                        foreach (var t in tags.Split(',' ))
+                                        {
+                                            var tag = t.Trim();
+                                            if (!string.IsNullOrEmpty(tag))
+                                                rel.Tag_AddNew(tag);
+                                        }
+                                    }
+                                }
+
+                                row++;
+                            }
+
+                            if (story.IsModified)
+                            {
+                                tbResults.Text += "\nSaving Changes ";
+                                await Task.Delay(20);
+                                tbResults.ScrollToEnd();
+                                story.Save();
+                                tbResults.Text += "\nSave Complete!";
+                                tbResults.ScrollToEnd();
+                                await Task.Delay(20);
+                            }
+                            else
+                            {
+                                tbResults.Text += "\nNo Changes detected";
+                                tbResults.ScrollToEnd();
+                                await Task.Delay(20);
+                            }
+                        }
+                    }
+                }
                 await Task.Delay(20);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("ERROR: " + ex.Message);
                 tbResults.Text += "\nERROR: " + ex.Message;
-                UpdatingMessageVisibility = Visibility.Collapsed;
             }
+
         }
 
-        private async void UpdateItems(DbConnection connection, Story story)
-        {
-            var sqlString = SQLString.Text;
-
-            if (string.IsNullOrWhiteSpace(sqlString))
-            {
-                tbResults.Text += "\nNo script for Items - Ignoring this step";
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
-                return;
-            }
-        }
 
         private void GenerateBatchFile(object sender, RoutedEventArgs e)
         {
@@ -641,6 +797,7 @@ Click YES to replace the current connection string text with the following sampl
                 SQLString.Text = qd.QueryString;
                 StoryId.Text = qd.StoryId;
                 SQLStringRels.Text = qd.QueryStringRels;
+                FileName.Text = qd.FileName;
             }
         }
 
@@ -648,6 +805,29 @@ Click YES to replace the current connection string text with the following sampl
         {
             SaveSettings();
         }
+
+        private void ConnectionString_LostFocusStoryID(object sender, RoutedEventArgs e)
+        {
+            var s = StoryId.Text;
+            if (s.Contains("#/story"))
+            {
+                var mid = s.Substring(s.IndexOf("#/story") + 8);
+                if (mid.Length > 36)
+                {
+                    mid = mid.Substring(0, 36);
+                    StoryId.Text = mid;
+                }
+            }
+
+            SaveSettings();
+        }
+
+        private void FileName_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={FileName.Text};Extended Properties=\"Excel 12.0 Xml; HDR = YES\"";
+            SaveSettings();
+        }
+
         private void ConnectionString_LostFocusName(object sender, RoutedEventArgs e)
         {
             SaveSettings();
@@ -657,6 +837,41 @@ Click YES to replace the current connection string text with the following sampl
             connectionList.ItemsSource = null;
             connectionList.ItemsSource = _connections;
             connectionList.SelectedIndex = i;
+        }
+
+        private void cbDatabase_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (cbDatabase != null)
+            {
+                var v1 = Visibility.Visible;
+                var v2 = Visibility.Collapsed;
+
+                switch (cbDatabase.SelectedIndex)
+                {
+                    case 3: // excel
+                        v1 = Visibility.Collapsed;
+                        v2 = Visibility.Visible;
+                        if (FileName.Text == "")
+                            FileName.Text = "c:/folder/file.xlsx";
+
+                        break;
+                }
+                lbl1.Visibility = v1;
+                ConnectionString.Visibility = v1;
+                lbl2.Visibility = v2;
+                FileName.Visibility = v2;
+                BrowseBut.Visibility = v2;
+            }
+        }
+
+        private void BrowseBut_Click(object sender, RoutedEventArgs e)
+        {
+            var ord = new OpenFileDialog() {Filter = "Excel Files (*.xls;*xlsx)|*.xls;*xlsx"};
+            if (ord.ShowDialog() == true)
+            {
+                FileName.Text = ord.FileName;
+                ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={ord.FileName};Extended Properties=\"Excel 12.0 Xml; HDR = YES\"";
+            }
         }
     }
 }
