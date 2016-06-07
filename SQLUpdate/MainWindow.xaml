@@ -170,9 +170,9 @@ Connection string may be very simple or quite detailed including username/passwo
                         <TabItem Header="3. Update Story" >
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="2*"></RowDefinition>
+                                    <RowDefinition Height="250"></RowDefinition>
                                     <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="1*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
                                 </Grid.RowDefinitions>
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Margin="2">
@@ -190,6 +190,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Story ID or URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
                                         <TextBox x:Name="StoryId" Width="270" LostFocus="ConnectionString_LostFocusStoryID"></TextBox>
+                                        <Button Click="SelectStoryClick"  Margin="10,0" Width="40" Background="#00AFFC" FontSize="14" Foreground="White" >...</Button>
                                     </StackPanel>
                                     <Button Click="UpdateSharpCloud"  Width="270" Margin="114,10" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
                                 </StackPanel>
@@ -209,11 +210,13 @@ Connection string may be very simple or quite detailed including username/passwo
                             </StackPanel>
                         </TabItem>
                         <TabItem Header="About">
+                            <Grid>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
-                                <TextBlock Text="Source code availalble from https://github.com/SharpCloud/SCQueryConnect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
-                                <TextBlock Text="Ability to add relationships will be coming soon." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <Image Grid.Row="0" Source="Images/logo_home.png" Width="250" Stretch="UniformToFill"></Image>
+                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
                             </StackPanel>
+                            <TextBlock Text="Source code availalble from https://github.com/SharpCloud/SCQueryConnect" TextWrapping="WrapWithOverflow" Foreground="White" HorizontalAlignment="Center" FontSize="14" MaxWidth="500" Margin="10" VerticalAlignment="Bottom"/>
+                            </Grid>
                         </TabItem>
                     </TabControl>
             </Grid>

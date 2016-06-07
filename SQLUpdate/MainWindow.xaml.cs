@@ -10,6 +10,7 @@ using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using SC.API.ComInterop;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Helpers;
+using SQLUpdate.Views;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
 
@@ -47,7 +49,6 @@ namespace SCQueryConnect
         public MainWindow()
         {
             InitializeComponent();
-
             Loaded += MainWindow_Loaded;
             DataContext = this;
         }
@@ -66,6 +67,9 @@ namespace SCQueryConnect
 
             LoadAllProfiles();
             connectionList.ItemsSource = _connections;
+
+            var splashScreen = new SplashScreen("Images/splash.jpg");
+            splashScreen.Show(true);
 
         }
 
@@ -94,7 +98,7 @@ namespace SCQueryConnect
                 _connections.Add(CreateNewQueryData("SQL Server Example", 0, "Server=.; Integrated Security=true; Database=demo", "SELECT * FROM TABLE"));
                 _connections.Add(CreateNewQueryData("ODBC Example", 1, "DSN=DatasourceName", "SELECT * FROM TABLE"));
                 _connections.Add(CreateNewQueryData("MS Access Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;", "SELECT * FROM TABLE"));
-                _connections.Add(CreateNewQueryData("Excel Spreadsheet Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:/myFolder/mySpreadsheet.xlsx;Extended Properties=\"Excel 12.0 Xml; HDR = YES\";", "SELECT * from [Sheet1$]"));
+                _connections.Add(CreateNewQueryData("Excel Spreadsheet Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:/myFolder/mySpreadsheet.xlsx;Extended Properties='Excel 12.0 Xml; HDR = YES';", "SELECT * from [Sheet1$]"));
             }
 
             connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
@@ -366,7 +370,7 @@ namespace SCQueryConnect
 
             if (string.IsNullOrWhiteSpace(sqlStringRels))
             {
-                tbResults.Text += "\nNo script for Rellationships - Ignoring this step";
+                tbResults.Text += "\nNo script for Relationships - Ignoring this step";
                 tbResults.ScrollToEnd();
             }
             else
@@ -700,8 +704,14 @@ namespace SCQueryConnect
                         return;
                 }
 
+                if (ConnectionString.Text.Contains("\""))
+                    MessageBox.Show(
+                        "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
+
+
                 try
                 {
+                    CopyResourceFile(folder, "SC.Framework.dll");
                     CopyResourceFile(folder, "SC.API.ComInterop.dll");
                     CopyResourceFile(folder, "SC.Api.dll");
                     CopyResourceFile(folder, "SCSQLBatch.exe");
@@ -713,7 +723,7 @@ namespace SCQueryConnect
                     return;    
                 }
 
-                string [] dbTypes = { "SQL", "ODBC", "OLDDB"};
+                string [] dbTypes = { "SQL", "ODBC", "OLEDB", "OLEDB" };
                 // set up the config
                 var content = File.ReadAllText(configFilename);
                 content = content.Replace("USERID", Username.Text);
@@ -723,8 +733,11 @@ namespace SCQueryConnect
                 content = content.Replace("00000000-0000-0000-0000-000000000000", StoryId.Text);
                 if (cbDatabase.SelectedIndex != -1)
                     content = content.Replace("SQL", dbTypes[cbDatabase.SelectedIndex]);
-                content = content.Replace("CONNECTIONSTRING", ConnectionString.Text.Replace("\r", " ").Replace("\n", " "));
-                content = content.Replace("QUERYSTRING", SQLString.Text.Replace("\r", " ").Replace("\n", " "));
+                content = content.Replace("CONNECTIONSTRING", ConnectionString.Text.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("QUERYSTRING", SQLString.Text.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("QUERYRELSSTRING", SQLStringRels.Text.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("LOGFILE", "Logfile.txt");
+
                 File.WriteAllText(configFilename, content);
 
                 Process.Start(folder);
@@ -737,7 +750,7 @@ namespace SCQueryConnect
         
         static void CopyResourceFile(string folder, string filename)
         {
-            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch", filename);
+            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch2", filename);
             var local = string.Format("{0}/{1}", folder, filename);
 
             WebClient Client = new WebClient();
@@ -824,7 +837,7 @@ namespace SCQueryConnect
 
         private void FileName_LostFocus(object sender, RoutedEventArgs e)
         {
-            ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={FileName.Text};Extended Properties=\"Excel 12.0 Xml; HDR = YES\"";
+            ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={FileName.Text};Extended Properties='Excel 12.0 Xml; HDR = YES'";
             SaveSettings();
         }
 
@@ -872,6 +885,26 @@ namespace SCQueryConnect
                 FileName.Text = ord.FileName;
                 ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={ord.FileName};Extended Properties=\"Excel 12.0 Xml; HDR = YES\"";
             }
+        }
+
+
+        private SharpCloudApi GetApi()
+        {
+            return new SharpCloudApi(Username.Text, Password.Password, Url.Text);
+        }
+
+
+        private void SelectStoryClick(object sender, RoutedEventArgs e)
+        {
+            var sel = new SelectStory(GetApi(), false, Username.Text);
+
+            bool? dialogResult = sel.ShowDialog();
+            if (dialogResult == true)
+            {
+                var story = sel.SelectedStoryLites.First();
+                StoryId.Text = story.Id;
+            }
+
         }
     }
 }
