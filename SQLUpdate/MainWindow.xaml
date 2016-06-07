@@ -190,9 +190,10 @@ Connection string may be very simple or quite detailed including username/passwo
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Story ID or URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
                                         <TextBox x:Name="StoryId" Width="270" LostFocus="ConnectionString_LostFocusStoryID"></TextBox>
-                                        <Button Click="SelectStoryClick"  Margin="10,0" Width="40" Background="#00AFFC" FontSize="14" Foreground="White" >...</Button>
+                                        <Button Click="SelectStoryClick"  Margin="0" Width="40" Background="#00AFFC" FontSize="14" Foreground="White" >...</Button>
+                                        <Button Click="ViewStoryClick"  Margin="10,0" Width="50" Background="#00AFFC" FontSize="14" Foreground="White" >Open</Button>
                                     </StackPanel>
-                                    <Button Click="UpdateSharpCloud"  Width="270" Margin="114,10" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
+                                    <Button Click="UpdateSharpCloud"  Width="270" Margin="100,10"  Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
                                 </StackPanel>
                                 <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
 
@@ -205,7 +206,7 @@ Connection string may be very simple or quite detailed including username/passwo
                         </TabItem>
                         <TabItem Header="4. Create batch files">
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Generating batch files creates an executable file that can be scheduled to run automatically, allowing your story to be continually updated witout manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
                                 <Button Click="GenerateBatchFile"  Height="50" Width="200" Margin="5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Generate Batch Files Now..</Button>
                             </StackPanel>
                         </TabItem>

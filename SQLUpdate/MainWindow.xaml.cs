@@ -841,7 +841,11 @@ namespace SCQueryConnect
                 var story = sel.SelectedStoryLites.First();
                 StoryId.Text = story.Id;
             }
+        }
 
+        private void ViewStoryClick(object sender, RoutedEventArgs e)
+        {
+            Process.Start($"{Url.Text}/html/#/story/{StoryId.Text}");
         }
     }
 }
