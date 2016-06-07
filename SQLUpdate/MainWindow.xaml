@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SQLUpdate"
         mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
-        Title="SharpCloud QueryConnect v2.03" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+        Title="SharpCloud QueryConnect v2.04" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
             <Grid >
