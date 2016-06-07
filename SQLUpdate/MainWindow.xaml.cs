@@ -353,329 +353,265 @@ namespace SCQueryConnect
             tbResults.ScrollToEnd();
             await Task.Delay(20);
 
+            var username = Username.Text;
+            var password = Password.Password;
+            var url = Url.Text;
+            var storyId = StoryId.Text;
+            var connectionString = ConnectionString.Text;
 
-            var sqlString = SQLString.Text;
-
-            if (string.IsNullOrWhiteSpace(sqlString))
+            try
             {
-                tbResults.Text += "\nNo script for Items - Ignoring this step";
+                tbResults.Text += "Connecting to Sharpcloud " + url;
                 tbResults.ScrollToEnd();
-            }
-            else
-            {
-               await UpdateItems();
-            }
-
-            var sqlStringRels = SQLStringRels.Text;
-
-            if (string.IsNullOrWhiteSpace(sqlStringRels))
-            {
-                tbResults.Text += "\nNo script for Relationships - Ignoring this step";
+                await Task.Delay(20);
+                var sc = new SharpCloudApi(username, password, url);
+                var story = sc.LoadStory(storyId);
+                tbResults.Text += "\nReading story '" + story.Name + "'";
                 tbResults.ScrollToEnd();
+                await Task.Delay(20);
+
+                using (DbConnection connection = GetDb(connectionString))
+                {
+                    connection.Open();
+                    await UpdateItems(connection, story, SQLString.Text);
+                    await UpdateRelationships(connection, story, SQLStringRels.Text);
+
+                    tbResults.Text += "\nSaving Changes ";
+                    await Task.Delay(20);
+                    tbResults.ScrollToEnd();
+                    story.Save();
+                    tbResults.Text += "\nSave Complete!";
+                    tbResults.ScrollToEnd();
+                    await Task.Delay(20);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await UpdateRelationships();
+                tbResults.Text += "\nError: " + ex.Message;
+                await Task.Delay(20);
+                tbResults.ScrollToEnd();
             }
 
             UpdatingMessageVisibility = Visibility.Collapsed;
             await Task.Delay(20);
-
         }
 
-        private async Task UpdateItems()
+        private async Task UpdateItems(DbConnection connection, Story story, string sqlString)
         {
-            var username = Username.Text;
-            var password = Password.Password;
-            var url = Url.Text;
-            var storyId = StoryId.Text;
-            var connectionString = ConnectionString.Text;
-
-            try
+            if (string.IsNullOrWhiteSpace(sqlString))
             {
-                tbResults.Text += "Connecting to Sharpcloud " + url;
+                tbResults.Text += "\nNo Item Query detected";
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
-                var sc = new SharpCloudApi(username, password, url);
-                var story = sc.LoadStory(storyId);
-                tbResults.Text += "\nReading story '" + story.Name + "'";
-                tbResults.ScrollToEnd();
-                var sqlString = SQLString.Text;
-                await Task.Delay(20);
+                return;
+            }
 
-                using (DbConnection connection = GetDb(connectionString))
+            using (DbCommand command = connection.CreateCommand())
+            {
+                command.CommandText = sqlString;
+                command.CommandType = CommandType.Text;
+
+                tbResults.Text += "\nReading database";
+                tbResults.ScrollToEnd();
+                await Task.Delay(20);
+                using (DbDataReader reader = command.ExecuteReader())
                 {
-                    connection.Open();
-                    using (DbCommand command = connection.CreateCommand())
+                    CheckDataIsOK(reader);
+
+                    var tempArray = new List<List<string>>();
+                    while (reader.Read())
                     {
-                        command.CommandText = sqlString;
-                        command.CommandType = CommandType.Text;
-
-                        tbResults.Text += "\nReading database";
-                        tbResults.ScrollToEnd();
-                        await Task.Delay(20);
-                        using (DbDataReader reader = command.ExecuteReader())
+                        var objs = new object[reader.FieldCount];
+                        reader.GetValues(objs);
+                        var data = new List<string>();
+                        foreach (var o in objs)
                         {
-                            CheckDataIsOK(reader);
-
-                            var tempArray = new List<List<string>>();
-                            while (reader.Read())
+                            if (o is DateTime?)
                             {
-                                var objs = new object[reader.FieldCount];
-                                reader.GetValues(objs);
-                                var data = new List<string>();
-                                foreach (var o in objs)
-                                {
-                                    if (o is DateTime?)
-                                    {
-                                        // definately date time
-                                        var date = (DateTime)o;
-                                        data.Add(date.ToString("yyyy MM dd"));
-                                    }
-                                    else
-                                    {
-                                        DateTime date;
-                                        double dbl;
-                                        var s = o.ToString();
-                                        if (double.TryParse(s, out dbl))
-                                        {
-                                            data.Add($"{dbl:#.##}");
-                                        }
-                                        else if (DateTime.TryParse(s, out date))
-                                        {
-                                            data.Add(date.ToString("yyyy MM dd"));
-                                        }
-                                        else if (s.ToLower().Trim() == "null")
-                                        {
-                                            data.Add("");
-                                        }
-                                        else
-                                        {
-                                            data.Add(s);
-                                        }
-                                    }
-                                }
-                                tempArray.Add(data);
-                            }
-
-                            // create our string arrar
-                            var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
-                            // add the headers
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                arrayValues[0, i] = reader.GetName(i);
-                                Debug.Write(arrayValues[0, i] + '\t');
-                            }
-                            // add the data values
-                            int row = 1;
-                            foreach (var list in tempArray)
-                            {
-                                int col = 0;
-                                foreach (string s in list)
-                                {
-                                    arrayValues[row, col++] = s;
-                                    Debug.Write(s + '\t');
-                                }
-                                Debug.WriteLine("");
-                                row++;
-                            }
-
-                            tbResults.Text += "\nProcessing " + row.ToString() + " rows";
-                            tbResults.ScrollToEnd();
-                            await Task.Delay(20);
-
-                            // pass the array to SharpCloud
-                            string errorMessage;
-                            if (story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
-                            {
-                                if (story.IsModified)
-                                {
-                                    tbResults.Text += "\nSaving Changes ";
-                                    await Task.Delay(20);
-                                    tbResults.ScrollToEnd();
-                                    story.Save();
-                                    tbResults.Text += "\nSave Complete!";
-                                    tbResults.ScrollToEnd();
-                                    await Task.Delay(20);
-                                }
-                                else
-                                {
-                                    tbResults.Text += "\nNo Changes detected";
-                                    tbResults.ScrollToEnd();
-                                    await Task.Delay(20);
-                                }
+                                // definately date time
+                                var date = (DateTime) o;
+                                data.Add(date.ToString("yyyy MM dd"));
                             }
                             else
                             {
-                                MessageBox.Show(errorMessage);
-                                tbResults.ScrollToEnd();
-                                tbResults.Text += "\nERROR: " + errorMessage;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("ERROR: " + ex.Message);
-                tbResults.Text += "\nERROR: " + ex.Message;
-            }
-        }
-
-        private async Task UpdateRelationships()
-        {
-            var username = Username.Text;
-            var password = Password.Password;
-            var url = Url.Text;
-            var storyId = StoryId.Text;
-            var connectionString = ConnectionString.Text;
-
-            try
-            {
-                tbResults.Text += "Connecting to Sharpcloud " + url;
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
-                var sc = new SharpCloudApi(username, password, url);
-                var story = sc.LoadStory(storyId);
-                tbResults.Text += "\nReading story '" + story.Name + "'";
-                tbResults.ScrollToEnd();
-                var sqlString = SQLStringRels.Text;
-                await Task.Delay(20);
-
-                string strItem1 = "ITEM1";
-                bool bItemName1 = true;
-                string strItem2 = "ITEM2";
-                bool bItemName2 = true;
-                bool bDirection = false;
-                bool bComment = false;
-                bool bTags = false;
-
-                using (DbConnection connection = GetDb(connectionString))
-                {
-                    connection.Open();
-                    using (DbCommand command = connection.CreateCommand())
-                    {
-                        command.CommandText = sqlString;
-                        command.CommandType = CommandType.Text;
-
-                        tbResults.Text += "\nReading database";
-                        tbResults.ScrollToEnd();
-                        await Task.Delay(20);
-                        using (DbDataReader reader = command.ExecuteReader())
-                        {
-                            if (!CheckDataIsOKRels(reader))
-                            {
-                                tbResults.Text += "\nERROR: Invalid SQL";
-                                return;
-                            }
-
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                var col = reader.GetName(i).ToUpper();
-                                if (col == "ITEM 1")
-                                    strItem1 = "ITEM 1";
-                                else if (col == "EXTERNALID1")
+                                DateTime date;
+                                double dbl;
+                                var s = o.ToString();
+                                if (double.TryParse(s, out dbl))
                                 {
-                                    bItemName1 = false;
-                                    strItem1 = "EXTERNALID1";
+                                    data.Add($"{dbl:#.##}");
                                 }
-                                else if (col == "EXTERNALID 1")
+                                else if (DateTime.TryParse(s, out date))
                                 {
-                                    bItemName1 = false;
-                                    strItem1 = "EXTERNALID 1";
+                                    data.Add(date.ToString("yyyy MM dd"));
                                 }
-                                else if (col == "ITEM 2")
-                                    strItem2 = "ITEM 2";
-                                else if (col == "EXTERNALID2")
+                                else if (s.ToLower().Trim() == "null")
                                 {
-                                    bItemName2 = false;
-                                    strItem2 = "EXTERNALID2";
-                                }
-                                else if (col == "EXTERNALID 2")
-                                {
-                                    bItemName2 = false;
-                                    strItem2 = "EXTERNALID 2";
-                                }
-                                else if (col == "COMMENT")
-                                    bComment = true;
-                                else if (col == "DIRECTION")
-                                    bDirection = true;
-                                else if (col == "TAGS")
-                                    bTags = true;
-                            }
-
-                            int row = 1;
-                            while (reader.Read())
-                            {
-                                var t1 = reader[strItem1].ToString();
-                                var t2 = reader[strItem2].ToString();
-
-                                var i1 = (bItemName1) ? story.Item_FindByName(t1) : story.Item_FindByExternalId(t1);
-                                var i2 = (bItemName2) ? story.Item_FindByName(t2) : story.Item_FindByExternalId(t2);
-
-                                if (i1 == null || i2 == null)
-                                {
-                                    tbResults.Text += $"\nERROR: Could not find items '{t1}' or '{t2}' on {row}.";
+                                    data.Add("");
                                 }
                                 else
                                 {
-                                    var rel = story.Relationship_FindByItems(i1, i2) ??
-                                              story.Relationship_AddNew(i1, i2);
-                                    if (bComment)
-                                        rel.Comment = reader["COMMENT"].ToString();
-                                    if (bDirection)
-                                    {
-                                        var txt = reader["DIRECTION"].ToString().Replace(" ", "").ToUpper();
-                                        if (txt.Contains("BOTH"))
-                                            rel.Direction = Relationship.RelationshipDirection.Both;
-                                        else if (txt.Contains("ATOB") || txt.Contains("1TO2"))
-                                            rel.Direction = Relationship.RelationshipDirection.AtoB;
-                                        else if (txt.Contains("BTOA") || txt.Contains("2TO1"))
-                                            rel.Direction = Relationship.RelationshipDirection.Both;
-                                        else 
-                                            rel.Direction = Relationship.RelationshipDirection.None;
-                                    }
-                                    if (bTags)
-                                    {
-                                        // TODO - delete tags - needs implementing in the SDK        
-                                        var tags = reader["TAGS"].ToString();
-                                        foreach (var t in tags.Split(',' ))
-                                        {
-                                            var tag = t.Trim();
-                                            if (!string.IsNullOrEmpty(tag))
-                                                rel.Tag_AddNew(tag);
-                                        }
-                                    }
+                                    data.Add(s);
                                 }
-
-                                row++;
-                            }
-
-                            if (story.IsModified)
-                            {
-                                tbResults.Text += "\nSaving Changes ";
-                                await Task.Delay(20);
-                                tbResults.ScrollToEnd();
-                                story.Save();
-                                tbResults.Text += "\nSave Complete!";
-                                tbResults.ScrollToEnd();
-                                await Task.Delay(20);
-                            }
-                            else
-                            {
-                                tbResults.Text += "\nNo Changes detected";
-                                tbResults.ScrollToEnd();
-                                await Task.Delay(20);
                             }
                         }
+                        tempArray.Add(data);
+                    }
+
+                    // create our string arrar
+                    var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
+                    // add the headers
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        arrayValues[0, i] = reader.GetName(i);
+                        Debug.Write(arrayValues[0, i] + '\t');
+                    }
+                    // add the data values
+                    int row = 1;
+                    foreach (var list in tempArray)
+                    {
+                        int col = 0;
+                        foreach (string s in list)
+                        {
+                            arrayValues[row, col++] = s;
+                            Debug.Write(s + '\t');
+                        }
+                        Debug.WriteLine("");
+                        row++;
+                    }
+
+                    tbResults.Text += "\nProcessing " + row.ToString() + " rows";
+                    tbResults.ScrollToEnd();
+                    await Task.Delay(20);
+
+                    // pass the array to SharpCloud
+                    string errorMessage;
+                    if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
+                    {
+                        MessageBox.Show(errorMessage);
+                        tbResults.ScrollToEnd();
+                        tbResults.Text += "\nERROR: " + errorMessage;
                     }
                 }
-                await Task.Delay(20);
             }
-            catch (Exception ex)
+        }
+
+        private async Task UpdateRelationships(DbConnection connection, Story story, string sqlString)
+        {
+            if (string.IsNullOrWhiteSpace(sqlString))
             {
-                MessageBox.Show("ERROR: " + ex.Message);
-                tbResults.Text += "\nERROR: " + ex.Message;
+                tbResults.Text += "\nNo Relationship Query detected";
+                tbResults.ScrollToEnd();
+                await Task.Delay(20);
+                return;
+            }
+
+            string strItem1 = "ITEM1";
+            bool bItemName1 = true;
+            string strItem2 = "ITEM2";
+            bool bItemName2 = true;
+            bool bDirection = false;
+            bool bComment = false;
+            bool bTags = false;
+
+            using (DbCommand command = connection.CreateCommand())
+            {
+                command.CommandText = sqlString;
+                command.CommandType = CommandType.Text;
+
+                tbResults.Text += "\nReading database for relationships";
+                tbResults.ScrollToEnd();
+                await Task.Delay(20);
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (!CheckDataIsOKRels(reader))
+                    {
+                        tbResults.Text += "\nERROR: Invalid SQL";
+                        return;
+                    }
+
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        var col = reader.GetName(i).ToUpper();
+                        if (col == "ITEM 1")
+                            strItem1 = "ITEM 1";
+                        else if (col == "EXTERNALID1")
+                        {
+                            bItemName1 = false;
+                            strItem1 = "EXTERNALID1";
+                        }
+                        else if (col == "EXTERNALID 1")
+                        {
+                            bItemName1 = false;
+                            strItem1 = "EXTERNALID 1";
+                        }
+                        else if (col == "ITEM 2")
+                            strItem2 = "ITEM 2";
+                        else if (col == "EXTERNALID2")
+                        {
+                            bItemName2 = false;
+                            strItem2 = "EXTERNALID2";
+                        }
+                        else if (col == "EXTERNALID 2")
+                        {
+                            bItemName2 = false;
+                            strItem2 = "EXTERNALID 2";
+                        }
+                        else if (col == "COMMENT")
+                            bComment = true;
+                        else if (col == "DIRECTION")
+                            bDirection = true;
+                        else if (col == "TAGS")
+                            bTags = true;
+                    }
+
+                    int row = 1;
+                    while (reader.Read())
+                    {
+                        var t1 = reader[strItem1].ToString();
+                        var t2 = reader[strItem2].ToString();
+
+                        var i1 = (bItemName1) ? story.Item_FindByName(t1) : story.Item_FindByExternalId(t1);
+                        var i2 = (bItemName2) ? story.Item_FindByName(t2) : story.Item_FindByExternalId(t2);
+
+                        if (i1 == null || i2 == null)
+                        {
+                            tbResults.Text += $"\nERROR: Could not find items '{t1}' or '{t2}' on {row}.";
+                        }
+                        else
+                        {
+                            var rel = story.Relationship_FindByItems(i1, i2) ??
+                                        story.Relationship_AddNew(i1, i2);
+                            if (bComment)
+                                rel.Comment = reader["COMMENT"].ToString();
+                            if (bDirection)
+                            {
+                                var txt = reader["DIRECTION"].ToString().Replace(" ", "").ToUpper();
+                                if (txt.Contains("BOTH"))
+                                    rel.Direction = Relationship.RelationshipDirection.Both;
+                                else if (txt.Contains("ATOB") || txt.Contains("1TO2"))
+                                    rel.Direction = Relationship.RelationshipDirection.AtoB;
+                                else if (txt.Contains("BTOA") || txt.Contains("2TO1"))
+                                    rel.Direction = Relationship.RelationshipDirection.Both;
+                                else 
+                                    rel.Direction = Relationship.RelationshipDirection.None;
+                            }
+                            if (bTags)
+                            {
+                                // TODO - delete tags - needs implementing in the SDK        
+                                var tags = reader["TAGS"].ToString();
+                                foreach (var t in tags.Split(',' ))
+                                {
+                                    var tag = t.Trim();
+                                    if (!string.IsNullOrEmpty(tag))
+                                        rel.Tag_AddNew(tag);
+                                }
+                            }
+                        }
+
+                        row++;
+                    }
+                }
             }
 
         }
@@ -711,6 +647,7 @@ namespace SCQueryConnect
 
                 try
                 {
+                    CopyResourceFile(folder, "Newtonsoft.Json.dll");
                     CopyResourceFile(folder, "SC.Framework.dll");
                     CopyResourceFile(folder, "SC.API.ComInterop.dll");
                     CopyResourceFile(folder, "SC.Api.dll");
