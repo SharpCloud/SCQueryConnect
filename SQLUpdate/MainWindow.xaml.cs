@@ -15,9 +15,12 @@ using System.Net;
 using SC.API.ComInterop;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using System.Xml;
+using mshtml;
 using Microsoft.Win32;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Helpers;
+using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
@@ -58,15 +61,19 @@ namespace SCQueryConnect
             ConnectionString.Text = SaveHelper.RegRead("ConnectionString",
                 "Server=.; Integrated Security=true; Database=demo");
             SQLString.Text = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
-
             Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
             Username.Text = SaveHelper.RegRead("Username", "");
             Password.Password = Encoding.Default.GetString(Convert.FromBase64String(SaveHelper.RegRead("Password", "")));
             StoryId.Text = SaveHelper.RegRead("StoryID", "");
-            cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
+
+            //cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
 
             LoadAllProfiles();
             connectionList.ItemsSource = _connections;
+
+            // choose our last settings
+            connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
+            BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
 
             var splashScreen = new SplashScreen("Images/splash.jpg");
             splashScreen.Show(true);
@@ -88,32 +95,23 @@ namespace SCQueryConnect
                 if (SQLString.Text != "SELECT * FROM TABLE" && ConnectionString.Text != "Server=.; Integrated Security=true; Database=demo")
                 {
                     // user papbably already has setting we should save from last time
-                    // create one based on old settings - whcih are already set up
-                    var pqd = CreateNewQueryData("Previous  Session");
+                    // create one based on old settings - which are already set up
+                    var pqd = new QueryData((QueryData.DbType)Int32.Parse(SaveHelper.RegRead("DBType", "0")));
+                    pqd.Name = "Previous Connection";
+                    pqd.ConnectionsString = SaveHelper.RegRead("ConnectionString", "Server=.; Integrated Security=true; Database=demo");
+                    pqd.QueryString = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
                     pqd.StoryId = StoryId.Text;
                     _connections.Add(pqd);
                 }
 
                 // add some examples
-                _connections.Add(CreateNewQueryData("SQL Server Example", 0, "Server=.; Integrated Security=true; Database=demo", "SELECT * FROM TABLE"));
-                _connections.Add(CreateNewQueryData("ODBC Example", 1, "DSN=DatasourceName", "SELECT * FROM TABLE"));
-                _connections.Add(CreateNewQueryData("MS Access Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;", "SELECT * FROM TABLE"));
-                _connections.Add(CreateNewQueryData("Excel Spreadsheet Example", 2, "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:/myFolder/mySpreadsheet.xlsx;Extended Properties='Excel 12.0 Xml; HDR = YES';", "SELECT * from [Sheet1$]"));
+                _connections.Add(new QueryData(QueryData.DbType.Excel)); 
+                _connections.Add(new QueryData(QueryData.DbType.Access));
+                _connections.Add(new QueryData(QueryData.DbType.SharepointList));
+                _connections.Add(new QueryData(QueryData.DbType.SQL));
+                _connections.Add(new QueryData(QueryData.DbType.ODBC));
+                _connections.Add(new QueryData(QueryData.DbType.ADO));
             }
-
-            connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
-            BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
-        }
-
-        private QueryData CreateNewQueryData(string name, int dbType = -1, string connection = "", string query = "")
-        {
-            var qd = new QueryData(name)
-            {
-                ConnectionType = dbType == -1 ? cbDatabase.SelectedIndex : dbType,
-                ConnectionsString = connection == "" ? ConnectionString.Text : connection,
-                QueryString = query == "" ? SQLString.Text : query
-            };
-            return qd;
         }
 
         private void HelpButtonClick(object sender, RoutedEventArgs e)
@@ -121,39 +119,36 @@ namespace SCQueryConnect
             Process.Start("http://www.connectionstrings.com/");
         }
 
-        private DbConnection GetDb(string connectionString)
+        private DbConnection GetDb()
         {
-            switch (cbDatabase.SelectedIndex)
-            {
-                default:
-                case 0:
-                    return new SqlConnection(connectionString);
-                case 1:
-                    return new OdbcConnection(connectionString);
-                case 2:
-                case 3:
-                    return new OleDbConnection(connectionString);
-            }
+            return (connectionList.SelectedItem as QueryData).GetDb();
         }
 
-        private void TextConnectionClick(object sender, RoutedEventArgs e)
+        private void TestConnectionClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                using (DbConnection connection = GetDb(ConnectionString.Text))
+                using (DbConnection connection = GetDb())
                 {
                     connection.Open();
-                    MessageBox.Show("Success!");
+                    MessageBox.Show("Hooray! It looks like it's worked!");
                     SaveSettings();
                     return;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed! " + ex.Message);
+                MessageBox.Show("Dope! It did not work!" + ex.Message);
             }
         }
 
+        private void ReviewConnectionClick(object sender, RoutedEventArgs e)
+        {
+            var qd = connectionList.SelectedItem as QueryData;
+            string info = string.Format("Internal Connection Type:\n{0}\n\nConnection String:\n{1}", qd.GetBatchDBType,
+                qd.FormattedConnectionString);
+            MessageBox.Show(info, "Internal Connection Info");
+            }
 
         private bool CheckDataIsOK(DbDataReader reader)
         {
@@ -196,11 +191,22 @@ namespace SCQueryConnect
         {
             try
             {
-                using (DbConnection connection = GetDb(ConnectionString.Text))
+                using (DbConnection connection = GetDb())
                 {
                     connection.Open();
                     using (DbCommand command = connection.CreateCommand())
                     {
+
+                        if (connection is OleDbConnection) { 
+                            DataTable schemaTable = ((OleDbConnection)connection).GetOleDbSchemaTable(
+                                OleDbSchemaGuid.Tables,
+                                new object[] {null, null, null, "TABLE"});
+
+                            Debug.Write( schemaTable.ToString());
+                        }
+
+
+
                         command.CommandText = SQLString.Text;
                         command.CommandType = CommandType.Text;
 
@@ -226,7 +232,7 @@ namespace SCQueryConnect
         {
             try
             {
-                using (DbConnection connection = GetDb(ConnectionString.Text))
+                using (DbConnection connection = GetDb())
                 {
                     connection.Open();
                     using (DbCommand command = connection.CreateCommand())
@@ -294,12 +300,12 @@ namespace SCQueryConnect
             if (qd != null)
             {
                 qd.Name = ConnectionName.Text;
-                qd.ConnectionType = cbDatabase.SelectedIndex;
                 qd.ConnectionsString = ConnectionString.Text;
                 qd.QueryString = SQLString.Text;
                 qd.StoryId = StoryId.Text;
                 qd.QueryStringRels = SQLStringRels.Text;
                 qd.FileName = FileName.Text;
+                qd.SharePointURL = SharePointURL.Text;
             }
         }
 
@@ -349,7 +355,7 @@ namespace SCQueryConnect
             await Task.Delay(20);
             SaveSettings();
 
-            tbResults.Text += ""; // clear
+            tbResults.Text = ""; // clear
             tbResults.ScrollToEnd();
             await Task.Delay(20);
 
@@ -357,7 +363,6 @@ namespace SCQueryConnect
             var password = Password.Password;
             var url = Url.Text;
             var storyId = StoryId.Text;
-            var connectionString = ConnectionString.Text;
 
             try
             {
@@ -370,7 +375,7 @@ namespace SCQueryConnect
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
 
-                using (DbConnection connection = GetDb(connectionString))
+                using (DbConnection connection = GetDb())
                 {
                     connection.Open();
                     await UpdateItems(connection, story, SQLString.Text);
@@ -456,6 +461,17 @@ namespace SCQueryConnect
                             }
                         }
                         tempArray.Add(data);
+                    }
+
+                    if (tempArray.Count > 10)
+                    {
+                        var s =
+                            "Your item query contains too many records (more than 1000). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
+                        MessageBox.Show(s);
+                        tbResults.Text += "\n" + s;
+                        tbResults.ScrollToEnd();
+                        await Task.Delay(20);
+                        return;
                     }
 
                     // create our string arrar
@@ -608,14 +624,11 @@ namespace SCQueryConnect
                                 }
                             }
                         }
-
                         row++;
                     }
                 }
             }
-
         }
-
 
         private void GenerateBatchFile(object sender, RoutedEventArgs e)
         {
@@ -643,8 +656,6 @@ namespace SCQueryConnect
                 if (ConnectionString.Text.Contains("\""))
                     MessageBox.Show(
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
-
-
                 try
                 {
                     CopyResourceFile(folder, "Newtonsoft.Json.dll");
@@ -660,7 +671,6 @@ namespace SCQueryConnect
                     return;    
                 }
 
-                string [] dbTypes = { "SQL", "ODBC", "OLEDB", "OLEDB" };
                 // set up the config
                 var content = File.ReadAllText(configFilename);
                 content = content.Replace("USERID", Username.Text);
@@ -668,11 +678,10 @@ namespace SCQueryConnect
                 content = content.Replace("BASE64PWORD", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
                 content = content.Replace("https://my.sharpcloud.com", Url.Text);
                 content = content.Replace("00000000-0000-0000-0000-000000000000", StoryId.Text);
-                if (cbDatabase.SelectedIndex != -1)
-                    content = content.Replace("SQL", dbTypes[cbDatabase.SelectedIndex]);
-                content = content.Replace("CONNECTIONSTRING", ConnectionString.Text.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("QUERYSTRING", SQLString.Text.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("QUERYRELSSTRING", SQLStringRels.Text.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("SQL", qd.GetBatchDBType);
+                content = content.Replace("CONNECTIONSTRING", qd.FormattedConnectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("QUERYSTRING", qd.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("QUERYRELSSTRING", qd.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("LOGFILE", "Logfile.txt");
 
                 File.WriteAllText(configFilename, content);
@@ -690,14 +699,27 @@ namespace SCQueryConnect
             var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch2", filename);
             var local = string.Format("{0}/{1}", folder, filename);
 
-            WebClient Client = new WebClient();
-            Client.DownloadFile(remote, local);
+            using (WebClient Client = new WebClient())
+            {
+                Client.DownloadFile(remote, local);
+            }
         }
 
         private void NewConnectionClick(object sender, RoutedEventArgs e)
         {
+            var newWnd = new SelectDatabaseType();
+            if (newWnd.ShowDialog() == true)
+            {
+                _connections.Add(new QueryData(newWnd.SelectedButton));
+                connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
+            }
+        }
+
+        private void CopyConnectionClick(object sender, RoutedEventArgs e)
+        {
             var qd = connectionList.SelectedItem as QueryData;
-            _connections.Add(CreateNewQueryData(qd.Name + " Copy"));
+            var qdNew = new QueryData(qd);
+            _connections.Add(qdNew);
             connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
         }
         private void UpConnectionClick(object sender, RoutedEventArgs e)
@@ -742,12 +764,15 @@ namespace SCQueryConnect
             if (qd != null)
             {
                 ConnectionName.Text = qd.Name;
-                cbDatabase.SelectedIndex = qd.ConnectionType;
+                txtDatabaseType.Text = qd.ConnectionType.ToString();
                 ConnectionString.Text = qd.ConnectionsString;
                 SQLString.Text = qd.QueryString;
                 StoryId.Text = qd.StoryId;
                 SQLStringRels.Text = qd.QueryStringRels;
                 FileName.Text = qd.FileName;
+                SharePointURL.Text = qd.SharePointURL;
+
+                SetVisibeObjects(qd);
             }
         }
 
@@ -756,7 +781,7 @@ namespace SCQueryConnect
             SaveSettings();
         }
 
-        private void ConnectionString_LostFocusStoryID(object sender, RoutedEventArgs e)
+        private void LostFocusStoryID(object sender, RoutedEventArgs e)
         {
             var s = StoryId.Text;
             if (s.Contains("#/story"))
@@ -768,13 +793,27 @@ namespace SCQueryConnect
                     StoryId.Text = mid;
                 }
             }
-
             SaveSettings();
         }
 
         private void FileName_LostFocus(object sender, RoutedEventArgs e)
         {
-            ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={FileName.Text};Extended Properties='Excel 12.0 Xml; HDR = YES'";
+            SaveSettings();
+        }
+
+        private void Sharepoint_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var qd = connectionList.SelectedItem as QueryData;
+            var text = SharePointURL.Text;
+            if (text.ToUpper().Contains("LIST="))
+            {
+                // user has provided a good link with a specified list.
+                // make sure the list is a guid 
+                text = text.Replace("%7B", "{").Replace("%2D", "-").Replace("%7D", "}");
+            }
+            qd.SharePointURL = text;
+            SharePointURL.Text = text;
+
             SaveSettings();
         }
 
@@ -789,21 +828,26 @@ namespace SCQueryConnect
             connectionList.SelectedIndex = i;
         }
 
-        private void cbDatabase_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void SetVisibeObjects(QueryData qd)
         {
-            if (cbDatabase != null)
+            if (qd != null)
             {
                 var v1 = Visibility.Visible;
                 var v2 = Visibility.Collapsed;
+                var v3 = Visibility.Collapsed;
 
-                switch (cbDatabase.SelectedIndex)
+                switch (qd.ConnectionType)
                 {
-                    case 3: // excel
+                    case QueryData.DbType.Access: 
+                    case QueryData.DbType.Excel: 
                         v1 = Visibility.Collapsed;
                         v2 = Visibility.Visible;
-                        if (FileName.Text == "")
-                            FileName.Text = "c:/folder/file.xlsx";
-
+                        v3 = Visibility.Collapsed;
+                        break;
+                    case QueryData.DbType.SharepointList:
+                        v1 = Visibility.Collapsed;
+                        v2 = Visibility.Collapsed;
+                        v3 = Visibility.Visible;
                         break;
                 }
                 lbl1.Visibility = v1;
@@ -811,20 +855,24 @@ namespace SCQueryConnect
                 lbl2.Visibility = v2;
                 FileName.Visibility = v2;
                 BrowseBut.Visibility = v2;
+                lbl3.Visibility = v3;
+                SharePointURL.Visibility = v3;
             }
         }
 
         private void BrowseBut_Click(object sender, RoutedEventArgs e)
         {
-            var ord = new OpenFileDialog() {Filter = "Excel Files (*.xls;*xlsx)|*.xls;*xlsx"};
+            var qd = connectionList.SelectedItem as QueryData;
+            var ord = new OpenFileDialog();
+            ord.Filter = qd.ConnectionType == QueryData.DbType.Excel ? "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx" : "Access Database Files (*.accdb;*.mdb)|*.accdb;*.mdb";
+
             if (ord.ShowDialog() == true)
             {
+                qd.FileName = ord.FileName;
                 FileName.Text = ord.FileName;
-                ConnectionString.Text = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={ord.FileName};Extended Properties=\"Excel 12.0 Xml; HDR = YES\"";
             }
         }
-
-
+        
         private SharpCloudApi GetApi()
         {
             return new SharpCloudApi(Username.Text, Password.Password, Url.Text);
@@ -846,6 +894,21 @@ namespace SCQueryConnect
         private void ViewStoryClick(object sender, RoutedEventArgs e)
         {
             Process.Start($"{Url.Text}/html/#/story/{StoryId.Text}");
+        }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start($"https://github.com/SharpCloud/SCQueryConnect");
+        }
+
+        private void Hyperlink_Click2(object sender, RoutedEventArgs e)
+        {
+            Process.Start($"https://www.microsoft.com/en-gb/download/details.aspx?id=13255");
+        }
+
+        private void Hyperlink_Click3(object sender, RoutedEventArgs e)
+        {
+            Process.Start($"https://www.youtube.com/watch?v=u9mTgEpjEFg");
         }
     }
 }
