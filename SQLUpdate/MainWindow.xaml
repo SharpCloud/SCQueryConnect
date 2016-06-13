@@ -238,7 +238,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                     <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click">
                                             <Hyperlink.Inlines>
-                                                <Run Foreground="White" FontSize="14" Text="Source code availalble from https://github.com/SharpCloud/SCQueryConnect"/>
+                                                <Run Foreground="White" FontSize="14" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
                                             </Hyperlink.Inlines>
                                         </Hyperlink>
                                   </TextBlock>
