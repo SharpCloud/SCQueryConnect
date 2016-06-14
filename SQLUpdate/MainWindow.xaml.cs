@@ -803,6 +803,11 @@ namespace SCQueryConnect
 
         private void Sharepoint_LostFocus(object sender, RoutedEventArgs e)
         {
+            // note - the list ID can be found by reading data from the following url
+            // SharePointURL/_api/web/lists
+            // TODO give the user a way of seacrching for the list ID..
+            // currently this can easily be done from Excel.
+
             var qd = connectionList.SelectedItem as QueryData;
             var text = SharePointURL.Text;
             if (text.ToUpper().Contains("LIST="))
