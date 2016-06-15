@@ -463,7 +463,7 @@ namespace SCQueryConnect
                         tempArray.Add(data);
                     }
 
-                    if (tempArray.Count > 10)
+                    if (tempArray.Count > 1000)
                     {
                         var s =
                             "Your item query contains too many records (more than 1000). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
@@ -771,6 +771,7 @@ namespace SCQueryConnect
                 SQLStringRels.Text = qd.QueryStringRels;
                 FileName.Text = qd.FileName;
                 SharePointURL.Text = qd.SharePointURL;
+                txtExampleRels.Text = "Example: " + qd.GetExampleRelQuery;
 
                 SetVisibeObjects(qd);
             }

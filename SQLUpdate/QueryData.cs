@@ -130,11 +130,25 @@ namespace SCQueryConnect
                     SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
                     QueryString = "SELECT * FROM LISTITEM";
-                    QueryStringRels =
+                    QueryStringRels = 
                         "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
             }
         }
+
+        public string GetExampleRelQuery
+        {
+            get
+            {
+                switch (ConnectionType)
+                {
+                    case QueryData.DbType.Excel:
+                        return "SELECT * from [Sheet2$]";
+                }
+                return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+            }
+        }
+
 
         public enum DbType
         {

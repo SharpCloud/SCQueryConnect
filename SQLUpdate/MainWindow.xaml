@@ -89,7 +89,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
                                     <TextBox x:Name="ConnectionName" Grid.Row="0" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
                                     <TextBox x:Name="txtDatabaseType" Grid.Row="0" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
                                     
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Filename:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl2"></TextBlock>
@@ -150,7 +150,8 @@ Connection string may be very simple or quite detailed including username/passwo
                                     <RowDefinition Height="3*"></RowDefinition>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="#00AFFC" Margin="5" Width="200" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="#00AFFC" Margin="200,5,5,5" HorizontalAlignment="Right"></TextBlock>
                                 <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
                                 <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
                                 <Grid Grid.Row="3">
