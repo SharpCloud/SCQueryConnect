@@ -682,7 +682,7 @@ namespace SCQueryConnect
                 content = content.Replace("CONNECTIONSTRING", qd.FormattedConnectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYSTRING", qd.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYRELSSTRING", qd.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("LOGFILE", "Logfile.txt");
+                content = content.Replace("LOGFILE", $"{folder}\\Logfile.txt");
 
                 File.WriteAllText(configFilename, content);
 
@@ -914,7 +914,7 @@ namespace SCQueryConnect
 
         private void Hyperlink_Click3(object sender, RoutedEventArgs e)
         {
-            Process.Start($"https://www.youtube.com/watch?v=u9mTgEpjEFg");
+            Process.Start($"https://www.youtube.com/watch?v=cZUyQkVzg2E"); 
         }
     }
 }
