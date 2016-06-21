@@ -90,16 +90,16 @@ namespace SCQueryConnect
                     FileName = "";
                     ConnectionsString = "Server=.; Integrated Security=true; Database=demo";
                     QueryString = "SELECT * FROM TABLE";
-                    QueryStringRels =
-                        "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
+                    QueryStringRels = "";
+                    // "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
                 case QueryData.DbType.ODBC:
                     Name = "ODBC Example";
                     FileName = "";
                     ConnectionsString = "DSN=DatasourceName";
                     QueryString = "SELECT * FROM TABLE";
-                    QueryStringRels =
-                        "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+                    QueryStringRels = "";
+                    //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
                     break;
                 case QueryData.DbType.ADO:
                     Name = "ADO/OLEDB Example";
@@ -107,7 +107,7 @@ namespace SCQueryConnect
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;";
                     QueryString = "SELECT * FROM TABLE";
-                    QueryStringRels = "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+                    QueryStringRels = "";//"SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
                     break;
                 case QueryData.DbType.Excel:
                     Name = "Excel Example";
@@ -115,23 +115,23 @@ namespace SCQueryConnect
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml; HDR = YES'";
                     QueryString = "SELECT * from [Sheet1$]";
-                    QueryStringRels = "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
+                    QueryStringRels = ""; // "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
                     break;
                 case QueryData.DbType.Access:
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0}";
                     QueryString = "SELECT * FROM TABLE";
-                    QueryStringRels =
-                        "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
+                    QueryStringRels = "";
+                    //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
                 case QueryData.DbType.SharepointList:
                     Name = "SharePoint List Example";
                     SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
                     QueryString = "SELECT * FROM LISTITEM";
-                    QueryStringRels = 
-                        "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
+                    QueryStringRels = ""; 
+                    //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
             }
         }
