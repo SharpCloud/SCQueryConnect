@@ -138,7 +138,7 @@ namespace SCQueryConnect
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Dope! It did not work!" + ex.Message);
+                MessageBox.Show("It did not work! " + ex.Message);
             }
         }
 
