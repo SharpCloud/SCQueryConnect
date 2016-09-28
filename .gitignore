@@ -18,4 +18,5 @@ obj/
 _ReSharper*/
 packages/
 */publish/*
+*/publishx86/*
 *.pfx
