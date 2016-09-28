@@ -24,7 +24,7 @@ using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
-
+using System.Globalization;
 
 namespace SCQueryConnect
 {
@@ -512,6 +512,13 @@ namespace SCQueryConnect
             }
         }
 
+        private bool TypeIsNumeric(Type type)
+        {
+            return type == typeof(double) || type == typeof(int) || type == typeof(float) || type == typeof(decimal) ||
+                type == typeof(short) || type == typeof(long) || type == typeof(byte) || type == typeof(SByte) ||
+                type == typeof(UInt16) || type == typeof(UInt32) || type == typeof(UInt64);
+        }
+
         private async Task UpdateRelationships(DbConnection connection, Story story, string sqlString)
         {
             if (string.IsNullOrWhiteSpace(sqlString))
@@ -529,6 +536,10 @@ namespace SCQueryConnect
             bool bDirection = false;
             bool bComment = false;
             bool bTags = false;
+            var attributeColumns = new List<RelationshipAttribute>();
+            var attributesToCreate = new List<string>();
+            var updatedRelationships = new List<Relationship>();
+            var attributeValues = new Dictionary<string, Dictionary<Relationship, string>>();
 
             using (DbCommand command = connection.CreateCommand())
             {
@@ -579,6 +590,31 @@ namespace SCQueryConnect
                             bDirection = true;
                         else if (col == "TAGS")
                             bTags = true;
+                        else
+                        {
+                            if (story.RelationshipAttributes.Any(a => a.Name.ToUpper() == col))
+                            {
+                                attributeColumns.Add(story.RelationshipAttributes.FirstOrDefault(a => a.Name.ToUpper() == col));
+                            } else if (!attributesToCreate.Any(name => name.ToUpper() == col))
+                            {
+                                var type = reader.GetFieldType(i);
+
+                                if (type == typeof(DateTime))
+                                {
+                                    var newAttribute = story.RelationshipAttribute_Add(reader.GetName(i), RelationshipAttribute.RelationshipAttributeType.Date);
+                                    attributeColumns.Add(newAttribute);
+                                }
+                                else if (TypeIsNumeric(type))
+                                {
+                                    var newAttribute = story.RelationshipAttribute_Add(reader.GetName(i), RelationshipAttribute.RelationshipAttributeType.Numeric);
+                                    attributeColumns.Add(newAttribute);
+                                }
+                                else {
+                                    attributesToCreate.Add(reader.GetName(i));
+                                    attributeValues.Add(reader.GetName(i), new Dictionary<Relationship, string>());
+                                }
+                            }
+                        }
                     }
 
                     int row = 1;
@@ -623,8 +659,149 @@ namespace SCQueryConnect
                                         rel.Tag_AddNew(tag);
                                 }
                             }
+
+                            foreach (var att in attributeColumns)
+                            {
+                                var val = reader[att.Name];
+
+                                if (val == null || val is DBNull || val.ToString() == "(NULL)")
+                                {
+                                    rel.RemoveAttributeValue(att);
+                                }
+                                else {
+                                    switch (att.Type)
+                                    {
+                                        case RelationshipAttribute.RelationshipAttributeType.Date:
+                                            rel.SetAttributeValue(att, (DateTime)val);
+                                            break;
+                                        case RelationshipAttribute.RelationshipAttributeType.Numeric:
+                                            rel.SetAttributeValue(att, (double)val);
+                                            break;
+                                        case RelationshipAttribute.RelationshipAttributeType.List:
+                                        case RelationshipAttribute.RelationshipAttributeType.Text:
+                                            rel.SetAttributeValue(att, val.ToString());
+                                            break;
+                                    }
+                                }
+                            }
+
+                            foreach (var newAtt in attributesToCreate)
+                            {
+                                // Attributes we don't know the type of, keep all the values
+                                attributeValues[newAtt].Add(rel, reader[newAtt].ToString());
+                            }
                         }
                         row++;
+                    }
+
+                    foreach (var item in attributeValues)
+                    {
+                        var nullCount = 0;
+                        var numCount = 0;
+                        var dateCount = 0;
+                        var labels = new List<string>();
+                        var isText = false;
+                        double outDouble;
+                        DateTime outDateTime;
+
+                        // Find the attribute type
+                        foreach(var rel in item.Value)
+                        {
+                            if (string.IsNullOrEmpty(rel.Value) || rel.Value == "(NULL)")
+                            {
+                                nullCount++;
+                            } else if (double.TryParse(rel.Value, out outDouble))
+                            {
+                                numCount++;
+                            } else if (DateTime.TryParseExact(rel.Value, "yyyy MM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "yyyy MMM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "yyyy-MMM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "yyyy/MMM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd MM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd MMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd/MMM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                        || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)) {
+                                dateCount++;
+                            } else {
+                                if (!isText)
+                                {
+                                    if (rel.Value.Length > 100)
+                                    {
+                                        isText = true;
+                                    }
+                                    else
+                                    {
+                                        if (!labels.Contains(rel.Value))
+                                        {
+                                            labels.Add(rel.Value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        RelationshipAttribute newAttribute;
+                        if (dateCount > 0 && dateCount + nullCount == item.Value.Count)
+                        {
+                            newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.Date);
+                            foreach (var rel in item.Value)
+                            {
+                                if (!string.IsNullOrEmpty(rel.Value) && rel.Value != "(NULL)")
+                                {
+                                    if (DateTime.TryParseExact(rel.Value, "yyyy MM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "yyyy MMM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "yyyy-MMM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "yyyy/MMM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd MM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd MMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd/MMM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
+                          || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime))
+                                    {
+                                        rel.Key.SetAttributeValue(newAttribute, outDateTime);
+                                    }
+                                }
+                            }
+                        }
+                        else if (numCount > 0 && numCount + nullCount == item.Value.Count)
+                        {
+                            newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.Numeric);
+                            foreach (var rel in item.Value) {
+                                if (!string.IsNullOrEmpty(rel.Value) && rel.Value != "(NULL)")
+                                {                                    
+                                    if (double.TryParse(rel.Value, out outDouble))
+                                    {
+                                        rel.Key.SetAttributeValue(newAttribute, outDouble);
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            if (!isText && (labels.Count + nullCount < item.Value.Count))
+                            {
+                                newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.List);
+                            }
+                            else
+                            {
+                                newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.Text);
+                            }
+                            foreach (var rel in item.Value)
+                            {
+                                if (!string.IsNullOrEmpty(rel.Value) && rel.Value != "(NULL)")
+                                {
+                                    rel.Key.SetAttributeValue(newAttribute, rel.Value);
+                                }
+                            }
+                        }
                     }
                 }
             }
