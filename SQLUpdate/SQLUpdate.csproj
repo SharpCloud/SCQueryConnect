@@ -15,7 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>publishx86\</PublishUrl>
+    <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -25,10 +25,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdatex86/</InstallUrl>
+    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>2.0.7.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -96,16 +96,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="SC.Api, Version=1.0.19.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.19\lib\SC.Api.dll</HintPath>
+    <Reference Include="SC.Api, Version=1.0.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.21\lib\SC.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SC.API.ComInterop, Version=1.0.19.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.19\lib\SC.API.ComInterop.dll</HintPath>
+    <Reference Include="SC.API.ComInterop, Version=1.0.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.21\lib\SC.API.ComInterop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SC.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.19\lib\SC.Framework.dll</HintPath>
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.21\lib\SC.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

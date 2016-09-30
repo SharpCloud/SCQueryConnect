@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SQLUpdate"
         mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
-        Title="SharpCloud QueryConnect v2.07" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+        Title="SharpCloud QueryConnect v2.08" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
             <Grid >
@@ -193,6 +193,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                         <Button Click="SelectStoryClick"  Margin="0" Width="40" Background="#00AFFC" FontSize="14" Foreground="White" >...</Button>
                                         <Button Click="ViewStoryClick"  Margin="10,0" Width="50" Background="#00AFFC" FontSize="14" Foreground="White" >Open</Button>
                                     </StackPanel>
+                                    <CheckBox x:Name="cbUnpub" Foreground="#00AFFC" HorizontalAlignment="Center" IsChecked="{Binding UnpublishItems, Mode=TwoWay}" ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">Unpublish unmatched items</CheckBox>
                                     <Button Click="UpdateSharpCloud"  Width="270" Margin="100,10"  Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
                                 </StackPanel>
                                 <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>

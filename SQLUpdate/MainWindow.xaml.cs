@@ -47,6 +47,17 @@ namespace SCQueryConnect
 
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
 
+        public bool UnpublishItems
+        {
+            get { return _unpublishItems; }
+            set
+            {
+                _unpublishItems = value;
+                OnPropertyChanged("UnpublishItems");
+            }
+        }
+        private bool _unpublishItems = false;
+
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
         public MainWindow()
@@ -74,6 +85,12 @@ namespace SCQueryConnect
             // choose our last settings
             connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
             BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
+
+            bool unpub;
+            if (bool.TryParse(SaveHelper.RegRead("UnpublishItems", "false"), out unpub))
+                UnpublishItems = unpub;
+            else
+                UnpublishItems = false;
 
             var splashScreen = new SplashScreen("Images/splash.jpg");
             splashScreen.Show(true);
@@ -293,6 +310,7 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
+            SaveHelper.RegWrite("UnpublishItems", UnpublishItems.ToString());
         }
 
         private void SaveSettings(QueryData qd)
@@ -502,11 +520,29 @@ namespace SCQueryConnect
 
                     // pass the array to SharpCloud
                     string errorMessage;
-                    if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
+                    if (UnpublishItems)
                     {
-                        MessageBox.Show(errorMessage);
-                        tbResults.ScrollToEnd();
-                        tbResults.Text += "\nERROR: " + errorMessage;
+                        List<Guid> updatedItems;
+                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out updatedItems))
+                        {
+                            MessageBox.Show(errorMessage);
+                            tbResults.ScrollToEnd();
+                            tbResults.Text += "\nERROR: " + errorMessage;
+                        } else
+                        {
+                            foreach (var item in story.Items)
+                            {
+                                item.AsElement.IsInRoadmap = updatedItems.Contains(item.AsElement.ID);
+                            }
+                        }
+                    }
+                    else {
+                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
+                        {
+                            MessageBox.Show(errorMessage);
+                            tbResults.ScrollToEnd();
+                            tbResults.Text += "\nERROR: " + errorMessage;
+                        }
                     }
                 }
             }
@@ -860,6 +896,7 @@ namespace SCQueryConnect
                 content = content.Replace("QUERYSTRING", qd.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYRELSSTRING", qd.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("LOGFILE", $"{folder}\\Logfile.txt");
+                content = content.Replace("UNPUBLISHITEMS", UnpublishItems.ToString());
 
                 File.WriteAllText(configFilename, content);
 
@@ -873,7 +910,7 @@ namespace SCQueryConnect
         
         static void CopyResourceFile(string folder, string filename)
         {
-            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch2", filename);
+            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch3", filename);
             var local = string.Format("{0}/{1}", folder, filename);
 
             using (WebClient Client = new WebClient())
