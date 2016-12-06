@@ -476,7 +476,7 @@ namespace SCQueryConnect
                                 var s = o.ToString();
                                 if (double.TryParse(s, out dbl))
                                 {
-                                    data.Add($"{dbl:#.##}");
+                                    data.Add($"{dbl:0.##}");
                                 }
                                 else if (DateTime.TryParse(s, out date))
                                 {
