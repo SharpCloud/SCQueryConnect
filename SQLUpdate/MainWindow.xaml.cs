@@ -25,6 +25,7 @@ using SQLUpdate.Views;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
 using System.Globalization;
+using SCQueryConnect.ViewModels;
 
 namespace SCQueryConnect
 {
@@ -60,6 +61,8 @@ namespace SCQueryConnect
 
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
+        private ProxyViewModel _proxyViewModel;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -76,6 +79,12 @@ namespace SCQueryConnect
             Username.Text = SaveHelper.RegRead("Username", "");
             Password.Password = Encoding.Default.GetString(Convert.FromBase64String(SaveHelper.RegRead("Password", "")));
             StoryId.Text = SaveHelper.RegRead("StoryID", "");
+
+            _proxyViewModel = new ProxyViewModel();
+            _proxyViewModel.Proxy = SaveHelper.RegRead("Proxy", "");
+            _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
+            _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
+            _proxyViewModel.ProxyPassword = Encoding.Default.GetString(Convert.FromBase64String(SaveHelper.RegRead("ProxyPassword", "")));
 
             //cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
 
@@ -311,6 +320,11 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
             SaveHelper.RegWrite("UnpublishItems", UnpublishItems.ToString());
+
+            SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
+            SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
+            SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
+            SaveHelper.RegWrite("ProxyPassword", Convert.ToBase64String(Encoding.Default.GetBytes(_proxyViewModel.ProxyPassword)));
         }
 
         private void SaveSettings(QueryData qd)
@@ -387,7 +401,7 @@ namespace SCQueryConnect
                 tbResults.Text += "Connecting to Sharpcloud " + url;
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
-                var sc = new SharpCloudApi(username, password, url);
+                var sc = new SharpCloudApi(username, password, url, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
                 var story = sc.LoadStory(storyId);
                 tbResults.Text += "\nReading story '" + story.Name + "'";
                 tbResults.ScrollToEnd();
@@ -897,6 +911,11 @@ namespace SCQueryConnect
                 content = content.Replace("QUERYRELSSTRING", qd.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("LOGFILE", $"{folder}\\Logfile.txt");
                 content = content.Replace("UNPUBLISHITEMS", UnpublishItems.ToString());
+                content = content.Replace("PROXY", _proxyViewModel.Proxy);
+                content = content.Replace("PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
+                content = content.Replace("PROXYUSERNAME", _proxyViewModel.ProxyUserName);
+                content = content.Replace("PROXYPASSWORD", "");
+                content = content.Replace("BASE64PROXYPWORD", Convert.ToBase64String(Encoding.Default.GetBytes(_proxyViewModel.Proxy)));
 
                 File.WriteAllText(configFilename, content);
 
@@ -910,7 +929,7 @@ namespace SCQueryConnect
         
         static void CopyResourceFile(string folder, string filename)
         {
-            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch3", filename);
+            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch4", filename);
             var local = string.Format("{0}/{1}", folder, filename);
 
             using (WebClient Client = new WebClient())
@@ -1095,7 +1114,7 @@ namespace SCQueryConnect
         
         private SharpCloudApi GetApi()
         {
-            return new SharpCloudApi(Username.Text, Password.Password, Url.Text);
+            return new SharpCloudApi(Username.Text, Password.Password, Url.Text, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
         }
 
 
@@ -1128,7 +1147,13 @@ namespace SCQueryConnect
 
         private void Hyperlink_Click3(object sender, RoutedEventArgs e)
         {
-            Process.Start($"https://www.youtube.com/watch?v=cZUyQkVzg2E"); 
+            Process.Start($"https://www.youtube.com/watch?v=cZUyQkVzg2E");
+        }
+
+        private void Proxy_OnClick(object sender, RoutedEventArgs e)
+        {
+            var proxy = new ProxySettings(_proxyViewModel);
+            proxy.ShowDialog();
         }
     }
 }

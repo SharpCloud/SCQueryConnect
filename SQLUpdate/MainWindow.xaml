@@ -178,6 +178,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Server:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
                                         <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="270"></TextBox>
+                                        <TextBlock Margin="10,0"><Hyperlink Foreground="#FF00AFFC" Click="Proxy_OnClick"> Proxy</Hyperlink></TextBlock>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="2">
                                         <TextBlock Text ="Username:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>

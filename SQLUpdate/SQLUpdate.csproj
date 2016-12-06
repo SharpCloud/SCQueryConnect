@@ -15,7 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>publishx86\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -25,10 +25,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/</InstallUrl>
+    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdatex86/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>11</ApplicationRevision>
+    <ApplicationRevision>13</ApplicationRevision>
     <ApplicationVersion>2.0.7.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -132,7 +132,11 @@
     <Compile Include="Converters\BoolToVisibility.cs" />
     <Compile Include="Helpers\SaveHelper.cs" />
     <Compile Include="QueryData.cs" />
+    <Compile Include="ViewModels\ProxyViewModel.cs" />
     <Compile Include="ViewModels\SelectedStoryViewModel.cs" />
+    <Compile Include="Views\ProxySettings.xaml.cs">
+      <DependentUpon>ProxySettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SelectStory.xaml.cs" />
     <Compile Include="Views\SelectDatabaseType.xaml.cs">
       <DependentUpon>SelectDatabaseType.xaml</DependentUpon>
@@ -149,6 +153,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\ProxySettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SelectStory.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
