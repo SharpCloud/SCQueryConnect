@@ -929,7 +929,7 @@ namespace SCQueryConnect
         
         static void CopyResourceFile(string folder, string filename)
         {
-            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch4", filename);
+            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch5", filename);
             var local = string.Format("{0}/{1}", folder, filename);
 
             using (WebClient Client = new WebClient())
