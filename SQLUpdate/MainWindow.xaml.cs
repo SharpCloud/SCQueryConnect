@@ -911,11 +911,11 @@ namespace SCQueryConnect
                 content = content.Replace("QUERYRELSSTRING", qd.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("LOGFILE", $"{folder}\\Logfile.txt");
                 content = content.Replace("UNPUBLISHITEMS", UnpublishItems.ToString());
-                content = content.Replace("PROXY", _proxyViewModel.Proxy);
+                content = content.Replace("PROXYADDRESS", _proxyViewModel.Proxy);
                 content = content.Replace("PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
                 content = content.Replace("PROXYUSERNAME", _proxyViewModel.ProxyUserName);
-                content = content.Replace("PROXYPASSWORD", "");
-                content = content.Replace("BASE64PROXYPWORD", Convert.ToBase64String(Encoding.Default.GetBytes(_proxyViewModel.Proxy)));
+                content = content.Replace("PROXYPWORD", "");
+                content = content.Replace("BASE64PROXYPWRD", Convert.ToBase64String(Encoding.Default.GetBytes(_proxyViewModel.Proxy)));
 
                 File.WriteAllText(configFilename, content);
 
@@ -929,7 +929,7 @@ namespace SCQueryConnect
         
         static void CopyResourceFile(string folder, string filename)
         {
-            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch5", filename);
+            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch6", filename);
             var local = string.Format("{0}/{1}", folder, filename);
 
             using (WebClient Client = new WebClient())
