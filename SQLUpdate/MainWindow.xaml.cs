@@ -945,6 +945,7 @@ namespace SCQueryConnect
             {
                 _connections.Add(new QueryData(newWnd.SelectedButton));
                 connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
+                BrowserTabs.SelectedIndex = 0; // go back to the first tab
             }
         }
 
@@ -954,6 +955,7 @@ namespace SCQueryConnect
             var qdNew = new QueryData(qd);
             _connections.Add(qdNew);
             connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
+            BrowserTabs.SelectedIndex = 0; // go back to the  first tab
         }
         private void UpConnectionClick(object sender, RoutedEventArgs e)
         {
