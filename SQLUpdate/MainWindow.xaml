@@ -8,9 +8,7 @@
         mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
-    <Window.DataContext>
-        <viewModels:MainViewModel/>
-    </Window.DataContext>    <Grid>
+    <Grid>
         <Grid>
             <Grid >
             <Grid.ColumnDefinitions>

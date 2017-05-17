@@ -135,7 +135,6 @@
     <Compile Include="Converters\BoolToVisibility.cs" />
     <Compile Include="Helpers\SaveHelper.cs" />
     <Compile Include="QueryData.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ProxyViewModel.cs" />
     <Compile Include="ViewModels\SelectedStoryViewModel.cs" />
     <Compile Include="Views\ProxySettings.xaml.cs">
