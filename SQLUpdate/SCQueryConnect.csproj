@@ -99,16 +99,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="SC.Api, Version=1.0.21.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.22\lib\SC.Api.dll</HintPath>
+    <Reference Include="SC.Api, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.25\lib\SC.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SC.API.ComInterop, Version=1.0.21.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.22\lib\SC.API.ComInterop.dll</HintPath>
+    <Reference Include="SC.API.ComInterop, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.25\lib\SC.API.ComInterop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SC.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.22\lib\SC.Framework.dll</HintPath>
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.25\lib\SC.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -135,6 +135,7 @@
     <Compile Include="Converters\BoolToVisibility.cs" />
     <Compile Include="Helpers\SaveHelper.cs" />
     <Compile Include="QueryData.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ProxyViewModel.cs" />
     <Compile Include="ViewModels\SelectedStoryViewModel.cs" />
     <Compile Include="Views\ProxySettings.xaml.cs">
@@ -196,6 +197,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="SCSQLBatchx86\SCSQLBatch.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatch\SCSQLBatch.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="sharpcloudcodesigning.pfx" />
     <None Include="SQLUpdate_TemporaryKey.pfx" />
   </ItemGroup>
@@ -222,6 +229,44 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="qc-icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SCSQLBatchx86\SC.Framework.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SCSQLBatchx86\Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatchx86\SC.API.ComInterop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatchx86\SC.Api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatchx86\SCSQLBatch.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatch\Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatch\SC.API.ComInterop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SCSQLBatch\SC.Api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SCSQLBatch\SC.Framework.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SCSQLBatch\SCSQLBatch.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

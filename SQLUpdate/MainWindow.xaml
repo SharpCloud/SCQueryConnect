@@ -4,10 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQLUpdate"
+        xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
-        Title="SharpCloud QueryConnect v2.09" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
-    <Grid>
+        Title="{Binding AppName}" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+    <Window.DataContext>
+        <viewModels:MainViewModel/>
+    </Window.DataContext>    <Grid>
         <Grid>
             <Grid >
             <Grid.ColumnDefinitions>
@@ -207,10 +210,16 @@ Connection string may be very simple or quite detailed including username/passwo
 
                         </TabItem>
                         <TabItem Header="4. Create batch files">
+                            <Grid>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
-                                <Button Click="GenerateBatchFile"  Height="50" Width="200" Margin="5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Generate Batch Files Now..</Button>
+                                <Button Click="GenerateBatchFileThis"  Height="50" Width="220" Margin="5,0" Background="#00AFFC" FontSize="16" Foreground="White" >Generate Batch Files Now...</Button>
                             </StackPanel>
+                            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="20">
+                                <Button Click="GenerateBatchFile32"  Height="25" Width="220" Margin="5,0" Background="#00AFFC" FontSize="12" Foreground="White" >Generate Batch 32bit (x86) Files Now...</Button>
+                                <Button Click="GenerateBatchFile64"  Height="25" Width="220" Margin="5,0" Background="#00AFFC" FontSize="12" Foreground="White" >Generate Batch 64bit (x64) Files Now...</Button>
+                            </StackPanel>
+                            </Grid>
                         </TabItem>
                         <TabItem Header="About">
                             <Grid>

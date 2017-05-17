@@ -36,6 +36,19 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public string AppNameOnly => $"SharpCloud QueryConnect v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
+
+        public string AppName
+        {
+            get
+            {
+                if (IntPtr.Size == 4)
+                    return $"{AppNameOnly} - 32Bit(x86)";
+                return $"{AppNameOnly} - 64Bit(AnyCPU)";
+            }
+        }
+
+
         public Visibility UpdatingMessageVisibility
         {
             get { return _updatingMessageVisibility; }
@@ -857,8 +870,27 @@ namespace SCQueryConnect
             }
         }
 
-        private void GenerateBatchFile(object sender, RoutedEventArgs e)
+        private void GenerateBatchFile32(object sender, RoutedEventArgs e)
         {
+            GenerateBatchFile(true);
+        }
+
+        private void GenerateBatchFile64(object sender, RoutedEventArgs e)
+        {
+            GenerateBatchFile(false);
+        }
+
+        private void GenerateBatchFileThis(object sender, RoutedEventArgs e)
+        {
+            GenerateBatchFile((IntPtr.Size == 4));
+        }
+
+        private void GenerateBatchFile(bool b32bit)
+        {
+            string folderName = "SCSQLBatch";
+            if (b32bit)
+                folderName = "SCSQLBatchx86";
+
             if (!ValidateCreds())
                 return;
 
@@ -885,16 +917,17 @@ namespace SCQueryConnect
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
                 try
                 {
-                    CopyResourceFile(folder, "Newtonsoft.Json.dll");
-                    CopyResourceFile(folder, "SC.Framework.dll");
-                    CopyResourceFile(folder, "SC.API.ComInterop.dll");
-                    CopyResourceFile(folder, "SC.Api.dll");
-                    CopyResourceFile(folder, "SCSQLBatch.exe");
-                    CopyResourceFile(folder, "SCSQLBatch.exe.config");
+                    CopyResourceFile(folderName, folder, "Newtonsoft.Json.dll");
+                    CopyResourceFile(folderName, folder, "SC.Framework.dll");
+                    CopyResourceFile(folderName, folder, "SC.API.ComInterop.dll");
+                    CopyResourceFile(folderName, folder, "SC.Api.dll");
+                    CopyResourceFile(folderName, folder, "SCSQLBatch.exe");
+                    CopyResourceFile(folderName, folder, "SCSQLBatch.exe.config");
                 }
                 catch (Exception exception2)
                 {
-                    MessageBox.Show("Sorry, we were unable to complete the process as we could not downlaod the files from the internet. Please make sure you have a working internet connection. " + exception2.Message, "NO CONNECTION");
+                    MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {exception2.Message}");
+//                    MessageBox.Show("Sorry, we were unable to complete the process as we could not downlaod the files from the internet. Please make sure you have a working internet connection. " + exception2.Message, "NO CONNECTION");
                     return;    
                 }
 
@@ -919,6 +952,17 @@ namespace SCQueryConnect
 
                 File.WriteAllText(configFilename, content);
 
+                // update the Logfile
+                var logfile = $"{folder}/Logfile.txt";
+                var contentNotes = new List<string>();
+                contentNotes.Add($"----------------------------------------------------------------------");
+                contentNotes.Add(b32bit
+                    ? $"32 bit (x86) Batch files created at {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}"
+                    : $"64 bit Batch files created at {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                contentNotes.Add($"----------------------------------------------------------------------");
+
+                File.AppendAllLines(logfile, contentNotes);
+
                 Process.Start(folder);
             }
             catch (Exception exception)
@@ -926,8 +970,17 @@ namespace SCQueryConnect
                 MessageBox.Show(exception.Message);
             }
         }
-        
-        static void CopyResourceFile(string folder, string filename)
+        static void CopyResourceFile(string resFolder, string folder, string filename)
+        {
+            var appFolder = System.AppDomain.CurrentDomain.BaseDirectory;
+
+            var sourceFileName = $"{appFolder}/{resFolder}/{filename}";
+            var destFileName = $"{folder}/{filename}";
+
+            File.Copy(sourceFileName, destFileName, true);
+        }
+
+        static void CopyResourceFileFromWeb(string folder, string filename)
         {
             var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch6", filename);
             var local = string.Format("{0}/{1}", folder, filename);
