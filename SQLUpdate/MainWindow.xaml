@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
         Closing="MainWindow_OnClosing"
-        Title="{Binding AppName}" Height="550" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+        Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
             <Grid >
@@ -17,7 +17,15 @@
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <GridSplitter Grid.Column="1"  Foreground="Red" HorizontalAlignment="Stretch" Width="3"></GridSplitter>
-            <ListBox Grid.Column="0" x:Name="connectionList" Background="Transparent" Foreground="white" SelectionChanged="connectionList_SelectionChanged" Margin="0,0,0,50" />
+                <ListBox Grid.Column="0" x:Name="connectionList" Background="Transparent" Foreground="white" SelectionChanged="connectionList_SelectionChanged" Margin="0,0,0,50" >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Grid Background="Black" VerticalAlignment="Bottom" Height="50">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -78,6 +86,7 @@
                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="40"></RowDefinition>
+                                        <RowDefinition Height="40"></RowDefinition>
                                         <RowDefinition Height="80"></RowDefinition>
                                         <RowDefinition Height="50"></RowDefinition>
                                         <RowDefinition Height="*"></RowDefinition>
@@ -89,28 +98,31 @@
                                         <ColumnDefinition Width="140"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
-                                    <TextBox x:Name="ConnectionName" Grid.Row="0" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
+                                    <TextBox Grid.Row="0" x:Name="ConnectionName" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
                                     <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
-                                    <TextBox x:Name="txtDatabaseType" Grid.Row="0" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
-                                    
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Filename:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl2"></TextBlock>
-                                    <TextBox x:Name="FileName" Grid.Row="1" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
-                                    <Button Grid.Row="1" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Background="#00AFFC" FontSize="14" Width="150" Foreground="White" Click="BrowseBut_Click">Choose file...</Button>
+                                    <TextBox Grid.Row="0" x:Name="txtDatabaseType" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
 
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Sharepoint URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl3"></TextBlock>
-                                    <TextBox x:Name="SharePointURL" Grid.Row="1" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                                    <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl1"></TextBlock>
-                                    <TextBox x:Name="ConnectionString" Grid.Row="1" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Filename:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl2"></TextBlock>
+                                    <TextBox Grid.Row="2" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
+                                    <Button Grid.Row="2" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Background="#00AFFC" FontSize="14" Width="150" Foreground="White" Click="BrowseBut_Click">Choose file...</Button>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Sharepoint URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl3"></TextBlock>
+                                    <TextBox Grid.Row="2" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl1"></TextBlock>
+                                    <TextBox Grid.Row="2" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
 
 
-                                    <Button Grid.Row="2" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="TestConnectionClick">Test Connection</Button>
-                                    <Button Grid.Row="2" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="ReviewConnectionClick">View Connection Info</Button>
+                                    <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="TestConnectionClick">Test Connection</Button>
+                                    <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="ReviewConnectionClick">View Connection Info</Button>
 
-                                    <TextBlock Margin="5" TextWrapping="WrapWithOverflow" Grid.Row="3" Grid.Column="1" Text="Connection strings allow you to connect to virtually any database.
+                                    <TextBlock Grid.Row="4" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1" Text="Connection strings allow you to connect to virtually any database.
 Connection string may be very simple or quite detailed including username/password and servername, IP address etc."></TextBlock>
 
-                                    <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="HelpButtonClick">Help on Connections Strings</Button>
+                                    <Button Grid.Row="5" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="HelpButtonClick">Help on Connections Strings</Button>
 
                                 </Grid>
 
@@ -136,7 +148,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
                                     <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
-                                    <Button  Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="120" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Run</Button>
+                                    <Button  Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Preview SQL Results</Button>
                                     <DataGrid x:Name="DataGrid" Grid.Row="1" Margin="5"/>
                                 </Grid>
                             </Grid>
@@ -162,7 +174,7 @@ Connection string may be very simple or quite detailed including username/passwo
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
                                     <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
-                                    <Button  Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="120" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Run</Button>
+                                    <Button  Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Preview SQL Results</Button>
                                     <DataGrid x:Name="DataGridRels" Grid.Row="1" Margin="5"/>
                                 </Grid>
                             </Grid>
@@ -202,6 +214,10 @@ Connection string may be very simple or quite detailed including username/passwo
 
                                 <Grid Grid.Row="2">
                                     <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="#00AFFC"  Margin="5"></TextBlock>
+                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
+                                        <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="#00AFFC"  Margin="5,0"></TextBlock>
+                                        <TextBlock x:Name="tbLastRun" Text="Now" TextAlignment="Right" Foreground="White"  Margin="5,0"></TextBlock>
+                                    </StackPanel>
                                     <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="#00AFFC" Background="#333333" ></TextBox>
                                 </Grid>
                             </Grid>
@@ -213,10 +229,11 @@ Connection string may be very simple or quite detailed including username/passwo
                                 <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
                                 <Button Click="GenerateBatchFileThis"  Height="50" Width="220" Margin="5,0" Background="#00AFFC" FontSize="16" Foreground="White" >Generate Batch Files Now...</Button>
                             </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="20">
+                            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="30">
                                 <Button Click="GenerateBatchFile32"  Height="25" Width="220" Margin="5,0" Background="#00AFFC" FontSize="12" Foreground="White" >Generate Batch 32bit (x86) Files Now...</Button>
                                 <Button Click="GenerateBatchFile64"  Height="25" Width="220" Margin="5,0" Background="#00AFFC" FontSize="12" Foreground="White" >Generate Batch 64bit (x64) Files Now...</Button>
                             </StackPanel>
+                                <Button Click="ViewExisting" VerticalAlignment="Bottom"  Height="25" Width="220" Margin="5" Background="Transparent" FontSize="12" Foreground="White" >View export folder...</Button>
                             </Grid>
                         </TabItem>
                         <TabItem Header="About">
@@ -232,13 +249,19 @@ Connection string may be very simple or quite detailed including username/passwo
                                 <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
                                     <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500"  />
                                     <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                        <Hyperlink Click="Hyperlink_Click4" >
+                                            <Hyperlink.Inlines>
+                                                <Run Foreground="White" FontSize="14" Text="Install Folder"/>
+                                            </Hyperlink.Inlines>
+                                        </Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click3" >
                                             <Hyperlink.Inlines>
                                                 <Run Foreground="White" FontSize="14" Text="Watch Video Guide"/>
                                             </Hyperlink.Inlines>
                                         </Hyperlink>
-                                    </TextBlock>
-                                    <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    </TextBlock>                                    <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click2">
                                             <Hyperlink.Inlines>
                                                 <Run Foreground="White" FontSize="14" Text="Download tools for Excel/Access"/>

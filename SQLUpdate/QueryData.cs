@@ -17,6 +17,8 @@ namespace SCQueryConnect
         [DataMember]
         public string Name { get; set; }
         [DataMember]
+        public string Description { get; set; }
+        [DataMember]
         public DbType ConnectionType { get; set; }
         [DataMember]
         public string ConnectionsString { get; set; }
@@ -30,7 +32,10 @@ namespace SCQueryConnect
         public string FileName { get; set; }
         [DataMember]
         public string SharePointURL { get; set; }
-
+        [DataMember]
+        public DateTime? LastRunDateTime { get; set; }
+        [DataMember]
+        public string LogData { get; set; }
 
         public string FormattedConnectionString => string.Format(ConnectionsString, FileName, SharePointURL);
 
@@ -62,6 +67,19 @@ namespace SCQueryConnect
             }
         }
 
+        public string LastRunDate
+        {
+            get
+            {
+                if (LastRunDateTime == null)
+                    return "Never";
+
+                if (LastRunDateTime.Value.ToShortDateString() == DateTime.Now.ToShortDateString())
+                    return $"TODAY at {LastRunDateTime.Value:HH:mm:ss}";
+
+                return $"{LastRunDateTime.Value:dd MMM yyyy HH:mm:ss}";
+            }
+        }
 
         public override string ToString()
         {
@@ -71,6 +89,7 @@ namespace SCQueryConnect
         public QueryData(QueryData qd)
         {
             Name = qd.Name + " Copy";
+            Description = "Copy of " + qd.Description;
             ConnectionType = qd.ConnectionType;
             ConnectionsString = qd.ConnectionsString;
             //StoryId = qd.StoryId; // do not copy this for a copy

@@ -5,18 +5,15 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using System.Windows;
-using System.Data.Odbc;
 using System.Data.OleDb;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using SC.API.ComInterop;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using System.Xml;
-using mshtml;
 using Microsoft.Win32;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Helpers;
@@ -345,6 +342,7 @@ namespace SCQueryConnect
             if (qd != null)
             {
                 qd.Name = ConnectionName.Text;
+                qd.Description = ConnectionDescription.Text;
                 qd.ConnectionsString = ConnectionString.Text;
                 qd.QueryString = SQLString.Text;
                 qd.StoryId = StoryId.Text;
@@ -408,9 +406,12 @@ namespace SCQueryConnect
             var password = Password.Password;
             var url = Url.Text;
             var storyId = StoryId.Text;
+            var qd = connectionList.SelectedItem as QueryData;
 
             try
             {
+                var start = DateTime.Now;
+                tbResults.Text += $"Starting update process at {DateTime.Now:dd MMM yyyy HH:mm:ss}\n";
                 tbResults.Text += "Connecting to Sharpcloud " + url;
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
@@ -433,6 +434,13 @@ namespace SCQueryConnect
                     tbResults.Text += "\nSave Complete!";
                     tbResults.ScrollToEnd();
                     await Task.Delay(20);
+
+                    tbResults.Text += $"\nUpdate process completed in {(DateTime.Now-start).TotalSeconds:f2} seconds";
+
+                    qd.LogData = tbResults.Text;
+                    qd.LastRunDateTime = DateTime.Now;
+                    tbLastRun.Text = qd.LastRunDate;
+                    SaveSettings();
                 }
             }
             catch (Exception ex)
@@ -870,6 +878,12 @@ namespace SCQueryConnect
             }
         }
 
+        private void ViewExisting(object sender, RoutedEventArgs e)
+        {
+            Process.Start(GetFolder());
+        }
+
+
         private void GenerateBatchFile32(object sender, RoutedEventArgs e)
         {
             GenerateBatchFile(true);
@@ -885,22 +899,29 @@ namespace SCQueryConnect
             GenerateBatchFile((IntPtr.Size == 4));
         }
 
+        private string GetFolder()
+        {
+            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
+            folder += "/data";
+            Directory.CreateDirectory(folder);
+            var qd = connectionList.SelectedItem as QueryData;
+            folder += "/" + qd.Name;
+            Directory.CreateDirectory(folder);
+
+            return folder;
+        }
+
         private void GenerateBatchFile(bool b32bit)
         {
-            string folderName = "SCSQLBatch";
+            string zipfile = "SCSQLBatch.zip";
             if (b32bit)
-                folderName = "SCSQLBatchx86";
+                zipfile = "SCSQLBatchx86.zip";
 
             if (!ValidateCreds())
                 return;
 
-            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
-            folder += "/data";
-            Directory.CreateDirectory(folder);
-
+            var folder = GetFolder();
             var qd = connectionList.SelectedItem as QueryData;
-            folder += "/" + qd.Name;
-            Directory.CreateDirectory(folder);
 
             try
             {
@@ -917,12 +938,24 @@ namespace SCQueryConnect
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
                 try
                 {
-                    CopyResourceFile(folderName, folder, "Newtonsoft.Json.dll");
-                    CopyResourceFile(folderName, folder, "SC.Framework.dll");
-                    CopyResourceFile(folderName, folder, "SC.API.ComInterop.dll");
-                    CopyResourceFile(folderName, folder, "SC.Api.dll");
-                    CopyResourceFile(folderName, folder, "SCSQLBatch.exe");
-                    CopyResourceFile(folderName, folder, "SCSQLBatch.exe.config");
+                    File.Delete($"{folder}/Newtonsoft.Json.dll");
+                    File.Delete($"{folder}/SC.Framework.dll");
+                    File.Delete($"{folder}/SC.API.ComInterop.dll");
+                    File.Delete($"{folder}/SC.Api.dll");
+                    File.Delete($"{folder}/SCSQLBatch.exe");
+                    File.Delete($"{folder}/SCSQLBatch.exe.config");
+                    File.Delete($"{folder}/SCSQLBatch.zip");
+
+                    ZipFile.ExtractToDirectory(zipfile, folder);
+
+                    /*
+                    CopyResourceFile(zipfile, folder, "Newtonsoft.Json.dll");
+                    CopyResourceFile(zipfile, folder, "SC.Framework.dll");
+                    CopyResourceFile(zipfile, folder, "SC.API.ComInterop.dll");
+                    CopyResourceFile(zipfile, folder, "SC.Api.dll");
+                    CopyResourceFile(zipfile, folder, "SCSQLBatch.exe");
+                    CopyResourceFile(zipfile, folder, "SCSQLBatch.exe.config");
+                    */
                 }
                 catch (Exception exception2)
                 {
@@ -942,7 +975,7 @@ namespace SCQueryConnect
                 content = content.Replace("CONNECTIONSTRING", qd.FormattedConnectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYSTRING", qd.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYRELSSTRING", qd.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("LOGFILE", $"{folder}\\Logfile.txt");
+                content = content.Replace("LOGFILE", $"Logfile.txt");
                 content = content.Replace("UNPUBLISHITEMS", UnpublishItems.ToString());
                 content = content.Replace("PROXYADDRESS", _proxyViewModel.Proxy);
                 content = content.Replace("PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
@@ -953,12 +986,12 @@ namespace SCQueryConnect
                 File.WriteAllText(configFilename, content);
 
                 // update the Logfile
-                var logfile = $"{folder}/Logfile.txt";
+                var logfile = $"{folder}Logfile.txt";
                 var contentNotes = new List<string>();
                 contentNotes.Add($"----------------------------------------------------------------------");
                 contentNotes.Add(b32bit
-                    ? $"32 bit (x86) Batch files created at {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}"
-                    : $"64 bit Batch files created at {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}");
+                    ? $"32 bit (x86) Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}"
+                    : $"64 bit Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}");
                 contentNotes.Add($"----------------------------------------------------------------------");
 
                 File.AppendAllLines(logfile, contentNotes);
@@ -1052,6 +1085,7 @@ namespace SCQueryConnect
             if (qd != null)
             {
                 ConnectionName.Text = qd.Name;
+                ConnectionDescription.Text = qd.Description;
                 txtDatabaseType.Text = qd.ConnectionType.ToString();
                 ConnectionString.Text = qd.ConnectionsString;
                 SQLString.Text = qd.QueryString;
@@ -1060,6 +1094,9 @@ namespace SCQueryConnect
                 FileName.Text = qd.FileName;
                 SharePointURL.Text = qd.SharePointURL;
                 txtExampleRels.Text = "Example: " + qd.GetExampleRelQuery;
+
+                tbLastRun.Text = qd.LastRunDate;
+                tbResults.Text = qd.LogData;
 
                 SetVisibeObjects(qd);
             }
@@ -1205,6 +1242,11 @@ namespace SCQueryConnect
             Process.Start($"https://www.youtube.com/watch?v=cZUyQkVzg2E");
         }
 
+        private void Hyperlink_Click4(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", System.AppDomain.CurrentDomain.BaseDirectory);
+        }
+    
         private void Proxy_OnClick(object sender, RoutedEventArgs e)
         {
             var proxy = new ProxySettings(_proxyViewModel);
