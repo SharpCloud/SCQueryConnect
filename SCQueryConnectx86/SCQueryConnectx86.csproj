@@ -4,18 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A8532662-2091-4D8E-ADD8-C1EAAA3679E1}</ProjectGuid>
+    <ProjectGuid>{18CAF0CE-D077-4DA4-A248-7084B39C6C59}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SCQueryConnect</RootNamespace>
     <AssemblyName>SCQueryConnect</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <TargetFrameworkProfile />
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <TargetFrameworkProfile />
+    <PublishUrl>publishx86\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -25,7 +24,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/</InstallUrl>
+    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdatex86/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <ApplicationRevision>3</ApplicationRevision>
@@ -35,7 +34,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -44,17 +43,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>qc-icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>A56D439541B8077E854630B3840030B23D8D1CD6</ManifestCertificateThumbprint>
@@ -65,30 +68,6 @@
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>qc-icon.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -96,20 +75,16 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="SC.Api, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpCloud.ClientAPI.1.0.26\lib\SC.Api.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="SC.API.ComInterop, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpCloud.ClientAPI.1.0.26\lib\SC.API.ComInterop.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="SC.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpCloud.ClientAPI.1.0.26\lib\SC.Framework.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -128,84 +103,110 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Compile Include="..\SQLUpdate\App.xaml.cs">
+      <Link>App.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\BoolInverse.cs">
+      <Link>Converters\BoolInverse.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\BOOLToCollapsed.cs">
+      <Link>Converters\BOOLToCollapsed.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
+      <Link>Converters\BoolToVisibility.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
+      <Link>Helpers\SaveHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
+      <Link>MainWindow.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Properties\Resources.Designer.cs">
+      <Link>Properties\Resources.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Properties\Settings.Designer.cs">
+      <Link>Properties\Settings.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\QueryData.cs">
+      <Link>QueryData.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
+      <Link>ViewModels\ProxyViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\SelectedStoryViewModel.cs">
+      <Link>ViewModels\SelectedStoryViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\ProxySettings.xaml.cs">
+      <Link>Views\ProxySettings.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\SelectDatabaseType.xaml.cs">
+      <Link>Views\SelectDatabaseType.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\SelectStory.xaml.cs">
+      <Link>Views\SelectStory.xaml.cs</Link>
+    </Compile>
+    <Resource Include="qc-icon.ico" />
+    <None Include="..\SQLUpdate\app.config">
+      <Link>app.config</Link>
+    </None>
+    <None Include="..\SQLUpdate\Properties\Settings.settings">
+      <Link>Properties\Settings.settings</Link>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="..\SQLUpdate\SCSQLBatch.zip">
+      <Link>SCSQLBatch.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SQLUpdate\SCSQLBatchx86.zip">
+      <Link>SCSQLBatchx86.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="packages.config" />
+    <None Include="sharpcloudcodesigning.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="..\SQLUpdate\App.xaml">
+      <Link>App.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Converters\BoolInverse.cs" />
-    <Compile Include="Converters\BOOLToCollapsed.cs" />
-    <Compile Include="Converters\BoolToVisibility.cs" />
-    <Compile Include="Helpers\SaveHelper.cs" />
-    <Compile Include="QueryData.cs" />
-    <Compile Include="ViewModels\ProxyViewModel.cs" />
-    <Compile Include="ViewModels\SelectedStoryViewModel.cs" />
-    <Compile Include="Views\ProxySettings.xaml.cs">
-      <DependentUpon>ProxySettings.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\SelectStory.xaml.cs" />
-    <Compile Include="Views\SelectDatabaseType.xaml.cs">
-      <DependentUpon>SelectDatabaseType.xaml</DependentUpon>
-    </Compile>
-    <Page Include="MainWindow.xaml">
+    <Page Include="..\SQLUpdate\MainWindow.xaml">
+      <Link>MainWindow.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Views\ProxySettings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SelectStory.xaml">
+    <Page Include="..\SQLUpdate\Views\ProxySettings.xaml">
+      <Link>Views\ProxySettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SelectDatabaseType.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="..\SQLUpdate\Views\SelectDatabaseType.xaml">
+      <Link>Views\SelectDatabaseType.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\SelectStory.xaml">
+      <Link>Views\SelectStory.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <AppDesigner Include="Properties\" />
-    <Content Include="SCSQLBatch.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SCSQLBatchx86.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="sharpcloudcodesigning.pfx" />
-    <None Include="SQLUpdate_TemporaryKey.pfx" />
+    <Resource Include="..\SQLUpdate\favicon.ico">
+      <Link>favicon.ico</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\SQLUpdate\Images\logo_home.png">
+      <Link>Images\logo_home.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\splash.jpg">
+      <Link>Images\splash.jpg</Link>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
@@ -220,35 +221,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="favicon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\logo_home.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\splash.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="qc-icon.ico" />
+    <EmbeddedResource Include="..\SQLUpdate\Properties\Resources.resx">
+      <Link>Properties\Resources.resx</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <ItemGroup>
-    <Content Include="$(SolutionDir)SCSQLBatch\**\*">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(SolutionDir)SCSQLBatchx86\**\*">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
 </Project>

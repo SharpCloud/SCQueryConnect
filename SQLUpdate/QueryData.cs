@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Data.Odbc;
 using System.Data.OleDb;
@@ -36,6 +37,10 @@ namespace SCQueryConnect
         public DateTime? LastRunDateTime { get; set; }
         [DataMember]
         public string LogData { get; set; }
+        [IgnoreDataMember]
+        public DataView QueryResults { get; set; }
+        [IgnoreDataMember]
+        public DataView QueryResultsRels { get; set; }
 
         public string FormattedConnectionString => string.Format(ConnectionsString, FileName, SharePointURL);
 

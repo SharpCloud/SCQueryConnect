@@ -23,6 +23,7 @@ using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
 using System.Globalization;
 using SCQueryConnect.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace SCQueryConnect
 {
@@ -252,8 +253,19 @@ namespace SCQueryConnect
 
                             DataTable dt = new DataTable();
                             dt.Load(reader);
-                            DataGrid.ItemsSource = dt.DefaultView;
 
+                            var regex = new Regex(Regex.Escape("#"));
+                            for (var c = 0; c < dt.Columns.Count; c++)
+                            {
+                                var col = dt.Columns[c];
+                                if (col.Caption.ToLower().StartsWith("tags#"))
+                                {
+                                    col.Caption = regex.Replace(col.Caption, ".", 1);
+                                }
+                            }
+
+                            DataGrid.ItemsSource = dt.DefaultView;
+                            (connectionList.SelectedItem as QueryData).QueryResults = dt.DefaultView;
                         }
                     }
                 }
@@ -283,7 +295,7 @@ namespace SCQueryConnect
                             DataTable dt = new DataTable();
                             dt.Load(reader);
                             DataGridRels.ItemsSource = dt.DefaultView;
-
+                            (connectionList.SelectedItem as QueryData).QueryResultsRels = dt.DefaultView;
                         }
                     }
                 }
@@ -530,9 +542,16 @@ namespace SCQueryConnect
                     // create our string arrar
                     var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
                     // add the headers
+                    var regex = new Regex(Regex.Escape("#"));
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        arrayValues[0, i] = reader.GetName(i);
+                        var header = reader.GetName(i);
+                        if (header.ToLower().StartsWith("tags#"))
+                        {
+                            header = regex.Replace(header, ".", 1);
+                        }
+                        arrayValues[0, i] = header;
+                            
                         Debug.Write(arrayValues[0, i] + '\t');
                     }
                     // add the data values
@@ -1097,6 +1116,9 @@ namespace SCQueryConnect
 
                 tbLastRun.Text = qd.LastRunDate;
                 tbResults.Text = qd.LogData;
+
+                DataGrid.ItemsSource = qd.QueryResults;
+                DataGridRels.ItemsSource = qd.QueryResultsRels;
 
                 SetVisibeObjects(qd);
             }
