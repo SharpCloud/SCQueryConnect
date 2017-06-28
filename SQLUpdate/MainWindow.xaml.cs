@@ -266,6 +266,11 @@ namespace SCQueryConnect
 
                             DataGrid.ItemsSource = dt.DefaultView;
                             (connectionList.SelectedItem as QueryData).QueryResults = dt.DefaultView;
+
+                            for (var col = 0; col < DataGrid.Columns.Count; col++)
+                            {
+                                DataGrid.Columns[col].Header = dt.Columns[col].Caption;
+                            }
                         }
                     }
                 }
@@ -296,6 +301,11 @@ namespace SCQueryConnect
                             dt.Load(reader);
                             DataGridRels.ItemsSource = dt.DefaultView;
                             (connectionList.SelectedItem as QueryData).QueryResultsRels = dt.DefaultView;
+
+                            for (var col = 0; col < DataGrid.Columns.Count; col++)
+                            {
+                                DataGrid.Columns[col].Header = dt.Columns[col].Caption;
+                            }
                         }
                     }
                 }
