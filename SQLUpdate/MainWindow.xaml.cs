@@ -299,12 +299,23 @@ namespace SCQueryConnect
 
                             DataTable dt = new DataTable();
                             dt.Load(reader);
+
+                            var regex = new Regex(Regex.Escape("#"));
+                            for (var c = 0; c < dt.Columns.Count; c++)
+                            {
+                                var col = dt.Columns[c];
+                                if (col.Caption.ToLower().StartsWith("tags#"))
+                                {
+                                    col.Caption = regex.Replace(col.Caption, ".", 1);
+                                }
+                            }
+
                             DataGridRels.ItemsSource = dt.DefaultView;
                             (connectionList.SelectedItem as QueryData).QueryResultsRels = dt.DefaultView;
 
-                            for (var col = 0; col < DataGrid.Columns.Count; col++)
+                            for (var col = 0; col < DataGridRels.Columns.Count; col++)
                             {
-                                DataGrid.Columns[col].Header = dt.Columns[col].Caption;
+                                DataGridRels.Columns[col].Header = dt.Columns[col].Caption;
                             }
                         }
                     }
@@ -640,6 +651,7 @@ namespace SCQueryConnect
             var attributesToCreate = new List<string>();
             var updatedRelationships = new List<Relationship>();
             var attributeValues = new Dictionary<string, Dictionary<Relationship, string>>();
+            var tagGroupColumns = new List<string>();
 
             using (DbCommand command = connection.CreateCommand())
             {
@@ -690,6 +702,11 @@ namespace SCQueryConnect
                             bDirection = true;
                         else if (col == "TAGS")
                             bTags = true;
+                        else if (col.StartsWith("TAGS#"))
+                        {
+                            bTags = true;
+                            tagGroupColumns.Add(reader.GetName(i));
+                        }
                         else
                         {
                             if (story.RelationshipAttributes.Any(a => a.Name.ToUpper() == col))
@@ -750,14 +767,16 @@ namespace SCQueryConnect
                             }
                             if (bTags)
                             {
-                                // TODO - delete tags - needs implementing in the SDK        
-                                var tags = reader["TAGS"].ToString();
-                                foreach (var t in tags.Split(',' ))
+                                var pastedTags = new Dictionary<string, string>();
+
+                                pastedTags.Add("", reader["TAGS"].ToString());
+
+                                foreach (var group in tagGroupColumns)
                                 {
-                                    var tag = t.Trim();
-                                    if (!string.IsNullOrEmpty(tag))
-                                        rel.Tag_AddNew(tag);
+                                    pastedTags.Add(group.Substring(5), reader[group].ToString());
                                 }
+
+                                rel.Tags_ReplaceWithCSVStringsUsingGroups(pastedTags);
                             }
 
                             foreach (var att in attributeColumns)

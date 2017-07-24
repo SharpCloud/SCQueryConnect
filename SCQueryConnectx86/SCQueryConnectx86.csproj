@@ -27,7 +27,7 @@
     <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdatex86/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -77,14 +77,14 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="SC.Api, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.26\lib\SC.Api.dll</HintPath>
+    <Reference Include="SC.Api, Version=1.0.27.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.27\lib\SC.Api.dll</HintPath>
     </Reference>
-    <Reference Include="SC.API.ComInterop, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.26\lib\SC.API.ComInterop.dll</HintPath>
+    <Reference Include="SC.API.ComInterop, Version=1.0.27.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.27\lib\SC.API.ComInterop.dll</HintPath>
     </Reference>
     <Reference Include="SC.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.26\lib\SC.Framework.dll</HintPath>
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.27\lib\SC.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
