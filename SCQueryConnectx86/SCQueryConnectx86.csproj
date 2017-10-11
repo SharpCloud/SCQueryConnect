@@ -27,7 +27,7 @@
     <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdatex86/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -127,15 +127,6 @@
     <Compile Include="..\SQLUpdate\Properties\Resources.Designer.cs">
       <Link>Properties\Resources.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Properties\Settings.Designer.cs">
-      <Link>Properties\Settings.Designer.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Properties\Settings1.Designer.cs">
-      <Link>Properties\Settings1.Designer.cs</Link>
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="..\SQLUpdate\QueryData.cs">
       <Link>QueryData.cs</Link>
     </Compile>
@@ -157,11 +148,6 @@
     <Resource Include="qc-icon.ico" />
     <None Include="..\SQLUpdate\app.config">
       <Link>app.config</Link>
-    </None>
-    <None Include="..\SQLUpdate\Properties\Settings.settings">
-      <Link>Properties\Settings.settings</Link>
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
     <Content Include="..\SQLUpdate\SCSQLBatch.zip">
       <Link>SCSQLBatch.zip</Link>
