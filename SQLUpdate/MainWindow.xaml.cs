@@ -184,7 +184,9 @@ namespace SCQueryConnect
             var qd = connectionList.SelectedItem as QueryData;
             string info = string.Format("Internal Connection Type:\n{0}\n\nConnection String:\n{1}", qd.GetBatchDBType,
                 qd.FormattedConnectionString);
-            MessageBox.Show(info, "Internal Connection Info");
+            var dlg = new ConnectionInfo(info);
+            dlg.ShowDialog();
+            //MessageBox.Show(info, "Internal Connection Info");
             }
 
         private bool CheckDataIsOK(DbDataReader reader)

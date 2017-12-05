@@ -42,7 +42,7 @@ namespace SCQueryConnect
         [IgnoreDataMember]
         public DataView QueryResultsRels { get; set; }
 
-        public string FormattedConnectionString => string.Format(ConnectionsString, FileName, SharePointURL);
+        public string FormattedConnectionString => ConnectionsString.Replace("{0}", FileName).Replace("{1}", SharePointURL);
 
         public string GetBatchDBType
         {
@@ -112,6 +112,7 @@ namespace SCQueryConnect
                 case QueryData.DbType.SQL:
                     Name = "SQL Server Example";
                     FileName = "";
+                    SharePointURL = "";
                     ConnectionsString = "Server=.; Integrated Security=true; Database=demo";
                     QueryString = "SELECT * FROM TABLE";
                     QueryStringRels = "";
@@ -120,6 +121,7 @@ namespace SCQueryConnect
                 case QueryData.DbType.ODBC:
                     Name = "ODBC Example";
                     FileName = "";
+                    SharePointURL = "";
                     ConnectionsString = "DSN=DatasourceName";
                     QueryString = "SELECT * FROM TABLE";
                     QueryStringRels = "";
@@ -128,6 +130,7 @@ namespace SCQueryConnect
                 case QueryData.DbType.ADO:
                     Name = "ADO/OLEDB Example";
                     FileName = "";
+                    SharePointURL = "";
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;";
                     QueryString = "SELECT * FROM TABLE";
@@ -136,6 +139,7 @@ namespace SCQueryConnect
                 case QueryData.DbType.Excel:
                     Name = "Excel Example";
                     FileName = "C:/MyFolder/MyFile.xlsx";
+                    SharePointURL = "";
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml; HDR = YES'";
                     QueryString = "SELECT * from [Sheet1$]";
@@ -144,6 +148,7 @@ namespace SCQueryConnect
                 case QueryData.DbType.Access:
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
+                    SharePointURL = "";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0}";
                     QueryString = "SELECT * FROM TABLE";
                     QueryStringRels = "";

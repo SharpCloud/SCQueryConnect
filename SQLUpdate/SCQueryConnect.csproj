@@ -129,6 +129,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Views\ConnectionInfo.xaml.cs">
+      <DependentUpon>ConnectionInfo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BoolInverse.cs" />
     <Compile Include="Converters\BOOLToCollapsed.cs" />
     <Compile Include="Converters\BoolToVisibility.cs" />
@@ -143,6 +146,10 @@
     <Compile Include="Views\SelectDatabaseType.xaml.cs">
       <DependentUpon>SelectDatabaseType.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ConnectionInfo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
