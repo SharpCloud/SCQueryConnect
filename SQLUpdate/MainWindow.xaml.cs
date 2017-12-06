@@ -604,12 +604,27 @@ namespace SCQueryConnect
                         {
                             MessageBox.Show(errorMessage);
                             tbResults.ScrollToEnd();
-                            tbResults.Text += "\nERROR: " + errorMessage;
+                            tbResults.Text += errorMessage;
                         } else
                         {
                             foreach (var item in story.Items)
                             {
-                                item.AsElement.IsInRoadmap = updatedItems.Contains(item.AsElement.ID);
+                                if (!updatedItems.Contains(item.AsElement.ID))
+                                {
+                                    try
+                                    {
+                                        item.IsPublished = false;
+                                    }
+                                    catch (FieldAccessException ex)
+                                    {
+                                        errorMessage += "\nERROR: " + ex.Message;
+                                    }
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                tbResults.ScrollToEnd();
+                                tbResults.Text += errorMessage;
                             }
                         }
                     }
@@ -618,7 +633,14 @@ namespace SCQueryConnect
                         {
                             MessageBox.Show(errorMessage);
                             tbResults.ScrollToEnd();
-                            tbResults.Text += "\nERROR: " + errorMessage;
+                            tbResults.Text += errorMessage;
+                        } else
+                        {
+                            if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                tbResults.ScrollToEnd();
+                                tbResults.Text += errorMessage;
+                            }
                         }
                     }
                 }
@@ -754,18 +776,34 @@ namespace SCQueryConnect
                             var rel = story.Relationship_FindByItems(i1, i2) ??
                                         story.Relationship_AddNew(i1, i2);
                             if (bComment)
-                                rel.Comment = reader["COMMENT"].ToString();
+                            {
+                                try
+                                {
+                                    rel.Comment = reader["COMMENT"].ToString();
+                                }
+                                catch (FieldAccessException ex)
+                                {
+                                    tbResults.Text += "\nERROR: " + ex.Message;
+                                }
+                            }
                             if (bDirection)
                             {
-                                var txt = reader["DIRECTION"].ToString().Replace(" ", "").ToUpper();
-                                if (txt.Contains("BOTH"))
-                                    rel.Direction = Relationship.RelationshipDirection.Both;
-                                else if (txt.Contains("ATOB") || txt.Contains("1TO2"))
-                                    rel.Direction = Relationship.RelationshipDirection.AtoB;
-                                else if (txt.Contains("BTOA") || txt.Contains("2TO1"))
-                                    rel.Direction = Relationship.RelationshipDirection.Both;
-                                else 
-                                    rel.Direction = Relationship.RelationshipDirection.None;
+                                try
+                                {
+                                    var txt = reader["DIRECTION"].ToString().Replace(" ", "").ToUpper();
+                                    if (txt.Contains("BOTH"))
+                                        rel.Direction = Relationship.RelationshipDirection.Both;
+                                    else if (txt.Contains("ATOB") || txt.Contains("1TO2"))
+                                        rel.Direction = Relationship.RelationshipDirection.AtoB;
+                                    else if (txt.Contains("BTOA") || txt.Contains("2TO1"))
+                                        rel.Direction = Relationship.RelationshipDirection.Both;
+                                    else 
+                                        rel.Direction = Relationship.RelationshipDirection.None;
+                                }
+                                catch (FieldAccessException ex)
+                                {
+                                    tbResults.Text += "\nERROR: " + ex.Message;
+                                }
                             }
                             if (bTags)
                             {
@@ -777,32 +815,45 @@ namespace SCQueryConnect
                                 {
                                     pastedTags.Add(group.Substring(5), reader[group].ToString());
                                 }
-
-                                rel.Tags_ReplaceWithCSVStringsUsingGroups(pastedTags);
+                                try
+                                {
+                                    rel.Tags_ReplaceWithCSVStringsUsingGroups(pastedTags);
+                                }
+                                catch (FieldAccessException ex)
+                                {
+                                    tbResults.Text += "\nERROR: " + ex.Message;
+                                }
                             }
 
                             foreach (var att in attributeColumns)
                             {
-                                var val = reader[att.Name];
-
-                                if (val == null || val is DBNull || val.ToString() == "(NULL)")
+                                try
                                 {
-                                    rel.RemoveAttributeValue(att);
-                                }
-                                else {
-                                    switch (att.Type)
+                                    var val = reader[att.Name];
+
+                                    if (val == null || val is DBNull || val.ToString() == "(NULL)")
                                     {
-                                        case RelationshipAttribute.RelationshipAttributeType.Date:
-                                            rel.SetAttributeValue(att, (DateTime)val);
-                                            break;
-                                        case RelationshipAttribute.RelationshipAttributeType.Numeric:
-                                            rel.SetAttributeValue(att, (double)val);
-                                            break;
-                                        case RelationshipAttribute.RelationshipAttributeType.List:
-                                        case RelationshipAttribute.RelationshipAttributeType.Text:
-                                            rel.SetAttributeValue(att, val.ToString());
-                                            break;
+                                        rel.RemoveAttributeValue(att);
                                     }
+                                    else {
+                                        switch (att.Type)
+                                        {
+                                            case RelationshipAttribute.RelationshipAttributeType.Date:
+                                                rel.SetAttributeValue(att, (DateTime)val);
+                                                break;
+                                            case RelationshipAttribute.RelationshipAttributeType.Numeric:
+                                                rel.SetAttributeValue(att, (double)val);
+                                                break;
+                                            case RelationshipAttribute.RelationshipAttributeType.List:
+                                            case RelationshipAttribute.RelationshipAttributeType.Text:
+                                                rel.SetAttributeValue(att, val.ToString());
+                                                break;
+                                        }
+                                    }
+                                }
+                                catch (FieldAccessException ex)
+                                {
+                                    tbResults.Text += "\nERROR: " + ex.Message;
                                 }
                             }
 
