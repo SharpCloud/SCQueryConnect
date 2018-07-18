@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
@@ -501,6 +502,16 @@ namespace SCQueryConnect
 
             using (DbCommand command = connection.CreateCommand())
             {
+                int MaxRowCount = 1000;
+                try
+                {
+                    MaxRowCount = Int32.Parse(ConfigurationManager.AppSettings["MaxRowCount"]);
+                }
+                catch (Exception E)
+                {
+                    MaxRowCount = 1000;
+                }
+
                 command.CommandText = sqlString;
                 command.CommandType = CommandType.Text;
 
@@ -551,10 +562,9 @@ namespace SCQueryConnect
                         tempArray.Add(data);
                     }
 
-                    if (tempArray.Count > 1000)
+                    if (tempArray.Count > MaxRowCount)
                     {
-                        var s =
-                            "Your item query contains too many records (more than 1000). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
+                        var s = $"Your item query contains too many records (more than {MaxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
                         MessageBox.Show(s);
                         tbResults.Text += "\n" + s;
                         tbResults.ScrollToEnd();
