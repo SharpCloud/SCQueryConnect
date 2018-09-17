@@ -72,22 +72,23 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SC.Api, Version=1.0.34.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.34\lib\SC.Api.dll</HintPath>
+    <Reference Include="SC.Api, Version=1.0.36.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.36\lib\SC.Api.dll</HintPath>
     </Reference>
-    <Reference Include="SC.API.ComInterop, Version=1.0.34.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.34\lib\SC.API.ComInterop.dll</HintPath>
+    <Reference Include="SC.API.ComInterop, Version=1.0.36.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.36\lib\SC.API.ComInterop.dll</HintPath>
     </Reference>
     <Reference Include="SC.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.34\lib\SC.Framework.dll</HintPath>
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.36\lib\SC.Framework.dll</HintPath>
     </Reference>
     <Reference Include="SC.SharedModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.34\lib\SC.SharedModels.dll</HintPath>
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.0.36\lib\SC.SharedModels.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -122,7 +123,7 @@ SET dest=$(TargetDir)SCSQLBatchx86
 ) ELSE (
 SET dest=$(TargetDir)SCSQLBatch
 )
-powershell.exe -nologo -noprofile -command "&amp;  { Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe.config -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\Newtonsoft.Json.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.API.ComInterop.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Api.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Framework.dll -DestinationPath %25dest%25; }"
+powershell.exe -nologo -noprofile -command "&amp;  { Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe.config -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\Newtonsoft.Json.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.API.ComInterop.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Api.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Framework.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.SharedModels.dll -DestinationPath %25dest%25; }"
 
 copy %25dest%25.zip $(SolutionDir)\SQLUpdate /y
 copy %25dest%25.zip $(SolutionDir)\SCQueryConnectx86 /y</PostBuildEvent>

@@ -1053,6 +1053,7 @@ namespace SCQueryConnect
                     File.Delete($"{folder}/SC.Framework.dll");
                     File.Delete($"{folder}/SC.API.ComInterop.dll");
                     File.Delete($"{folder}/SC.Api.dll");
+                    File.Delete($"{folder}/SC.SharedModels.dll");
                     File.Delete($"{folder}/SCSQLBatch.exe");
                     File.Delete($"{folder}/SCSQLBatch.exe.config");
                     File.Delete($"{folder}/SCSQLBatch.zip");

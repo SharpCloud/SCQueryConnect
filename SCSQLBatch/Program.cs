@@ -205,7 +205,7 @@ namespace SCSQLBatch
                             {
                                 item.AsElement.IsInRoadmap = updatedItems.Contains(item.AsElement.ID);
                             }
-                            Log(string.Format("{0} rows processed.", row));
+                            Log(errorMessage);
                         }
                         else
                         {
@@ -215,7 +215,7 @@ namespace SCSQLBatch
                     else {
                         if (story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
                         {
-                            Log(string.Format("{0} rows processed.", row));
+                            Log(errorMessage);
                         }
                         else
                         {
@@ -542,7 +542,6 @@ namespace SCSQLBatch
             {
                 try
                 {
-
                     File.AppendAllText(LogFile, text);
                 }
                 catch (Exception ex)
