@@ -1,4 +1,7 @@
-﻿using System;
+﻿using SC.API.ComInterop;
+using SC.API.ComInterop.ArrayProcessing;
+using SC.API.ComInterop.Models;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -9,16 +12,30 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
-using SC.API.ComInterop;
-using SC.API.ComInterop.Models;
-using System.Globalization;
 
 namespace SCSQLBatch
 {
     class Program
     {
+        private readonly string[] _validItem1Headings =
+        {
+            "ITEM 1",
+            "EXTERNALID1",
+            "EXTERNALID 1",
+            "EXTERNAL ID 1",
+            "INTERNAL ID 1"
+        };
+
+        private readonly string[] _validItem2Headings =
+{
+            "ITEM 2",
+            "EXTERNALID2",
+            "EXTERNALID 2",
+            "EXTERNAL ID 2",
+            "INTERNAL ID 2"
+        };
+
         static bool unpublishItems = false;
 
         static void Main(string[] args)
@@ -239,283 +256,68 @@ namespace SCSQLBatch
                 return;
 
             Log("Updating relationships");
-
-            string strItem1 = "ITEM1";
-            bool bItemName1 = true;
-            string strItem2 = "ITEM2";
-            bool bItemName2 = true;
-            bool bDirection = false;
-            bool bComment = false;
-            bool bTags = false;
+            
             var attributeColumns = new List<RelationshipAttribute>();
             var attributesToCreate = new List<string>();
             var updatedRelationships = new List<Relationship>();
             var attributeValues = new Dictionary<string, Dictionary<Relationship, string>>();
 
-            int row = 1;
+            int rowCount;
 
             using (DbCommand command = connection.CreateCommand())
             {
                 command.CommandText = queryString;
                 command.CommandType = CommandType.Text;
 
+                int columnCount;
+                var dataList = new List<string[]>();
                 using (DbDataReader reader = command.ExecuteReader())
                 {
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        var col = reader.GetName(i).ToUpper();
-                        if (col == "ITEM 1")
-                            strItem1 = "ITEM 1";
-                        else if (col == "EXTERNALID1")
-                        {
-                            bItemName1 = false;
-                            strItem1 = "EXTERNALID1";
-                        }
-                        else if (col == "EXTERNALID 1")
-                        {
-                            bItemName1 = false;
-                            strItem1 = "EXTERNALID 1";
-                        }
-                        else if (col == "ITEM 2")
-                            strItem2 = "ITEM 2";
-                        else if (col == "EXTERNALID2")
-                        {
-                            bItemName2 = false;
-                            strItem2 = "EXTERNALID2";
-                        }
-                        else if (col == "EXTERNALID 2")
-                        {
-                            bItemName2 = false;
-                            strItem2 = "EXTERNALID 2";
-                        }
-                        else if (col == "COMMENT")
-                            bComment = true;
-                        else if (col == "DIRECTION")
-                            bDirection = true;
-                        else if (col == "TAGS")
-                            bTags = true;
-                        else
-                        {
-                            if (story.RelationshipAttributes.Any(a => a.Name.ToUpper() == col))
-                            {
-                                attributeColumns.Add(story.RelationshipAttributes.FirstOrDefault(a => a.Name.ToUpper() == col));
-                            }
-                            else if (!attributesToCreate.Any(name => name.ToUpper() == col))
-                            {
-                                var type = reader.GetFieldType(i);
+                    // Write array column headers
 
-                                if (type == typeof(DateTime))
-                                {
-                                    var newAttribute = story.RelationshipAttribute_Add(reader.GetName(i), RelationshipAttribute.RelationshipAttributeType.Date);
-                                    attributeColumns.Add(newAttribute);
-                                }
-                                else if (TypeIsNumeric(type))
-                                {
-                                    var newAttribute = story.RelationshipAttribute_Add(reader.GetName(i), RelationshipAttribute.RelationshipAttributeType.Numeric);
-                                    attributeColumns.Add(newAttribute);
-                                }
-                                else {
-                                    attributesToCreate.Add(reader.GetName(i));
-                                    attributeValues.Add(reader.GetName(i), new Dictionary<Relationship, string>());
-                                }
-                            }
-                        }
+                    columnCount = reader.FieldCount;
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        dataList.Add(new string[columnCount]);
+                        dataList[0][i] = reader.GetName(i).ToUpper();
                     }
+
+                    // Write array data
 
                     while (reader.Read())
                     {
-                        var t1 = reader[strItem1].ToString();
-                        var t2 = reader[strItem2].ToString();
+                        var dataRow = new string[columnCount];
+                        dataList.Add(dataRow);
 
-                        var i1 = (bItemName1) ? story.Item_FindByName(t1) : story.Item_FindByExternalId(t1);
-                        var i2 = (bItemName2) ? story.Item_FindByName(t2) : story.Item_FindByExternalId(t2);
-
-                        if (i1 == null || i2 == null)
+                        for (int i = 0; i < columnCount; i++)
                         {
-                            Log($"ERROR: Could not find items '{t1}' or '{t2}' on {row}.");
-                        }
-                        else
-                        {
-                            var rel = story.Relationship_FindByItems(i1, i2) ??
-                                      story.Relationship_AddNew(i1, i2);
-                            if (bComment)
-                                rel.Comment = reader["COMMENT"].ToString();
-                            if (bDirection)
-                            {
-                                var txt = reader["DIRECTION"].ToString().Replace(" ", "").ToUpper();
-                                if (txt.Contains("BOTH"))
-                                    rel.Direction = Relationship.RelationshipDirection.Both;
-                                else if (txt.Contains("ATOB") || txt.Contains("1TO2"))
-                                    rel.Direction = Relationship.RelationshipDirection.AtoB;
-                                else if (txt.Contains("BTOA") || txt.Contains("2TO1"))
-                                    rel.Direction = Relationship.RelationshipDirection.Both;
-                                else
-                                    rel.Direction = Relationship.RelationshipDirection.None;
-                            }
-                            if (bTags)
-                            {
-                                // TODO - delete tags - needs implementing in the SDK        
-                                var tags = reader["TAGS"].ToString();
-                                foreach (var t in tags.Split(','))
-                                {
-                                    var tag = t.Trim();
-                                    if (!string.IsNullOrEmpty(tag))
-                                        rel.Tag_AddNew(tag);
-                                }
-                            }
-
-                            foreach (var att in attributeColumns)
-                            {
-                                var val = reader[att.Name];
-
-                                if (val == null || val is DBNull || val.ToString() == "(NULL)")
-                                {
-                                    rel.RemoveAttributeValue(att);
-                                }
-                                else {
-                                    switch (att.Type)
-                                    {
-                                        case RelationshipAttribute.RelationshipAttributeType.Date:
-                                            rel.SetAttributeValue(att, (DateTime)val);
-                                            break;
-                                        case RelationshipAttribute.RelationshipAttributeType.Numeric:
-                                            rel.SetAttributeValue(att, (double)val);
-                                            break;
-                                        case RelationshipAttribute.RelationshipAttributeType.List:
-                                        case RelationshipAttribute.RelationshipAttributeType.Text:
-                                            rel.SetAttributeValue(att, val.ToString());
-                                            break;
-                                    }
-                                }
-                            }
-
-                            foreach (var newAtt in attributesToCreate)
-                            {
-                                // Attributes we don't know the type of, keep all the values
-                                attributeValues[newAtt].Add(rel, reader[newAtt].ToString());
-                            }
-                        }
-                        row++;
-                    }
-
-                    foreach (var item in attributeValues)
-                    {
-                        var nullCount = 0;
-                        var numCount = 0;
-                        var dateCount = 0;
-                        var labels = new List<string>();
-                        var isText = false;
-                        double outDouble;
-                        DateTime outDateTime;
-
-                        // Find the attribute type
-                        foreach (var rel in item.Value)
-                        {
-                            if (string.IsNullOrEmpty(rel.Value) || rel.Value == "(NULL)")
-                            {
-                                nullCount++;
-                            }
-                            else if (double.TryParse(rel.Value, out outDouble))
-                            {
-                                numCount++;
-                            }
-                            else if (DateTime.TryParseExact(rel.Value, "yyyy MM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "yyyy MMM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "yyyy-MMM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "yyyy/MMM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd MM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd MMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd/MMM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                              || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime))
-                            {
-                                dateCount++;
-                            }
-                            else {
-                                if (!isText)
-                                {
-                                    if (rel.Value.Length > 100)
-                                    {
-                                        isText = true;
-                                    }
-                                    else
-                                    {
-                                        if (!labels.Contains(rel.Value))
-                                        {
-                                            labels.Add(rel.Value);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        RelationshipAttribute newAttribute;
-                        if (dateCount > 0 && dateCount + nullCount == item.Value.Count)
-                        {
-                            newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.Date);
-                            foreach (var rel in item.Value)
-                            {
-                                if (!string.IsNullOrEmpty(rel.Value) && rel.Value != "(NULL)")
-                                {
-                                    if (DateTime.TryParseExact(rel.Value, "yyyy MM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "yyyy MMM dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "yyyy-MMM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "yyyy/MMM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd MM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd MMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd/MMM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime)
-                          || DateTime.TryParseExact(rel.Value, "dd/MM/yyyy hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out outDateTime))
-                                    {
-                                        rel.Key.SetAttributeValue(newAttribute, outDateTime);
-                                    }
-                                }
-                            }
-                        }
-                        else if (numCount > 0 && numCount + nullCount == item.Value.Count)
-                        {
-                            newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.Numeric);
-                            foreach (var rel in item.Value)
-                            {
-                                if (!string.IsNullOrEmpty(rel.Value) && rel.Value != "(NULL)")
-                                {
-                                    if (double.TryParse(rel.Value, out outDouble))
-                                    {
-                                        rel.Key.SetAttributeValue(newAttribute, outDouble);
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            if (!isText && (labels.Count + nullCount < item.Value.Count))
-                            {
-                                newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.List);
-                            }
-                            else
-                            {
-                                newAttribute = story.RelationshipAttribute_Add(item.Key, RelationshipAttribute.RelationshipAttributeType.Text);
-                            }
-                            foreach (var rel in item.Value)
-                            {
-                                if (!string.IsNullOrEmpty(rel.Value) && rel.Value != "(NULL)")
-                                {
-                                    rel.Key.SetAttributeValue(newAttribute, rel.Value);
-                                }
-                            }
+                            dataRow[i] = reader[i].ToString();
                         }
                     }
                 }
-            }
-            Log($"{row} rows processed.");
 
+                // Create data array to pass to SharpCloud
+
+                var filteredData = dataList.Where(strArray =>
+                    strArray.Any(s => !string.IsNullOrWhiteSpace(s)))
+                    .ToList();
+
+                var data = new string[filteredData.Count, columnCount];
+
+                for (int row = 0; row < filteredData.Count; row++)
+                {
+                    for (int column = 0; column < columnCount; column++)
+                    {
+                        data[row, column] = filteredData[row][column];
+                    }
+                }
+                
+                rowCount = filteredData.Count - 1; // -1 for headings
+
+                var updater = new RelationshipsUpdater();
+                updater.UpdateRelationships(data, story);
+            }
+            Log($"{rowCount} rows processed.");
         }
 
         private static DbConnection GetDb(string connectionString)
