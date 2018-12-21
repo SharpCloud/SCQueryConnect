@@ -725,7 +725,7 @@ namespace SCQueryConnect
                     for (int i = 0; i < columnCount; i++)
                     {
                         dataList.Add(new string[columnCount]);
-                        dataList[0][i] = reader.GetName(i).ToUpper();
+                        dataList[0][i] = reader.GetName(i);
                     }
 
                     // Write array data
