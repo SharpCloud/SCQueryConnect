@@ -135,6 +135,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\MainWindowHelper.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>
     </Compile>

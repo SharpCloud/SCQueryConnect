@@ -998,16 +998,9 @@ namespace SCQueryConnect
 
         private void LostFocusStoryID(object sender, RoutedEventArgs e)
         {
+            var helper = new MainWindowHelper();
             var s = StoryId.Text;
-            if (s.Contains("#/story"))
-            {
-                var mid = s.Substring(s.IndexOf("#/story") + 8);
-                if (mid.Length > 36)
-                {
-                    mid = mid.Substring(0, 36);
-                    StoryId.Text = mid;
-                }
-            }
+            StoryId.Text = helper.GetStoryUrl(s);
             SaveSettings();
         }
 
