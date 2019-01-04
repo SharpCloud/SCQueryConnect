@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E564C8AE-70EA-4CED-AEC0-A5924B264996}</ProjectGuid>
+    <ProjectGuid>{F9E94CCA-D232-4AA7-96CB-AC9E2F099ED1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SCSQLBatchDelete</RootNamespace>
-    <AssemblyName>SCSQLBatchDelete</AssemblyName>
+    <RootNamespace>SCSQLBatchx86</RootNamespace>
+    <AssemblyName>SCSQLBatchx86</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -48,17 +49,19 @@
       <HintPath>..\packages\SharpCloud.ClientAPI.1.0.38\lib\SC.SharedModels.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="..\SCSQLBatch\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,4 +69,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>SET dest=$(TargetDir)SCSQLBatchx86
+
+powershell.exe -nologo -noprofile -command "&amp;  { Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatchx86.exe -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatchx86.exe.config -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\Newtonsoft.Json.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.API.ComInterop.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Api.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Framework.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.SharedModels.dll -DestinationPath %25dest%25; }"
+
+copy %25dest%25.zip $(SolutionDir)\SQLUpdate /y
+copy %25dest%25.zip $(SolutionDir)\SCQueryConnectx86 /y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
