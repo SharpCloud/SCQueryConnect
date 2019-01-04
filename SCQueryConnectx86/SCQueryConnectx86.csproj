@@ -119,9 +119,6 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
       <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Helpers\MainWindowHelper.cs">
-      <Link>Helpers\MainWindowHelper.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
@@ -230,6 +227,12 @@
     <EmbeddedResource Include="..\SQLUpdate\Properties\Resources.resx">
       <Link>Properties\Resources.resx</Link>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SCQueryConnect.Common\SCQueryConnect.Common.csproj">
+      <Project>{5b57d77f-7ce4-47f2-9f12-a5c532022cd1}</Project>
+      <Name>SCQueryConnect.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

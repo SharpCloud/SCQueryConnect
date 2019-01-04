@@ -2,6 +2,7 @@
 using SC.API.ComInterop;
 using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
+using SCQueryConnect.Common;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
@@ -92,7 +93,7 @@ namespace SCQueryConnect
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
         private ProxyViewModel _proxyViewModel;
-        private MainWindowHelper _mainWindowHelper = new MainWindowHelper();
+        private QueryConnectHelper _mainWindowHelper = new QueryConnectHelper();
 
         public MainWindow()
         {

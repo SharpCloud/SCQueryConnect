@@ -135,7 +135,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helpers\MainWindowHelper.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>
     </Compile>
@@ -263,5 +262,11 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SCQueryConnect.Common\SCQueryConnect.Common.csproj">
+      <Project>{5b57d77f-7ce4-47f2-9f12-a5c532022cd1}</Project>
+      <Name>SCQueryConnect.Common</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

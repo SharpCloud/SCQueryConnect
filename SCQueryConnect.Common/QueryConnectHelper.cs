@@ -1,8 +1,8 @@
 ﻿using SC.API.ComInterop.Models;
 
-namespace SCQueryConnect.Helpers
+namespace SCQueryConnect.Common
 {
-    internal class MainWindowHelper
+    public class QueryConnectHelper
     {
         public string GetStoryUrl(string input)
         {
