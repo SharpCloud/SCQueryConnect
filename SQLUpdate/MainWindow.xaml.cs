@@ -838,17 +838,9 @@ namespace SCQueryConnect
                     File.Delete($"{folder}/SCSQLBatch.exe");
                     File.Delete($"{folder}/SCSQLBatch.exe.config");
                     File.Delete($"{folder}/SCSQLBatch.zip");
+                    File.Delete($"{folder}/SCQueryConnect.Common.dll");
 
                     ZipFile.ExtractToDirectory(zipfile, folder);
-
-                    /*
-                    CopyResourceFile(zipfile, folder, "Newtonsoft.Json.dll");
-                    CopyResourceFile(zipfile, folder, "SC.Framework.dll");
-                    CopyResourceFile(zipfile, folder, "SC.API.ComInterop.dll");
-                    CopyResourceFile(zipfile, folder, "SC.Api.dll");
-                    CopyResourceFile(zipfile, folder, "SCSQLBatch.exe");
-                    CopyResourceFile(zipfile, folder, "SCSQLBatch.exe.config");
-                    */
                 }
                 catch (Exception exception2)
                 {
