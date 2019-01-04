@@ -92,6 +92,7 @@ namespace SCQueryConnect
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
         private ProxyViewModel _proxyViewModel;
+        private MainWindowHelper _mainWindowHelper = new MainWindowHelper();
 
         public MainWindow()
         {
@@ -471,32 +472,37 @@ namespace SCQueryConnect
                 tbResults.Text += "Connecting to Sharpcloud " + url;
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
+
                 var sc = new SharpCloudApi(username, password, url, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
                 var story = sc.LoadStory(storyId);
-                tbResults.Text += "\nReading story '" + story.Name + "'";
+                var isValid = _mainWindowHelper.Validate(story, out var message);
+                tbResults.Text += $"\n{message}";
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
 
-                using (DbConnection connection = GetDb())
+                if (isValid)
                 {
-                    connection.Open();
-                    await UpdateItems(connection, story, SQLString.Text);
-                    await UpdateRelationships(connection, story, SQLStringRels.Text);
+                    using (DbConnection connection = GetDb())
+                    {
+                        connection.Open();
+                        await UpdateItems(connection, story, SQLString.Text);
+                        await UpdateRelationships(connection, story, SQLStringRels.Text);
 
-                    tbResults.Text += "\nSaving Changes ";
-                    await Task.Delay(20);
-                    tbResults.ScrollToEnd();
-                    story.Save();
-                    tbResults.Text += "\nSave Complete!";
-                    tbResults.ScrollToEnd();
-                    await Task.Delay(20);
+                        tbResults.Text += "\nSaving Changes ";
+                        await Task.Delay(20);
+                        tbResults.ScrollToEnd();
+                        story.Save();
+                        tbResults.Text += "\nSave Complete!";
+                        tbResults.ScrollToEnd();
+                        await Task.Delay(20);
 
-                    tbResults.Text += $"\nUpdate process completed in {(DateTime.Now-start).TotalSeconds:f2} seconds";
+                        tbResults.Text += $"\nUpdate process completed in {(DateTime.Now - start).TotalSeconds:f2} seconds";
 
-                    qd.LogData = tbResults.Text;
-                    qd.LastRunDateTime = DateTime.Now;
-                    tbLastRun.Text = qd.LastRunDate;
-                    SaveSettings();
+                        qd.LogData = tbResults.Text;
+                        qd.LastRunDateTime = DateTime.Now;
+                        tbLastRun.Text = qd.LastRunDate;
+                        SaveSettings();
+                    }
                 }
             }
             catch (Exception ex)
@@ -998,9 +1004,8 @@ namespace SCQueryConnect
 
         private void LostFocusStoryID(object sender, RoutedEventArgs e)
         {
-            var helper = new MainWindowHelper();
             var s = StoryId.Text;
-            StoryId.Text = helper.GetStoryUrl(s);
+            StoryId.Text = _mainWindowHelper.GetStoryUrl(s);
             SaveSettings();
         }
 

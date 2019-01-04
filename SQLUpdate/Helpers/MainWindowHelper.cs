@@ -1,4 +1,6 @@
-﻿namespace SCQueryConnect.Helpers
+﻿using SC.API.ComInterop.Models;
+
+namespace SCQueryConnect.Helpers
 {
     internal class MainWindowHelper
     {
@@ -15,6 +17,18 @@
             }
 
             return input;
+        }
+
+        public bool Validate(Story story, out string message)
+        {
+            if (story.Categories.Length == 0)
+            {
+                message = "Aborting update: story has no categories";
+                return false;
+            }
+
+            message = $"Reading story '{story.Name}'";
+            return true;
         }
     }
 }

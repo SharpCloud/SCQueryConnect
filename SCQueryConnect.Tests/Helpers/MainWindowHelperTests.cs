@@ -1,4 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
+using SC.Api.Interfaces;
+using SC.API.ComInterop.Models;
+using SC.Entities.Models;
+using Category = SC.Entities.Models.Category;
 
 namespace SCQueryConnect.Helpers.Tests
 {
@@ -56,6 +61,46 @@ namespace SCQueryConnect.Helpers.Tests
             // Assert
 
             Assert.AreEqual(StoryId, output);
+        }
+
+        [Test]
+        public void StoryIsInvalidWithNoCategories()
+        {
+            // Arrange
+
+            var story = new Story(new Roadmap(), Mock.Of<ISharpcloudClient2>());
+            var helper = new MainWindowHelper();
+
+            // Act
+
+            var isValid = helper.Validate(story, out var message);
+
+            // Assert
+
+            Assert.IsFalse(isValid);
+            Assert.AreEqual(message, "Aborting update: story has no categories");
+        }
+
+        [Test]
+        public void StoryIsValidWithCategories()
+        {
+            // Arrange
+
+            var roadmap = new Roadmap();
+            roadmap.Categories.Add(new Category());
+            roadmap.Name = "StoryName";
+
+            var story = new Story(roadmap, Mock.Of<ISharpcloudClient2>());
+            var helper = new MainWindowHelper();
+
+            // Act
+
+            var isValid = helper.Validate(story, out var message);
+
+            // Assert
+
+            Assert.IsTrue(isValid);
+            Assert.AreEqual(message, "Reading story 'StoryName'");
         }
     }
 }
