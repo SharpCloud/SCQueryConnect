@@ -805,9 +805,8 @@ namespace SCQueryConnect
 
         private void GenerateBatchFile(bool b32bit)
         {
-            string zipfile = "SCSQLBatch.zip";
-            if (b32bit)
-                zipfile = "SCSQLBatchx86.zip";
+            var suffix = b32bit ? "x86" : string.Empty;
+            string zipfile = $"SCSQLBatch{suffix}.zip";
 
             if (!ValidateCreds())
                 return;
@@ -817,7 +816,7 @@ namespace SCQueryConnect
 
             try
             {
-                var configFilename = folder + "/SCSQLBatch.exe.config";
+                var configFilename = folder + $"/SCSQLBatch{suffix}.exe.config";
 
                 if (File.Exists(configFilename))
                 {
@@ -835,8 +834,8 @@ namespace SCQueryConnect
                     File.Delete($"{folder}/SC.API.ComInterop.dll");
                     File.Delete($"{folder}/SC.Api.dll");
                     File.Delete($"{folder}/SC.SharedModels.dll");
-                    File.Delete($"{folder}/SCSQLBatch.exe");
-                    File.Delete($"{folder}/SCSQLBatch.exe.config");
+                    File.Delete($"{folder}/SCSQLBatch{suffix}.exe");
+                    File.Delete($"{folder}/SCSQLBatch{suffix}.exe.config");
                     File.Delete($"{folder}/SCSQLBatch.zip");
                     File.Delete($"{folder}/SCQueryConnect.Common.dll");
 
