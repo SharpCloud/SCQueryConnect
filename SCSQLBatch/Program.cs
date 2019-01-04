@@ -1,6 +1,7 @@
 ﻿using SC.API.ComInterop;
 using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
+using SCQueryConnect.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -57,6 +58,7 @@ namespace SCSQLBatch
             var proxyUsername = ConfigurationManager.AppSettings["proxyUsername"];
             var proxyPassword = ConfigurationManager.AppSettings["proxyPassword"];
             var proxyPassword64 = ConfigurationManager.AppSettings["proxyPassword64"];
+            var qcHelper = new QueryConnectHelper();
 
             // basic checks
             if (string.IsNullOrEmpty(userid) || userid == "USERID")
@@ -115,21 +117,20 @@ namespace SCSQLBatch
                 // create our connection
                 var sc = new SharpCloudApi(userid, password, url, proxy, proxyAnonymous, proxyUsername, proxyPassword);
                 var story = sc.LoadStory(storyid);
+                var isValid = qcHelper.Validate(story, out var message);
+                Log(message);
 
-
-                using (DbConnection connection = GetDb(connectionString))
+                if (isValid)
                 {
-                    connection.Open();
-
-                    UpdateItems(connection, story, queryString);
-
-                    UpdateRelationships(connection, story, queryStringRels);
-
-                    Log("Saving");
-
-                    story.Save();
-
-                    Log($"Process completed in {(DateTime.UtcNow-start).Seconds} seconds.");
+                    using (DbConnection connection = GetDb(connectionString))
+                    {
+                        connection.Open();
+                        UpdateItems(connection, story, queryString);
+                        UpdateRelationships(connection, story, queryStringRels);
+                        Log("Saving");
+                        story.Save();
+                        Log($"Process completed in {(DateTime.UtcNow - start).Seconds} seconds.");
+                    }
                 }
             }
             catch (Exception e)

@@ -93,7 +93,7 @@ namespace SCQueryConnect
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
         private ProxyViewModel _proxyViewModel;
-        private QueryConnectHelper _mainWindowHelper = new QueryConnectHelper();
+        private QueryConnectHelper _qcHelper = new QueryConnectHelper();
 
         public MainWindow()
         {
@@ -476,7 +476,7 @@ namespace SCQueryConnect
 
                 var sc = new SharpCloudApi(username, password, url, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
                 var story = sc.LoadStory(storyId);
-                var isValid = _mainWindowHelper.Validate(story, out var message);
+                var isValid = _qcHelper.Validate(story, out var message);
                 tbResults.Text += $"\n{message}";
                 tbResults.ScrollToEnd();
                 await Task.Delay(20);
@@ -1006,7 +1006,7 @@ namespace SCQueryConnect
         private void LostFocusStoryID(object sender, RoutedEventArgs e)
         {
             var s = StoryId.Text;
-            StoryId.Text = _mainWindowHelper.GetStoryUrl(s);
+            StoryId.Text = _qcHelper.GetStoryUrl(s);
             SaveSettings();
         }
 
