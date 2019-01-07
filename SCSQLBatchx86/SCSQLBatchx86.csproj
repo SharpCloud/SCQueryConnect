@@ -60,6 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SCSQLBatch\Helpers\LogHelper.cs">
+      <Link>Helpers\LogHelper.cs</Link>
+    </Compile>
     <Compile Include="..\SCSQLBatch\Program.cs">
       <Link>Program.cs</Link>
     </Compile>

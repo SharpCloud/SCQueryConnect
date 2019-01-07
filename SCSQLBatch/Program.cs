@@ -2,6 +2,7 @@
 using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Common;
+using SCSQLBatch.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -345,7 +346,9 @@ namespace SCSQLBatch
             {
                 try
                 {
-                    File.AppendAllText(LogFile, text);
+                    var helper = new LogHelper();
+                    var path = helper.GetAbsolutePath(LogFile);
+                    File.AppendAllText(path, text);
                 }
                 catch (Exception ex)
                 {
