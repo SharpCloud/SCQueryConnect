@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using SC.API.ComInterop;
-using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Common;
 using SCQueryConnect.Helpers;
@@ -36,24 +35,6 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private readonly string[] _validItem1Headings =
-        {
-            "ITEM 1",
-            "EXTERNALID1",
-            "EXTERNALID 1",
-            "EXTERNAL ID 1",
-            "INTERNAL ID 1"
-        };
-
-        private readonly string[] _validItem2Headings =
-{
-            "ITEM 2",
-            "EXTERNALID2",
-            "EXTERNALID 2",
-            "EXTERNAL ID 2",
-            "INTERNAL ID 2"
-        };
-
         public string AppNameOnly => $"SharpCloud QueryConnect v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
 
         public string AppName
@@ -93,14 +74,21 @@ namespace SCQueryConnect
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
         private ProxyViewModel _proxyViewModel;
-        private QueryConnectHelper _qcHelper = new QueryConnectHelper();
+        private QueryConnectHelper _qcHelper;
+        private UIRelationshipsDataChecker _relationshipsChecker;
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             DataContext = this;
-        }
+
+            _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
+
+            _qcHelper = new QueryConnectHelper(
+                new UILogger(tbResults),
+                _relationshipsChecker);
+    }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -229,26 +217,6 @@ namespace SCQueryConnect
             return bOK;
         }
 
-        private bool CheckDataIsOKRels(DbDataReader reader)
-        {
-            bool bOK1 = false;
-            bool bOK2 = false;
-
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                var heading = reader.GetName(i).ToUpper();
-
-                if (_validItem1Headings.Contains(heading))
-                    bOK1 = true;
-
-                if (_validItem2Headings.Contains(heading))
-                    bOK2 = true;
-            }
-            txterrRels.Visibility = (bOK1 && bOK2) ? Visibility.Collapsed : Visibility.Visible;
-
-            return bOK1 && bOK2;
-        }
-
         private void RunClick(object sender, RoutedEventArgs e)
         {
             try
@@ -320,7 +288,7 @@ namespace SCQueryConnect
 
                         using (DbDataReader reader = command.ExecuteReader())
                         {
-                            CheckDataIsOKRels(reader);
+                            _relationshipsChecker.CheckDataIsOKRels(reader);
 
                             DataTable dt = new DataTable();
                             dt.Load(reader);
@@ -487,7 +455,7 @@ namespace SCQueryConnect
                     {
                         connection.Open();
                         await UpdateItems(connection, story, SQLString.Text);
-                        await UpdateRelationships(connection, story, SQLStringRels.Text);
+                        await _qcHelper.UpdateRelationships(connection, story, SQLStringRels.Text);
 
                         tbResults.Text += "\nSaving Changes ";
                         await Task.Delay(20);
@@ -691,84 +659,10 @@ namespace SCQueryConnect
                 type == typeof(UInt16) || type == typeof(UInt32) || type == typeof(UInt64);
         }
 
-        private async Task UpdateRelationships(DbConnection connection, Story story, string sqlString)
-        {
-            if (string.IsNullOrWhiteSpace(sqlString))
-            {
-                tbResults.Text += "\nNo Relationship Query detected";
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
-                return;
-            }
-
-            using (DbCommand command = connection.CreateCommand())
-            {
-                command.CommandText = sqlString;
-                command.CommandType = CommandType.Text;
-
-                tbResults.Text += "\nReading database for relationships";
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
-
-                int columnCount;
-                var dataList = new List<string[]>();
-                using (DbDataReader reader = command.ExecuteReader())
-                {
-                    if (!CheckDataIsOKRels(reader))
-                    {
-                        tbResults.Text += "\nERROR: Invalid SQL";
-                        return;
-                    }
-
-                    // Write array column headers
-
-                    columnCount = reader.FieldCount;
-                    for (int i = 0; i < columnCount; i++)
-                    {
-                        dataList.Add(new string[columnCount]);
-                        dataList[0][i] = reader.GetName(i);
-                    }
-
-                    // Write array data
-
-                    while (reader.Read())
-                    {
-                        var dataRow = new string[columnCount];
-                        dataList.Add(dataRow);
-
-                        for (int i = 0; i < columnCount; i++)
-                        {
-                            dataRow[i] = reader[i].ToString();
-                        }
-                    }
-                }
-
-                // Create data array to pass to SharpCloud
-
-                var filteredData = dataList.Where(strArray =>
-                    strArray.Any(s => !string.IsNullOrWhiteSpace(s)))
-                    .ToList();
-
-                var data = new string[filteredData.Count, columnCount];
-
-                for (int row = 0; row < filteredData.Count; row++)
-                {
-                    for (int column = 0; column < columnCount; column++)
-                    {
-                        data[row, column] = filteredData[row][column];
-                    }
-                }
-
-                var updater = new RelationshipsUpdater();
-                updater.UpdateRelationships(data, story);
-            }
-        }
-
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
             Process.Start(GetFolder());
         }
-
 
         private void GenerateBatchFile32(object sender, RoutedEventArgs e)
         {

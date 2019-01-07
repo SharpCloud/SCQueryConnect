@@ -134,6 +134,12 @@
     <Compile Include="..\SQLUpdate\QueryData.cs">
       <Link>QueryData.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\UILogger.cs">
+      <Link>UILogger.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\UIRelationshipsDataChecker.cs">
+      <Link>UIRelationshipsDataChecker.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
       <Link>ViewModels\ProxyViewModel.cs</Link>
     </Compile>

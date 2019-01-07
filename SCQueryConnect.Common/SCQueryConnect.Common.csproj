@@ -56,6 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\ILog.cs" />
+    <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />
+    <Compile Include="RelationshipsDataChecker.cs" />
     <Compile Include="QueryConnectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
