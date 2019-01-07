@@ -701,12 +701,6 @@ namespace SCQueryConnect
                 return;
             }
 
-            var attributeColumns = new List<RelationshipAttribute>();
-            var attributesToCreate = new List<string>();
-            var updatedRelationships = new List<Relationship>();
-            var attributeValues = new Dictionary<string, Dictionary<Relationship, string>>();
-            var tagGroupColumns = new List<string>();
-
             using (DbCommand command = connection.CreateCommand())
             {
                 command.CommandText = sqlString;

@@ -258,11 +258,6 @@ namespace SCSQLBatch
                 return;
 
             Log("Updating relationships");
-            
-            var attributeColumns = new List<RelationshipAttribute>();
-            var attributesToCreate = new List<string>();
-            var updatedRelationships = new List<Relationship>();
-            var attributeValues = new Dictionary<string, Dictionary<Relationship, string>>();
 
             int rowCount;
 
