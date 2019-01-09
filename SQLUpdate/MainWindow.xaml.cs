@@ -452,7 +452,7 @@ namespace SCQueryConnect
             try
             {
                 var start = DateTime.Now;
-                await _logger.Log($"Starting update process at {DateTime.Now:dd MMM yyyy HH:mm:ss}");
+                await _logger.Log($"Starting update process...");
 
                 await _logger.Log("Connecting to Sharpcloud " + url);
                 var sc = new SharpCloudApi(username, password, url, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);

@@ -59,6 +59,7 @@
     <Compile Include="Helpers\ConnectionStringHelper.cs" />
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="RelationshipsDataChecker.cs" />
     <Compile Include="QueryConnectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

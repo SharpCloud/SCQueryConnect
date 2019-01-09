@@ -1,4 +1,4 @@
-﻿using SCQueryConnect.Common.Interfaces;
+﻿using SCQueryConnect.Common;
 using SCSQLBatch.Helpers;
 using System;
 using System.Configuration;
@@ -8,22 +8,21 @@ using System.Threading.Tasks;
 
 namespace SCSQLBatch
 {
-    public class ConsoleLogger : ILog
+    public class ConsoleLogger : Logger
     {
-        public Task Clear()
+        public override Task Clear()
         {
             throw new NotSupportedException();
         }
 
-        public async Task Log(string text)
+        public override async Task Log(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;
             }
 
-            var now = DateTime.UtcNow;
-            text = now.ToShortDateString() + " " + now.ToLongTimeString() + " " + text + "\r\n";
+            var message = FormatMessage(text);
             var LogFile = ConfigurationManager.AppSettings["LogFile"];
             if (!string.IsNullOrEmpty(LogFile) && LogFile != "LOGFILE")
             {
@@ -31,7 +30,7 @@ namespace SCSQLBatch
                 {
                     var helper = new LogHelper();
                     var path = helper.GetAbsolutePath(LogFile);
-                    File.AppendAllText(path, text);
+                    File.AppendAllText(path, message);
                 }
                 catch (Exception ex)
                 {
@@ -40,8 +39,8 @@ namespace SCSQLBatch
                 }
             }
 
-            Debug.Write(text);
-            Console.Write(text);
+            Debug.Write(message);
+            Console.Write(message);
         }
     }
 }

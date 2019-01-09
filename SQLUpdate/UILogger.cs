@@ -1,11 +1,10 @@
-﻿using System;
+﻿using SCQueryConnect.Common;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using SCQueryConnect.Common.Interfaces;
 
 namespace SCQueryConnect
 {
-    public class UILogger : ILog
+    public class UILogger : Logger
     {
         private readonly TextBox _textBox;
 
@@ -14,16 +13,16 @@ namespace SCQueryConnect
             _textBox = textBox;
         }
 
-        public async Task Clear()
+        public override async Task Clear()
         {
-            _textBox.Text = "";
+            _textBox.Text = string.Empty;
             _textBox.ScrollToEnd();
             await Task.Delay(20);
         }
 
-        public async Task Log(string text)
+        public override async Task Log(string text)
         {
-            _textBox.Text += $"{text}{Environment.NewLine}";
+            _textBox.Text += FormatMessage(text);
             _textBox.ScrollToEnd();
             await Task.Delay(20);
         }
