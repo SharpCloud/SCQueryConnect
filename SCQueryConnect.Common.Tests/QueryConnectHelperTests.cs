@@ -3,7 +3,7 @@ using NUnit.Framework;
 using SC.Api.Interfaces;
 using SC.API.ComInterop.Models;
 using SC.Entities.Models;
-using SCQueryConnect.Common;
+using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using Category = SC.Entities.Models.Category;
 

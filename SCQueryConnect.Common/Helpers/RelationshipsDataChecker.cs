@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Linq;
 
-namespace SCQueryConnect.Common
+namespace SCQueryConnect.Common.Helpers
 {
     public class RelationshipsDataChecker : IRelationshipsDataChecker
     {

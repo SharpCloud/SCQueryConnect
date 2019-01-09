@@ -60,8 +60,8 @@
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="RelationshipsDataChecker.cs" />
-    <Compile Include="QueryConnectHelper.cs" />
+    <Compile Include="Helpers\RelationshipsDataChecker.cs" />
+    <Compile Include="Helpers\QueryConnectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

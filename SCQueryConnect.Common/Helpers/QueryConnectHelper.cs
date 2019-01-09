@@ -7,7 +7,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SCQueryConnect.Common
+namespace SCQueryConnect.Common.Helpers
 {
     public class QueryConnectHelper
     {

@@ -1,6 +1,6 @@
 ﻿using SC.API.ComInterop;
 using SC.API.ComInterop.Models;
-using SCQueryConnect.Common;
+using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using System;
 using System.Collections.Generic;
