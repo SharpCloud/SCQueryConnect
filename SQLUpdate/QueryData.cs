@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace SCQueryConnect
 {
@@ -67,6 +64,14 @@ namespace SCQueryConnect
                     return new SqlConnection(FormattedConnectionString);
                 case QueryData.DbType.ODBC:
                     return new OdbcConnection(FormattedConnectionString);
+                case QueryData.DbType.SharpCloud:
+                    var excelConnectionString = Regex.Replace(
+                        ConnectionsString,
+                        "Source Story=.+?;",
+                        string.Empty,
+                        RegexOptions.IgnoreCase);
+
+                    return new OleDbConnection(excelConnectionString);
                 default:
                     return new OleDbConnection(FormattedConnectionString);
             }
@@ -162,6 +167,18 @@ namespace SCQueryConnect
                     QueryStringRels = ""; 
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
+                case QueryData.DbType.SharpCloud:
+                    Name = "SharpCloud Example";
+                    ConnectionsString =
+                        "Source Story=00000000-0000-0000-0000-000000000000;" +
+                        "Provider=Microsoft.ACE.OLEDB.12.0;" +
+                        @"Data Source=C:\MyFolder\MyFile.xlsx;" +
+                        "Extended Properties='Excel 12.0 Xml;" +
+                        "HDR = YES'";
+
+                    QueryString = "SELECT * from [Sheet1$]";
+                    QueryStringRels = ""; // "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
+                    break;
             }
         }
 
@@ -186,7 +203,8 @@ namespace SCQueryConnect
             ADO,
             Excel,
             Access,
-            SharepointList
+            SharepointList,
+            SharpCloud
         }
     }
 }

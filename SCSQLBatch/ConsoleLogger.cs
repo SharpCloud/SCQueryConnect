@@ -10,6 +10,11 @@ namespace SCSQLBatch
 {
     public class ConsoleLogger : ILog
     {
+        public Task Clear()
+        {
+            throw new NotSupportedException();
+        }
+
         public async Task Log(string text)
         {
             if (string.IsNullOrWhiteSpace(text))

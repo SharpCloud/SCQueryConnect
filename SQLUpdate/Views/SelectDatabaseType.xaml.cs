@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SCQueryConnect.Views
 {
@@ -19,30 +9,32 @@ namespace SCQueryConnect.Views
     /// </summary>
     public partial class SelectDatabaseType : Window
     {
+        public IList<DatabaseType> DatabaseTypes { get; }
         public QueryData.DbType SelectedButton { get; set; }
 
         public SelectDatabaseType()
         {
             InitializeComponent();
+
+            DatabaseTypes = new[]
+            {
+                new DatabaseType(QueryData.DbType.Excel, "Excel Spreadsheet"),
+                new DatabaseType(QueryData.DbType.Access, "Access Database"),
+                new DatabaseType(QueryData.DbType.SharepointList, "SharePoint List"),
+                new DatabaseType(QueryData.DbType.SQL, "SQL Server Connection"),
+                new DatabaseType(QueryData.DbType.ODBC, "ODBC Database Connection"),
+                new DatabaseType(QueryData.DbType.ADO, "Generic ADO/OLDEB Connection"),
+                new DatabaseType(QueryData.DbType.SharpCloud, "SharpCloud")
+            };
+
+            DataContext = this;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
-
-            if (button.Content.ToString().Contains("SQL"))
-                SelectedButton = QueryData.DbType.SQL;
-            if (button.Content.ToString().Contains("ODBC"))
-                SelectedButton = QueryData.DbType.ODBC;
-            if (button.Content.ToString().Contains("ADO"))
-                SelectedButton = QueryData.DbType.ADO;
-            if (button.Content.ToString().Contains("Excel"))
-                SelectedButton = QueryData.DbType.Excel;
-            if (button.Content.ToString().Contains("Access"))
-                SelectedButton = QueryData.DbType.Access;
-            if (button.Content.ToString().Contains("SharePoint"))
-                SelectedButton = QueryData.DbType.SharepointList;
-
+            var type = button.DataContext as DatabaseType;
+            SelectedButton = type.DBType;
             DialogResult = true;
         }
     }

@@ -2,6 +2,8 @@
 using SC.API.ComInterop;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Common;
+using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
@@ -73,6 +75,7 @@ namespace SCQueryConnect
 
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
+        private ILog _logger;
         private ProxyViewModel _proxyViewModel;
         private QueryConnectHelper _qcHelper;
         private UIRelationshipsDataChecker _relationshipsChecker;
@@ -84,10 +87,8 @@ namespace SCQueryConnect
             DataContext = this;
 
             _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
-
-            _qcHelper = new QueryConnectHelper(
-                new UILogger(tbResults),
-                _relationshipsChecker);
+            _logger = new UILogger(tbResults);
+            _qcHelper = new QueryConnectHelper(_logger, _relationshipsChecker);
     }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -378,7 +379,6 @@ namespace SCQueryConnect
             }
         }
 
-
         private bool ValidateCreds()
         {
             if (string.IsNullOrEmpty(Url.Text))
@@ -415,18 +415,33 @@ namespace SCQueryConnect
             return true;
         }
 
+        private void InitialiseDatabase(SharpCloudApi sharpCloudApi, QueryData queryData)
+        {
+            if (queryData.ConnectionType == QueryData.DbType.SharpCloud)
+            {
+                var helper = new ConnectionStringHelper();
+                var filename = helper.GetVariable(queryData.ConnectionsString, "Data Source");
+                var sourceId = helper.GetVariable(queryData.ConnectionsString, "Source Story");
+
+                var story = sharpCloudApi.LoadStory(sourceId);
+                var items = story.GetItemsData();
+                var relationships = story.GetRelationshipsData();
+
+                var writer = new ExcelWriter();
+                writer.WriteToExcel(filename, items, relationships);
+            }
+        }
 
         private async void UpdateSharpCloud(object sender, RoutedEventArgs e)
         {
             if (!ValidateCreds())
                 return;
+
             UpdatingMessageVisibility = Visibility.Visible;
             await Task.Delay(20);
             SaveSettings();
 
-            tbResults.Text = ""; // clear
-            tbResults.ScrollToEnd();
-            await Task.Delay(20);
+            await _logger.Clear();
 
             var username = Username.Text;
             var password = Password.Password;
@@ -437,35 +452,28 @@ namespace SCQueryConnect
             try
             {
                 var start = DateTime.Now;
-                tbResults.Text += $"Starting update process at {DateTime.Now:dd MMM yyyy HH:mm:ss}\n";
-                tbResults.Text += "Connecting to Sharpcloud " + url;
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
+                await _logger.Log($"Starting update process at {DateTime.Now:dd MMM yyyy HH:mm:ss}");
 
+                await _logger.Log("Connecting to Sharpcloud " + url);
                 var sc = new SharpCloudApi(username, password, url, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
                 var story = sc.LoadStory(storyId);
                 var isValid = _qcHelper.Validate(story, out var message);
-                tbResults.Text += $"\n{message}";
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
+                await _logger.Log(message);
 
                 if (isValid)
                 {
+                    InitialiseDatabase(sc, qd);
+
                     using (DbConnection connection = GetDb())
                     {
                         connection.Open();
                         await UpdateItems(connection, story, SQLString.Text);
                         await _qcHelper.UpdateRelationships(connection, story, SQLStringRels.Text);
 
-                        tbResults.Text += "\nSaving Changes ";
-                        await Task.Delay(20);
-                        tbResults.ScrollToEnd();
+                        await _logger.Log("Saving Changes");
                         story.Save();
-                        tbResults.Text += "\nSave Complete!";
-                        tbResults.ScrollToEnd();
-                        await Task.Delay(20);
-
-                        tbResults.Text += $"\nUpdate process completed in {(DateTime.Now - start).TotalSeconds:f2} seconds";
+                        await _logger.Log("Save Complete!");
+                        await _logger.Log($"Update process completed in {(DateTime.Now - start).TotalSeconds:f2} seconds");
 
                         qd.LogData = tbResults.Text;
                         qd.LastRunDateTime = DateTime.Now;
@@ -476,9 +484,7 @@ namespace SCQueryConnect
             }
             catch (Exception ex)
             {
-                tbResults.Text += "\nError: " + ex.Message;
-                await Task.Delay(20);
-                tbResults.ScrollToEnd();
+                await _logger.Log("Error: " + ex.Message);
             }
 
             UpdatingMessageVisibility = Visibility.Collapsed;
@@ -489,9 +495,7 @@ namespace SCQueryConnect
         {
             if (string.IsNullOrWhiteSpace(sqlString))
             {
-                tbResults.Text += "\nNo Item Query detected";
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
+                await _logger.Log("No Item Query detected");
                 return;
             }
 
@@ -510,9 +514,7 @@ namespace SCQueryConnect
                 command.CommandText = sqlString;
                 command.CommandType = CommandType.Text;
 
-                tbResults.Text += "\nReading database";
-                tbResults.ScrollToEnd();
-                await Task.Delay(20);
+                await _logger.Log("Reading database");
                 using (DbDataReader reader = command.ExecuteReader())
                 {
                     CheckDataIsOK(reader);
@@ -561,9 +563,7 @@ namespace SCQueryConnect
                     {
                         var s = $"Your item query contains too many records (more than {MaxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
                         MessageBox.Show(s);
-                        tbResults.Text += "\n" + s;
-                        tbResults.ScrollToEnd();
-                        await Task.Delay(20);
+                        await _logger.Log(s);
                         return;
                     }
 
@@ -596,9 +596,7 @@ namespace SCQueryConnect
                         row++;
                     }
 
-                    tbResults.Text += "\nProcessing " + row.ToString() + " rows";
-                    tbResults.ScrollToEnd();
-                    await Task.Delay(20);
+                    await _logger.Log($"Processing {row.ToString()} rows");
 
                     // pass the array to SharpCloud
                     string errorMessage;
@@ -608,9 +606,9 @@ namespace SCQueryConnect
                         if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out updatedItems))
                         {
                             MessageBox.Show(errorMessage);
-                            tbResults.ScrollToEnd();
-                            tbResults.Text += errorMessage;
-                        } else
+                            await _logger.Log(errorMessage);
+                        }
+                        else
                         {
                             foreach (var item in story.Items)
                             {
@@ -628,8 +626,7 @@ namespace SCQueryConnect
                             }
                             if (!string.IsNullOrEmpty(errorMessage))
                             {
-                                tbResults.ScrollToEnd();
-                                tbResults.Text += errorMessage;
+                                await _logger.Log(errorMessage);
                             }
                         }
                     }
@@ -637,14 +634,12 @@ namespace SCQueryConnect
                         if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
                         {
                             MessageBox.Show(errorMessage);
-                            tbResults.ScrollToEnd();
-                            tbResults.Text += errorMessage;
+                            await _logger.Log(errorMessage);
                         } else
                         {
                             if (!string.IsNullOrEmpty(errorMessage))
                             {
-                                tbResults.ScrollToEnd();
-                                tbResults.Text += errorMessage;
+                                await _logger.Log(errorMessage);
                             }
                         }
                     }
