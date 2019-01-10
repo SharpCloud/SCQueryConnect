@@ -4,6 +4,7 @@ using SC.API.ComInterop.Models;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
@@ -426,21 +427,29 @@ namespace SCQueryConnect
                 maxRowCount = 1000;
             }
 
-            await _qcHelper.UpdateSharpCloud(
-                username,
-                password,
-                url,
-                _proxyViewModel.Proxy,
-                _proxyViewModel.ProxyAnnonymous,
-                _proxyViewModel.ProxyUserName,
-                _proxyViewModel.ProxyPassword,
-                storyId,
-                SQLString.Text,
-                SQLStringRels.Text,
-                qd.FormattedConnectionString,
-                qd.ConnectionType,
-                maxRowCount,
-                UnpublishItems);
+            var config = new SharpCloudConfiguration
+            {
+                Username = username,
+                Password = password,
+                Url = url,
+                ProxyUrl = _proxyViewModel.Proxy,
+                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnnonymous,
+                ProxyUserName = _proxyViewModel.ProxyUserName,
+                ProxyPassword = _proxyViewModel.ProxyPassword
+            };
+
+            var settings = new UpdateSettings
+            {
+                TargetStoryId = storyId,
+                QueryString = SQLString.Text,
+                QueryStringRels = SQLStringRels.Text,
+                ConnectionString = qd.FormattedConnectionString,
+                DBType = qd.ConnectionType,
+                MaxRowCount = maxRowCount,
+                UnpublishItems = UnpublishItems
+            };
+
+            await _qcHelper.UpdateSharpCloud(config, settings);
 
             qd.LogData = tbResults.Text;
             qd.LastRunDateTime = DateTime.Now;

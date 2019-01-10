@@ -1,6 +1,7 @@
 ﻿using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Models;
 using System;
 using System.Configuration;
 using System.Text;
@@ -94,21 +95,29 @@ namespace SCSQLBatch
 
             var dbType = GetDbType();
 
-            await qcHelper.UpdateSharpCloud(
-               userid,
-               password,
-               url,
-               proxy,
-               proxyAnonymous,
-               proxyUsername,
-               proxyPassword,
-               storyid,
-               queryString,
-               queryStringRels,
-               connectionString,
-               dbType,
-               1000,
-               unpubItems);
+            var config = new SharpCloudConfiguration
+            {
+                Username = userid,
+                Password = password,
+                Url = url,
+                ProxyUrl = proxy,
+                UseDefaultProxyCredentials = proxyAnonymous,
+                ProxyUserName = proxyUsername,
+                ProxyPassword = proxyPassword
+            };
+
+            var settings = new UpdateSettings
+            {
+                TargetStoryId = storyid,
+                QueryString = queryString,
+                QueryStringRels = queryStringRels,
+                ConnectionString = connectionString,
+                DBType = dbType,
+                MaxRowCount = 1000,
+                UnpublishItems = unpubItems
+            };
+
+            await qcHelper.UpdateSharpCloud(config, settings);
         }
 
         private static bool TypeIsNumeric(Type type)

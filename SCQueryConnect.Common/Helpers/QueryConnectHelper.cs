@@ -2,6 +2,7 @@
 using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -155,49 +156,44 @@ namespace SCQueryConnect.Common.Helpers
         }
 
         public async Task UpdateSharpCloud(
-            string username,
-            string password,
-            string url,
-            string proxyUrl,
-            bool useDefaultProxyCredentials,
-            string proxyUserName,
-            string proxyPassword,
-            string targetStoryId,
-            string queryString,
-            string queryStringRels,
-            string connectionString,
-            DatabaseType dbType,
-            int maxRowCount,
-            bool unpublishItems)
+            SharpCloudConfiguration config,
+            UpdateSettings settings)
         {
             try
             {
                 var start = DateTime.Now;
                 await _logger.Log($"Starting update process...");
-                await _logger.Log("Connecting to Sharpcloud " + url);
+                await _logger.Log("Connecting to Sharpcloud " + config.Url);
 
                 var sc = new SharpCloudApi(
-                    username,
-                    password,
-                    url,
-                    proxyUrl,
-                    useDefaultProxyCredentials,
-                    proxyUserName,
-                    proxyPassword);
+                    config.Username,
+                    config.Password,
+                    config.Url,
+                    config.ProxyUrl,
+                    config.UseDefaultProxyCredentials,
+                    config.ProxyUserName,
+                    config.ProxyPassword);
 
-                var story = sc.LoadStory(targetStoryId);
+                var story = sc.LoadStory(settings.TargetStoryId);
                 var isValid = Validate(story, out var message);
                 await _logger.Log(message);
 
                 if (isValid)
                 {
-                    InitialiseDatabase(sc, connectionString, dbType);
+                    InitialiseDatabase(sc, settings.ConnectionString, settings.DBType);
 
-                    using (DbConnection connection = GetDb(connectionString, dbType))
+                    using (DbConnection connection = GetDb(settings.ConnectionString, settings.DBType))
                     {
                         connection.Open();
-                        await UpdateItems(connection, story, queryString, maxRowCount, unpublishItems);
-                        await UpdateRelationships(connection, story, queryStringRels);
+
+                        await UpdateItems(
+                            connection,
+                            story,
+                            settings.QueryString,
+                            settings.MaxRowCount,
+                            settings.UnpublishItems);
+
+                        await UpdateRelationships(connection, story, settings.QueryStringRels);
                         await _logger.Log("Saving Changes");
                         story.Save();
                         await _logger.Log("Save Complete!");
