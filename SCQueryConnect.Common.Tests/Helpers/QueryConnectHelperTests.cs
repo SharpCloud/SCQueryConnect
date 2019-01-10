@@ -3,11 +3,12 @@ using NUnit.Framework;
 using SC.Api.Interfaces;
 using SC.API.ComInterop.Models;
 using SC.Entities.Models;
+using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using Category = SC.Entities.Models.Category;
 
-namespace SCQueryConnect.Helpers.Tests
+namespace SCQueryConnect.Helpers.Tests.Helpers
 {
     [TestFixture]
     public class MainWindowHelperTests
@@ -22,6 +23,7 @@ namespace SCQueryConnect.Helpers.Tests
             var input = "http://hostname.com/html/#/story/5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2/view/4e204f07-2598-469a-bdeb-583afd599cdc";
 
             var helper = new QueryConnectHelper(
+                Mock.Of<IDataChecker>(),
                 Mock.Of<ILog>(),
                 Mock.Of<IRelationshipsDataChecker>());
 
@@ -42,6 +44,7 @@ namespace SCQueryConnect.Helpers.Tests
             var input = "http://hostname.com/html/#/story/5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
 
             var helper = new QueryConnectHelper(
+                Mock.Of<IDataChecker>(),
                 Mock.Of<ILog>(),
                 Mock.Of<IRelationshipsDataChecker>());
 
@@ -62,6 +65,7 @@ namespace SCQueryConnect.Helpers.Tests
             var input = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
 
             var helper = new QueryConnectHelper(
+                Mock.Of<IDataChecker>(),
                 Mock.Of<ILog>(),
                 Mock.Of<IRelationshipsDataChecker>());
 
@@ -82,6 +86,7 @@ namespace SCQueryConnect.Helpers.Tests
             var story = new Story(new Roadmap(), Mock.Of<ISharpcloudClient2>());
 
             var helper = new QueryConnectHelper(
+                Mock.Of<IDataChecker>(),
                 Mock.Of<ILog>(),
                 Mock.Of<IRelationshipsDataChecker>());
 
@@ -107,6 +112,7 @@ namespace SCQueryConnect.Helpers.Tests
             var story = new Story(roadmap, Mock.Of<ISharpcloudClient2>());
 
             var helper = new QueryConnectHelper(
+                Mock.Of<IDataChecker>(),
                 Mock.Of<ILog>(),
                 Mock.Of<IRelationshipsDataChecker>());
 
@@ -118,6 +124,28 @@ namespace SCQueryConnect.Helpers.Tests
 
             Assert.IsTrue(isValid);
             Assert.AreEqual(message, "Reading story 'StoryName'");
+        }
+
+        [TestCase(@"Source Story=12a8eb5d-c12b-4a8a-beeb-f67f3c168392;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\data.xlsx;Extended Properties='Excel 12.0 Xml;HDR = YES'")]
+        [TestCase(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\data.xlsx;Extended Properties='Excel 12.0 Xml;HDR = YES';Source Story=12a8eb5d-c12b-4a8a-beeb-f67f3c168392")]
+        public void GetDbReturnsOleConnectionWithoutSharpCloudStoryId(string input)
+        {
+            // Arrange
+
+            var helper = new QueryConnectHelper(
+                Mock.Of<IDataChecker>(),
+                Mock.Of<ILog>(),
+                Mock.Of<IRelationshipsDataChecker>());
+
+            // Act
+
+            var connection = helper.GetDb(input, DatabaseType.SharpCloud);
+
+            // Assert
+
+            Assert.AreEqual(
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\data.xlsx;Extended Properties='Excel 12.0 Xml;HDR = YES'",
+                connection.ConnectionString);
         }
     }
 }

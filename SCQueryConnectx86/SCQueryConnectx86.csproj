@@ -137,6 +137,9 @@
     <Compile Include="..\SQLUpdate\QueryData.cs">
       <Link>QueryData.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\UIDataChecker.cs">
+      <Link>UIDataChecker.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\UILogger.cs">
       <Link>UILogger.cs</Link>
     </Compile>
@@ -152,8 +155,8 @@
     <Compile Include="..\SQLUpdate\Views\ConnectionInfo.xaml.cs">
       <Link>Views\ConnectionInfo.xaml.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Views\DatabaseType.cs">
-      <Link>Views\DatabaseType.cs</Link>
+    <Compile Include="..\SQLUpdate\Views\Database.cs">
+      <Link>Views\Database.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Views\ProxySettings.xaml.cs">
       <Link>Views\ProxySettings.xaml.cs</Link>

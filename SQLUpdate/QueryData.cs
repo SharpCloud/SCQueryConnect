@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SCQueryConnect.Common;
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.Odbc;
@@ -17,7 +18,7 @@ namespace SCQueryConnect
         [DataMember]
         public string Description { get; set; }
         [DataMember]
-        public DbType ConnectionType { get; set; }
+        public DatabaseType ConnectionType { get; set; }
         [DataMember]
         public string ConnectionsString { get; set; }
         [DataMember]
@@ -47,9 +48,9 @@ namespace SCQueryConnect
             {
                 switch (ConnectionType)
                 {
-                    case DbType.SQL:
+                    case DatabaseType.SQL:
                         return "SQL";
-                    case DbType.ODBC:
+                    case DatabaseType.ODBC:
                         return "ODBC";
                 }
                 return "OLEDB"; // most types are ADO
@@ -60,11 +61,11 @@ namespace SCQueryConnect
         {
             switch (ConnectionType)
             {
-                case QueryData.DbType.SQL:
+                case DatabaseType.SQL:
                     return new SqlConnection(FormattedConnectionString);
-                case QueryData.DbType.ODBC:
+                case DatabaseType.ODBC:
                     return new OdbcConnection(FormattedConnectionString);
-                case QueryData.DbType.SharpCloud:
+                case DatabaseType.SharpCloud:
                     var excelConnectionString = Regex.Replace(
                         ConnectionsString,
                         "Source Story=.+?;",
@@ -109,12 +110,12 @@ namespace SCQueryConnect
             SharePointURL = qd.SharePointURL;    
         }
 
-        public QueryData(DbType type)
+        public QueryData(DatabaseType type)
         {
             ConnectionType = type;
             switch (type)
             {
-                case QueryData.DbType.SQL:
+                case DatabaseType.SQL:
                     Name = "SQL Server Example";
                     FileName = "";
                     SharePointURL = "";
@@ -123,7 +124,7 @@ namespace SCQueryConnect
                     QueryStringRels = "";
                     // "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
-                case QueryData.DbType.ODBC:
+                case DatabaseType.ODBC:
                     Name = "ODBC Example";
                     FileName = "";
                     SharePointURL = "";
@@ -132,7 +133,7 @@ namespace SCQueryConnect
                     QueryStringRels = "";
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
                     break;
-                case QueryData.DbType.ADO:
+                case DatabaseType.ADO:
                     Name = "ADO/OLEDB Example";
                     FileName = "";
                     SharePointURL = "";
@@ -141,7 +142,7 @@ namespace SCQueryConnect
                     QueryString = "SELECT * FROM TABLE";
                     QueryStringRels = "";//"SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
                     break;
-                case QueryData.DbType.Excel:
+                case DatabaseType.Excel:
                     Name = "Excel Example";
                     FileName = "C:/MyFolder/MyFile.xlsx";
                     SharePointURL = "";
@@ -150,7 +151,7 @@ namespace SCQueryConnect
                     QueryString = "SELECT * from [Sheet1$]";
                     QueryStringRels = ""; // "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
                     break;
-                case QueryData.DbType.Access:
+                case DatabaseType.Access:
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
                     SharePointURL = "";
@@ -159,7 +160,7 @@ namespace SCQueryConnect
                     QueryStringRels = "";
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
-                case QueryData.DbType.SharepointList:
+                case DatabaseType.SharepointList:
                     Name = "SharePoint List Example";
                     SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
@@ -167,7 +168,7 @@ namespace SCQueryConnect
                     QueryStringRels = ""; 
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
-                case QueryData.DbType.SharpCloud:
+                case DatabaseType.SharpCloud:
                     Name = "SharpCloud Example";
                     ConnectionsString =
                         "Source Story=00000000-0000-0000-0000-000000000000;" +
@@ -188,23 +189,11 @@ namespace SCQueryConnect
             {
                 switch (ConnectionType)
                 {
-                    case QueryData.DbType.Excel:
+                    case DatabaseType.Excel:
                         return "SELECT * from [Sheet2$]";
                 }
                 return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
             }
-        }
-
-
-        public enum DbType
-        {
-            SQL,
-            ODBC,
-            ADO,
-            Excel,
-            Access,
-            SharepointList,
-            SharpCloud
         }
     }
 }

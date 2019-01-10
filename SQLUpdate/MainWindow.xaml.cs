@@ -75,10 +75,11 @@ namespace SCQueryConnect
 
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
 
-        private ILog _logger;
         private ProxyViewModel _proxyViewModel;
         private QueryConnectHelper _qcHelper;
-        private UIRelationshipsDataChecker _relationshipsChecker;
+        private IDataChecker _dataChecker;
+        private ILog _logger;
+        private IRelationshipsDataChecker _relationshipsChecker;
 
         public MainWindow()
         {
@@ -86,10 +87,11 @@ namespace SCQueryConnect
             Loaded += MainWindow_Loaded;
             DataContext = this;
 
+            _dataChecker = new UIDataChecker(txterr);
             _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
             _logger = new UILogger(tbResults);
-            _qcHelper = new QueryConnectHelper(_logger, _relationshipsChecker);
-    }
+            _qcHelper = new QueryConnectHelper(_dataChecker, _logger, _relationshipsChecker);
+        }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -143,7 +145,7 @@ namespace SCQueryConnect
                 {
                     // user papbably already has setting we should save from last time
                     // create one based on old settings - which are already set up
-                    var pqd = new QueryData((QueryData.DbType)Int32.Parse(SaveHelper.RegRead("DBType", "0")));
+                    var pqd = new QueryData((DatabaseType)Int32.Parse(SaveHelper.RegRead("DBType", "0")));
                     pqd.Name = "Previous Connection";
                     pqd.ConnectionsString = SaveHelper.RegRead("ConnectionString", "Server=.; Integrated Security=true; Database=demo");
                     pqd.QueryString = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
@@ -152,12 +154,12 @@ namespace SCQueryConnect
                 }
 
                 // add some examples
-                _connections.Add(new QueryData(QueryData.DbType.Excel)); 
-                _connections.Add(new QueryData(QueryData.DbType.Access));
-                _connections.Add(new QueryData(QueryData.DbType.SharepointList));
-                _connections.Add(new QueryData(QueryData.DbType.SQL));
-                _connections.Add(new QueryData(QueryData.DbType.ODBC));
-                _connections.Add(new QueryData(QueryData.DbType.ADO));
+                _connections.Add(new QueryData(DatabaseType.Excel)); 
+                _connections.Add(new QueryData(DatabaseType.Access));
+                _connections.Add(new QueryData(DatabaseType.SharepointList));
+                _connections.Add(new QueryData(DatabaseType.SQL));
+                _connections.Add(new QueryData(DatabaseType.ODBC));
+                _connections.Add(new QueryData(DatabaseType.ADO));
             }
         }
 
@@ -197,25 +199,6 @@ namespace SCQueryConnect
             var dlg = new ConnectionInfo(info);
             dlg.ShowDialog();
             //MessageBox.Show(info, "Internal Connection Info");
-            }
-
-        private bool CheckDataIsOK(DbDataReader reader)
-        {
-            bool bOK = false;
-
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                var heading = reader.GetName(i).ToUpper();
-                if (heading == "NAME")
-                    bOK = true;
-                else if (heading == "EXTERNAL ID")
-                    bOK = true;
-                else if (heading == "EXTERNALID")
-                    bOK = true;
-            }
-            txterr.Visibility = bOK ? Visibility.Collapsed : Visibility.Visible;
-
-            return bOK;
         }
 
         private void RunClick(object sender, RoutedEventArgs e)
@@ -243,7 +226,7 @@ namespace SCQueryConnect
 
                         using (DbDataReader reader = command.ExecuteReader())
                         {
-                            CheckDataIsOK(reader);
+                            _dataChecker.CheckDataIsOK(reader);
 
                             DataTable dt = new DataTable();
                             dt.Load(reader);
@@ -415,23 +398,6 @@ namespace SCQueryConnect
             return true;
         }
 
-        private void InitialiseDatabase(SharpCloudApi sharpCloudApi, QueryData queryData)
-        {
-            if (queryData.ConnectionType == QueryData.DbType.SharpCloud)
-            {
-                var helper = new ConnectionStringHelper();
-                var filename = helper.GetVariable(queryData.ConnectionsString, "Data Source");
-                var sourceId = helper.GetVariable(queryData.ConnectionsString, "Source Story");
-
-                var story = sharpCloudApi.LoadStory(sourceId);
-                var items = story.GetItemsData();
-                var relationships = story.GetRelationshipsData();
-
-                var writer = new ExcelWriter();
-                writer.WriteToExcel(filename, items, relationships);
-            }
-        }
-
         private async void UpdateSharpCloud(object sender, RoutedEventArgs e)
         {
             if (!ValidateCreds())
@@ -449,202 +415,40 @@ namespace SCQueryConnect
             var storyId = StoryId.Text;
             var qd = connectionList.SelectedItem as QueryData;
 
+            int maxRowCount = 1000;
+
             try
             {
-                var start = DateTime.Now;
-                await _logger.Log($"Starting update process...");
-
-                await _logger.Log("Connecting to Sharpcloud " + url);
-                var sc = new SharpCloudApi(username, password, url, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
-                var story = sc.LoadStory(storyId);
-                var isValid = _qcHelper.Validate(story, out var message);
-                await _logger.Log(message);
-
-                if (isValid)
-                {
-                    InitialiseDatabase(sc, qd);
-
-                    using (DbConnection connection = GetDb())
-                    {
-                        connection.Open();
-                        await UpdateItems(connection, story, SQLString.Text);
-                        await _qcHelper.UpdateRelationships(connection, story, SQLStringRels.Text);
-
-                        await _logger.Log("Saving Changes");
-                        story.Save();
-                        await _logger.Log("Save Complete!");
-                        await _logger.Log($"Update process completed in {(DateTime.Now - start).TotalSeconds:f2} seconds");
-
-                        qd.LogData = tbResults.Text;
-                        qd.LastRunDateTime = DateTime.Now;
-                        tbLastRun.Text = qd.LastRunDate;
-                        SaveSettings();
-                    }
-                }
+                maxRowCount = int.Parse(ConfigurationManager.AppSettings["MaxRowCount"]);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await _logger.Log("Error: " + ex.Message);
+                maxRowCount = 1000;
             }
+
+            await _qcHelper.UpdateSharpCloud(
+                username,
+                password,
+                url,
+                _proxyViewModel.Proxy,
+                _proxyViewModel.ProxyAnnonymous,
+                _proxyViewModel.ProxyUserName,
+                _proxyViewModel.ProxyPassword,
+                storyId,
+                SQLString.Text,
+                SQLStringRels.Text,
+                qd.FormattedConnectionString,
+                qd.ConnectionType,
+                maxRowCount,
+                UnpublishItems);
+
+            qd.LogData = tbResults.Text;
+            qd.LastRunDateTime = DateTime.Now;
+            tbLastRun.Text = qd.LastRunDate;
+            SaveSettings();
 
             UpdatingMessageVisibility = Visibility.Collapsed;
             await Task.Delay(20);
-        }
-
-        private async Task UpdateItems(DbConnection connection, Story story, string sqlString)
-        {
-            if (string.IsNullOrWhiteSpace(sqlString))
-            {
-                await _logger.Log("No Item Query detected");
-                return;
-            }
-
-            using (DbCommand command = connection.CreateCommand())
-            {
-                int MaxRowCount = 1000;
-                try
-                {
-                    MaxRowCount = Int32.Parse(ConfigurationManager.AppSettings["MaxRowCount"]);
-                }
-                catch (Exception E)
-                {
-                    MaxRowCount = 1000;
-                }
-
-                command.CommandText = sqlString;
-                command.CommandType = CommandType.Text;
-
-                await _logger.Log("Reading database");
-                using (DbDataReader reader = command.ExecuteReader())
-                {
-                    CheckDataIsOK(reader);
-
-                    var tempArray = new List<List<string>>();
-                    while (reader.Read())
-                    {
-                        var objs = new object[reader.FieldCount];
-                        reader.GetValues(objs);
-                        var data = new List<string>();
-                        foreach (var o in objs)
-                        {
-                            if (o is DateTime?)
-                            {
-                                // definately date time
-                                var date = (DateTime) o;
-                                data.Add(date.ToString("yyyy MM dd"));
-                            }
-                            else
-                            {
-                                DateTime date;
-                                double dbl;
-                                var s = o.ToString();
-                                if (double.TryParse(s, out dbl))
-                                {
-                                    data.Add($"{dbl:0.##}");
-                                }
-                                else if (DateTime.TryParse(s, out date))
-                                {
-                                    data.Add(date.ToString("yyyy MM dd"));
-                                }
-                                else if (s.ToLower().Trim() == "null")
-                                {
-                                    data.Add("");
-                                }
-                                else
-                                {
-                                    data.Add(s);
-                                }
-                            }
-                        }
-                        tempArray.Add(data);
-                    }
-
-                    if (tempArray.Count > MaxRowCount)
-                    {
-                        var s = $"Your item query contains too many records (more than {MaxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
-                        MessageBox.Show(s);
-                        await _logger.Log(s);
-                        return;
-                    }
-
-                    // create our string arrar
-                    var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
-                    // add the headers
-                    var regex = new Regex(Regex.Escape("#"));
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        var header = reader.GetName(i);
-                        if (header.ToLower().StartsWith("tags#"))
-                        {
-                            header = regex.Replace(header, ".", 1);
-                        }
-                        arrayValues[0, i] = header;
-                            
-                        Debug.Write(arrayValues[0, i] + '\t');
-                    }
-                    // add the data values
-                    int row = 1;
-                    foreach (var list in tempArray)
-                    {
-                        int col = 0;
-                        foreach (string s in list)
-                        {
-                            arrayValues[row, col++] = s;
-                            Debug.Write(s + '\t');
-                        }
-                        Debug.WriteLine("");
-                        row++;
-                    }
-
-                    await _logger.Log($"Processing {row.ToString()} rows");
-
-                    // pass the array to SharpCloud
-                    string errorMessage;
-                    if (UnpublishItems)
-                    {
-                        List<Guid> updatedItems;
-                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out updatedItems))
-                        {
-                            MessageBox.Show(errorMessage);
-                            await _logger.Log(errorMessage);
-                        }
-                        else
-                        {
-                            foreach (var item in story.Items)
-                            {
-                                if (!updatedItems.Contains(item.AsElement.ID))
-                                {
-                                    try
-                                    {
-                                        item.IsPublished = false;
-                                    }
-                                    catch (FieldAccessException ex)
-                                    {
-                                        errorMessage += "\nERROR: " + ex.Message;
-                                    }
-                                }
-                            }
-                            if (!string.IsNullOrEmpty(errorMessage))
-                            {
-                                await _logger.Log(errorMessage);
-                            }
-                        }
-                    }
-                    else {
-                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
-                        {
-                            MessageBox.Show(errorMessage);
-                            await _logger.Log(errorMessage);
-                        } else
-                        {
-                            if (!string.IsNullOrEmpty(errorMessage))
-                            {
-                                await _logger.Log(errorMessage);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         private bool TypeIsNumeric(Type type)
@@ -931,13 +735,13 @@ namespace SCQueryConnect
 
                 switch (qd.ConnectionType)
                 {
-                    case QueryData.DbType.Access: 
-                    case QueryData.DbType.Excel: 
+                    case DatabaseType.Access: 
+                    case DatabaseType.Excel: 
                         v1 = Visibility.Collapsed;
                         v2 = Visibility.Visible;
                         v3 = Visibility.Collapsed;
                         break;
-                    case QueryData.DbType.SharepointList:
+                    case DatabaseType.SharepointList:
                         v1 = Visibility.Collapsed;
                         v2 = Visibility.Collapsed;
                         v3 = Visibility.Visible;
@@ -957,7 +761,7 @@ namespace SCQueryConnect
         {
             var qd = connectionList.SelectedItem as QueryData;
             var ord = new OpenFileDialog();
-            ord.Filter = qd.ConnectionType == QueryData.DbType.Excel ? "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx" : "Access Database Files (*.accdb;*.mdb)|*.accdb;*.mdb";
+            ord.Filter = qd.ConnectionType == DatabaseType.Excel ? "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx" : "Access Database Files (*.accdb;*.mdb)|*.accdb;*.mdb";
 
             if (ord.ShowDialog() == true)
             {

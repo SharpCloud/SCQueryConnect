@@ -15,6 +15,7 @@ namespace SCSQLBatch
             throw new NotSupportedException();
         }
 
+        #pragma warning disable 1998
         public override async Task Log(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -42,5 +43,6 @@ namespace SCSQLBatch
             Debug.Write(message);
             Console.Write(message);
         }
+        #pragma warning restore 1998
     }
 }

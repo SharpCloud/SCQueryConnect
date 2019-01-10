@@ -137,6 +137,7 @@
     </ApplicationDefinition>
     <Compile Include="Helpers\ExcelWriter.cs" />
     <Compile Include="UILogger.cs" />
+    <Compile Include="UIDataChecker.cs" />
     <Compile Include="UIRelationshipsDataChecker.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>
@@ -148,7 +149,7 @@
     <Compile Include="QueryData.cs" />
     <Compile Include="ViewModels\ProxyViewModel.cs" />
     <Compile Include="ViewModels\SelectedStoryViewModel.cs" />
-    <Compile Include="Views\DatabaseType.cs" />
+    <Compile Include="Views\Database.cs" />
     <Compile Include="Views\ProxySettings.xaml.cs">
       <DependentUpon>ProxySettings.xaml</DependentUpon>
     </Compile>
