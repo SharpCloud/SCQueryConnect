@@ -120,18 +120,18 @@ namespace SCSQLBatch
 
         private static DatabaseType GetDbType()
         {
-            var dbType = ConfigurationManager.AppSettings["dbType"].ToUpper();
+            var dbType = ConfigurationManager.AppSettings["dbType"];
 
             switch (dbType)
             {
-                case "SQL":
+                case DatabaseTypeStrings.Sql:
                     return DatabaseType.SQL;
-                case "ODBC":
+                case DatabaseTypeStrings.Odbc:
                     return DatabaseType.ODBC;
                 default:
-                case "OLEDB":
+                case DatabaseTypeStrings.Oledb:
                     return DatabaseType.Excel;
-                case "SHARPCLOUD":
+                case DatabaseTypeStrings.SharpCloud:
                     return DatabaseType.SharpCloud;
             }
         }
