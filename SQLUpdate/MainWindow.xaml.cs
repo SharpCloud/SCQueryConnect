@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using SC.API.ComInterop;
-using SC.API.ComInterop.Models;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
@@ -74,8 +73,8 @@ namespace SCQueryConnect
         }
         private bool _unpublishItems = false;
 
+        private string _lastUsedSharpCloudConnection;
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
-
         private ProxyViewModel _proxyViewModel;
         private QueryConnectHelper _qcHelper;
         private IDataChecker _dataChecker;
@@ -202,10 +201,34 @@ namespace SCQueryConnect
             //MessageBox.Show(info, "Internal Connection Info");
         }
 
+        private void SetLastUsedSharpCloudConnection()
+        {
+            var qd = connectionList.SelectedItem as QueryData;
+            if (qd.ConnectionType == DatabaseType.SharpCloud)
+            {
+                _lastUsedSharpCloudConnection = qd.FormattedConnectionString;
+            }
+        }
+
+        private void InitialiseSharpCloudDataIfNeeded()
+        {
+            var qd = connectionList.SelectedItem as QueryData;
+            if (qd.ConnectionType == DatabaseType.SharpCloud &&
+                qd.FormattedConnectionString != _lastUsedSharpCloudConnection)
+            {
+                _qcHelper.InitialiseDatabase(
+                    GetApi(),
+                    qd.FormattedConnectionString,
+                    qd.ConnectionType);
+            }
+        }
+
         private void RunClick(object sender, RoutedEventArgs e)
         {
             try
             {
+                InitialiseSharpCloudDataIfNeeded();
+
                 using (DbConnection connection = GetDb())
                 {
                     connection.Open();
@@ -252,6 +275,8 @@ namespace SCQueryConnect
                         }
                     }
                 }
+
+                SetLastUsedSharpCloudConnection();
             }
             catch (Exception ex)
             {
@@ -261,6 +286,8 @@ namespace SCQueryConnect
 
         private void RunClickRels(object sender, RoutedEventArgs e)
         {
+            InitialiseSharpCloudDataIfNeeded();
+
             try
             {
                 using (DbConnection connection = GetDb())
@@ -298,6 +325,8 @@ namespace SCQueryConnect
                         }
                     }
                 }
+
+                SetLastUsedSharpCloudConnection();
             }
             catch (Exception ex)
             {

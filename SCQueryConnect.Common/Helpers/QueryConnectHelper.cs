@@ -135,7 +135,7 @@ namespace SCQueryConnect.Common.Helpers
             await _logger.Log($"{rowCount} rows processed.");
         }
 
-        private void InitialiseDatabase(
+        public void InitialiseDatabase(
             SharpCloudApi sharpCloudApi,
             string connectionString,
             DatabaseType dbType)
