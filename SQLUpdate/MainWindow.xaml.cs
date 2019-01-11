@@ -160,6 +160,7 @@ namespace SCQueryConnect
                 _connections.Add(new QueryData(DatabaseType.SQL));
                 _connections.Add(new QueryData(DatabaseType.ODBC));
                 _connections.Add(new QueryData(DatabaseType.ADO));
+                _connections.Add(new QueryData(DatabaseType.SharpCloud));
             }
         }
 
