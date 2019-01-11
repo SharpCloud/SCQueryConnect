@@ -1,5 +1,5 @@
 ﻿using SCQueryConnect.Common.Interfaces;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 
 namespace SCQueryConnect.Common.Helpers
@@ -24,7 +24,7 @@ namespace SCQueryConnect.Common.Helpers
             "INTERNAL ID 2"
         };
 
-        public bool CheckDataIsOKRels(DbDataReader reader)
+        public bool CheckDataIsOKRels(IDataReader reader)
         {
             bool bOK1 = false;
             bool bOK2 = false;

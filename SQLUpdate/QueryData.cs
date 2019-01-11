@@ -59,27 +59,6 @@ namespace SCQueryConnect
             }
         }
 
-        public DbConnection GetDb()
-        {
-            switch (ConnectionType)
-            {
-                case DatabaseType.SQL:
-                    return new SqlConnection(FormattedConnectionString);
-                case DatabaseType.ODBC:
-                    return new OdbcConnection(FormattedConnectionString);
-                case DatabaseType.SharpCloud:
-                    var excelConnectionString = Regex.Replace(
-                        ConnectionsString,
-                        "Source Story=.+?;",
-                        string.Empty,
-                        RegexOptions.IgnoreCase);
-
-                    return new OleDbConnection(excelConnectionString);
-                default:
-                    return new OleDbConnection(FormattedConnectionString);
-            }
-        }
-
         public string LastRunDate
         {
             get

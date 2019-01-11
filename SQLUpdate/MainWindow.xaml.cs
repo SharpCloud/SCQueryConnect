@@ -5,6 +5,7 @@ using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
+using SCQueryConnect.Interfaces;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
@@ -81,6 +82,7 @@ namespace SCQueryConnect
         private QueryConnectHelper _qcHelper;
         private IConnectionStringHelper _connectionStringHelper;
         private IDataChecker _dataChecker;
+        private IDbConnectionFactory _dbConnectionFactory;
         private ILog _logger;
         private IRelationshipsDataChecker _relationshipsChecker;
 
@@ -92,6 +94,7 @@ namespace SCQueryConnect
 
             _connectionStringHelper = new ConnectionStringHelper();
             _dataChecker = new UIDataChecker(txterr);
+            _dbConnectionFactory = new DbConnectionFactory();
             _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
             _logger = new UILogger(tbResults);
 
@@ -178,9 +181,9 @@ namespace SCQueryConnect
             Process.Start("http://www.connectionstrings.com/");
         }
 
-        private DbConnection GetDb()
+        private IDbConnection GetDb()
         {
-            return SelectedQueryData.GetDb();
+            return _dbConnectionFactory.GetDb(SelectedQueryData);
         }
 
         private void TestConnectionClick(object sender, RoutedEventArgs e)
@@ -203,7 +206,7 @@ namespace SCQueryConnect
 
             try
             {
-                using (DbConnection connection = GetDb())
+                using (IDbConnection connection = GetDb())
                 {
                     connection.Open();
                     MessageBox.Show("Hooray! It looks like it's worked!");
@@ -254,10 +257,10 @@ namespace SCQueryConnect
             {
                 InitialiseSharpCloudDataIfNeeded();
 
-                using (DbConnection connection = GetDb())
+                using (IDbConnection connection = GetDb())
                 {
                     connection.Open();
-                    using (DbCommand command = connection.CreateCommand())
+                    using (IDbCommand command = connection.CreateCommand())
                     {
 
                         if (connection is OleDbConnection) { 
@@ -273,7 +276,7 @@ namespace SCQueryConnect
                         command.CommandText = SQLString.Text;
                         command.CommandType = CommandType.Text;
 
-                        using (DbDataReader reader = command.ExecuteReader())
+                        using (IDataReader reader = command.ExecuteReader())
                         {
                             _dataChecker.CheckDataIsOK(reader);
 
@@ -315,15 +318,15 @@ namespace SCQueryConnect
 
             try
             {
-                using (DbConnection connection = GetDb())
+                using (IDbConnection connection = GetDb())
                 {
                     connection.Open();
-                    using (DbCommand command = connection.CreateCommand())
+                    using (IDbCommand command = connection.CreateCommand())
                     {
                         command.CommandText = SQLStringRels.Text;
                         command.CommandType = CommandType.Text;
 
-                        using (DbDataReader reader = command.ExecuteReader())
+                        using (IDataReader reader = command.ExecuteReader())
                         {
                             _relationshipsChecker.CheckDataIsOKRels(reader);
 

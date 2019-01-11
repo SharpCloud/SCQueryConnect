@@ -119,11 +119,17 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
       <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\DbConnectionFactory.cs">
+      <Link>Helpers\DbConnectionFactory.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\ExcelWriter.cs">
       <Link>Helpers\ExcelWriter.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IDbConnectionFactory.cs">
+      <Link>Interfaces\IDbConnectionFactory.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>

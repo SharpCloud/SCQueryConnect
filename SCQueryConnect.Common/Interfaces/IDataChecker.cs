@@ -1,9 +1,9 @@
-﻿using System.Data.Common;
+﻿using System.Data;
 
 namespace SCQueryConnect.Common.Interfaces
 {
     public interface IDataChecker
     {
-        bool CheckDataIsOK(DbDataReader reader);
+        bool CheckDataIsOK(IDataReader reader);
     }
 }

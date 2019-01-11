@@ -1,11 +1,11 @@
 ﻿using SCQueryConnect.Common.Interfaces;
-using System.Data.Common;
+using System.Data;
 
 namespace SCQueryConnect.Common.Helpers
 {
     public class DataChecker : IDataChecker
     {
-        public bool CheckDataIsOK(DbDataReader reader)
+        public bool CheckDataIsOK(IDataReader reader)
         {
             bool bOK = false;
 

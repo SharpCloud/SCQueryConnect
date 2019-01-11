@@ -1,9 +1,9 @@
-﻿using System.Data.Common;
+﻿using System.Data;
 
 namespace SCQueryConnect.Common.Interfaces
 {
     public interface IRelationshipsDataChecker
     {
-        bool CheckDataIsOKRels(DbDataReader reader);
+        bool CheckDataIsOKRels(IDataReader reader);
     }
 }
