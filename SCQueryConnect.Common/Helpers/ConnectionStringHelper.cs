@@ -2,7 +2,7 @@
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class ConnectionStringHelper
+    public class ConnectionStringHelper : IConnectionStringHelper
     {
         public string GetVariable(string connectionString, string variableName)
         {

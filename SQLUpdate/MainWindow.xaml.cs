@@ -79,6 +79,7 @@ namespace SCQueryConnect
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
         private ProxyViewModel _proxyViewModel;
         private QueryConnectHelper _qcHelper;
+        private IConnectionStringHelper _connectionStringHelper;
         private IDataChecker _dataChecker;
         private ILog _logger;
         private IRelationshipsDataChecker _relationshipsChecker;
@@ -89,10 +90,16 @@ namespace SCQueryConnect
             Loaded += MainWindow_Loaded;
             DataContext = this;
 
+            _connectionStringHelper = new ConnectionStringHelper();
             _dataChecker = new UIDataChecker(txterr);
             _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
             _logger = new UILogger(tbResults);
-            _qcHelper = new QueryConnectHelper(_dataChecker, _logger, _relationshipsChecker);
+
+            _qcHelper = new QueryConnectHelper(
+                _connectionStringHelper,
+                _dataChecker,
+                _logger,
+                _relationshipsChecker);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -178,6 +185,22 @@ namespace SCQueryConnect
 
         private void TestConnectionClick(object sender, RoutedEventArgs e)
         {
+            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud)
+            {
+                try
+                {
+                    _qcHelper.InitialiseDatabase(
+                        GetApi(),
+                        SelectedQueryData.ConnectionsString,
+                        SelectedQueryData.ConnectionType);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not connect to SharpCloud! " + ex.Message);
+                    return;
+                }
+            }
+
             try
             {
                 using (DbConnection connection = GetDb())
@@ -190,7 +213,7 @@ namespace SCQueryConnect
             }
             catch (Exception ex)
             {
-                MessageBox.Show("It did not work! " + ex.Message);
+                MessageBox.Show("Could not connect to database! " + ex.Message);
             }
         }
 

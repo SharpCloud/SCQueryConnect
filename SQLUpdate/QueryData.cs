@@ -49,13 +49,13 @@ namespace SCQueryConnect
                 switch (ConnectionType)
                 {
                     case DatabaseType.SQL:
-                        return DatabaseTypeStrings.Sql;
+                        return DatabaseStrings.Sql;
                     case DatabaseType.ODBC:
-                        return DatabaseTypeStrings.Odbc;
+                        return DatabaseStrings.Odbc;
                     case DatabaseType.SharpCloud:
-                        return DatabaseTypeStrings.SharpCloud;
+                        return DatabaseStrings.SharpCloud;
                 }
-                return DatabaseTypeStrings.Oledb; // most types are ADO
+                return DatabaseStrings.Oledb; // most types are ADO
             }
         }
 

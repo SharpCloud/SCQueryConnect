@@ -18,15 +18,18 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class QueryConnectHelper
     {
+        private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
 
         public QueryConnectHelper(
+            IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
             ILog log,
             IRelationshipsDataChecker relationshipsDataChecker)
         {
+            _connectionStringHelper = connectionStringHelper;
             _dataChecker = dataChecker;
             _logger = log;
             _relationshipsDataChecker = relationshipsDataChecker;
@@ -142,9 +145,8 @@ namespace SCQueryConnect.Common.Helpers
         {
             if (dbType == DatabaseType.SharpCloud)
             {
-                var helper = new ConnectionStringHelper();
-                var filename = helper.GetVariable(connectionString, "Data Source");
-                var sourceId = helper.GetVariable(connectionString, "Source Story");
+                var filename = _connectionStringHelper.GetVariable(connectionString, "Data Source");
+                var sourceId = _connectionStringHelper.GetVariable(connectionString, DatabaseStrings.SharpCloudSourceStory);
 
                 var story = sharpCloudApi.LoadStory(sourceId);
                 var items = story.GetItemsData();

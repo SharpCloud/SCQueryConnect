@@ -40,6 +40,7 @@ namespace SCSQLBatch
             var proxyPassword64 = ConfigurationManager.AppSettings["proxyPassword64"];
 
             var qcHelper = new QueryConnectHelper(
+                new ConnectionStringHelper(),
                 new DataChecker(),
                 logger,
                 new RelationshipsDataChecker());
@@ -133,14 +134,14 @@ namespace SCSQLBatch
 
             switch (dbType)
             {
-                case DatabaseTypeStrings.Sql:
+                case DatabaseStrings.Sql:
                     return DatabaseType.SQL;
-                case DatabaseTypeStrings.Odbc:
+                case DatabaseStrings.Odbc:
                     return DatabaseType.ODBC;
                 default:
-                case DatabaseTypeStrings.Oledb:
+                case DatabaseStrings.Oledb:
                     return DatabaseType.Excel;
-                case DatabaseTypeStrings.SharpCloud:
+                case DatabaseStrings.SharpCloud:
                     return DatabaseType.SharpCloud;
             }
         }

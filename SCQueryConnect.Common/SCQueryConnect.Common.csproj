@@ -57,10 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseType.cs" />
-    <Compile Include="DatabaseTypeStrings.cs" />
+    <Compile Include="DatabaseStrings.cs" />
     <Compile Include="Helpers\ConnectionStringHelper.cs" />
     <Compile Include="Helpers\ExcelWriter.cs" />
     <Compile Include="Helpers\DataChecker.cs" />
+    <Compile Include="Interfaces\IConnectionStringHelper.cs" />
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IDataChecker.cs" />
     <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />

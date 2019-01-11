@@ -15,17 +15,22 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
     {
         private const string StoryId = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
 
+        private QueryConnectHelper CreateQueryConnectHelper()
+        {
+            return new QueryConnectHelper(
+                Mock.Of<IConnectionStringHelper>(),
+                Mock.Of<IDataChecker>(),
+                Mock.Of<ILog>(),
+                Mock.Of<IRelationshipsDataChecker>());
+        }
+
         [Test]
         public void ReturnsStoryIdFromUrlWithView()
         {
             // Arrange
 
             var input = "http://hostname.com/html/#/story/5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2/view/4e204f07-2598-469a-bdeb-583afd599cdc";
-
-            var helper = new QueryConnectHelper(
-                Mock.Of<IDataChecker>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+            var helper = CreateQueryConnectHelper();
 
             // Act
 
@@ -42,11 +47,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             // Arrange
 
             var input = "http://hostname.com/html/#/story/5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
-
-            var helper = new QueryConnectHelper(
-                Mock.Of<IDataChecker>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+            var helper = CreateQueryConnectHelper();
 
             // Act
 
@@ -63,11 +64,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             // Arrange
 
             var input = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
-
-            var helper = new QueryConnectHelper(
-                Mock.Of<IDataChecker>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+            var helper = CreateQueryConnectHelper();
 
             // Act
 
@@ -84,11 +81,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             // Arrange
 
             var story = new Story(new Roadmap(), Mock.Of<ISharpcloudClient2>());
-
-            var helper = new QueryConnectHelper(
-                Mock.Of<IDataChecker>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+            var helper = CreateQueryConnectHelper();
 
             // Act
 
@@ -110,11 +103,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             roadmap.Name = "StoryName";
 
             var story = new Story(roadmap, Mock.Of<ISharpcloudClient2>());
-
-            var helper = new QueryConnectHelper(
-                Mock.Of<IDataChecker>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+            var helper = CreateQueryConnectHelper();
 
             // Act
 
@@ -132,10 +121,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
         {
             // Arrange
 
-            var helper = new QueryConnectHelper(
-                Mock.Of<IDataChecker>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+            var helper = CreateQueryConnectHelper();
 
             // Act
 
