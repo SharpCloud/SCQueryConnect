@@ -97,43 +97,56 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="40"></RowDefinition>
                                 <RowDefinition Height="40"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="80"></RowDefinition>
                                 <RowDefinition Height="50"></RowDefinition>
                                 <RowDefinition Height="*"></RowDefinition>
                                 <RowDefinition Height="50"></RowDefinition>
                             </Grid.RowDefinitions>
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="140"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="140"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                            <Grid.Resources>
+                                <Style x:Key="Label" TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                    <Setter Property="Margin" Value="5" />
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </Grid.Resources>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
                             <TextBox Grid.Row="0" x:Name="ConnectionName" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
                             <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
                             <TextBox Grid.Row="0" x:Name="txtDatabaseType" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Foreground="#00AFFC" TextAlignment="Right" Margin="5"></TextBlock>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
                             <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Filename:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl2"></TextBlock>
-                            <TextBox Grid.Row="2" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
-                            <Button Grid.Row="2" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Width="150" Click="BrowseBut_Click">Choose file...</Button>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
+                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5" LostFocus="LostFocusStoryID" />
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Sharepoint URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl3"></TextBlock>
-                            <TextBox Grid.Row="2" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" x:Name="lbl2" />
+                            <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
+                            <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Width="150" Click="BrowseBut_Click">Choose file...</Button>
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl1"></TextBlock>
-                            <TextBox Grid.Row="2" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" x:Name="lbl3" />
+                            <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
 
-                            <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="TestConnectionClick">Test Connection</Button>
-                            <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" x:Name="lbl1" />
+                            <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
 
-                            <TextBlock Grid.Row="4" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
+                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="TestConnectionClick">Test Connection</Button>
+                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
+
+                            <TextBlock Grid.Row="5" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
                                 Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
                             </TextBlock>
 
-                            <Button Grid.Row="5" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
+                            <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
                         </Grid>
                     </TabItem>
 

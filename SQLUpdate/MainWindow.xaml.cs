@@ -25,6 +25,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
@@ -417,6 +418,7 @@ namespace SCQueryConnect
                 qd.QueryStringRels = SQLStringRels.Text;
                 qd.FileName = FileName.Text;
                 qd.SharePointURL = SharePointURL.Text;
+                qd.SourceStoryId = SourceStoryId.Text;
             }
         }
 
@@ -709,7 +711,7 @@ namespace SCQueryConnect
             }
         }
 
-        private void connectionList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void connectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SelectedQueryData != null)
             {
@@ -723,6 +725,7 @@ namespace SCQueryConnect
                 FileName.Text = SelectedQueryData.FileName;
                 SharePointURL.Text = SelectedQueryData.SharePointURL;
                 txtExampleRels.Text = "Example: " + SelectedQueryData.GetExampleRelQuery;
+                SourceStoryId.Text = SelectedQueryData.SourceStoryId;
 
                 tbLastRun.Text = SelectedQueryData.LastRunDate;
                 tbResults.Text = SelectedQueryData.LogData;
@@ -741,8 +744,9 @@ namespace SCQueryConnect
 
         private void LostFocusStoryID(object sender, RoutedEventArgs e)
         {
-            var s = StoryId.Text;
-            StoryId.Text = _qcHelper.GetStoryUrl(s);
+            var textBox = sender as TextBox;
+            var idString = textBox.Text;
+            textBox.Text = _qcHelper.GetStoryUrl(idString);
             SaveSettings();
         }
 
@@ -786,38 +790,61 @@ namespace SCQueryConnect
         {
             if (qd != null)
             {
-                var v1 = Visibility.Visible;
-                var v2 = Visibility.Collapsed;
-                var v3 = Visibility.Collapsed;
+                var connectionStringVisibility = Visibility.Visible;
+                var filenameVisibility = Visibility.Collapsed;
+                var sharepointVisibility = Visibility.Collapsed;
+                var sourceStoryIdVisibility = Visibility.Collapsed;
 
                 switch (qd.ConnectionType)
                 {
                     case DatabaseType.Access: 
                     case DatabaseType.Excel: 
-                        v1 = Visibility.Collapsed;
-                        v2 = Visibility.Visible;
-                        v3 = Visibility.Collapsed;
+                        connectionStringVisibility = Visibility.Collapsed;
+                        filenameVisibility = Visibility.Visible;
+                        sharepointVisibility = Visibility.Collapsed;
+                        sourceStoryIdVisibility = Visibility.Collapsed;
                         break;
+
                     case DatabaseType.SharepointList:
-                        v1 = Visibility.Collapsed;
-                        v2 = Visibility.Collapsed;
-                        v3 = Visibility.Visible;
+                        connectionStringVisibility = Visibility.Collapsed;
+                        filenameVisibility = Visibility.Collapsed;
+                        sharepointVisibility = Visibility.Visible;
+                        sourceStoryIdVisibility = Visibility.Collapsed;
+                        break;
+
+                    case DatabaseType.SharpCloud:
+                        connectionStringVisibility = Visibility.Collapsed;
+                        filenameVisibility = Visibility.Visible;
+                        sharepointVisibility = Visibility.Collapsed;
+                        sourceStoryIdVisibility = Visibility.Visible;
                         break;
                 }
-                lbl1.Visibility = v1;
-                ConnectionString.Visibility = v1;
-                lbl2.Visibility = v2;
-                FileName.Visibility = v2;
-                BrowseBut.Visibility = v2;
-                lbl3.Visibility = v3;
-                SharePointURL.Visibility = v3;
+                lbl1.Visibility = connectionStringVisibility;
+                ConnectionString.Visibility = connectionStringVisibility;
+                lbl2.Visibility = filenameVisibility;
+                FileName.Visibility = filenameVisibility;
+                BrowseBut.Visibility = filenameVisibility;
+                lbl3.Visibility = sharepointVisibility;
+                SharePointURL.Visibility = sharepointVisibility;
+                SourceStoryId.Visibility = sourceStoryIdVisibility;
             }
         }
 
         private void BrowseBut_Click(object sender, RoutedEventArgs e)
         {
             var ord = new OpenFileDialog();
-            ord.Filter = SelectedQueryData.ConnectionType == DatabaseType.Excel ? "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx" : "Access Database Files (*.accdb;*.mdb)|*.accdb;*.mdb";
+
+            switch (SelectedQueryData.ConnectionType)
+            {
+                case DatabaseType.Access:
+                    ord.Filter = "Access Database Files (*.accdb;*.mdb)|*.accdb;*.mdb";
+                    break;
+
+                case DatabaseType.Excel:
+                case DatabaseType.SharpCloud:
+                    ord.Filter = "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx";
+                    break;
+            }
 
             if (ord.ShowDialog() == true)
             {
