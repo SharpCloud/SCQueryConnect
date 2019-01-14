@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCQueryConnect.Common.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCSQLBatch.Tests", "SCSQLBatch.Tests\SCSQLBatch.Tests.csproj", "{3F61EBDA-44AA-48FC-8445-F1403B8C253C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E741B813-0B3E-41F0-B031-0046AE90F93F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,6 +116,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F274D204-7A2D-4692-BE65-0C9B6C6C9502} = {E741B813-0B3E-41F0-B031-0046AE90F93F}
+		{3F61EBDA-44AA-48FC-8445-F1403B8C253C} = {E741B813-0B3E-41F0-B031-0046AE90F93F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3EB0D425-C030-4D58-996F-3E19384B3EF0}
