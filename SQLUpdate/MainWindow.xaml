@@ -10,13 +10,23 @@
         Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
+            <Grid.Resources>
+                <SolidColorBrush x:Key="QCBlue" Color="#00AFFC" />
+
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="{StaticResource QCBlue}" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="Foreground" Value="White" />
+                </Style>
+            </Grid.Resources>
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300"></ColumnDefinition>
                 <ColumnDefinition Width="3"></ColumnDefinition>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <GridSplitter Grid.Column="1"  Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
+            <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
             <ListBox Grid.Column="0" x:Name="connectionList" Background="Transparent" Foreground="white" SelectionChanged="connectionList_SelectionChanged" Margin="0,0,0,50" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -34,14 +44,14 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Button Click="NewConnectionClick" Grid.Row="0" Grid.Column="0" Height="40" VerticalAlignment="Top" Background="#00AFFC" FontSize="14" Foreground="White" Margin="5,5,0,5" >+New</Button>
-                <Button Click="CopyConnectionClick" Grid.Row="0" Grid.Column="1" Height="40" VerticalAlignment="Top" Background="#666666" FontSize="14" Foreground="White" Margin="5,5,0,5" >Copy</Button>
-                <Button Click="UpConnectionClick" Grid.Row="0" Grid.Column="2" Height="40" VerticalAlignment="Top" Background="#666666" FontSize="14" Foreground="White"  Margin="5,5,0,5" >Up</Button>
-                <Button Click="DownConnectionClick" Grid.Row="0" Grid.Column="3" Height="40" VerticalAlignment="Top" Background="#666666" FontSize="14" Foreground="White"  Margin="5,5,0,5" >Down</Button>
-                <Button Click="DeleteConnectionClick" Grid.Row="0" Grid.Column="4" Height="40" VerticalAlignment="Top" Background="Red" FontSize="14" Foreground="White"  Margin="5" >Delete</Button>
+                <Button Click="NewConnectionClick" Grid.Row="0" Grid.Column="0" Height="40" VerticalAlignment="Top" Margin="5,5,0,5" >+New</Button>
+                <Button Click="CopyConnectionClick" Grid.Row="0" Grid.Column="1" Height="40" VerticalAlignment="Top" Background="#666666" Margin="5,5,0,5">Copy</Button>
+                <Button Click="UpConnectionClick" Grid.Row="0" Grid.Column="2" Height="40" VerticalAlignment="Top" Background="#666666"  Margin="5,5,0,5">Up</Button>
+                <Button Click="DownConnectionClick" Grid.Row="0" Grid.Column="3" Height="40" VerticalAlignment="Top" Background="#666666"  Margin="5,5,0,5">Down</Button>
+                <Button Click="DeleteConnectionClick" Grid.Row="0" Grid.Column="4" Height="40" VerticalAlignment="Top" Background="Red" Margin="5">Delete</Button>
             </Grid>
             <Grid Grid.Column="2" Background="Black">
-                <TabControl  Background="#333333" x:Name="BrowserTabs" BorderBrush="Transparent" MinWidth="750">
+                <TabControl Background="#333333" x:Name="BrowserTabs" BorderBrush="Transparent" MinWidth="750">
                     <TabControl.Resources>
                         <Style TargetType="TabControl">
                             <Setter Property="IsTabStop" Value="False"/>
@@ -108,7 +118,7 @@
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Filename:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl2"></TextBlock>
                             <TextBox Grid.Row="2" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
-                            <Button Grid.Row="2" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Background="#00AFFC" FontSize="14" Width="150" Foreground="White" Click="BrowseBut_Click">Choose file...</Button>
+                            <Button Grid.Row="2" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Width="150" Click="BrowseBut_Click">Choose file...</Button>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Sharepoint URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl3"></TextBlock>
                             <TextBox Grid.Row="2" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
@@ -116,14 +126,14 @@
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Connection String:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" x:Name="lbl1"></TextBlock>
                             <TextBox Grid.Row="2" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
 
-                            <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="TestConnectionClick">Test Connection</Button>
-                            <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="ReviewConnectionClick">View Connection Info</Button>
+                            <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="TestConnectionClick">Test Connection</Button>
+                            <Button Grid.Row="3" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
 
                             <TextBlock Grid.Row="4" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
                                 Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
                             </TextBlock>
 
-                            <Button Grid.Row="5" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Click="HelpButtonClick">Help on Connections Strings</Button>
+                            <Button Grid.Row="5" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
                         </Grid>
                     </TabItem>
 
@@ -146,7 +156,7 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
                                 <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
-                                <Button  Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Preview SQL Results</Button>
+                                <Button Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0">Preview SQL Results</Button>
                                 <DataGrid x:Name="DataGrid" Grid.Row="1" Margin="5"/>
                             </Grid>
                         </Grid>
@@ -172,7 +182,7 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
                                 <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
-                                <Button  Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" Background="#00AFFC" FontSize="14" Foreground="White" >Preview SQL Results</Button>
+                                <Button Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" >Preview SQL Results</Button>
                                 <DataGrid x:Name="DataGridRels" Grid.Row="1" Margin="5"/>
                             </Grid>
                         </Grid>
@@ -202,21 +212,21 @@
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Story ID or URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
                                     <TextBox x:Name="StoryId" Width="270" LostFocus="LostFocusStoryID"></TextBox>
-                                    <Button Click="SelectStoryClick"  Margin="0" Width="40" Background="#00AFFC" FontSize="14" Foreground="White" >...</Button>
-                                    <Button Click="ViewStoryClick"  Margin="10,0" Width="50" Background="#00AFFC" FontSize="14" Foreground="White" >Open</Button>
+                                    <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
+                                    <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>
                                 <CheckBox x:Name="cbUnpub" Foreground="#00AFFC" HorizontalAlignment="Center" IsChecked="{Binding UnpublishItems, Mode=TwoWay}" ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">Unpublish unmatched items</CheckBox>
-                                <Button Click="UpdateSharpCloud"  Width="270" Margin="100,10"  Height="40" Background="#00AFFC" FontSize="14" Foreground="White" >Update Story Now..</Button>
+                                <Button Click="UpdateSharpCloud" Width="270" Margin="100,10" Height="40">Update Story Now..</Button>
                             </StackPanel>
                             <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
 
                             <Grid Grid.Row="2">
-                                <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="#00AFFC"  Margin="5"></TextBlock>
+                                <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
-                                    <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="#00AFFC"  Margin="5,0"></TextBlock>
-                                    <TextBlock x:Name="tbLastRun" Text="Now" TextAlignment="Right" Foreground="White"  Margin="5,0"></TextBlock>
+                                    <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="#00AFFC" Margin="5,0"></TextBlock>
+                                    <TextBlock x:Name="tbLastRun" Text="Now" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
                                 </StackPanel>
-                                <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="#00AFFC" Background="#333333" ></TextBox>
+                                <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="#00AFFC" Background="#333333"></TextBox>
                             </Grid>
                         </Grid>
                     </TabItem>
@@ -225,13 +235,13 @@
                         <Grid>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
-                                <Button Click="GenerateBatchFileThis"  Height="50" Width="220" Margin="5,0" Background="#00AFFC" FontSize="16" Foreground="White" >Generate Batch Files Now...</Button>
+                                <Button Click="GenerateBatchFileThis" Height="50" Width="220" Margin="5,0" FontSize="16" >Generate Batch Files Now...</Button>
                             </StackPanel>
                             <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="30">
-                                <Button Click="GenerateBatchFile32"  Height="25" Width="220" Margin="5,0" Background="#00AFFC" FontSize="12" Foreground="White" >Generate Batch 32bit (x86) Files Now...</Button>
-                                <Button Click="GenerateBatchFile64"  Height="25" Width="220" Margin="5,0" Background="#00AFFC" FontSize="12" Foreground="White" >Generate Batch 64bit (x64) Files Now...</Button>
+                                <Button Click="GenerateBatchFile32" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 32bit (x86) Files Now...</Button>
+                                <Button Click="GenerateBatchFile64" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 64bit (x64) Files Now...</Button>
                             </StackPanel>
-                            <Button Click="ViewExisting" VerticalAlignment="Bottom"  Height="25" Width="220" Margin="5" Background="Transparent" FontSize="12" Foreground="White" >View export folder...</Button>
+                            <Button Click="ViewExisting" VerticalAlignment="Bottom" Height="25" Width="220" Margin="5" Background="Transparent" FontSize="12" >View export folder...</Button>
                         </Grid>
                     </TabItem>
 
@@ -246,7 +256,7 @@
                                 <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500"  />
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click4" >
                                             <Hyperlink.Inlines>
