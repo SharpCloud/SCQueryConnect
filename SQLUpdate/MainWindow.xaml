@@ -118,7 +118,7 @@
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
                             <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
                             <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" />
                             <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
 
