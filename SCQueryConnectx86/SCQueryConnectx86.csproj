@@ -119,17 +119,11 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
       <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Helpers\DbConnectionFactory.cs">
-      <Link>Helpers\DbConnectionFactory.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\ExcelWriter.cs">
       <Link>Helpers\ExcelWriter.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IDbConnectionFactory.cs">
-      <Link>Interfaces\IDbConnectionFactory.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
@@ -173,6 +167,9 @@
     <Compile Include="..\SQLUpdate\Views\SelectStory.xaml.cs">
       <Link>Views\SelectStory.xaml.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Views\SourceStorySettings.xaml.cs">
+      <Link>Views\SourceStorySettings.xaml.cs</Link>
+    </Compile>
     <Resource Include="qc-icon.ico" />
     <None Include="..\SQLUpdate\app.config">
       <Link>app.config</Link>
@@ -215,6 +212,11 @@
     </Page>
     <Page Include="..\SQLUpdate\Views\SelectStory.xaml">
       <Link>Views\SelectStory.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\SourceStorySettings.xaml">
+      <Link>Views\SourceStorySettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

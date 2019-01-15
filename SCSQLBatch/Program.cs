@@ -42,6 +42,7 @@ namespace SCSQLBatch
             var qcHelper = new QueryConnectHelper(
                 new ConnectionStringHelper(),
                 new DataChecker(),
+                new DbConnectionFactory(),
                 logger,
                 new RelationshipsDataChecker());
 

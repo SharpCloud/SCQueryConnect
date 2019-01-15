@@ -8,10 +8,15 @@ namespace SCQueryConnect.Common.Helpers
         {
             var kvp = Regex.Match(
                 connectionString,
-                $"{variableName}=.+?;",
+                $"{variableName}=.*?;",
                 RegexOptions.IgnoreCase).Value.Trim(';');
 
-            var value = kvp.Split('=')[1];
+            var split = kvp.Split('=');
+
+            var value = split.Length > 1
+                ? split[1]
+                : string.Empty;
+
             return value;
         }
     }

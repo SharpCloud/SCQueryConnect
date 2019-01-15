@@ -6,7 +6,5 @@
         public const string Odbc = "ODBC";
         public const string Oledb = "OLEDB";
         public const string SharpCloud = "SHARPCLOUD";
-
-        public const string SharpCloudSourceStory = "Source Story";
     }
 }

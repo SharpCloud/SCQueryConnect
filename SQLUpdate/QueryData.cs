@@ -32,6 +32,12 @@ namespace SCQueryConnect
         public string LogData { get; set; }
         [DataMember]
         public string SourceStoryId { get; set; }
+        [DataMember]
+        public string SourceStoryUserName { get; set; }
+        [DataMember]
+        public string SourceStoryPassword { get; set; }
+        [DataMember]
+        public string SourceStoryServer { get; set; }
         [IgnoreDataMember]
         public DataView QueryResults { get; set; }
         [IgnoreDataMember]
@@ -40,7 +46,10 @@ namespace SCQueryConnect
         public string FormattedConnectionString => ConnectionsString
             .Replace("{filename}", FileName)
             .Replace("{sharepoint-url}", SharePointURL)
-            .Replace("{source-story-id}", SourceStoryId);
+            .Replace("{source-story-id}", SourceStoryId)
+            .Replace("{source-story-user-name}", SourceStoryUserName)
+            .Replace("{source-story-password}", SourceStoryPassword)
+            .Replace("{source-story-server}", SourceStoryServer);
 
         public string GetBatchDBType
         {
@@ -154,7 +163,10 @@ namespace SCQueryConnect
                     FileName = @"C:\MyFolder\MyFile.xlsx";
                     SourceStoryId = "00000000-0000-0000-0000-000000000000";
                     ConnectionsString =
-                        "Source Story={source-story-id};" +
+                        "SourceId={source-story-id};" +
+                        "SourceUserName={source-story-user-name};" +
+                        "SourcePassword={source-story-password};" +
+                        "SourceServer={source-story-server};" +
                         "Provider=Microsoft.ACE.OLEDB.12.0;" +
                         "Data Source={filename};" +
                         "Extended Properties='Excel 12.0 Xml;" +

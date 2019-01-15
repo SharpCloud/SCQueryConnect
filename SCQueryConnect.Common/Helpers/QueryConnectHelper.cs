@@ -7,9 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.Odbc;
-using System.Data.OleDb;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -20,17 +17,20 @@ namespace SCQueryConnect.Common.Helpers
     {
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
+        private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
 
         public QueryConnectHelper(
             IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
+            IDbConnectionFactory dbConnectionFactory,
             ILog log,
             IRelationshipsDataChecker relationshipsDataChecker)
         {
             _connectionStringHelper = connectionStringHelper;
             _dataChecker = dataChecker;
+            _dbConnectionFactory = dbConnectionFactory;
             _logger = log;
             _relationshipsDataChecker = relationshipsDataChecker;
         }
@@ -62,7 +62,7 @@ namespace SCQueryConnect.Common.Helpers
             return true;
         }
 
-        public async Task UpdateRelationships(DbConnection connection, Story story, string sqlString)
+        public async Task UpdateRelationships(IDbConnection connection, Story story, string sqlString)
         {
             if (string.IsNullOrWhiteSpace(sqlString))
             {
@@ -72,7 +72,7 @@ namespace SCQueryConnect.Common.Helpers
 
             int rowCount;
 
-            using (DbCommand command = connection.CreateCommand())
+            using (IDbCommand command = connection.CreateCommand())
             {
                 command.CommandText = sqlString;
                 command.CommandType = CommandType.Text;
@@ -82,7 +82,7 @@ namespace SCQueryConnect.Common.Helpers
                 int columnCount;
                 var dataList = new List<string[]>();
                 
-                using (DbDataReader reader = command.ExecuteReader())
+                using (IDataReader reader = command.ExecuteReader())
                 {
                     if (!_relationshipsDataChecker.CheckDataIsOKRels(reader))
                     {
@@ -139,16 +139,41 @@ namespace SCQueryConnect.Common.Helpers
         }
 
         public void InitialiseDatabase(
-            SharpCloudApi sharpCloudApi,
+            SharpCloudConfiguration config,
             string connectionString,
             DatabaseType dbType)
         {
             if (dbType == DatabaseType.SharpCloud)
             {
                 var filename = _connectionStringHelper.GetVariable(connectionString, "Data Source");
-                var sourceId = _connectionStringHelper.GetVariable(connectionString, DatabaseStrings.SharpCloudSourceStory);
+                var sourceId = _connectionStringHelper.GetVariable(connectionString, "SourceId");
 
-                var story = sharpCloudApi.LoadStory(sourceId);
+                var csUsername = _connectionStringHelper.GetVariable(connectionString, "SourceUserName");
+                var csPassword = _connectionStringHelper.GetVariable(connectionString, "SourcePassword");
+                var csServer = _connectionStringHelper.GetVariable(connectionString, "SourceServer");
+
+                var username = string.IsNullOrWhiteSpace(csUsername)
+                    ? config.Username
+                    : csUsername;
+
+                var password = string.IsNullOrWhiteSpace(csPassword)
+                    ? config.Password
+                    : csPassword;
+
+                var server = string.IsNullOrWhiteSpace(csServer)
+                    ? config.Url
+                    : csServer;
+
+                var sc = new SharpCloudApi(
+                    username,
+                    password,
+                    server,
+                    config.ProxyUrl,
+                    config.UseDefaultProxyCredentials,
+                    config.ProxyUserName,
+                    config.ProxyPassword);
+
+                var story = sc.LoadStory(sourceId);
                 var items = story.GetItemsData();
                 var relationships = story.GetRelationshipsData();
 
@@ -182,9 +207,9 @@ namespace SCQueryConnect.Common.Helpers
 
                 if (isValid)
                 {
-                    InitialiseDatabase(sc, settings.ConnectionString, settings.DBType);
+                    InitialiseDatabase(config, settings.ConnectionString, settings.DBType);
 
-                    using (DbConnection connection = GetDb(settings.ConnectionString, settings.DBType))
+                    using (IDbConnection connection = _dbConnectionFactory.GetDb(settings.ConnectionString, settings.DBType))
                     {
                         connection.Open();
 
@@ -209,41 +234,8 @@ namespace SCQueryConnect.Common.Helpers
             }
         }
 
-        public DbConnection GetDb(string connectionString, DatabaseType dbType)
-        {
-            switch (dbType)
-            {
-                case DatabaseType.SQL:
-                {
-                    return new SqlConnection(connectionString);
-                }
-
-                case DatabaseType.ODBC:
-                {
-                    return new OdbcConnection(connectionString);
-                }
-
-                case DatabaseType.SharpCloud:
-                {
-                    const string delimiter = ";";
-
-                    var kvps = connectionString
-                        .Split(delimiter[0])
-                        .Where(kvp => !kvp.ToLower().StartsWith("source story"))
-                        .ToArray();
-
-                    var excelConnectionString = string.Join(delimiter, kvps);
-                    return new OleDbConnection(excelConnectionString);
-                }
-                default:
-                {
-                    return new OleDbConnection(connectionString);
-                }
-            }
-        }
-
         private async Task UpdateItems(
-            DbConnection connection,
+            IDbConnection connection,
             Story story,
             string sqlString,
             int maxRowCount,
@@ -255,13 +247,13 @@ namespace SCQueryConnect.Common.Helpers
                 return;
             }
 
-            using (DbCommand command = connection.CreateCommand())
+            using (IDbCommand command = connection.CreateCommand())
             {
                 command.CommandText = sqlString;
                 command.CommandType = CommandType.Text;
 
                 await _logger.Log("Reading database");
-                using (DbDataReader reader = command.ExecuteReader())
+                using (IDataReader reader = command.ExecuteReader())
                 {
                     _dataChecker.CheckDataIsOK(reader);
 

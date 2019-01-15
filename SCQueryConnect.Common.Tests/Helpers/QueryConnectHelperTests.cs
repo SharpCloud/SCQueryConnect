@@ -20,6 +20,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             return new QueryConnectHelper(
                 Mock.Of<IConnectionStringHelper>(),
                 Mock.Of<IDataChecker>(),
+                Mock.Of<IDbConnectionFactory>(),
                 Mock.Of<ILog>(),
                 Mock.Of<IRelationshipsDataChecker>());
         }
@@ -113,25 +114,6 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
 
             Assert.IsTrue(isValid);
             Assert.AreEqual(message, "Reading story 'StoryName'");
-        }
-
-        [TestCase(@"Source Story=12a8eb5d-c12b-4a8a-beeb-f67f3c168392;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\data.xlsx;Extended Properties='Excel 12.0 Xml;HDR = YES'")]
-        [TestCase(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\data.xlsx;Extended Properties='Excel 12.0 Xml;HDR = YES';Source Story=12a8eb5d-c12b-4a8a-beeb-f67f3c168392")]
-        public void GetDbReturnsOleConnectionWithoutSharpCloudStoryId(string input)
-        {
-            // Arrange
-
-            var helper = CreateQueryConnectHelper();
-
-            // Act
-
-            var connection = helper.GetDb(input, DatabaseType.SharpCloud);
-
-            // Assert
-
-            Assert.AreEqual(
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\data.xlsx;Extended Properties='Excel 12.0 Xml;HDR = YES'",
-                connection.ConnectionString);
         }
     }
 }

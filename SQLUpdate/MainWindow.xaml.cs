@@ -5,7 +5,6 @@ using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
-using SCQueryConnect.Interfaces;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
@@ -14,7 +13,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
-using System.Data.Common;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
@@ -102,6 +100,7 @@ namespace SCQueryConnect
             _qcHelper = new QueryConnectHelper(
                 _connectionStringHelper,
                 _dataChecker,
+                _dbConnectionFactory,
                 _logger,
                 _relationshipsChecker);
         }
@@ -184,7 +183,23 @@ namespace SCQueryConnect
 
         private IDbConnection GetDb()
         {
-            return _dbConnectionFactory.GetDb(SelectedQueryData);
+            return _dbConnectionFactory.GetDb(
+                SelectedQueryData.FormattedConnectionString,
+                SelectedQueryData.ConnectionType);
+        }
+
+        private SharpCloudConfiguration GetApiConfiguration()
+        {
+            return new SharpCloudConfiguration
+            {
+                Username = Username.Text,
+                Password = Password.Password,
+                Url = Url.Text,
+                ProxyUrl = _proxyViewModel.Proxy,
+                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnnonymous,
+                ProxyUserName = _proxyViewModel.ProxyUserName,
+                ProxyPassword = _proxyViewModel.ProxyPassword
+            };
         }
 
         private void TestConnectionClick(object sender, RoutedEventArgs e)
@@ -194,7 +209,7 @@ namespace SCQueryConnect
                 try
                 {
                     _qcHelper.InitialiseDatabase(
-                        GetApi(),
+                        GetApiConfiguration(),
                         SelectedQueryData.ConnectionsString,
                         SelectedQueryData.ConnectionType);
                 }
@@ -246,7 +261,7 @@ namespace SCQueryConnect
                 SelectedQueryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
             {
                 _qcHelper.InitialiseDatabase(
-                    GetApi(),
+                    GetApiConfiguration(),
                     SelectedQueryData.FormattedConnectionString,
                     SelectedQueryData.ConnectionType);
             }
@@ -468,12 +483,6 @@ namespace SCQueryConnect
             SaveSettings();
 
             await _logger.Clear();
-
-            var username = Username.Text;
-            var password = Password.Password;
-            var url = Url.Text;
-            var storyId = StoryId.Text;
-
             int maxRowCount = 1000;
 
             try
@@ -485,20 +494,11 @@ namespace SCQueryConnect
                 maxRowCount = 1000;
             }
 
-            var config = new SharpCloudConfiguration
-            {
-                Username = username,
-                Password = password,
-                Url = url,
-                ProxyUrl = _proxyViewModel.Proxy,
-                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnnonymous,
-                ProxyUserName = _proxyViewModel.ProxyUserName,
-                ProxyPassword = _proxyViewModel.ProxyPassword
-            };
+            var config = GetApiConfiguration();
 
             var settings = new UpdateSettings
             {
-                TargetStoryId = storyId,
+                TargetStoryId = StoryId.Text,
                 QueryString = SQLString.Text,
                 QueryStringRels = SQLStringRels.Text,
                 ConnectionString = SelectedQueryData.FormattedConnectionString,
@@ -852,16 +852,19 @@ namespace SCQueryConnect
                 FileName.Text = ord.FileName;
             }
         }
-        
-        private SharpCloudApi GetApi()
-        {
-            return new SharpCloudApi(Username.Text, Password.Password, Url.Text, _proxyViewModel.Proxy, _proxyViewModel.ProxyAnnonymous, _proxyViewModel.ProxyUserName, _proxyViewModel.ProxyPassword);
-        }
-
 
         private void SelectStoryClick(object sender, RoutedEventArgs e)
         {
-            var sel = new SelectStory(GetApi(), false, Username.Text);
+            var api = new SharpCloudApi(
+                Username.Text,
+                Password.Password,
+                Url.Text,
+                _proxyViewModel.Proxy,
+                _proxyViewModel.ProxyAnnonymous,
+                _proxyViewModel.ProxyUserName,
+                _proxyViewModel.ProxyPassword);
+
+            var sel = new SelectStory(api, false, Username.Text);
 
             bool? dialogResult = sel.ShowDialog();
             if (dialogResult == true)
@@ -904,14 +907,12 @@ namespace SCQueryConnect
 
         private void StorySourceSettings_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new SourceStorySettings
+            var dlg = new SourceStorySettings(SelectedQueryData)
             {
                 Owner = this
             };
 
-            if (dlg.ShowDialog() == true)
-            {
-            }
+            dlg.ShowDialog();
         }
     }
 }

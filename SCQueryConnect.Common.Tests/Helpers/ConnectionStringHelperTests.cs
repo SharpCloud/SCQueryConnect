@@ -22,5 +22,22 @@ namespace SCQueryConnect.Common.Tests.Helpers
 
             Assert.AreEqual("value2", output);
         }
+
+        [TestCase("key1=;")]
+        [TestCase("key1=;key2=value2;")]
+        public void ReturnsEmptyStringForNoValue(string connectionString)
+        {
+            // Arrange
+
+            var helper = new ConnectionStringHelper();
+
+            // Act
+
+            var output = helper.GetVariable(connectionString, "key1");
+
+            // Assert
+
+            Assert.AreEqual(string.Empty, output);
+        }
     }
 }
