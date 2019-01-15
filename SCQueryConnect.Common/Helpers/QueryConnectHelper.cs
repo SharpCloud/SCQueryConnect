@@ -138,6 +138,10 @@ namespace SCQueryConnect.Common.Helpers
             await _logger.Log($"{rowCount} rows processed.");
         }
 
+        /// <summary>
+        /// Load data from SharpCloud and save it to an Excel file. Only needed when
+        /// SharpCloud is a data source, so the upload process can work on local data.
+        /// </summary>
         public void InitialiseDatabase(
             SharpCloudConfiguration config,
             string connectionString,

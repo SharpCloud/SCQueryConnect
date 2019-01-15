@@ -255,6 +255,11 @@ namespace SCQueryConnect
             }
         }
 
+        /// <summary>
+        /// Check if updating the database is necessary, e.g. an update is only necessary
+        /// when running queries against data when the query is run for the first time;
+        /// subsequent runs should be able to use local data to speed up the process.
+        /// </summary>
         private void InitialiseSharpCloudDataIfNeeded()
         {
             if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud &&
