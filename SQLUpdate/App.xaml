@@ -4,6 +4,19 @@
              xmlns:local="clr-namespace:SQLUpdate"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="QCBlue" Color="#00AFFC" />
+
+        <Style x:Key="DefaultButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource QCBlue}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="TextAlignment" Value="Right" />
+        </Style>
     </Application.Resources>
 </Application>

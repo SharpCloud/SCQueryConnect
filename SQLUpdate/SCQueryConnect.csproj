@@ -155,7 +155,12 @@
     <Compile Include="Views\ProxySettings.xaml.cs">
       <DependentUpon>ProxySettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SelectStory.xaml.cs" />
+    <Compile Include="Views\SourceStorySettings.xaml.cs">
+      <DependentUpon>SourceStorySettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectStory.xaml.cs">
+      <DependentUpon>SelectStory.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SelectDatabaseType.xaml.cs">
       <DependentUpon>SelectDatabaseType.xaml</DependentUpon>
     </Compile>
@@ -178,6 +183,10 @@
     <Page Include="Views\ProxySettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SourceStorySettings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SelectStory.xaml">
       <Generator>MSBuild:Compile</Generator>

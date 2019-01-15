@@ -893,13 +893,25 @@ namespace SCQueryConnect
 
         private void Hyperlink_Click4(object sender, RoutedEventArgs e)
         {
-            Process.Start("explorer.exe", System.AppDomain.CurrentDomain.BaseDirectory);
+            Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
         }
     
         private void Proxy_OnClick(object sender, RoutedEventArgs e)
         {
             var proxy = new ProxySettings(_proxyViewModel);
             proxy.ShowDialog();
+        }
+
+        private void StorySourceSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new SourceStorySettings
+            {
+                Owner = this
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+            }
         }
     }
 }

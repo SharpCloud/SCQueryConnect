@@ -11,13 +11,7 @@
     <Grid>
         <Grid>
             <Grid.Resources>
-                <SolidColorBrush x:Key="QCBlue" Color="#00AFFC" />
-
-                <Style TargetType="Button">
-                    <Setter Property="Background" Value="{StaticResource QCBlue}" />
-                    <Setter Property="FontSize" Value="14" />
-                    <Setter Property="Foreground" Value="White" />
-                </Style>
+                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
             </Grid.Resources>
             
             <Grid.ColumnDefinitions>
@@ -111,10 +105,8 @@
                             </Grid.ColumnDefinitions>
 
                             <Grid.Resources>
-                                <Style x:Key="Label" TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                                     <Setter Property="Margin" Value="5" />
-                                    <Setter Property="TextAlignment" Value="Right" />
                                 </Style>
                             </Grid.Resources>
 
@@ -127,11 +119,12 @@
                             <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
-                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5" LostFocus="LostFocusStoryID" />
+                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" />
+                            <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
 
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" x:Name="lbl2" />
                             <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
-                            <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Width="150" Click="BrowseBut_Click">Choose file...</Button>
+                            <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click">Choose file...</Button>
 
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" x:Name="lbl3" />
                             <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
@@ -139,14 +132,14 @@
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" x:Name="lbl1" />
                             <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
 
-                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="TestConnectionClick">Test Connection</Button>
-                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="5" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
+                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
+                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
 
                             <TextBlock Grid.Row="5" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
                                 Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
                             </TextBlock>
 
-                            <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Margin="5" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
+                            <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
                         </Grid>
                     </TabItem>
 
@@ -210,20 +203,20 @@
                             </Grid.RowDefinitions>
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Server:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                    <TextBlock Text ="Server:" Style="{StaticResource Label}" Width="100"></TextBlock>
                                     <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="270"></TextBox>
                                     <TextBlock Margin="10,0"><Hyperlink Foreground="#FF00AFFC" Click="Proxy_OnClick"> Proxy</Hyperlink></TextBlock>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Username:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                    <TextBlock Text ="Username:" Style="{StaticResource Label}" Width="100"></TextBlock>
                                     <TextBox x:Name="Username" Width="270"></TextBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Password:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                    <TextBlock Text ="Password:" Style="{StaticResource Label}" Width="100"></TextBlock>
                                     <PasswordBox x:Name="Password" Width="270"></PasswordBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Story ID or URL:" Foreground="#00AFFC" TextAlignment="Right" Margin="5" Width="100"></TextBlock>
+                                    <TextBlock Text ="Story ID or URL:" Style="{StaticResource Label}" Width="100"></TextBlock>
                                     <TextBox x:Name="StoryId" Width="270" LostFocus="LostFocusStoryID"></TextBox>
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
