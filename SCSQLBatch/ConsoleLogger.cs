@@ -1,5 +1,5 @@
 ﻿using SCQueryConnect.Common;
-using SCSQLBatch.Helpers;
+using SCQueryConnect.Common.Helpers;
 using System;
 using System.Configuration;
 using System.Diagnostics;
@@ -29,7 +29,7 @@ namespace SCSQLBatch
             {
                 try
                 {
-                    var helper = new LogHelper();
+                    var helper = new PathHelper();
                     var path = helper.GetAbsolutePath(LogFile);
                     File.AppendAllText(path, message);
                 }

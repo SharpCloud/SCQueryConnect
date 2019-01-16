@@ -1,19 +1,19 @@
 ﻿using NUnit.Framework;
-using SCSQLBatch.Helpers;
+using SCQueryConnect.Common.Helpers;
 using System.IO;
 using System.Reflection;
 
-namespace SCSQLBatch.Tests.Helpers
+namespace SCQueryConnect.Common.Tests.Helpers
 {
     [TestFixture]
-    public class LogHelperTests
+    public class PathHelperTests
     {
         [Test]
         public void ReturnsAbsolutePathWhenSpecified()
         {
             // Arrange
 
-            var helper = new LogHelper();
+            var helper = new PathHelper();
 
             // Act
 
@@ -29,7 +29,7 @@ namespace SCSQLBatch.Tests.Helpers
         {
             // Arrange
 
-            var helper = new LogHelper();
+            var helper = new PathHelper();
 
             // Act
 

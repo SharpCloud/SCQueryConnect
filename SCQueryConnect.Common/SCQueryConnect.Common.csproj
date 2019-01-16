@@ -62,6 +62,7 @@
     <Compile Include="Helpers\DbConnectionFactory.cs" />
     <Compile Include="Helpers\ExcelWriter.cs" />
     <Compile Include="Helpers\DataChecker.cs" />
+    <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="Interfaces\IConnectionStringHelper.cs" />
     <Compile Include="Interfaces\IDbConnectionFactory.cs" />
     <Compile Include="Interfaces\ILog.cs" />

@@ -63,9 +63,6 @@
     <Compile Include="..\SCSQLBatch\ConsoleLogger.cs">
       <Link>ConsoleLogger.cs</Link>
     </Compile>
-    <Compile Include="..\SCSQLBatch\Helpers\LogHelper.cs">
-      <Link>Helpers\LogHelper.cs</Link>
-    </Compile>
     <Compile Include="..\SCSQLBatch\Program.cs">
       <Link>Program.cs</Link>
     </Compile>

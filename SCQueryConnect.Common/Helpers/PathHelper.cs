@@ -2,9 +2,9 @@
 using System.IO;
 using System.Reflection;
 
-namespace SCSQLBatch.Helpers
+namespace SCQueryConnect.Common.Helpers
 {
-    public class LogHelper
+    public class PathHelper
     {
         public string GetAbsolutePath(string path)
         {

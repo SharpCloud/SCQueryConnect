@@ -6,7 +6,7 @@ using SCQueryConnect.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -149,7 +149,7 @@ namespace SCQueryConnect.Common.Helpers
         {
             if (dbType == DatabaseType.SharpCloud)
             {
-                var filename = _connectionStringHelper.GetVariable(connectionString, "Data Source");
+                var filename = _connectionStringHelper.GetVariable(connectionString, DatabaseStrings.DataSourceKey);
                 var sourceId = _connectionStringHelper.GetVariable(connectionString, "SourceId");
 
                 var csUsername = _connectionStringHelper.GetVariable(connectionString, "SourceUserName");
@@ -183,6 +183,8 @@ namespace SCQueryConnect.Common.Helpers
                 var items = story.GetItemsData();
                 var relationships = story.GetRelationshipsData();
 
+                await _logger.Log($"Writing story to {filename}");
+
                 var writer = new ExcelWriter();
                 writer.WriteToExcel(filename, items, relationships);
 
@@ -194,6 +196,9 @@ namespace SCQueryConnect.Common.Helpers
             SharpCloudConfiguration config,
             UpdateSettings settings)
         {
+            string newFilename = null;
+            var generateTempFile = false;
+
             try
             {
                 var start = DateTime.Now;
@@ -215,9 +220,21 @@ namespace SCQueryConnect.Common.Helpers
 
                 if (isValid)
                 {
-                    await InitialiseDatabase(config, settings.ConnectionString, settings.DBType);
+                    var filename = _connectionStringHelper.GetVariable(
+                        settings.ConnectionString,
+                        DatabaseStrings.DataSourceKey);
 
-                    using (IDbConnection connection = _dbConnectionFactory.GetDb(settings.ConnectionString, settings.DBType))
+                    generateTempFile = string.IsNullOrWhiteSpace(filename);
+                    var pathHelper = new PathHelper();
+                    newFilename = pathHelper.GetAbsolutePath($"{Guid.NewGuid()}.xlsx");
+
+                    var connectionString = generateTempFile
+                        ? _connectionStringHelper.SetDataSource(settings.ConnectionString, newFilename)
+                        : settings.ConnectionString;
+
+                    await InitialiseDatabase(config, connectionString, settings.DBType);
+
+                    using (IDbConnection connection = _dbConnectionFactory.GetDb(connectionString, settings.DBType))
                     {
                         connection.Open();
 
@@ -239,6 +256,15 @@ namespace SCQueryConnect.Common.Helpers
             catch (Exception ex)
             {
                 await _logger.Log("Error: " + ex.Message);
+            }
+            finally
+            {
+                var removeFile = generateTempFile && File.Exists(newFilename);
+                if (removeFile)
+                {
+                    await _logger.Log($"Removing file {newFilename}");
+                    File.Delete(newFilename);
+                }
             }
         }
 

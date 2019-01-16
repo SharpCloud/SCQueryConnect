@@ -8,7 +8,7 @@ namespace SCQueryConnect.Common.Helpers
         {
             var kvp = Regex.Match(
                 connectionString,
-                $"{variableName}=.*?;",
+                $"{variableName}=(.*?)(;|$)",
                 RegexOptions.IgnoreCase).Value.Trim(';');
 
             var split = kvp.Split('=');
@@ -18,6 +18,16 @@ namespace SCQueryConnect.Common.Helpers
                 : string.Empty;
 
             return value;
+        }
+
+        public string SetDataSource(string connectionString, string newLocation)
+        {
+            var updated = Regex.Replace(
+                connectionString,
+                $"{DatabaseStrings.DataSourceKey}=(.*?)(;|$)",
+                m => $"{DatabaseStrings.DataSourceKey}={newLocation}{m.Groups[2]}");
+
+            return updated;
         }
     }
 }
