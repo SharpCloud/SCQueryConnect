@@ -118,45 +118,44 @@ namespace SQLUpdate.Views
             
         }
 
-        private void Team_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Team_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Border grid = sender as Border;
             if (grid == null) return;
-            var item = grid.DataContext as SC.API.ComInterop.Models.Team;
+            var item = grid.DataContext as Team;
             try
             {
                 _viewModel.AllStories.Clear();
                 var tStories = _client.StoriesTeam(item.Id);
 
                 this.userStoriesContainer.Visibility = Visibility.Visible;
-                foreach (SC.API.ComInterop.Models.StoryLite a in tStories)
+                foreach (StoryLite a in tStories)
                 {
                     _viewModel.AllStories.Add(a);
                 }
 
-                //this.userStories.ItemsSource = tStories;
-                //this.userStories.Items.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-
             }
-            catch (Exception e1)
-            { }
+            catch (Exception)
+            {
+            }
         }
 
         private CheckBox _checkBox;
 
-        private void Story_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Story_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Border grid = sender as Border;
             if (grid == null) return;
-            var item = grid.DataContext as SC.API.ComInterop.Models.StoryLite;
+            var item = grid.DataContext as StoryLite;
             try
             {
                 if (_checkBox != null)
                     _checkBox.IsChecked = !_checkBox.IsChecked;
 
             }
-            catch (Exception e1)
-            { }
+            catch (Exception)
+            {
+            }
         }
 
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
