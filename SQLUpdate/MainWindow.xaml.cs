@@ -606,6 +606,16 @@ namespace SCQueryConnect
                 }
 
                 // set up the config
+
+                // Remove data source if type is SharpCloud; a temp file will
+                // be used, so an overwrite prompt will not appear
+
+                var connectionString = SelectedQueryData.GetBatchDBType == DatabaseStrings.SharpCloud
+                    ? _connectionStringHelper.SetDataSource(
+                        SelectedQueryData.FormattedConnectionString,
+                        string.Empty)
+                    : SelectedQueryData.FormattedConnectionString;
+
                 var content = File.ReadAllText(configFilename);
                 content = content.Replace("USERID", Username.Text);
                 content = content.Replace("PASSWORD", ""); // we keep the password hidden
@@ -613,7 +623,7 @@ namespace SCQueryConnect
                 content = content.Replace("https://my.sharpcloud.com", Url.Text);
                 content = content.Replace("00000000-0000-0000-0000-000000000000", StoryId.Text);
                 content = content.Replace("SQL", SelectedQueryData.GetBatchDBType);
-                content = content.Replace("CONNECTIONSTRING", SelectedQueryData.FormattedConnectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = content.Replace("CONNECTIONSTRING", connectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYSTRING", SelectedQueryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("QUERYRELSSTRING", SelectedQueryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = content.Replace("LOGFILE", $"Logfile.txt");
