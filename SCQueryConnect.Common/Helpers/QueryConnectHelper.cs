@@ -142,7 +142,7 @@ namespace SCQueryConnect.Common.Helpers
         /// Load data from SharpCloud and save it to an Excel file. Only needed when
         /// SharpCloud is a data source, so the upload process can work on local data.
         /// </summary>
-        public void InitialiseDatabase(
+        public async Task InitialiseDatabase(
             SharpCloudConfiguration config,
             string connectionString,
             DatabaseType dbType)
@@ -168,6 +168,8 @@ namespace SCQueryConnect.Common.Helpers
                     ? config.Url
                     : csServer;
 
+                await _logger.Log("Initialising data source...");
+
                 var sc = new SharpCloudApi(
                     username,
                     password,
@@ -183,6 +185,8 @@ namespace SCQueryConnect.Common.Helpers
 
                 var writer = new ExcelWriter();
                 writer.WriteToExcel(filename, items, relationships);
+
+                await _logger.Log("Data source ready");
             }
         }
 
@@ -211,7 +215,7 @@ namespace SCQueryConnect.Common.Helpers
 
                 if (isValid)
                 {
-                    InitialiseDatabase(config, settings.ConnectionString, settings.DBType);
+                    await InitialiseDatabase(config, settings.ConnectionString, settings.DBType);
 
                     using (IDbConnection connection = _dbConnectionFactory.GetDb(settings.ConnectionString, settings.DBType))
                     {

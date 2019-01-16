@@ -202,13 +202,13 @@ namespace SCQueryConnect
             };
         }
 
-        private void TestConnectionClick(object sender, RoutedEventArgs e)
+        private async void TestConnectionClick(object sender, RoutedEventArgs e)
         {
             if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud)
             {
                 try
                 {
-                    _qcHelper.InitialiseDatabase(
+                    await _qcHelper.InitialiseDatabase(
                         GetApiConfiguration(),
                         SelectedQueryData.ConnectionsString,
                         SelectedQueryData.ConnectionType);
@@ -260,23 +260,23 @@ namespace SCQueryConnect
         /// when running queries against data when the query is run for the first time;
         /// subsequent runs should be able to use local data to speed up the process.
         /// </summary>
-        private void InitialiseSharpCloudDataIfNeeded()
+        private async Task InitialiseSharpCloudDataIfNeeded()
         {
             if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud &&
                 SelectedQueryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
             {
-                _qcHelper.InitialiseDatabase(
+                await _qcHelper.InitialiseDatabase(
                     GetApiConfiguration(),
                     SelectedQueryData.FormattedConnectionString,
                     SelectedQueryData.ConnectionType);
             }
         }
 
-        private void RunClick(object sender, RoutedEventArgs e)
+        private async void RunClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                InitialiseSharpCloudDataIfNeeded();
+                await InitialiseSharpCloudDataIfNeeded();
 
                 using (IDbConnection connection = GetDb())
                 {
@@ -333,9 +333,9 @@ namespace SCQueryConnect
             }
         }
 
-        private void RunClickRels(object sender, RoutedEventArgs e)
+        private async void RunClickRels(object sender, RoutedEventArgs e)
         {
-            InitialiseSharpCloudDataIfNeeded();
+            await InitialiseSharpCloudDataIfNeeded();
 
             try
             {
