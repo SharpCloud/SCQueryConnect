@@ -61,8 +61,8 @@ namespace SCQueryConnect
                         return DatabaseStrings.Sql;
                     case DatabaseType.ODBC:
                         return DatabaseStrings.Odbc;
-                    case DatabaseType.SharpCloud:
-                        return DatabaseStrings.SharpCloud;
+                    case DatabaseType.SharpCloudExcel:
+                        return DatabaseStrings.SharpCloudExcel;
                 }
                 return DatabaseStrings.Oledb; // most types are ADO
             }
@@ -158,8 +158,8 @@ namespace SCQueryConnect
                     QueryStringRels = ""; 
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
                     break;
-                case DatabaseType.SharpCloud:
-                    Name = "SharpCloud Example";
+                case DatabaseType.SharpCloudExcel:
+                    Name = "SharpCloud (Excel) Example";
                     FileName = @"C:\MyFolder\MyFile.xlsx";
                     SourceStoryId = "00000000-0000-0000-0000-000000000000";
                     ConnectionsString =
@@ -172,8 +172,8 @@ namespace SCQueryConnect
                         "Extended Properties='Excel 12.0 Xml;" +
                         "HDR = YES'";
 
-                    QueryString = "SELECT * from [Sheet1$]";
-                    QueryStringRels = ""; // "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
+                    QueryString = "SELECT * from [Items$]";
+                    QueryStringRels = "SELECT * from [Relationships$]";
                     break;
             }
         }

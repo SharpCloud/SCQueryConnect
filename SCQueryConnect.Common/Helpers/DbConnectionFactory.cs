@@ -21,7 +21,7 @@ namespace SCQueryConnect.Common.Interfaces
                 case DatabaseType.ODBC:
                     return new OdbcConnection(connectionString);
 
-                case DatabaseType.SharpCloud:
+                case DatabaseType.SharpCloudExcel:
                     var variables = new List<string>()
                     {
                         "SourceId",

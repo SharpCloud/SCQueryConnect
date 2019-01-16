@@ -142,8 +142,8 @@ namespace SCSQLBatch
                 default:
                 case DatabaseStrings.Oledb:
                     return DatabaseType.Excel;
-                case DatabaseStrings.SharpCloud:
-                    return DatabaseType.SharpCloud;
+                case DatabaseStrings.SharpCloudExcel:
+                    return DatabaseType.SharpCloudExcel;
             }
         }
     }

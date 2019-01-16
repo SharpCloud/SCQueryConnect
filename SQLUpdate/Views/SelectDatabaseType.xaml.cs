@@ -25,7 +25,7 @@ namespace SCQueryConnect.Views
                 new Database(DatabaseType.SQL, "SQL Server Connection"),
                 new Database(DatabaseType.ODBC, "ODBC Database Connection"),
                 new Database(DatabaseType.ADO, "Generic ADO/OLDEB Connection"),
-                new Database(DatabaseType.SharpCloud, "SharpCloud")
+                new Database(DatabaseType.SharpCloudExcel, "SharpCloud (Excel)")
             };
 
             DataContext = this;

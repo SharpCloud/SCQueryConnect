@@ -16,7 +16,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
 
             // Act
 
-            var output = factory.GetDb(connectionString, DatabaseType.SharpCloud);
+            var output = factory.GetDb(connectionString, DatabaseType.SharpCloudExcel);
 
             // Assert
 

@@ -147,7 +147,7 @@ namespace SCQueryConnect.Common.Helpers
             string connectionString,
             DatabaseType dbType)
         {
-            if (dbType == DatabaseType.SharpCloud)
+            if (dbType == DatabaseType.SharpCloudExcel)
             {
                 var filename = _connectionStringHelper.GetVariable(connectionString, DatabaseStrings.DataSourceKey);
                 var sourceId = _connectionStringHelper.GetVariable(connectionString, "SourceId");

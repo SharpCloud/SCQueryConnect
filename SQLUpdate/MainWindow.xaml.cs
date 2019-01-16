@@ -172,7 +172,7 @@ namespace SCQueryConnect
                 _connections.Add(new QueryData(DatabaseType.SQL));
                 _connections.Add(new QueryData(DatabaseType.ODBC));
                 _connections.Add(new QueryData(DatabaseType.ADO));
-                _connections.Add(new QueryData(DatabaseType.SharpCloud));
+                _connections.Add(new QueryData(DatabaseType.SharpCloudExcel));
             }
         }
 
@@ -204,7 +204,7 @@ namespace SCQueryConnect
 
         private async void TestConnectionClick(object sender, RoutedEventArgs e)
         {
-            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud)
+            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel)
             {
                 try
                 {
@@ -249,7 +249,7 @@ namespace SCQueryConnect
 
         private void SetLastUsedSharpCloudConnection()
         {
-            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud)
+            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel)
             {
                 _lastUsedSharpCloudConnection = SelectedQueryData.FormattedConnectionString;
             }
@@ -262,7 +262,7 @@ namespace SCQueryConnect
         /// </summary>
         private async Task InitialiseSharpCloudDataIfNeeded()
         {
-            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloud &&
+            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel &&
                 SelectedQueryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
             {
                 await _qcHelper.InitialiseDatabase(
@@ -610,7 +610,7 @@ namespace SCQueryConnect
                 // Remove data source if type is SharpCloud; a temp file will
                 // be used, so an overwrite prompt will not appear
 
-                var connectionString = SelectedQueryData.GetBatchDBType == DatabaseStrings.SharpCloud
+                var connectionString = SelectedQueryData.GetBatchDBType == DatabaseStrings.SharpCloudExcel
                     ? _connectionStringHelper.SetDataSource(
                         SelectedQueryData.FormattedConnectionString,
                         string.Empty)
@@ -677,7 +677,11 @@ namespace SCQueryConnect
 
         private void NewConnectionClick(object sender, RoutedEventArgs e)
         {
-            var newWnd = new SelectDatabaseType();
+            var newWnd = new SelectDatabaseType
+            {
+                Owner = this
+            };
+
             if (newWnd.ShowDialog() == true)
             {
                 _connections.Add(new QueryData(newWnd.SelectedButton));
@@ -827,7 +831,7 @@ namespace SCQueryConnect
                         sourceStoryIdVisibility = Visibility.Collapsed;
                         break;
 
-                    case DatabaseType.SharpCloud:
+                    case DatabaseType.SharpCloudExcel:
                         connectionStringVisibility = Visibility.Collapsed;
                         filenameVisibility = Visibility.Visible;
                         sharepointVisibility = Visibility.Collapsed;
@@ -856,7 +860,7 @@ namespace SCQueryConnect
                     break;
 
                 case DatabaseType.Excel:
-                case DatabaseType.SharpCloud:
+                case DatabaseType.SharpCloudExcel:
                     ord.Filter = "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx";
                     break;
             }

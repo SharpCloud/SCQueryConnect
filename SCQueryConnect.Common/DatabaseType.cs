@@ -8,6 +8,6 @@
         Excel,
         Access,
         SharepointList,
-        SharpCloud
+        SharpCloudExcel
     }
 }

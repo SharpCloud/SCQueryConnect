@@ -4,7 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Select Database Connection Type" Height="390" Width="300" ResizeMode="NoResize" Background="#333333">
+        Title="Select Database Connection Type"
+        Height="390"
+        Width="300"
+        ResizeMode="NoResize"
+        Background="#333333"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <ItemsControl ItemsSource="{Binding DatabaseTypes}" VerticalAlignment="Center">
             <ItemsControl.ItemTemplate>
