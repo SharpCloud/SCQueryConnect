@@ -44,8 +44,8 @@ namespace SCQueryConnect
         public DataView QueryResultsRels { get; set; }
 
         public string FormattedConnectionString => ConnectionsString
-            .Replace("{filename}", FileName)
-            .Replace("{sharepoint-url}", SharePointURL)
+            .Replace("{0}", FileName)
+            .Replace("{1}", SharePointURL)
             .Replace("{source-story-id}", SourceStoryId)
             .Replace("{source-story-user-name}", SourceStoryUserName)
             .Replace("{source-story-password}", SourceStoryPassword)
@@ -137,7 +137,7 @@ namespace SCQueryConnect
                     FileName = "C:/MyFolder/MyFile.xlsx";
                     SharePointURL = "";
                     ConnectionsString =
-                        "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filename};Extended Properties='Excel 12.0 Xml; HDR = YES'";
+                        "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml; HDR = YES'";
                     QueryString = "SELECT * from [Sheet1$]";
                     QueryStringRels = ""; // "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
                     break;
@@ -145,7 +145,7 @@ namespace SCQueryConnect
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
                     SharePointURL = "";
-                    ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filename}";
+                    ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0}";
                     QueryString = "SELECT * FROM TABLE";
                     QueryStringRels = "";
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
@@ -153,7 +153,7 @@ namespace SCQueryConnect
                 case DatabaseType.SharepointList:
                     Name = "SharePoint List Example";
                     SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
-                    ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={sharepoint-url}";
+                    ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
                     QueryString = "SELECT * FROM LISTITEM";
                     QueryStringRels = ""; 
                     //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
@@ -168,7 +168,7 @@ namespace SCQueryConnect
                         "SourcePassword={source-story-password};" +
                         "SourceServer={source-story-server};" +
                         "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                        "Data Source={filename};" +
+                        "Data Source={0};" +
                         "Extended Properties='Excel 12.0 Xml;" +
                         "HDR = YES'";
 
