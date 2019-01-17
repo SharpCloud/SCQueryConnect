@@ -20,6 +20,7 @@ namespace SCQueryConnect.Common.Helpers
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
+        private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
         public QueryConnectHelper(
             IConnectionStringHelper connectionStringHelper,
@@ -62,6 +63,17 @@ namespace SCQueryConnect.Common.Helpers
             return true;
         }
 
+        private string GetHeaderName(string headerText)
+        {
+            if (headerText.ToLower().StartsWith("tags#"))
+            {
+                var updated = _tagHeaderRegex.Replace(headerText, ".", 1);
+                return updated;
+            }
+
+            return headerText;
+        }
+
         public async Task UpdateRelationships(IDbConnection connection, Story story, string sqlString)
         {
             if (string.IsNullOrWhiteSpace(sqlString))
@@ -96,7 +108,10 @@ namespace SCQueryConnect.Common.Helpers
                     for (int i = 0; i < columnCount; i++)
                     {
                         dataList.Add(new string[columnCount]);
-                        dataList[0][i] = reader.GetName(i);
+
+                        var headerText = reader.GetName(i);
+                        var header = GetHeaderName(headerText);
+                        dataList[0][i] = header;
                     }
 
                     // Write array data
@@ -341,14 +356,10 @@ namespace SCQueryConnect.Common.Helpers
                     // create our string arrar
                     var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
                     // add the headers
-                    var regex = new Regex(Regex.Escape("#"));
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        var header = reader.GetName(i);
-                        if (header.ToLower().StartsWith("tags#"))
-                        {
-                            header = regex.Replace(header, ".", 1);
-                        }
+                        var headerText = reader.GetName(i);
+                        var header = GetHeaderName(headerText);
                         arrayValues[0, i] = header;
                     }
                     // add the data values
