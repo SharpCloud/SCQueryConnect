@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class ExcelWriter
+    public class ExcelWriter : IExcelWriter
     {
         public void WriteToExcel(
             string filename,
