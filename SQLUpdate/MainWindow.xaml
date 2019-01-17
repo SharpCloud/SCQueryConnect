@@ -122,11 +122,7 @@
                             <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" />
                             <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
 
-                            <StackPanel Grid.Row="3" Grid.Column="0">
-                                <TextBlock Text="Filename:" Style="{StaticResource Label}" x:Name="lbl2" />
-                                <TextBlock Text="(Optional)" Style="{StaticResource Label}" FontStyle="Italic" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
-                            </StackPanel>
-                            
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" x:Name="lbl2" />
                             <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
                             <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click">Choose file...</Button>
 
