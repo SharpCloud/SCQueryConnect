@@ -210,7 +210,7 @@ namespace SCQueryConnect
                 {
                     await _qcHelper.InitialiseDatabase(
                         GetApiConfiguration(),
-                        SelectedQueryData.ConnectionsString,
+                        SelectedQueryData.FormattedConnectionString,
                         SelectedQueryData.ConnectionType);
                 }
                 catch (Exception ex)
