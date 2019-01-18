@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -177,7 +178,7 @@ namespace SCQueryConnect.Common.Helpers
 
                 var password = string.IsNullOrWhiteSpace(csPassword)
                     ? config.Password
-                    : csPassword;
+                    : Encoding.Default.GetString(Convert.FromBase64String(csPassword));
 
                 var server = string.IsNullOrWhiteSpace(csServer)
                     ? config.Url
