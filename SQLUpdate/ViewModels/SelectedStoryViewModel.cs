@@ -32,7 +32,6 @@ namespace SQLUpdate.ViewModels
         private ICollectionView _stories;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private Dispatcher currentDispatcher;
 
         protected void OnPropertyChanged(string propertyName)
         {
