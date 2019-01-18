@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
@@ -136,9 +137,33 @@ namespace SCQueryConnect
             else
                 UnpublishItems = false;
 
+            EventManager.RegisterClassHandler(
+                typeof(TextBox),
+                GotKeyboardFocusEvent,
+                new KeyboardFocusChangedEventHandler(SelectAllOnTabFocus));
+
+            EventManager.RegisterClassHandler(
+                typeof(PasswordBox),
+                GotKeyboardFocusEvent,
+                new KeyboardFocusChangedEventHandler(SelectAllOnTabFocus));
+
             var splashScreen = new SplashScreen("Images/splash.jpg");
             splashScreen.Show(true);
+        }
 
+        private void SelectAllOnTabFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (e.KeyboardDevice.IsKeyDown(Key.Tab))
+            {
+                if (sender is TextBox textBox && !textBox.IsReadOnly)
+                {
+                    textBox.SelectAll();
+                }
+                else if (sender is PasswordBox passwordBox)
+                {
+                    passwordBox.SelectAll();
+                }
+            }
         }
 
         private void LoadAllProfiles()
