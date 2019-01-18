@@ -923,15 +923,5 @@ namespace SCQueryConnect
             var proxy = new ProxySettings(_proxyViewModel);
             proxy.ShowDialog();
         }
-
-        private void StorySourceSettings_Click(object sender, RoutedEventArgs e)
-        {
-            var dlg = new SourceStorySettings(SelectedQueryData)
-            {
-                Owner = this
-            };
-
-            dlg.ShowDialog();
-        }
     }
 }
