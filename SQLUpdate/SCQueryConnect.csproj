@@ -135,7 +135,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helpers\ExcelWriter.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataChecker.cs" />
     <Compile Include="UIRelationshipsDataChecker.cs" />

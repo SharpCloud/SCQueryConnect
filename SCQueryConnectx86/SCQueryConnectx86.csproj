@@ -119,9 +119,6 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
       <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Helpers\ExcelWriter.cs">
-      <Link>Helpers\ExcelWriter.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
