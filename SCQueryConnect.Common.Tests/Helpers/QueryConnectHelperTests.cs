@@ -6,6 +6,8 @@ using SC.Entities.Models;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Models;
+using System.Threading.Tasks;
 using Category = SC.Entities.Models.Category;
 
 namespace SCQueryConnect.Helpers.Tests.Helpers
@@ -15,14 +17,21 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
     {
         private const string StoryId = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
 
-        private QueryConnectHelper CreateQueryConnectHelper()
+        private QueryConnectHelper CreateQueryConnectHelper(
+            IConnectionStringHelper connectionStringHelper = null,
+            IDataChecker dataChecker = null,
+            IDbConnectionFactory dbConnectionFactory = null,
+            ILog log = null,
+            IRelationshipsDataChecker relationshipsDataChecker = null,
+            ISharpCloudApiFactory sharpCloudApiFactory = null)
         {
             return new QueryConnectHelper(
-                Mock.Of<IConnectionStringHelper>(),
-                Mock.Of<IDataChecker>(),
-                Mock.Of<IDbConnectionFactory>(),
-                Mock.Of<ILog>(),
-                Mock.Of<IRelationshipsDataChecker>());
+                connectionStringHelper ?? Mock.Of<IConnectionStringHelper>(),
+                dataChecker ?? Mock.Of<IDataChecker>(),
+                dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
+                log ?? Mock.Of<ILog>(),
+                relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
+                sharpCloudApiFactory ?? Mock.Of<ISharpCloudApiFactory>());
         }
 
         [Test]
@@ -114,6 +123,31 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
 
             Assert.IsTrue(isValid);
             Assert.AreEqual(message, "Reading story 'StoryName'");
+        }
+
+        [Test]
+        public void InitialiseDatabaseThrowsIfCredentialsAreInvalid()
+        {
+            // Arrange
+
+            var factory = Mock.Of<ISharpCloudApiFactory>(f =>
+                f.CreateSharpCloudApi(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<bool>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()) == null);
+
+            var helper = CreateQueryConnectHelper(sharpCloudApiFactory: factory);
+
+            // Act, Assert
+
+            Assert.ThrowsAsync<InvalidCredentialsException>(() => helper.InitialiseDatabase(
+                new SharpCloudConfiguration(),
+                string.Empty,
+                DatabaseType.SharpCloudExcel));
         }
     }
 }

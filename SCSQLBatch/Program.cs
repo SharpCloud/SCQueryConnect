@@ -44,7 +44,8 @@ namespace SCSQLBatch
                 new DataChecker(),
                 new DbConnectionFactory(),
                 logger,
-                new RelationshipsDataChecker());
+                new RelationshipsDataChecker(),
+                new SharpCloudApiFactory());
 
             // basic checks
             if (string.IsNullOrEmpty(userid) || userid == "USERID")

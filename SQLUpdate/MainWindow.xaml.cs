@@ -80,11 +80,12 @@ namespace SCQueryConnect
         public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
         private ProxyViewModel _proxyViewModel;
         private QueryConnectHelper _qcHelper;
-        private IConnectionStringHelper _connectionStringHelper;
-        private IDataChecker _dataChecker;
-        private IDbConnectionFactory _dbConnectionFactory;
-        private ILog _logger;
-        private IRelationshipsDataChecker _relationshipsChecker;
+        private readonly IConnectionStringHelper _connectionStringHelper;
+        private readonly IDataChecker _dataChecker;
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly ILog _logger;
+        private readonly IRelationshipsDataChecker _relationshipsChecker;
+        private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
 
         public MainWindow()
         {
@@ -96,6 +97,7 @@ namespace SCQueryConnect
             _dataChecker = new UIDataChecker(txterr);
             _dbConnectionFactory = new DbConnectionFactory();
             _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
+            _sharpCloudApiFactory = new SharpCloudApiFactory();
             _logger = new UILogger(tbResults);
 
             _qcHelper = new QueryConnectHelper(
@@ -103,7 +105,8 @@ namespace SCQueryConnect
                 _dataChecker,
                 _dbConnectionFactory,
                 _logger,
-                _relationshipsChecker);
+                _relationshipsChecker,
+                _sharpCloudApiFactory);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -899,7 +902,7 @@ namespace SCQueryConnect
 
         private void SelectStoryClick(object sender, RoutedEventArgs e)
         {
-            var api = new SharpCloudApi(
+            var api = _sharpCloudApiFactory.CreateSharpCloudApi(
                 Username.Text,
                 Password.Password,
                 Url.Text,
@@ -907,6 +910,12 @@ namespace SCQueryConnect
                 _proxyViewModel.ProxyAnnonymous,
                 _proxyViewModel.ProxyUserName,
                 _proxyViewModel.ProxyPassword);
+
+            if (api == null)
+            {
+                _logger.Log(InvalidCredentialsException.LoginFailed);
+                return;
+            }
 
             var sel = new SelectStory(api, false, Username.Text);
 

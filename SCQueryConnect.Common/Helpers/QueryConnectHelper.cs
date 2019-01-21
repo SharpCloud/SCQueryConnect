@@ -21,6 +21,7 @@ namespace SCQueryConnect.Common.Helpers
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
+        private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
         public QueryConnectHelper(
@@ -28,13 +29,15 @@ namespace SCQueryConnect.Common.Helpers
             IDataChecker dataChecker,
             IDbConnectionFactory dbConnectionFactory,
             ILog log,
-            IRelationshipsDataChecker relationshipsDataChecker)
+            IRelationshipsDataChecker relationshipsDataChecker,
+            ISharpCloudApiFactory sharpCloudApiFactory)
         {
             _connectionStringHelper = connectionStringHelper;
             _dataChecker = dataChecker;
             _dbConnectionFactory = dbConnectionFactory;
             _logger = log;
             _relationshipsDataChecker = relationshipsDataChecker;
+            _sharpCloudApiFactory = sharpCloudApiFactory;
         }
 
         public string GetStoryUrl(string input)
@@ -186,7 +189,7 @@ namespace SCQueryConnect.Common.Helpers
 
                 await _logger.Log("Initialising data source...");
 
-                var sc = new SharpCloudApi(
+                var sc = _sharpCloudApiFactory.CreateSharpCloudApi(
                     username,
                     password,
                     server,
@@ -194,6 +197,11 @@ namespace SCQueryConnect.Common.Helpers
                     config.UseDefaultProxyCredentials,
                     config.ProxyUserName,
                     config.ProxyPassword);
+
+                if (sc == null)
+                {
+                    throw new InvalidCredentialsException();
+                }
 
                 var story = sc.LoadStory(sourceId);
                 var items = story.GetItemsData();
@@ -217,11 +225,7 @@ namespace SCQueryConnect.Common.Helpers
 
             try
             {
-                var start = DateTime.Now;
-                await _logger.Log($"Starting update process...");
-                await _logger.Log("Connecting to Sharpcloud " + config.Url);
-
-                var sc = new SharpCloudApi(
+                var sc = _sharpCloudApiFactory.CreateSharpCloudApi(
                     config.Username,
                     config.Password,
                     config.Url,
@@ -229,6 +233,17 @@ namespace SCQueryConnect.Common.Helpers
                     config.UseDefaultProxyCredentials,
                     config.ProxyUserName,
                     config.ProxyPassword);
+
+                if (sc == null)
+                {
+                    await _logger.Log(InvalidCredentialsException.LoginFailed);
+                    return;
+                }
+
+                var start = DateTime.Now;
+
+                await _logger.Log("Starting update process...");
+                await _logger.Log("Connecting to Sharpcloud " + config.Url);
 
                 var story = sc.LoadStory(settings.TargetStoryId);
                 var isValid = Validate(story, out var message);
