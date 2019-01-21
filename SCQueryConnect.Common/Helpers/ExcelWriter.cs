@@ -1,10 +1,33 @@
 ﻿using Microsoft.Office.Interop.Excel;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace SCQueryConnect.Common.Helpers
 {
     public class ExcelWriter : IExcelWriter
     {
+        private readonly HashSet<string> _validFileExtensions = new HashSet<string>
+        {
+            ".xls",
+            ".xlsb",
+            ".xlsm",
+            ".xlsx"
+        };
+
+        public string GetValidFilename(string filename)
+        {
+            var ext = Path.GetExtension(filename);
+            var isValid = _validFileExtensions.Contains(ext);
+
+            var suffix = isValid
+                ? string.Empty
+                : ".xlsx";
+
+            var toReturn = $"{filename}{suffix}";
+            return toReturn;
+        }
+
         public void WriteToExcel(
             string filename,
             string[,] itemsData,

@@ -83,6 +83,7 @@ namespace SCQueryConnect
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
@@ -96,6 +97,7 @@ namespace SCQueryConnect
             _connectionStringHelper = new ConnectionStringHelper();
             _dataChecker = new UIDataChecker(txterr);
             _dbConnectionFactory = new DbConnectionFactory();
+            _excelWriter = new ExcelWriter();
             _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
             _sharpCloudApiFactory = new SharpCloudApiFactory();
             _logger = new UILogger(tbResults);
@@ -104,6 +106,7 @@ namespace SCQueryConnect
                 _connectionStringHelper,
                 _dataChecker,
                 _dbConnectionFactory,
+                _excelWriter,
                 _logger,
                 _relationshipsChecker,
                 _sharpCloudApiFactory);
@@ -799,6 +802,13 @@ namespace SCQueryConnect
 
         private void FileName_LostFocus(object sender, RoutedEventArgs e)
         {
+            if (SelectedQueryData.ConnectionType == DatabaseType.Excel ||
+                SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel)
+            {
+                var filenameBox = sender as TextBox;
+                var validated = _excelWriter.GetValidFilename(filenameBox.Text);
+                filenameBox.Text = validated;
+            }
             SaveSettings();
         }
 

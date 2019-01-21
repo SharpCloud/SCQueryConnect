@@ -43,6 +43,7 @@ namespace SCSQLBatch
                 new ConnectionStringHelper(),
                 new DataChecker(),
                 new DbConnectionFactory(),
+                new ExcelWriter(),
                 logger,
                 new RelationshipsDataChecker(),
                 new SharpCloudApiFactory());

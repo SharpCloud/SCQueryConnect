@@ -21,6 +21,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             IConnectionStringHelper connectionStringHelper = null,
             IDataChecker dataChecker = null,
             IDbConnectionFactory dbConnectionFactory = null,
+            IExcelWriter excelWriter = null,
             ILog log = null,
             IRelationshipsDataChecker relationshipsDataChecker = null,
             ISharpCloudApiFactory sharpCloudApiFactory = null)
@@ -29,6 +30,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
                 connectionStringHelper ?? Mock.Of<IConnectionStringHelper>(),
                 dataChecker ?? Mock.Of<IDataChecker>(),
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
+                excelWriter ?? Mock.Of<IExcelWriter>(),
                 log ?? Mock.Of<ILog>(),
                 relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
                 sharpCloudApiFactory ?? Mock.Of<ISharpCloudApiFactory>());

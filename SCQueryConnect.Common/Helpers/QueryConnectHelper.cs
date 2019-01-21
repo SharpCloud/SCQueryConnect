@@ -19,6 +19,7 @@ namespace SCQueryConnect.Common.Helpers
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
@@ -28,6 +29,7 @@ namespace SCQueryConnect.Common.Helpers
             IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
             IDbConnectionFactory dbConnectionFactory,
+            IExcelWriter excelWriter,
             ILog log,
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory)
@@ -35,6 +37,7 @@ namespace SCQueryConnect.Common.Helpers
             _connectionStringHelper = connectionStringHelper;
             _dataChecker = dataChecker;
             _dbConnectionFactory = dbConnectionFactory;
+            _excelWriter = excelWriter;
             _logger = log;
             _relationshipsDataChecker = relationshipsDataChecker;
             _sharpCloudApiFactory = sharpCloudApiFactory;
@@ -208,10 +211,7 @@ namespace SCQueryConnect.Common.Helpers
                 var relationships = story.GetRelationshipsData();
 
                 await _logger.Log($"Writing story to {filename}");
-
-                var writer = new ExcelWriter();
-                writer.WriteToExcel(filename, items, relationships);
-
+                _excelWriter.WriteToExcel(filename, items, relationships);
                 await _logger.Log("Data source ready");
             }
         }
