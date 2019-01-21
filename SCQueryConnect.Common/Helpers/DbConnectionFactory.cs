@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using SCQueryConnect.Common.Interfaces;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace SCQueryConnect.Common.Interfaces
+namespace SCQueryConnect.Common.Helpers
 {
     public class DbConnectionFactory : IDbConnectionFactory
     {

@@ -1,4 +1,4 @@
-﻿namespace SCQueryConnect.Common.Helpers
+﻿namespace SCQueryConnect.Common.Interfaces
 {
     public interface IConnectionStringHelper
     {

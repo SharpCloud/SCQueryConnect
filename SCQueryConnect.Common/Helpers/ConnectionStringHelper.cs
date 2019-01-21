@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using SCQueryConnect.Common.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace SCQueryConnect.Common.Helpers
 {

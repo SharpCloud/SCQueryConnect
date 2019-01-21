@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Helpers;
 
 namespace SCQueryConnect.Common.Tests.Helpers
 {
