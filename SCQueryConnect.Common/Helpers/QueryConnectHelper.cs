@@ -320,7 +320,11 @@ namespace SCQueryConnect.Common.Helpers
                 await _logger.Log("Reading database");
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    _dataChecker.CheckDataIsOK(reader);
+                    var isOk = _dataChecker.CheckDataIsOK(reader);
+                    if (!isOk)
+                    {
+                        return;
+                    }
 
                     var tempArray = new List<List<string>>();
                     while (reader.Read())
