@@ -119,7 +119,8 @@
                             <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
-                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5" LostFocus="LostFocusStoryID" />
+                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" />
+                            <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
 
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" x:Name="lbl2" />
                             <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
