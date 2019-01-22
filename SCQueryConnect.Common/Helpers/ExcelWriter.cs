@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using SCQueryConnect.Common.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -8,7 +9,8 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class ExcelWriter : IExcelWriter
     {
-        private readonly HashSet<string> _validFileExtensions = new HashSet<string>
+        private readonly HashSet<string> _validFileExtensions
+            = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ".xls",
             ".xlsb",

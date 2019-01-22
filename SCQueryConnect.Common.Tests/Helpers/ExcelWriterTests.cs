@@ -10,6 +10,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
         [TestCase(@"C:\Folder\MyFile.xls", @"C:\Folder\MyFile.xls")]
         [TestCase(@"C:\Folder\MyFile.xlsb", @"C:\Folder\MyFile.xlsb")]
         [TestCase(@"C:\Folder\MyFile.xlsm", @"C:\Folder\MyFile.xlsm")]
+        [TestCase(@"C:\Folder\MyFile.XLSX", @"C:\Folder\MyFile.XLSX")]
         [TestCase(@"C:\Folder\MyFile.xlsx", @"C:\Folder\MyFile.xlsx")]
         [TestCase(@"C:\Folder\MyFile.xml", @"C:\Folder\MyFile.xml.xlsx")]
         public void GetValidFilename(string input, string expectedOut)
