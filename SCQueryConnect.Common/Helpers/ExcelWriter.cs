@@ -3,6 +3,7 @@ using SCQueryConnect.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
 
 namespace SCQueryConnect.Common.Helpers
@@ -71,7 +72,8 @@ namespace SCQueryConnect.Common.Helpers
             {
                 for (var r = 0; r < rowCount; r++)
                 {
-                    worksheet.Cells[c + 1, r + 1] = data[c, r];
+                    var dataItem = WebUtility.HtmlDecode(data[c, r]);
+                    worksheet.Cells[c + 1, r + 1] = dataItem;
                 }
             }
         }
