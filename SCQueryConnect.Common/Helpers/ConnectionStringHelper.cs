@@ -12,11 +12,10 @@ namespace SCQueryConnect.Common.Helpers
                 $"{variableName}=(.*?)(;|$)",
                 RegexOptions.IgnoreCase).Value.Trim(';');
 
-            var split = kvp.Split('=');
-
-            var value = split.Length > 1
-                ? split[1]
-                : string.Empty;
+            var value = Regex.Match(
+                kvp,
+                $"{variableName}=(.*)",
+                RegexOptions.IgnoreCase).Groups[1].Value;
 
             return value;
         }

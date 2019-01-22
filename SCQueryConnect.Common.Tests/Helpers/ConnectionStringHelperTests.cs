@@ -59,5 +59,22 @@ namespace SCQueryConnect.Common.Tests.Helpers
             var filename = helper.GetVariable(updated, "Data Source");
             Assert.AreEqual(newLocation, filename);
         }
+
+        [TestCase("key=value=;")]
+        [TestCase("key=value=")]
+        public void ValueEndingInEqualsIsFullyReturned(string connectionString)
+        {
+            // Arrange
+
+            var helper = new ConnectionStringHelper();
+
+            // Act
+
+            var output = helper.GetVariable(connectionString, "key");
+
+            // Assert
+
+            Assert.AreEqual("value=", output);
+        }
     }
 }
