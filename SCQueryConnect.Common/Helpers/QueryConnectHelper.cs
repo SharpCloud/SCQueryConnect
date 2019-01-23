@@ -255,7 +255,8 @@ namespace SCQueryConnect.Common.Helpers
                         settings.ConnectionString,
                         DatabaseStrings.DataSourceKey);
 
-                    generateTempFile = string.IsNullOrWhiteSpace(filename);
+                    var withoutExt = Path.GetFileNameWithoutExtension(filename);
+                    generateTempFile = string.IsNullOrWhiteSpace(withoutExt);
                     var pathHelper = new PathHelper();
                     newFilename = pathHelper.GetAbsolutePath($"{Guid.NewGuid()}.xlsx");
 
