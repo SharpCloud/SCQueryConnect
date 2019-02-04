@@ -734,8 +734,10 @@ namespace SCQueryConnect
             if (i > 0)
             {
                 i--;
-                _connections.Remove(SelectedQueryData);
-                _connections.Insert(i, SelectedQueryData);
+
+                var selected = SelectedQueryData; // Keep reference to query data
+                _connections.Remove(selected);
+                _connections.Insert(i, selected);
                 connectionList.SelectedIndex = i;
             }
 
@@ -746,8 +748,10 @@ namespace SCQueryConnect
             if (i < _connections.Count-1)
             {
                 i++;
-                _connections.Remove(SelectedQueryData);
-                _connections.Insert(i, SelectedQueryData);
+
+                var selected = SelectedQueryData; // Keep reference to query data
+                _connections.Remove(selected);
+                _connections.Insert(i, selected);
                 connectionList.SelectedIndex = i;
             }
         }
