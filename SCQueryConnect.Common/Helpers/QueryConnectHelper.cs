@@ -114,11 +114,19 @@ namespace SCQueryConnect.Common.Helpers
                     columnCount = reader.FieldCount;
                     for (int i = 0; i < columnCount; i++)
                     {
-                        dataList.Add(new string[columnCount]);
+                        try
+                        {
+                            dataList.Add(new string[columnCount]);
 
-                        var headerText = reader.GetName(i);
-                        var header = GetHeaderName(headerText);
-                        dataList[0][i] = header;
+                            var headerText = reader.GetName(i);
+                            var header = GetHeaderName(headerText);
+                            dataList[0][i] = header;
+                        }
+                        catch (Exception)
+                        {
+                            await _logger.Log($"Could not read relationship header column {i}");
+                            throw;
+                        }
                     }
 
                     // Write array data
@@ -130,7 +138,16 @@ namespace SCQueryConnect.Common.Helpers
 
                         for (int i = 0; i < columnCount; i++)
                         {
-                            dataRow[i] = reader[i].ToString();
+                            try
+                            {
+                                dataRow[i] = reader[i].ToString();
+                            }
+                            catch (Exception)
+                            {
+                                var dataSoFar = string.Join(", ", dataRow);
+                                await _logger.Log($"Could not read relationship data column {i}. Data successfully read: [{dataSoFar}]");
+                                throw;
+                            }
                         }
                     }
                 }
@@ -287,7 +304,7 @@ namespace SCQueryConnect.Common.Helpers
             }
             catch (Exception ex)
             {
-                await _logger.Log("Error: " + ex.Message);
+                await _logger.Log("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
             finally
             {
