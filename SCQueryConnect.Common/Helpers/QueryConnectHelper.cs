@@ -25,6 +25,18 @@ namespace SCQueryConnect.Common.Helpers
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
+        public string AppNameOnly => $"SharpCloud QueryConnect v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
+
+        public string AppName
+        {
+            get
+            {
+                if (IntPtr.Size == 4)
+                    return $"{AppNameOnly} - 32Bit(x86)";
+                return $"{AppNameOnly} - 64Bit(AnyCPU)";
+            }
+        }
+
         public QueryConnectHelper(
             IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
@@ -259,7 +271,7 @@ namespace SCQueryConnect.Common.Helpers
 
                 var start = DateTime.Now;
 
-                await _logger.Log("Starting update process...");
+                await _logger.Log($"{AppName}: Starting update process...");
                 await _logger.Log("Connecting to Sharpcloud " + config.Url);
 
                 var story = sc.LoadStory(settings.TargetStoryId);

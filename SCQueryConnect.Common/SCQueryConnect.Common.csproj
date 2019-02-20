@@ -78,6 +78,7 @@
     <Compile Include="Models\SharpCloudConfiguration.cs" />
     <Compile Include="Models\UpdateSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyVersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

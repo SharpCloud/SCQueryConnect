@@ -38,18 +38,13 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public string AppNameOnly => $"SharpCloud QueryConnect v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
-
         public string AppName
         {
             get
             {
-                if (IntPtr.Size == 4)
-                    return $"{AppNameOnly} - 32Bit(x86)";
-                return $"{AppNameOnly} - 64Bit(AnyCPU)";
+                return _qcHelper.AppName;
             }
         }
-
 
         public Visibility UpdatingMessageVisibility
         {

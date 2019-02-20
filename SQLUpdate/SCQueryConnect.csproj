@@ -135,6 +135,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\SCQueryConnect.Common\Properties\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataChecker.cs" />
     <Compile Include="UIRelationshipsDataChecker.cs" />
