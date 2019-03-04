@@ -60,10 +60,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6F9D2324E1AB28D5FCCEF134EF5ECC76AF162DBD</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>43AD70F2FDF7089E8265E4D1318C9B5EDD412FE6</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>CodeSign.pfx</ManifestKeyFile>
+    <ManifestKeyFile>sharpcloudcodesigning.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
