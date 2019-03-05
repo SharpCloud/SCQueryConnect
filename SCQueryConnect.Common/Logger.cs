@@ -13,7 +13,12 @@ namespace SCQueryConnect.Common
         {
             var now = DateTime.UtcNow;
             var timestamp = $"{now.ToShortDateString()} {now.ToLongTimeString()}";
-            return $"{timestamp} {message}{Environment.NewLine}";
+
+            var lineEnd = message.EndsWith(Environment.NewLine)
+                ? string.Empty
+                : Environment.NewLine;
+            
+            return $"{timestamp} {message}{lineEnd}";
         }
     }
 }
