@@ -186,7 +186,7 @@ namespace SCQueryConnect.Common.Helpers
                 updater.UpdateRelationships(data, story);
             }
 
-            await _logger.Log($"{rowCount} rows processed.");
+            await _logger.Log($"{rowCount} relationships processed.");
         }
 
         /// <summary>
