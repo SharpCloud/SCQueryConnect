@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQLUpdate"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
-        mc:Ignorable="d" Background="#333333" Foreground="#00AFFC" FontSize="14"
+        mc:Ignorable="d" Background="#333333" Foreground="{StaticResource QCBlue}" FontSize="14"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
@@ -68,7 +68,7 @@
                                             ContentSource="Header" Margin="10,2"/>
                                                 </Border>
                                             </StackPanel>
-                                            <Border x:Name="selectedBorder" Height="2" VerticalAlignment="Bottom" Background="#FF00AFFC"></Border>
+                                            <Border x:Name="selectedBorder" Height="2" VerticalAlignment="Bottom" Background="{StaticResource QCBlue}"></Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
@@ -112,7 +112,7 @@
 
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
                             <TextBox Grid.Row="0" x:Name="ConnectionName" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="#00AFFC" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
                             <TextBox Grid.Row="0" x:Name="txtDatabaseType" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
 
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
@@ -152,7 +152,7 @@
                                 <RowDefinition Height="3*"></RowDefinition>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="Query String:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                            <TextBlock Grid.Row="0" Text="Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
                             <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
                             <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
                             <Grid Grid.Row="3">
@@ -160,7 +160,7 @@
                                     <RowDefinition Height="30"></RowDefinition>
                                     <RowDefinition ></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
                                 <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
                                 <Button Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0">Preview SQL Results</Button>
                                 <DataGrid x:Name="DataGrid" Grid.Row="1" Margin="5"/>
@@ -177,8 +177,8 @@
                                 <RowDefinition Height="3*"></RowDefinition>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="#00AFFC" Margin="5" Width="200" HorizontalAlignment="Left"></TextBlock>
-                            <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="#00AFFC" Margin="200,5,5,5" HorizontalAlignment="Right"></TextBlock>
+                            <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5" Width="200" HorizontalAlignment="Left"></TextBlock>
+                            <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right"></TextBlock>
                             <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
                             <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
                             <Grid Grid.Row="3">
@@ -186,7 +186,7 @@
                                     <RowDefinition Height="30"></RowDefinition>
                                     <RowDefinition ></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
                                 <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
                                 <Button Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" >Preview SQL Results</Button>
                                 <DataGrid x:Name="DataGridRels" Grid.Row="1" Margin="5"/>
@@ -205,7 +205,7 @@
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Server:" Style="{StaticResource Label}" Width="100"></TextBlock>
                                     <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="270"></TextBox>
-                                    <TextBlock Margin="10,0"><Hyperlink Foreground="#FF00AFFC" Click="Proxy_OnClick"> Proxy</Hyperlink></TextBlock>
+                                    <TextBlock Margin="10,0"><Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick"> Proxy</Hyperlink></TextBlock>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Username:" Style="{StaticResource Label}" Width="100"></TextBlock>
@@ -221,18 +221,18 @@
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>
-                                <CheckBox x:Name="cbUnpub" Foreground="#00AFFC" HorizontalAlignment="Center" IsChecked="{Binding UnpublishItems, Mode=TwoWay}" ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">Unpublish unmatched items</CheckBox>
+                                <CheckBox x:Name="cbUnpub" Foreground="{StaticResource QCBlue}" HorizontalAlignment="Center" IsChecked="{Binding UnpublishItems, Mode=TwoWay}" ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">Unpublish unmatched items</CheckBox>
                                 <Button Click="UpdateSharpCloud" Width="270" Margin="100,10" Height="40">Update Story Now..</Button>
                             </StackPanel>
                             <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
 
                             <Grid Grid.Row="2">
-                                <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="#00AFFC" Margin="5"></TextBlock>
+                                <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
-                                    <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="#00AFFC" Margin="5,0"></TextBlock>
+                                    <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="5,0"></TextBlock>
                                     <TextBlock x:Name="tbLastRun" Text="Now" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
                                 </StackPanel>
-                                <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="#00AFFC" Background="#333333"></TextBox>
+                                <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="{StaticResource QCBlue}" Background="#333333"></TextBox>
                             </Grid>
                         </Grid>
                     </TabItem>

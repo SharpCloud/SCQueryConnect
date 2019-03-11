@@ -14,7 +14,7 @@
         <ItemsControl ItemsSource="{Binding DatabaseTypes}" VerticalAlignment="Center">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Click="Button_Click" Height="40" Background="#00AFFC" FontSize="14" Foreground="White" Margin="5" Content="{Binding Name}" />
+                    <Button Click="Button_Click" Height="40" Background="{StaticResource QCBlue}" FontSize="14" Foreground="White" Margin="5" Content="{Binding Name}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

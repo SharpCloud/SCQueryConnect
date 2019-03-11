@@ -10,7 +10,7 @@
         ResizeMode="NoResize"
         Background="#333333"
         WindowStartupLocation="CenterOwner"
-        Foreground="#FF00AFFC"
+        Foreground="{StaticResource QCBlue}"
         FontSize="14">
     <Grid Margin="10">
         <StackPanel>

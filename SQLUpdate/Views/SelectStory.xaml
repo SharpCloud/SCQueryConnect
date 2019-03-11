@@ -6,7 +6,7 @@
              xmlns:viewModels="clr-namespace:SQLUpdate.ViewModels"
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
-             Height="600" Width="1000" Foreground="#FF00AFFC" Background="#333333">
+             Height="600" Width="1000" Foreground="{StaticResource QCBlue}" Background="#333333">
 
     <Window.DataContext>
         <viewModels:SelectedStoryViewModel />
@@ -142,8 +142,8 @@
         </Grid>
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal" >
-            <Button Width="100" Content="OK" Margin="5" Click="OnClickOK" Background="#00AFFC" FontSize="14" Foreground="White"/>
-            <Button Width="100" Content="Cancel" Margin="5" Click="OnClickCancel" Background="#00AFFC" FontSize="14" Foreground="White"/>
+            <Button Width="100" Content="OK" Margin="5" Click="OnClickOK" Background="{StaticResource QCBlue}" FontSize="14" Foreground="White"/>
+            <Button Width="100" Content="Cancel" Margin="5" Click="OnClickCancel" Background="{StaticResource QCBlue}" FontSize="14" Foreground="White"/>
         </StackPanel>
     </Grid>
 

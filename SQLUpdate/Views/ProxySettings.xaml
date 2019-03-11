@@ -20,18 +20,18 @@
 
         <StackPanel Grid.Column="1" Margin="10,10,10,30" VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Width="100" Text="Server:" Foreground="#FF00AFFC"></TextBlock>
+                <TextBlock Width="100" Text="Server:" Foreground="{StaticResource QCBlue}"></TextBlock>
                 <TextBox Width="300" x:Name="tbProxy" ></TextBox>
             </StackPanel>
             <Grid >
-                <CheckBox Foreground="#FF00AFFC" Margin="105,0" x:Name="chkAnnonymous">Anonymous</CheckBox>
+                <CheckBox Foreground="{StaticResource QCBlue}" Margin="105,0" x:Name="chkAnnonymous">Anonymous</CheckBox>
             </Grid>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Width="100" Text="Username:" Foreground="#FF00AFFC"></TextBlock>
+                <TextBlock Width="100" Text="Username:" Foreground="{StaticResource QCBlue}"></TextBlock>
                 <TextBox Width="300" IsEnabled="{Binding Path=IsChecked, ElementName=chkAnnonymous, Converter={StaticResource BoolInverse}}" x:Name="tbUsername" ></TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Width="100" Text="Password:" Foreground="#FF00AFFC"></TextBlock>
+                <TextBlock Width="100" Text="Password:" Foreground="{StaticResource QCBlue}"></TextBlock>
                 <PasswordBox Width="300" IsEnabled="{Binding Path=IsChecked, ElementName=chkAnnonymous, Converter={StaticResource BoolInverse} }" x:Name="tbPassword" ></PasswordBox>
             </StackPanel>
         </StackPanel>
