@@ -1,12 +1,12 @@
 ﻿<Window x:Class="SQLUpdate.Views.SelectStory"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewModels="clr-namespace:SQLUpdate.ViewModels"
-             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-             mc:Ignorable="d" 
-             Height="600" Width="1000" Foreground="{StaticResource QCBlue}" Background="#333333">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:viewModels="clr-namespace:SQLUpdate.ViewModels"
+        mc:Ignorable="d" 
+        Height="600" Width="1000" Foreground="{StaticResource QCBlue}" Background="#333333"
+        FontSize="{StaticResource DefaultFontSize}">
 
     <Window.DataContext>
         <viewModels:SelectedStoryViewModel />
@@ -64,13 +64,20 @@
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
 
-                                                <Image
-                    			Stretch="UniformToFill" 
-                    			x:Name="imgIcon" VerticalAlignment="Center" HorizontalAlignment="Center" Loaded="imgIcon_Loaded"/>
+                                                <Image Stretch="UniformToFill"
+                                                       x:Name="imgIcon"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       Loaded="imgIcon_Loaded"/>
 
-
-                                                <TextBlock
-							Grid.Row="1" Text="{Binding Name}" Foreground="White" FontSize="14" TextOptions.TextHintingMode="Fixed" VerticalAlignment="Top" TextWrapping="Wrap" Margin="0,10,0,0" HorizontalAlignment="Center">
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding Name}"
+                                                           Foreground="White"
+                                                           TextOptions.TextHintingMode="Fixed"
+                                                           VerticalAlignment="Top"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,10,0,0"
+                                                           HorizontalAlignment="Center">
                                                 </TextBlock>
                                             </Grid>
 
@@ -106,28 +113,38 @@
                                 <!-- ItemTemplate -->
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border  Background="#FF292929"
-            								Margin="3"
-            								Width="138"
-											Height="138" MouseUp="Story_MouseUp" MouseDown="UIElement_OnMouseDown" Cursor="Hand" MouseEnter="Story_MouseEnter" MouseLeave="Story_MouseLeave">
+                                        <Border Background="#FF292929"
+                                                Margin="3"
+                                                Width="138"
+                                                Height="138"
+                                                MouseUp="Story_MouseUp"
+                                                MouseDown="UIElement_OnMouseDown"
+                                                Cursor="Hand"
+                                                MouseEnter="Story_MouseEnter"
+                                                MouseLeave="Story_MouseLeave">
+                                            
                                             <ToolTipService.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock Text="{Binding Name}" />
                                                 </ToolTip>
                                             </ToolTipService.ToolTip>
+                                            
                                             <Grid Margin="10,10,10,0">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="75"/>
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
+                                                
                                                 <Image Source="{Binding ImageUri}"
-                    			Stretch="UniformToFill" 
-                    			x:Name="imgIcon" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                       Stretch="UniformToFill"
+                                                       x:Name="imgIcon"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"/>
 
                                                 <CheckBox x:Name="cbStory" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked"></CheckBox>
 
                                                 <TextBlock
-							                        Grid.Row="1" Text="{Binding Name}" Foreground="White" FontSize="14" TextOptions.TextHintingMode="Fixed" VerticalAlignment="Top" TextWrapping="Wrap" Margin="0,10,0,0" HorizontalAlignment="Center">
+							                        Grid.Row="1" Text="{Binding Name}" Foreground="White" TextOptions.TextHintingMode="Fixed" VerticalAlignment="Top" TextWrapping="Wrap" Margin="0,10,0,0" HorizontalAlignment="Center">
                                                 </TextBlock>
                                             </Grid>
 
@@ -142,8 +159,8 @@
         </Grid>
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal" >
-            <Button Width="100" Content="OK" Margin="5" Click="OnClickOK" Background="{StaticResource QCBlue}" FontSize="14" Foreground="White"/>
-            <Button Width="100" Content="Cancel" Margin="5" Click="OnClickCancel" Background="{StaticResource QCBlue}" FontSize="14" Foreground="White"/>
+            <Button Width="100" Content="OK" Margin="5" Click="OnClickOK" Background="{StaticResource QCBlue}" Foreground="White"/>
+            <Button Width="100" Content="Cancel" Margin="5" Click="OnClickCancel" Background="{StaticResource QCBlue}" Foreground="White"/>
         </StackPanel>
     </Grid>
 
