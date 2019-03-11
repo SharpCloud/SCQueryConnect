@@ -40,6 +40,7 @@ namespace SCSQLBatch
             var proxyPassword64 = ConfigurationManager.AppSettings["proxyPassword64"];
 
             var qcHelper = new QueryConnectHelper(
+                new ArchitectureDetector(),
                 new ConnectionStringHelper(),
                 new DataChecker(),
                 new DbConnectionFactory(),

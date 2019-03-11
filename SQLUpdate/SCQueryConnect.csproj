@@ -138,6 +138,7 @@
     <Compile Include="..\SCQueryConnect.Common\Properties\AssemblyVersionInfo.cs">
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataChecker.cs" />
     <Compile Include="UIRelationshipsDataChecker.cs" />
@@ -154,6 +155,9 @@
     <Compile Include="Views\Database.cs" />
     <Compile Include="Views\ProxySettings.xaml.cs">
       <DependentUpon>ProxySettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DatabaseErrorMessage.xaml.cs">
+      <DependentUpon>DatabaseErrorMessage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SourceStorySettings.xaml.cs">
       <DependentUpon>SourceStorySettings.xaml</DependentUpon>
@@ -183,6 +187,10 @@
     <Page Include="Views\ProxySettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DatabaseErrorMessage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SourceStorySettings.xaml">
       <Generator>MSBuild:Compile</Generator>

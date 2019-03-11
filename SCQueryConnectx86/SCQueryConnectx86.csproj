@@ -125,6 +125,9 @@
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
+      <Link>Helpers\UrlHelper.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
     </Compile>
@@ -157,6 +160,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Views\Database.cs">
       <Link>Views\Database.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\DatabaseErrorMessage.xaml.cs">
+      <Link>Views\DatabaseErrorMessage.xaml.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Views\ProxySettings.xaml.cs">
       <Link>Views\ProxySettings.xaml.cs</Link>
@@ -197,6 +203,11 @@
     </Page>
     <Page Include="..\SQLUpdate\Views\ConnectionInfo.xaml">
       <Link>Views\ConnectionInfo.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\DatabaseErrorMessage.xaml">
+      <Link>Views\DatabaseErrorMessage.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

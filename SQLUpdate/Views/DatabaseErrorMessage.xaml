@@ -1,0 +1,50 @@
+﻿<Window x:Class="SCQueryConnect.Views.DatabaseErrorMessage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Problem Connecting to Data Source"
+        Height="230"
+        Width="400"
+        ResizeMode="NoResize"
+        Background="#333333"
+        WindowStartupLocation="CenterOwner"
+        Foreground="#FF00AFFC"
+        FontSize="14">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock TextWrapping="WrapWithOverflow">Something went wrong connecting to the data source. Here are some things that might help:<LineBreak/></TextBlock>
+
+            <TextBlock Margin="10,0,0,0" TextWrapping="WrapWithOverflow">
+                <Run>* Please download and install the</Run>
+                <Run Text="{Binding AlternateArchitecture, Mode=OneWay}"/>
+                <Run>bit version of</Run>
+                <Hyperlink Click="QueryConnectHyperlink_Click">
+                    <Hyperlink.Inlines>
+                        <Run Foreground="White" Text="Query Connect"/>
+                    </Hyperlink.Inlines>
+                </Hyperlink>
+                <LineBreak/>
+            </TextBlock>
+
+            <TextBlock Margin="10,0,0,0" TextWrapping="WrapWithOverflow">
+                <Run>* If that doesn't fix the problem, try installing the</Run>
+                <Hyperlink Click="AccessDatabaseEngineHyperlink_Click">
+                    <Hyperlink.Inlines>
+                        <Run Foreground="White" Text="Microsoft Access Database Engine 2010 Redistributable"/>
+                    </Hyperlink.Inlines>
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+
+        <Button IsCancel="True"
+                IsDefault="True"
+                HorizontalAlignment="Right"
+                Style="{StaticResource DefaultButtonStyle}"
+                VerticalAlignment="Bottom"
+                Width="80">
+            OK
+        </Button>
+    </Grid>
+</Window>

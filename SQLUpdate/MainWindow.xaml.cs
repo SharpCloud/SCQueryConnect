@@ -98,6 +98,7 @@ namespace SCQueryConnect
             _logger = new UILogger(tbResults);
 
             _qcHelper = new QueryConnectHelper(
+                new ArchitectureDetector(),
                 _connectionStringHelper,
                 _dataChecker,
                 _dbConnectionFactory,
@@ -298,6 +299,21 @@ namespace SCQueryConnect
             }
         }
 
+        private void ProcessRunException(Exception e)
+        {
+            switch (e)
+            {
+                case InvalidOperationException ex when ex.Message.Contains(QueryConnectHelper.AccessDBEngineErrorMessage):
+                    var msgbox = new DatabaseErrorMessage { Owner = this };
+                    msgbox.ShowDialog();
+                    break;
+
+                default:
+                    MessageBox.Show($"There was an error: {e.Message}");
+                    break;
+            }
+        }
+
         private async void RunClick(object sender, RoutedEventArgs e)
         {
             try
@@ -355,7 +371,7 @@ namespace SCQueryConnect
             }
             catch (Exception ex)
             {
-                MessageBox.Show("There was an error: " + ex.Message);
+                ProcessRunException(ex);
             }
         }
 
@@ -405,7 +421,7 @@ namespace SCQueryConnect
             }
             catch (Exception ex)
             {
-                MessageBox.Show("There was an error: " + ex.Message);
+                ProcessRunException(ex);
             }
         }
 
@@ -948,7 +964,7 @@ namespace SCQueryConnect
 
         private void Hyperlink_Click2(object sender, RoutedEventArgs e)
         {
-            Process.Start($"https://www.microsoft.com/en-gb/download/details.aspx?id=13255");
+            UrlHelper.GoToAccessDatabaseEngine();
         }
 
         private void Hyperlink_Click3(object sender, RoutedEventArgs e)

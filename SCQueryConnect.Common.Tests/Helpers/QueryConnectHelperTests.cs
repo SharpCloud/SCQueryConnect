@@ -18,6 +18,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
         private const string StoryId = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
 
         private QueryConnectHelper CreateQueryConnectHelper(
+            IArchitectureDetector architectureDetector = null,
             IConnectionStringHelper connectionStringHelper = null,
             IDataChecker dataChecker = null,
             IDbConnectionFactory dbConnectionFactory = null,
@@ -27,6 +28,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             ISharpCloudApiFactory sharpCloudApiFactory = null)
         {
             return new QueryConnectHelper(
+                architectureDetector ?? Mock.Of<IArchitectureDetector>(),
                 connectionStringHelper ?? Mock.Of<IConnectionStringHelper>(),
                 dataChecker ?? Mock.Of<IDataChecker>(),
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
@@ -150,6 +152,23 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
                 new SharpCloudConfiguration(),
                 string.Empty,
                 DatabaseType.SharpCloudExcel));
+        }
+
+        [TestCase(true, "32Bit(x86)")]
+        [TestCase(false, "64Bit(AnyCPU)")]
+        public void AppNameIsCorrect(bool simulateX86, string expectedAppSuffix)
+        {
+            // Arrange
+
+            var detector = Mock.Of<IArchitectureDetector>(d =>
+                d.Is32Bit == simulateX86);
+
+            var helper = CreateQueryConnectHelper(architectureDetector: detector);
+
+            // Act, Assert
+
+            var suffixMatch = helper.AppName.EndsWith(expectedAppSuffix);
+            Assert.IsTrue(suffixMatch);
         }
     }
 }

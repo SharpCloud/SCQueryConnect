@@ -16,6 +16,7 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class QueryConnectHelper
     {
+        private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -25,19 +26,22 @@ namespace SCQueryConnect.Common.Helpers
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
+        public const string AccessDBEngineErrorMessage = "The 'Microsoft.ACE.OLEDB.12.0' provider is not registered on the local machine.";
+
         public string AppNameOnly => $"SharpCloud QueryConnect v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
 
         public string AppName
         {
             get
             {
-                if (IntPtr.Size == 4)
-                    return $"{AppNameOnly} - 32Bit(x86)";
-                return $"{AppNameOnly} - 64Bit(AnyCPU)";
+                return _architectureDetector.Is32Bit
+                    ? $"{AppNameOnly} - 32Bit(x86)"
+                    : $"{AppNameOnly} - 64Bit(AnyCPU)";
             }
         }
 
         public QueryConnectHelper(
+            IArchitectureDetector architectureDetector,
             IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
             IDbConnectionFactory dbConnectionFactory,
@@ -46,6 +50,7 @@ namespace SCQueryConnect.Common.Helpers
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory)
         {
+            _architectureDetector = architectureDetector;
             _connectionStringHelper = connectionStringHelper;
             _dataChecker = dataChecker;
             _dbConnectionFactory = dbConnectionFactory;
@@ -117,7 +122,7 @@ namespace SCQueryConnect.Common.Helpers
                 {
                     if (!_relationshipsDataChecker.CheckDataIsOKRels(reader))
                     {
-                        await _logger.Log("\nERROR: Invalid SQL");
+                        await LogError("Invalid SQL");
                         return;
                     }
 
@@ -314,9 +319,21 @@ namespace SCQueryConnect.Common.Helpers
                     }
                 }
             }
+            catch (InvalidOperationException ex) when (ex.Message.Contains(AccessDBEngineErrorMessage))
+            {
+                var altArchitecture = _architectureDetector.Is32Bit ? "64" : "32";
+
+                var message =
+                    $"Something went wrong connecting to the data source. Here are some things that might help:{Environment.NewLine}" +
+                    $"  * Please download and install the {altArchitecture} bit version of Query Connect.{Environment.NewLine}" +
+                    $"  * If that doesn't fix the problem, try installing the Microsoft Access Database Engine 2010 Redistributable. " +
+                    $"You can find this by clicking on the 'Download tools for Excel/Access' link on the 'About' tab in Query Connect.";
+
+                await LogError($"{message}{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
             catch (Exception ex)
             {
-                await _logger.Log("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                await LogError(ex.Message + Environment.NewLine + ex.StackTrace);
             }
             finally
             {
@@ -447,7 +464,7 @@ namespace SCQueryConnect.Common.Helpers
                                     }
                                     catch (FieldAccessException ex)
                                     {
-                                        await _logger.Log($"ERROR: {ex.Message}");
+                                        await LogError(ex.Message);
                                     }
                                 }
                             }
@@ -473,6 +490,11 @@ namespace SCQueryConnect.Common.Helpers
                     }
                 }
             }
+        }
+
+        private async Task LogError(string message)
+        {
+            await _logger.Log($"ERROR: {message}");
         }
     }
 }
