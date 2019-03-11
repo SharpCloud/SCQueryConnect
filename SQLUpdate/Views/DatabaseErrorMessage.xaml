@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Problem Connecting to Data Source"
-        Height="230"
+        Height="250"
         Width="400"
         ResizeMode="NoResize"
         Background="#333333"
