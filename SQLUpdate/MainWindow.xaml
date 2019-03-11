@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQLUpdate"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
-        mc:Ignorable="d" Background="#333333" Foreground="{StaticResource QCBlue}" FontSize="14"
+        mc:Ignorable="d" Background="#333333" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
@@ -240,7 +240,7 @@
                     <TabItem Header="4. Create batch files">
                         <Grid>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="10"/>
+                                <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="10"/>
                                 <Button Click="GenerateBatchFileThis" Height="50" Width="220" Margin="5,0" FontSize="16" >Generate Batch Files Now...</Button>
                             </StackPanel>
                             <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="30">
@@ -259,35 +259,35 @@
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" VerticalAlignment="Center">
                                 <Image Source="Images/logo_home.png" Width="250" Stretch="UniformToFill"></Image>
-                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" FontSize="14" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
+                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click4" >
                                             <Hyperlink.Inlines>
-                                                <Run Foreground="White" FontSize="14" Text="Install Folder"/>
+                                                <Run Foreground="White" Text="Install Folder"/>
                                             </Hyperlink.Inlines>
                                         </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click3" >
                                             <Hyperlink.Inlines>
-                                                <Run Foreground="White" FontSize="14" Text="Watch Video Guide"/>
+                                                <Run Foreground="White" Text="Watch Video Guide"/>
                                             </Hyperlink.Inlines>
                                         </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click2">
                                             <Hyperlink.Inlines>
-                                                <Run Foreground="White" FontSize="14" Text="Download tools for Excel/Access"/>
+                                                <Run Foreground="White" Text="Download tools for Excel/Access"/>
                                             </Hyperlink.Inlines>
                                         </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click">
                                             <Hyperlink.Inlines>
-                                                <Run Foreground="White" FontSize="14" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
+                                                <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
                                             </Hyperlink.Inlines>
                                         </Hyperlink>
                                 </TextBlock>

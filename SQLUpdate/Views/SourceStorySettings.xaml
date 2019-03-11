@@ -9,7 +9,7 @@
         Background="#333333"
         Title="Source Story Settings"
         WindowStartupLocation="CenterOwner"
-        FontSize="14">
+        FontSize="{StaticResource DefaultFontSize}">
     
     <Grid Margin="10">
         <Grid.RowDefinitions>

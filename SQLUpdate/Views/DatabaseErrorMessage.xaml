@@ -11,7 +11,7 @@
         Background="#333333"
         WindowStartupLocation="CenterOwner"
         Foreground="{StaticResource QCBlue}"
-        FontSize="14">
+        FontSize="{StaticResource DefaultFontSize}">
     <Grid Margin="10">
         <StackPanel>
             <TextBlock TextWrapping="WrapWithOverflow">Something went wrong connecting to the data source. Here are some things that might help:<LineBreak/></TextBlock>
