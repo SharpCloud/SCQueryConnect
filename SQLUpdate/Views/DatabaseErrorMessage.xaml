@@ -10,7 +10,7 @@
         ResizeMode="NoResize"
         Background="#333333"
         WindowStartupLocation="CenterOwner"
-        Foreground="{StaticResource QCBlue}"
+        Foreground="White"
         FontSize="{StaticResource DefaultFontSize}">
     <Grid Margin="10">
         <StackPanel>
@@ -22,7 +22,7 @@
                 <Run>bit version of</Run>
                 <Hyperlink Click="QueryConnectHyperlink_Click">
                     <Hyperlink.Inlines>
-                        <Run Foreground="White" Text="Query Connect"/>
+                        <Run Foreground="{StaticResource QCBlue}" Text="Query Connect"/>
                     </Hyperlink.Inlines>
                 </Hyperlink>
                 <LineBreak/>
@@ -32,7 +32,7 @@
                 <Run>* If that doesn't fix the problem, try installing the</Run>
                 <Hyperlink Click="AccessDatabaseEngineHyperlink_Click">
                     <Hyperlink.Inlines>
-                        <Run Foreground="White" Text="Microsoft Access Database Engine 2010 Redistributable"/>
+                        <Run Foreground="{StaticResource QCBlue}" Text="Microsoft Access Database Engine 2010 Redistributable"/>
                     </Hyperlink.Inlines>
                 </Hyperlink>
             </TextBlock>
