@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQLUpdate"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
-        mc:Ignorable="d" Background="#333333" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
+        mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
@@ -45,7 +45,7 @@
                 <Button Click="DeleteConnectionClick" Grid.Row="0" Grid.Column="4" Height="40" VerticalAlignment="Top" Background="Red" Margin="5">Delete</Button>
             </Grid>
             <Grid Grid.Column="2" Background="Black">
-                <TabControl Background="#333333" x:Name="BrowserTabs" BorderBrush="Transparent" MinWidth="750">
+                <TabControl Background="{StaticResource QCBackground}" x:Name="BrowserTabs" BorderBrush="Transparent" MinWidth="750">
                     <TabControl.Resources>
                         <Style TargetType="TabControl">
                             <Setter Property="IsTabStop" Value="False"/>
@@ -61,7 +61,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="TabItem">
-                                        <Grid x:Name="gdBorder" Background="#333333">
+                                        <Grid x:Name="gdBorder" Background="{StaticResource QCBackground}">
                                             <StackPanel Orientation="Horizontal">
                                                 <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="2,0" Height="30">
                                                     <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -73,7 +73,7 @@
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
-                                                <Setter TargetName="gdBorder" Property="Background" Value="#333333" />
+                                                <Setter TargetName="gdBorder" Property="Background" Value="{StaticResource QCBackground}" />
                                             </Trigger>
                                             <Trigger Property="IsSelected" Value="False">
                                                 <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
@@ -232,7 +232,15 @@
                                     <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="5,0"></TextBlock>
                                     <TextBlock x:Name="tbLastRun" Text="Now" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
                                 </StackPanel>
-                                <TextBox x:Name="tbResults" Width="Auto" Margin="5,35,5,5" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Foreground="{StaticResource QCBlue}" Background="#333333"></TextBox>
+                                <TextBox x:Name="tbResults"
+                                         Width="Auto"
+                                         Margin="5,35,5,5"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         IsReadOnly="True"
+                                         Foreground="{StaticResource QCBlue}"
+                                         Background="{StaticResource QCBackground}">
+                                </TextBox>
                             </Grid>
                         </Grid>
                     </TabItem>

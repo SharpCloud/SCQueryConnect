@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:SCQueryConnect.Views"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         mc:Ignorable="d"
-        Title="ProxySettings" Height="272.047" Width="475.333" ResizeMode="NoResize" Background="#333333" FontSize="18">
+        Title="ProxySettings" Height="272.047" Width="475.333" ResizeMode="NoResize" Background="{StaticResource QCBackground}" FontSize="18">
     <Window.DataContext>
         <viewModels:ProxyViewModel />
     </Window.DataContext>

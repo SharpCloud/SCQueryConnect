@@ -8,7 +8,7 @@
         Height="390"
         Width="300"
         ResizeMode="NoResize"
-        Background="#333333"
+        Background="{StaticResource QCBackground}"
         WindowStartupLocation="CenterOwner"
         FontSize="{StaticResource DefaultFontSize}">
     <Grid>

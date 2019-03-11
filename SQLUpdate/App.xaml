@@ -6,7 +6,8 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <SolidColorBrush x:Key="QCBlue" Color="#00AFFC" />
-        
+        <SolidColorBrush x:Key="QCBackground" Color="#333333" />
+
         <core:Double x:Key="DefaultFontSize">14</core:Double>
         
         <Style x:Key="DefaultButtonStyle" TargetType="Button">

@@ -6,7 +6,7 @@
         mc:Ignorable="d" 
         Height="250"
         Width="400"
-        Background="#333333"
+        Background="{StaticResource QCBackground}"
         Title="Source Story Settings"
         WindowStartupLocation="CenterOwner"
         FontSize="{StaticResource DefaultFontSize}">

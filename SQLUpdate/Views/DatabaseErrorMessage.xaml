@@ -8,7 +8,7 @@
         Height="250"
         Width="400"
         ResizeMode="NoResize"
-        Background="#333333"
+        Background="{StaticResource QCBackground}"
         WindowStartupLocation="CenterOwner"
         Foreground="White"
         FontSize="{StaticResource DefaultFontSize}">

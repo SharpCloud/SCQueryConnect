@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:viewModels="clr-namespace:SQLUpdate.ViewModels"
         mc:Ignorable="d" 
-        Height="600" Width="1000" Foreground="{StaticResource QCBlue}" Background="#333333"
+        Height="600" Width="1000" Foreground="{StaticResource QCBlue}" Background="{StaticResource QCBackground}"
         FontSize="{StaticResource DefaultFontSize}">
 
     <Window.DataContext>
