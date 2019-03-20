@@ -188,7 +188,13 @@ namespace SCQueryConnect.Common.Helpers
                 rowCount = filteredData.Count - 1; // -1 for headings
 
                 var updater = new RelationshipsUpdater();
-                updater.UpdateRelationships(data, story);
+                var result = updater.UpdateRelationships(data, story);
+
+                var hasMessage = !string.IsNullOrWhiteSpace(result.ErrorMessage);
+                if (hasMessage)
+                {
+                    await _logger.Log(result.ErrorMessage);
+                }
             }
 
             await _logger.Log($"{rowCount} relationships processed.");
