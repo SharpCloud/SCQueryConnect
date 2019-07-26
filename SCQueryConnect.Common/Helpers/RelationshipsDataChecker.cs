@@ -8,6 +8,7 @@ namespace SCQueryConnect.Common.Helpers
     {
         private readonly string[] _validItem1Headings =
         {
+            "ITEM1",
             "ITEM 1",
             "EXTERNALID1",
             "EXTERNALID 1",
@@ -17,6 +18,7 @@ namespace SCQueryConnect.Common.Helpers
 
         private readonly string[] _validItem2Headings =
         {
+            "ITEM2",
             "ITEM 2",
             "EXTERNALID2",
             "EXTERNALID 2",
