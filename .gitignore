@@ -22,3 +22,4 @@ packages/
 */publishx86a/*
 *.pfx
 **/[Ss]erver/sqlite3/**
+.vs/**
