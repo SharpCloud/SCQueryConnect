@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+﻿using SCQueryConnect;
 using System.Windows;
 
 namespace SQLUpdate
@@ -12,5 +8,19 @@ namespace SQLUpdate
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            Bootstrapper.Start();
+
+            var window = Bootstrapper.Resolve<MainWindow>();
+
+            window.Closed += (s, a) =>
+            {
+                Bootstrapper.Stop();
+            };
+
+            window.Show();
+        }
     }
 }

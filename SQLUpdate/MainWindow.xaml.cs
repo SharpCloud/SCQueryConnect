@@ -1,7 +1,5 @@
 ﻿using Microsoft.Win32;
-using SC.API.ComInterop;
 using SCQueryConnect.Common;
-using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
@@ -38,14 +36,6 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public string AppName
-        {
-            get
-            {
-                return _qcHelper.AppName;
-            }
-        }
-
         public Visibility UpdatingMessageVisibility
         {
             get { return _updatingMessageVisibility; }
@@ -72,9 +62,9 @@ namespace SCQueryConnect
         private QueryData SelectedQueryData => connectionList.SelectedItem as QueryData;
 
         private string _lastUsedSharpCloudConnection;
-        public SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
+        private SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
         private ProxyViewModel _proxyViewModel;
-        private QueryConnectHelper _qcHelper;
+        private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -83,29 +73,36 @@ namespace SCQueryConnect
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
 
-        public MainWindow()
+        public MainWindow(IConnectionStringHelper connectionStringHelper,
+            IDataChecker dataChecker,
+            IDbConnectionFactory dbConnectionFactory,
+            IExcelWriter excelWriter,
+            IRelationshipsDataChecker relationshipsDataChecker,
+            ISharpCloudApiFactory sharpCloudApiFactory,
+            ILog logger,
+            IQueryConnectHelper qcHelper)
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             DataContext = this;
 
-            _connectionStringHelper = new ConnectionStringHelper();
-            _dataChecker = new UIDataChecker(txterr);
-            _dbConnectionFactory = new DbConnectionFactory();
-            _excelWriter = new ExcelWriter();
-            _relationshipsChecker = new UIRelationshipsDataChecker(txterrRels);
-            _sharpCloudApiFactory = new SharpCloudApiFactory();
-            _logger = new UILogger(tbResults);
+            _connectionStringHelper = connectionStringHelper;
 
-            _qcHelper = new QueryConnectHelper(
-                new ArchitectureDetector(),
-                _connectionStringHelper,
-                _dataChecker,
-                _dbConnectionFactory,
-                _excelWriter,
-                _logger,
-                _relationshipsChecker,
-                _sharpCloudApiFactory);
+            _dataChecker = dataChecker;
+            ((UIDataChecker) _dataChecker).ErrorText = txterr;
+
+            _dbConnectionFactory = dbConnectionFactory;
+            _excelWriter = excelWriter;
+
+            _relationshipsChecker = relationshipsDataChecker;
+            ((UIRelationshipsDataChecker) _relationshipsChecker).RelationshipErrorText = txterrRels;
+
+            _sharpCloudApiFactory = sharpCloudApiFactory;
+
+            _logger = logger;
+            ((UILogger) _logger).Output = tbResults;
+
+            _qcHelper = qcHelper;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -303,7 +300,7 @@ namespace SCQueryConnect
         {
             switch (e)
             {
-                case InvalidOperationException ex when ex.Message.Contains(QueryConnectHelper.AccessDBEngineErrorMessage):
+                case InvalidOperationException ex when ex.Message.Contains(Constants.AccessDBEngineErrorMessage):
                     var msgbox = new DatabaseErrorMessage { Owner = this };
                     msgbox.ShowDialog();
                     break;

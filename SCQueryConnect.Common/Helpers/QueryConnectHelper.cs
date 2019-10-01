@@ -1,5 +1,4 @@
-﻿using SC.API.ComInterop;
-using SC.API.ComInterop.ArrayProcessing;
+﻿using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class QueryConnectHelper
+    public class QueryConnectHelper : IQueryConnectHelper
     {
         private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
@@ -25,8 +24,6 @@ namespace SCQueryConnect.Common.Helpers
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
-
-        public const string AccessDBEngineErrorMessage = "The 'Microsoft.ACE.OLEDB.12.0' provider is not registered on the local machine.";
 
         public string AppNameOnly => $"SharpCloud QueryConnect v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
 
@@ -325,7 +322,7 @@ namespace SCQueryConnect.Common.Helpers
                     }
                 }
             }
-            catch (InvalidOperationException ex) when (ex.Message.Contains(AccessDBEngineErrorMessage))
+            catch (InvalidOperationException ex) when (ex.Message.Contains(Constants.AccessDBEngineErrorMessage))
             {
                 var altArchitecture = _architectureDetector.Is32Bit ? "64" : "32";
 

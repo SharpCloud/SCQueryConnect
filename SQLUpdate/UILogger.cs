@@ -6,24 +6,19 @@ namespace SCQueryConnect
 {
     public class UILogger : Logger
     {
-        private readonly TextBox _textBox;
-
-        public UILogger(TextBox textBox)
-        {
-            _textBox = textBox;
-        }
+        internal TextBox Output { private get; set; }
 
         public override async Task Clear()
         {
-            _textBox.Text = string.Empty;
-            _textBox.ScrollToEnd();
+            Output.Text = string.Empty;
+            Output.ScrollToEnd();
             await Task.Delay(20);
         }
 
         public override async Task Log(string text)
         {
-            _textBox.Text += FormatMessage(text);
-            _textBox.ScrollToEnd();
+            Output.Text += FormatMessage(text);
+            Output.ScrollToEnd();
             await Task.Delay(20);
         }
     }

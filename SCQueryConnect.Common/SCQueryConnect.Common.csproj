@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="DatabaseType.cs" />
     <Compile Include="DatabaseStrings.cs" />
     <Compile Include="Helpers\ArchitectureDetector.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Interfaces\IDataChecker.cs" />
     <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />
     <Compile Include="Interfaces\ISharpCloudApiFactory.cs" />
+    <Compile Include="Interfaces\IQueryConnectHelper.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Helpers\RelationshipsDataChecker.cs" />
     <Compile Include="Helpers\QueryConnectHelper.cs" />

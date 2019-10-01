@@ -6,16 +6,11 @@ namespace SCQueryConnect
 {
     public class UIRelationshipsDataChecker : RelationshipsDataChecker
     {
-        private readonly TextBlock _relationshipErrorText;
-
-        public UIRelationshipsDataChecker(TextBlock relationshipErrorText)
-        {
-            _relationshipErrorText = relationshipErrorText;
-        }
+        internal TextBlock RelationshipErrorText { private get; set; }
 
         protected override void ProcessDataValidity(bool isOk)
         {
-            _relationshipErrorText.Visibility = isOk ? Visibility.Collapsed : Visibility.Visible;
+            RelationshipErrorText.Visibility = isOk ? Visibility.Collapsed : Visibility.Visible;
             base.ProcessDataValidity(isOk);
         }
     }
