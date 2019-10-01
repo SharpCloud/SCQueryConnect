@@ -625,6 +625,7 @@ namespace SCQueryConnect
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
                 try
                 {
+                    File.Delete($"{folder}/Autofac.dll");
                     File.Delete($"{folder}/Newtonsoft.Json.dll");
                     File.Delete($"{folder}/SC.Framework.dll");
                     File.Delete($"{folder}/SC.API.ComInterop.dll");

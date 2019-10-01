@@ -68,6 +68,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.9.4.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.9.4\lib\net45\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -126,7 +129,7 @@
   <PropertyGroup>
     <PostBuildEvent>SET dest=$(TargetDir)SCSQLBatch
 
-powershell.exe -nologo -noprofile -command "&amp;  { Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe.config -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\Newtonsoft.Json.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.API.ComInterop.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Api.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Framework.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.SharedModels.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCQueryConnect.Common.dll -DestinationPath %25dest%25;}"
+powershell.exe -nologo -noprofile -command "&amp;  { Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCSQLBatch.exe.config -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\Autofac.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\Newtonsoft.Json.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.API.ComInterop.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Api.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.Framework.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SC.SharedModels.dll -DestinationPath %25dest%25; Compress-Archive -U -LiteralPath $(TargetDir)\SCQueryConnect.Common.dll -DestinationPath %25dest%25; }"
 
 copy %25dest%25.zip $(SolutionDir)\SQLUpdate /y
 copy %25dest%25.zip $(SolutionDir)\SCQueryConnectx86 /y</PostBuildEvent>
