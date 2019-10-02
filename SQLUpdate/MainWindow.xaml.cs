@@ -37,6 +37,14 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public string AppName
+        {
+            get
+            {
+                return _qcHelper.AppName;
+            }
+        }
+
         public Visibility UpdatingMessageVisibility
         {
             get { return _updatingMessageVisibility; }
