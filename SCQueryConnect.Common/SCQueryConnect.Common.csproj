@@ -49,6 +49,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -63,11 +64,13 @@
     <Compile Include="Helpers\ArchitectureDetector.cs" />
     <Compile Include="Helpers\ConnectionStringHelper.cs" />
     <Compile Include="Helpers\DbConnectionFactory.cs" />
+    <Compile Include="Helpers\DpapiHelper.cs" />
     <Compile Include="Helpers\ExcelWriter.cs" />
     <Compile Include="Helpers\DataChecker.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="Helpers\SharpCloudApiFactory.cs" />
     <Compile Include="Interfaces\IArchitectureDetector.cs" />
+    <Compile Include="Interfaces\IEncryptionHelper.cs" />
     <Compile Include="Interfaces\IExcelWriter.cs" />
     <Compile Include="Interfaces\IConnectionStringHelper.cs" />
     <Compile Include="Interfaces\IDbConnectionFactory.cs" />

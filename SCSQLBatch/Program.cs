@@ -4,7 +4,6 @@ using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using System;
 using System.Configuration;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -27,7 +26,7 @@ namespace SCSQLBatch
             {
                 var userid = ConfigurationManager.AppSettings["userid"];
                 var password = ConfigurationManager.AppSettings["password"];
-                var password64 = ConfigurationManager.AppSettings["password64"];
+                var passwordDpapi = ConfigurationManager.AppSettings["passwordDpapi"];
                 var url = ConfigurationManager.AppSettings["url"];
                 var storyid = ConfigurationManager.AppSettings["storyid"];
                 var connectionString = ConfigurationManager.AppSettings["connectionString"];
@@ -38,7 +37,9 @@ namespace SCSQLBatch
                 bool.TryParse(ConfigurationManager.AppSettings["proxyAnonymous"], out var proxyAnonymous);
                 var proxyUsername = ConfigurationManager.AppSettings["proxyUsername"];
                 var proxyPassword = ConfigurationManager.AppSettings["proxyPassword"];
-                var proxyPassword64 = ConfigurationManager.AppSettings["proxyPassword64"];
+                var proxyPasswordDpapi = ConfigurationManager.AppSettings["proxyPasswordDpapi"];
+
+                var encryptionHelper = iocContainer.Resolve<IEncryptionHelper>();
 
                 var qcHelper = iocContainer.Resolve<IQueryConnectHelper>(
                     new NamedParameter("log", logger));
@@ -54,14 +55,10 @@ namespace SCSQLBatch
                 {
                     // set the password from the encoded password
 
-                    var plaintext = ProtectedData.Unprotect(
-                        Convert.FromBase64String(password64),
-                        null,
-                        DataProtectionScope.LocalMachine);
+                    password = encryptionHelper.TextEncoding.GetString(
+                        encryptionHelper.Decrypt(passwordDpapi));
 
-                    password = Encoding.Default.GetString(plaintext);
-
-                    if (string.IsNullOrEmpty(password64))
+                    if (string.IsNullOrEmpty(passwordDpapi))
                     {
                         await logger.Log("Error: No password provided.");
                         return;
@@ -96,12 +93,8 @@ namespace SCSQLBatch
                 {
                     if (string.IsNullOrEmpty(proxyPassword))
                     {
-                        var plaintext = ProtectedData.Unprotect(
-                            Convert.FromBase64String(proxyPassword64),
-                            null,
-                            DataProtectionScope.LocalMachine);
-
-                        proxyPassword = Encoding.Default.GetString(plaintext);
+                        proxyPassword = encryptionHelper.TextEncoding.GetString(
+                            encryptionHelper.Decrypt(proxyPasswordDpapi));
                     }
 
                     if (string.IsNullOrEmpty(proxyUsername) || string.IsNullOrEmpty(proxyPassword))
@@ -171,6 +164,7 @@ namespace SCSQLBatch
             builder.RegisterType<ArchitectureDetector>().As<IArchitectureDetector>();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>();
             builder.RegisterType<DataChecker>().As<IDataChecker>();
+            builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>();

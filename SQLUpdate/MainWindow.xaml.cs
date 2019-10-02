@@ -17,7 +17,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -77,14 +76,17 @@ namespace SCQueryConnect
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IEncryptionHelper _encryptionHelper;
         private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
 
-        public MainWindow(IConnectionStringHelper connectionStringHelper,
+        public MainWindow(
+            IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
             IDbConnectionFactory dbConnectionFactory,
+            IEncryptionHelper encryptionHelper,
             IExcelWriter excelWriter,
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory,
@@ -101,6 +103,7 @@ namespace SCQueryConnect
             ((UIDataChecker) _dataChecker).ErrorText = txterr;
 
             _dbConnectionFactory = dbConnectionFactory;
+            _encryptionHelper = encryptionHelper;
             _excelWriter = excelWriter;
 
             _relationshipsChecker = relationshipsDataChecker;
@@ -665,33 +668,30 @@ namespace SCQueryConnect
                         string.Empty)
                     : SelectedQueryData.FormattedConnectionString;
 
-                var passwordBytes = ProtectedData.Protect(
-                    Encoding.Default.GetBytes(Password.Password),
-                    null,
-                    DataProtectionScope.LocalMachine);
+                var passwordBytes = _encryptionHelper.Encrypt(
+                    _encryptionHelper.TextEncoding.GetBytes(Password.Password));
 
-                var proxyPasswordBytes = ProtectedData.Protect(
-                    Encoding.Default.GetBytes(_proxyViewModel.ProxyPassword),
-                    null,
-                    DataProtectionScope.LocalMachine);
+                var proxyPasswordBytes = _encryptionHelper.Encrypt(
+                    _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword));
 
                 var content = File.ReadAllText(configFilename);
-                content = content.Replace("USERID", Username.Text);
-                content = content.Replace("PASSWORD", ""); // we keep the password hidden
-                content = content.Replace("BASE64PWORD", Convert.ToBase64String(passwordBytes));
-                content = content.Replace("https://my.sharpcloud.com", Url.Text);
-                content = content.Replace("00000000-0000-0000-0000-000000000000", StoryId.Text);
-                content = content.Replace("SQL", SelectedQueryData.GetBatchDBType);
-                content = content.Replace("CONNECTIONSTRING", connectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("QUERYSTRING", SelectedQueryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("QUERYRELSSTRING", SelectedQueryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = content.Replace("LOGFILE", $"Logfile.txt");
-                content = content.Replace("UNPUBLISHITEMS", UnpublishItems.ToString());
-                content = content.Replace("PROXYADDRESS", _proxyViewModel.Proxy);
-                content = content.Replace("PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
-                content = content.Replace("PROXYUSERNAME", _proxyViewModel.ProxyUserName);
-                content = content.Replace("PROXYPWORD", "");
-                content = content.Replace("BASE64PROXYPWRD", Convert.ToBase64String(proxyPasswordBytes));
+
+                content = ReplaceConfigSetting(content, "USERID", Username.Text);
+                content = ReplaceConfigSetting(content, "PASSWORD", ""); // we keep the password hidden
+                content = ReplaceConfigSetting(content, "PASSWORD_DPAPI", Convert.ToBase64String(passwordBytes));
+                content = ReplaceConfigSetting(content, "https://my.sharpcloud.com", Url.Text);
+                content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", StoryId.Text);
+                content = ReplaceConfigSetting(content, "SQL", SelectedQueryData.GetBatchDBType);
+                content = ReplaceConfigSetting(content, "CONNECTIONSTRING", connectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = ReplaceConfigSetting(content, "QUERYSTRING", SelectedQueryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = ReplaceConfigSetting(content, "QUERYRELSSTRING", SelectedQueryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = ReplaceConfigSetting(content, "LOGFILE", $"Logfile.txt");
+                content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", UnpublishItems.ToString());
+                content = ReplaceConfigSetting(content, "PROXYADDRESS", _proxyViewModel.Proxy);
+                content = ReplaceConfigSetting(content, "PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
+                content = ReplaceConfigSetting(content, "PROXYUSERNAME", _proxyViewModel.ProxyUserName);
+                content = ReplaceConfigSetting(content, "PROXYPWORD", "");
+                content = ReplaceConfigSetting(content, "PROXYPWORD_DPAPI", Convert.ToBase64String(proxyPasswordBytes));
 
                 File.WriteAllText(configFilename, content);
 
@@ -713,6 +713,16 @@ namespace SCQueryConnect
                 MessageBox.Show(exception.Message);
             }
         }
+
+        private static string ReplaceConfigSetting(
+            string configText,
+            string oldValue,
+            string newValue)
+        {
+            var updated = configText.Replace($"\"{oldValue}\"", $"\"{newValue}\"");
+            return updated;
+        }
+
         static void CopyResourceFile(string resFolder, string folder, string filename)
         {
             var appFolder = System.AppDomain.CurrentDomain.BaseDirectory;

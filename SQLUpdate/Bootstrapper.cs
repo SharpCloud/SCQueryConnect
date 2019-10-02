@@ -55,6 +55,7 @@ namespace SCQueryConnect
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>().InstancePerLifetimeScope();
             builder.RegisterType<UIDataChecker>().As<IDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>().InstancePerLifetimeScope();
             builder.RegisterType<UIRelationshipsDataChecker>().As<IRelationshipsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>().InstancePerLifetimeScope();
