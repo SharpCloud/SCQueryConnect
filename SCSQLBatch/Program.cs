@@ -4,6 +4,7 @@ using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using System;
 using System.Configuration;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -52,7 +53,14 @@ namespace SCSQLBatch
                 if (string.IsNullOrEmpty(password))
                 {
                     // set the password from the encoded password
-                    password = Encoding.Default.GetString(Convert.FromBase64String(password64));
+
+                    var plaintext = ProtectedData.Unprotect(
+                        Convert.FromBase64String(password64),
+                        null,
+                        DataProtectionScope.LocalMachine);
+
+                    password = Encoding.Default.GetString(plaintext);
+
                     if (string.IsNullOrEmpty(password64))
                     {
                         await logger.Log("Error: No password provided.");
@@ -86,14 +94,19 @@ namespace SCSQLBatch
 
                 if (!string.IsNullOrEmpty(proxy) && !proxyAnonymous)
                 {
+                    if (string.IsNullOrEmpty(proxyPassword))
+                    {
+                        var plaintext = ProtectedData.Unprotect(
+                            Convert.FromBase64String(proxyPassword64),
+                            null,
+                            DataProtectionScope.LocalMachine);
+
+                        proxyPassword = Encoding.Default.GetString(plaintext);
+                    }
+
                     if (string.IsNullOrEmpty(proxyUsername) || string.IsNullOrEmpty(proxyPassword))
                     {
                         await logger.Log("Error: No proxy username or password provided.");
-                    }
-
-                    if (string.IsNullOrEmpty(proxyPassword))
-                    {
-                        proxyPassword = Encoding.Default.GetString(Convert.FromBase64String(proxyPassword64));
                     }
                 }
                 // do the work
