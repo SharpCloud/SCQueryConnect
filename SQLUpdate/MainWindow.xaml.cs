@@ -708,7 +708,6 @@ namespace SCQueryConnect
                 var content = File.ReadAllText(configFilename);
 
                 content = ReplaceConfigSetting(content, "USERID", Username.Text);
-                content = ReplaceConfigSetting(content, "PASSWORD", ""); // we keep the password hidden
                 content = ReplaceConfigSetting(content, "PASSWORD_DPAPI", Convert.ToBase64String(passwordBytes));
                 content = ReplaceConfigSetting(content, "https://my.sharpcloud.com", Url.Text);
                 content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", StoryId.Text);
@@ -721,7 +720,6 @@ namespace SCQueryConnect
                 content = ReplaceConfigSetting(content, "PROXYADDRESS", _proxyViewModel.Proxy);
                 content = ReplaceConfigSetting(content, "PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
                 content = ReplaceConfigSetting(content, "PROXYUSERNAME", _proxyViewModel.ProxyUserName);
-                content = ReplaceConfigSetting(content, "PROXYPWORD", "");
                 content = ReplaceConfigSetting(content, "PROXYPWORD_DPAPI", Convert.ToBase64String(proxyPasswordBytes));
 
                 File.WriteAllText(configFilename, content);
