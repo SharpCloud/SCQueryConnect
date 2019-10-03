@@ -17,6 +17,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -124,14 +125,38 @@ namespace SCQueryConnect
             SQLString.Text = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
             Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
             Username.Text = SaveHelper.RegRead("Username", "");
-            Password.Password = Encoding.Default.GetString(Convert.FromBase64String(SaveHelper.RegRead("Password", "")));
             StoryId.Text = SaveHelper.RegRead("StoryID", "");
+
+            var regPassword = SaveHelper.RegRead("Password", "");
+            try
+            {
+                Password.Password = _encryptionHelper.TextEncoding.GetString(
+                    _encryptionHelper.Decrypt(regPassword));
+            }
+            catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
+            {
+                // Fallback method for backwards compatibility
+                Password.Password = Encoding.Default.GetString(
+                    Convert.FromBase64String(regPassword));
+            }
 
             _proxyViewModel = new ProxyViewModel();
             _proxyViewModel.Proxy = SaveHelper.RegRead("Proxy", "");
             _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
             _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
-            _proxyViewModel.ProxyPassword = Encoding.Default.GetString(Convert.FromBase64String(SaveHelper.RegRead("ProxyPassword", "")));
+
+            var regProxyPassword = SaveHelper.RegRead("ProxyPassword", "");
+            try
+            {
+                _proxyViewModel.ProxyPassword = _encryptionHelper.TextEncoding.GetString(
+                    _encryptionHelper.Decrypt(regProxyPassword));
+            }
+            catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
+            {
+                // Fallback method for backwards compatibility
+                _proxyViewModel.ProxyPassword = Encoding.Default.GetString(
+                    Convert.FromBase64String(regProxyPassword));
+            }
 
             //cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
 
@@ -457,7 +482,10 @@ namespace SCQueryConnect
         {
             SaveHelper.RegWrite("URL", Url.Text);
             SaveHelper.RegWrite("Username", Username.Text);
-            SaveHelper.RegWrite("Password", Convert.ToBase64String(Encoding.Default.GetBytes(Password.Password)));
+
+            SaveHelper.RegWrite("Password", Convert.ToBase64String(
+                _encryptionHelper.Encrypt(
+                    _encryptionHelper.TextEncoding.GetBytes(Password.Password))));
 
             SaveSettings(SelectedQueryData);
 
@@ -474,7 +502,10 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
             SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
             SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
-            SaveHelper.RegWrite("ProxyPassword", Convert.ToBase64String(Encoding.Default.GetBytes(_proxyViewModel.ProxyPassword)));
+
+            SaveHelper.RegWrite("ProxyPassword", Convert.ToBase64String(
+                _encryptionHelper.Encrypt(
+                    _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword))));
         }
 
         private void SaveSettings(QueryData qd)
