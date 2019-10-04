@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
@@ -278,6 +279,76 @@ namespace SCSqlBatch.Tests
 
             var config = (SharpCloudConfiguration)configMock.Invocations[0].Arguments[0];
             Assert.AreEqual(proxyPasswordDpapi, config.ProxyPassword);
+        }
+
+        [Test]
+        public async Task ConfigVariablesArePassedThroughCorrectly()
+        {
+            // Arrange
+
+            var configHelper = Mock.Of<IConfigurationReader>(r =>
+                r.Get("userid") == "BatchUserId" &&
+                r.Get("password") == "BatchPassword" &&
+                r.Get("url") == "BatchUrl" &&
+                r.Get("storyid") == "BatchStoryId" &&
+                r.Get("connectionString") == "BatchConnectionString" &&
+                r.Get("queryString") == "BatchQueryString" &&
+                r.Get("queryStringRels") == "BatchQueryStringRels" &&
+                r.Get("unpublishItems") == "true" &&
+                r.Get("proxy") == "BatchProxy" &&
+                r.Get("proxyAnonymous") == "true" &&
+                r.Get("proxyUsername") == "BatchProxyUsername" &&
+                r.Get("proxyPassword") == "BatchProxyPassword" &&
+                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+
+            var encryptionHelper = Mock.Of<IEncryptionHelper>();
+            var logger = Mock.Of<ILog>();
+            var qcHelper = Mock.Of<IQueryConnectHelper>();
+
+            var logic = new BatchLogic(configHelper, encryptionHelper, logger, qcHelper);
+
+            // Act
+
+            await logic.Run();
+
+            // Assert
+
+            var configMock = Mock.Get(qcHelper);
+            Assert.AreEqual(1, configMock.Invocations.Count);
+
+            var expectedConfig = new SharpCloudConfiguration
+            {
+                Username = "BatchUserId",
+                Password = "BatchPassword",
+                Url = "BatchUrl",
+                ProxyUrl = "BatchProxy",
+                ProxyUserName = "BatchProxyUsername",
+                ProxyPassword = "BatchProxyPassword",
+                UseDefaultProxyCredentials = true
+            };
+
+            var expectedSettings = new UpdateSettings
+            {
+                TargetStoryId = "BatchStoryId",
+                QueryString = "BatchQueryString",
+                QueryStringRels = "BatchQueryStringRels",
+                ConnectionString = "BatchConnectionString",
+                MaxRowCount = 1000,
+                DBType = DatabaseType.SharpCloudExcel,
+                UnpublishItems = true
+            };
+
+            var expectedConfigJson = JsonConvert.SerializeObject(expectedConfig);
+            var expectedSettingsJson = JsonConvert.SerializeObject(expectedSettings);
+
+            var config = (SharpCloudConfiguration)configMock.Invocations[0].Arguments[0];
+            var settings = (UpdateSettings)configMock.Invocations[0].Arguments[1];
+
+            var configJson = JsonConvert.SerializeObject(config);
+            var settingsJson = JsonConvert.SerializeObject(settings);
+
+            Assert.AreEqual(expectedConfigJson, configJson);
+            Assert.AreEqual(expectedSettingsJson, settingsJson);
         }
     }
 }
