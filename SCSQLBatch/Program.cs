@@ -26,6 +26,7 @@ namespace SCSQLBatch
             {
                 var userid = ConfigurationManager.AppSettings["userid"];
                 var password = ConfigurationManager.AppSettings["password"];
+                var password64 = ConfigurationManager.AppSettings["password64"];
                 var passwordDpapi = ConfigurationManager.AppSettings["passwordDpapi"];
                 var url = ConfigurationManager.AppSettings["url"];
                 var storyid = ConfigurationManager.AppSettings["storyid"];
@@ -37,6 +38,7 @@ namespace SCSQLBatch
                 bool.TryParse(ConfigurationManager.AppSettings["proxyAnonymous"], out var proxyAnonymous);
                 var proxyUsername = ConfigurationManager.AppSettings["proxyUsername"];
                 var proxyPassword = ConfigurationManager.AppSettings["proxyPassword"];
+                var proxyPassword64 = ConfigurationManager.AppSettings["proxyPassword64"];
                 var proxyPasswordDpapi = ConfigurationManager.AppSettings["proxyPasswordDpapi"];
 
                 var encryptionHelper = iocContainer.Resolve<IEncryptionHelper>();
@@ -53,10 +55,20 @@ namespace SCSQLBatch
 
                 if (string.IsNullOrEmpty(password))
                 {
-                    // set the password from the encoded password
+                    // set the password from encoded password
 
-                    password = encryptionHelper.TextEncoding.GetString(
-                        encryptionHelper.Decrypt(passwordDpapi));
+                    var hasPassword64 = !string.IsNullOrWhiteSpace(password64);
+
+                    if (hasPassword64)
+                    {
+                        password = Encoding.Default.GetString(
+                            Convert.FromBase64String(password64));
+                    }
+                    else
+                    {
+                        password = encryptionHelper.TextEncoding.GetString(
+                            encryptionHelper.Decrypt(passwordDpapi));
+                    }
 
                     if (string.IsNullOrEmpty(passwordDpapi))
                     {
@@ -93,8 +105,18 @@ namespace SCSQLBatch
                 {
                     if (string.IsNullOrEmpty(proxyPassword))
                     {
-                        proxyPassword = encryptionHelper.TextEncoding.GetString(
-                            encryptionHelper.Decrypt(proxyPasswordDpapi));
+                        var hasProxyPassword64 = !string.IsNullOrWhiteSpace(proxyPassword64);
+
+                        if (hasProxyPassword64)
+                        {
+                            proxyPassword = Encoding.Default.GetString(
+                                Convert.FromBase64String(proxyPassword64));
+                        }
+                        else
+                        {
+                            proxyPassword = encryptionHelper.TextEncoding.GetString(
+                                encryptionHelper.Decrypt(proxyPasswordDpapi));
+                        }
                     }
 
                     if (string.IsNullOrEmpty(proxyUsername) || string.IsNullOrEmpty(proxyPassword))
