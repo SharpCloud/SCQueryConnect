@@ -64,8 +64,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SCSQLBatch\BatchLogic.cs">
+      <Link>BatchLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\SCSQLBatch\ConfigurationReader.cs">
+      <Link>ConfigurationReader.cs</Link>
+    </Compile>
     <Compile Include="..\SCSQLBatch\ConsoleLogger.cs">
       <Link>ConsoleLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\SCSQLBatch\IConfigurationReader.cs">
+      <Link>IConfigurationReader.cs</Link>
     </Compile>
     <Compile Include="..\SCSQLBatch\Program.cs">
       <Link>Program.cs</Link>
