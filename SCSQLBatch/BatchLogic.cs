@@ -69,7 +69,7 @@ namespace SCSQLBatch
                         _encryptionHelper.Decrypt(passwordDpapi));
                 }
 
-                if (string.IsNullOrEmpty(passwordDpapi))
+                if (string.IsNullOrEmpty(password))
                 {
                     await _logger.Log("Error: No password provided.");
                     return;
