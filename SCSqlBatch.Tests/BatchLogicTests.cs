@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Newtonsoft.Json;
@@ -13,30 +14,78 @@ namespace SCSqlBatch.Tests
     [TestFixture]
     public class BatchLogicTests
     {
+        private const string UserId = "userid";
+        private const string Password = "password";
+        private const string Password64 = "password64";
+        private const string PasswordDpapi = "passwordDpapi";
+        private const string Url = "url";
+        private const string StoryId = "storyid";
+        private const string ConnectionString = "connectionString";
+        private const string QueryString = "queryString";
+        private const string QueryStringRels = "queryStringRels";
+        private const string UnpublishItems = "unpublishItems";
+        private const string Proxy = "proxy";
+        private const string ProxyAnonymous = "proxyAnonymous";
+        private const string ProxyUsername = "proxyUsername";
+        private const string ProxyPassword = "proxyPassword";
+        private const string ProxyPassword64 = "proxyPassword64";
+        private const string ProxyPasswordDpapi = "proxyPasswordDpapi";
+        private const string DbType = "dbType";
+
+        private IConfigurationReader CreateConfigurationReader(
+            IDictionary<string, string> configOverrides = null)
+        {
+            var defaultConfig = new Dictionary<string, string>
+            {
+                [UserId] = "BatchUserId",
+                [Password] = "BatchPassword",
+                [Password64] = "QmF0Y2hQYXNzd29yZDY0", // 'BatchPassword64'
+                [PasswordDpapi] = "BatchPasswordDpapi",
+                [Url] = "BatchUrl",
+                [StoryId] = "BatchStoryId",
+                [ConnectionString] = "BatchConnectionString",
+                [QueryString] = "BatchQueryString",
+                [QueryStringRels] = "BatchQueryStringRels",
+                [UnpublishItems] = "false",
+                [Proxy] = "BatchProxy",
+                [ProxyAnonymous] = "false",
+                [ProxyUsername] = "BatchProxyUsername",
+                [ProxyPassword] = "BatchProxyPassword",
+                [ProxyPassword64] = "QmF0Y2hQcm94eVBhc3N3b3JkNjQ=", // 'BatchProxyPassword64'
+                [ProxyPasswordDpapi] = "BatchProxyPasswordDpapi",
+                [DbType] = DatabaseStrings.SharpCloudExcel
+            };
+
+            var configReaderMock = new Mock<IConfigurationReader>();
+
+            foreach (var configKey in defaultConfig.Keys)
+            {
+                string configValue;
+
+                if (configOverrides != null &&
+                    configOverrides.ContainsKey(configKey))
+                {
+                    configValue = configOverrides[configKey];
+                }
+                else
+                {
+                    configValue = defaultConfig[configKey];
+                }
+
+                configReaderMock
+                    .Setup(r => r.Get(configKey))
+                    .Returns(configValue);
+            }
+
+            return configReaderMock.Object;
+        }
+
         [Test]
         public async Task PreferPasswordIfPresent()
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == "BatchPassword" &&
-                r.Get("password64") == "QmF0Y2hQYXNzd29yZDY0" && // 'BatchPassword64'
-                r.Get("passwordDpapi") == "BatchPasswordDpapi" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == "BatchProxyPassword" &&
-                r.Get("proxyPassword64") == "BatchProxyPassword64" &&
-                r.Get("proxyPasswordDpapi") == "BatchProxyPasswordDpapi" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
-
+            var configHelper = CreateConfigurationReader();
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -61,25 +110,12 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == string.Empty &&
-                r.Get("password64") == "QmF0Y2hQYXNzd29yZDY0" && // 'BatchPassword64'
-                r.Get("passwordDpapi") == "BatchPasswordDpapi" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == "BatchProxyPassword" &&
-                r.Get("proxyPassword64") == "BatchProxyPassword64" &&
-                r.Get("proxyPasswordDpapi") == "BatchProxyPasswordDpapi" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+            var overrides = new Dictionary<string, string>
+            {
+                [Password] = string.Empty
+            };
 
+            var configHelper = CreateConfigurationReader(overrides);
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -104,25 +140,13 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == string.Empty &&
-                r.Get("password64") == "QmF0Y2hQYXNzd29yZDY0" && // 'BatchPassword64'
-                r.Get("passwordDpapi") == string.Empty &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == "BatchProxyPassword" &&
-                r.Get("proxyPassword64") == "BatchProxyPassword64" &&
-                r.Get("proxyPasswordDpapi") == "BatchProxyPasswordDpapi" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+            var overrides = new Dictionary<string, string>
+            {
+                [Password] = string.Empty,
+                [PasswordDpapi] = string.Empty
+            };
 
+            var configHelper = CreateConfigurationReader(overrides);
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -147,30 +171,20 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            const string passwordDpapi = "BatchPasswordDpapi";
+            const string passwordDpapiValue = "BatchPasswordDpapi";
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == string.Empty &&
-                r.Get("password64") == string.Empty &&
-                r.Get("passwordDpapi") == passwordDpapi &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == "BatchProxyPassword" &&
-                r.Get("proxyPassword64") == "BatchProxyPassword64" &&
-                r.Get("proxyPasswordDpapi") == "BatchProxyPasswordDpapi" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+            var overrides = new Dictionary<string, string>
+            {
+                [Password] = string.Empty,
+                [Password64] = string.Empty,
+                [PasswordDpapi] = passwordDpapiValue
+            };
+
+            var configHelper = CreateConfigurationReader(overrides);
 
             var encryptionHelper = Mock.Of<IEncryptionHelper>(h =>
                 h.TextEncoding == Encoding.UTF8 &&
-                h.Decrypt(It.IsAny<string>()) == Encoding.UTF8.GetBytes(passwordDpapi));
+                h.Decrypt(It.IsAny<string>()) == Encoding.UTF8.GetBytes(passwordDpapiValue));
 
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -187,7 +201,7 @@ namespace SCSqlBatch.Tests
             Assert.AreEqual(1, configMock.Invocations.Count);
 
             var config = (SharpCloudConfiguration)configMock.Invocations[0].Arguments[0];
-            Assert.AreEqual(passwordDpapi, config.Password);
+            Assert.AreEqual(passwordDpapiValue, config.Password);
         }
 
         [Test]
@@ -195,25 +209,7 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == "BatchPassword" &&
-                r.Get("password64") == "BatchPassword64" &&
-                r.Get("passwordDpapi") == "BatchPasswordDpapi" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == "BatchProxyPassword" &&
-                r.Get("proxyPassword64") == "QmF0Y2hQcm94eVBhc3N3b3JkNjQ=" && // 'BatchProxyPassword64'
-                r.Get("proxyPasswordDpapi") == "BatchProxyPasswordDpapi" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
-
+            var configHelper = CreateConfigurationReader();
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -238,25 +234,12 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == "BatchPassword" &&
-                r.Get("password64") == "BatchPassword64" &&
-                r.Get("passwordDpapi") == "BatchPasswordDpapi" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == string.Empty &&
-                r.Get("proxyPassword64") == "QmF0Y2hQcm94eVBhc3N3b3JkNjQ=" && // 'BatchProxyPassword64'
-                r.Get("proxyPasswordDpapi") == "BatchProxyPasswordDpapi" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+            var overrides = new Dictionary<string, string>
+            {
+                [ProxyPassword] = string.Empty
+            };
 
+            var configHelper = CreateConfigurationReader(overrides);
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -281,25 +264,13 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == "BatchPassword" &&
-                r.Get("password64") == "BatchPassword64" &&
-                r.Get("passwordDpapi") == "BatchPasswordDpapi" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == string.Empty &&
-                r.Get("proxyPassword64") == "QmF0Y2hQcm94eVBhc3N3b3JkNjQ=" && // 'BatchProxyPassword64'
-                r.Get("proxyPasswordDpapi") == string.Empty &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+            var overrides = new Dictionary<string, string>
+            {
+                [ProxyPassword] = string.Empty,
+                [ProxyPasswordDpapi] = string.Empty
+            };
 
+            var configHelper = CreateConfigurationReader(overrides);
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -324,30 +295,20 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            const string proxyPasswordDpapi = "BatchProxyPasswordDpapi";
+            const string proxyPasswordDpapiValue = "BatchProxyPasswordDpapi";
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == "BatchPassword" &&
-                r.Get("password64") == "BatchPassword64" &&
-                r.Get("passwordDpapi") == "BatchPasswordDpapi" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "BatchUnpublishItems" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "BatchProxyAnonymous" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == string.Empty &&
-                r.Get("proxyPassword64") == string.Empty &&
-                r.Get("proxyPasswordDpapi") == proxyPasswordDpapi &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
+            var overrides = new Dictionary<string, string>
+            {
+                [ProxyPassword] = string.Empty,
+                [ProxyPassword64] = string.Empty,
+                [ProxyPasswordDpapi] = proxyPasswordDpapiValue
+            };
+
+            var configHelper = CreateConfigurationReader(overrides);
 
             var encryptionHelper = Mock.Of<IEncryptionHelper>(h =>
                 h.TextEncoding == Encoding.UTF8 &&
-                h.Decrypt(It.IsAny<string>()) == Encoding.UTF8.GetBytes(proxyPasswordDpapi));
+                h.Decrypt(It.IsAny<string>()) == Encoding.UTF8.GetBytes(proxyPasswordDpapiValue));
 
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -364,7 +325,7 @@ namespace SCSqlBatch.Tests
             Assert.AreEqual(1, configMock.Invocations.Count);
 
             var config = (SharpCloudConfiguration)configMock.Invocations[0].Arguments[0];
-            Assert.AreEqual(proxyPasswordDpapi, config.ProxyPassword);
+            Assert.AreEqual(proxyPasswordDpapiValue, config.ProxyPassword);
         }
 
         [Test]
@@ -372,21 +333,18 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-            var configHelper = Mock.Of<IConfigurationReader>(r =>
-                r.Get("userid") == "BatchUserId" &&
-                r.Get("password") == "BatchPassword" &&
-                r.Get("url") == "BatchUrl" &&
-                r.Get("storyid") == "BatchStoryId" &&
-                r.Get("connectionString") == "BatchConnectionString" &&
-                r.Get("queryString") == "BatchQueryString" &&
-                r.Get("queryStringRels") == "BatchQueryStringRels" &&
-                r.Get("unpublishItems") == "true" &&
-                r.Get("proxy") == "BatchProxy" &&
-                r.Get("proxyAnonymous") == "true" &&
-                r.Get("proxyUsername") == "BatchProxyUsername" &&
-                r.Get("proxyPassword") == "BatchProxyPassword" &&
-                r.Get("dbType") == DatabaseStrings.SharpCloudExcel);
 
+            var overrides = new Dictionary<string, string>
+            {
+                [Password64] = null,
+                [PasswordDpapi] = null,
+                [UnpublishItems] = "true",
+                [ProxyAnonymous] = "true",
+                [ProxyPassword64] = null,
+                [ProxyPasswordDpapi] = null
+            };
+
+            var configHelper = CreateConfigurationReader(overrides);
             var encryptionHelper = Mock.Of<IEncryptionHelper>();
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
