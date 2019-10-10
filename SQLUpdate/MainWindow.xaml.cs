@@ -127,7 +127,7 @@ namespace SCQueryConnect
             Username.Text = SaveHelper.RegRead("Username", "");
             StoryId.Text = SaveHelper.RegRead("StoryID", "");
 
-            var regPassword = SaveHelper.RegRead("Password", "");
+            var regPassword = SaveHelper.RegRead("PasswordDpapi", "");
             try
             {
                 Password.Password = _encryptionHelper.TextEncoding.GetString(
@@ -136,8 +136,12 @@ namespace SCQueryConnect
             catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
             {
                 // Fallback method for backwards compatibility
+                regPassword = SaveHelper.RegRead("Password", "");
+                
                 Password.Password = Encoding.Default.GetString(
                     Convert.FromBase64String(regPassword));
+
+                SaveHelper.RegDelete("Password");
             }
 
             _proxyViewModel = new ProxyViewModel();
@@ -145,7 +149,7 @@ namespace SCQueryConnect
             _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
             _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
 
-            var regProxyPassword = SaveHelper.RegRead("ProxyPassword", "");
+            var regProxyPassword = SaveHelper.RegRead("ProxyPasswordDpapi", "");
             try
             {
                 _proxyViewModel.ProxyPassword = _encryptionHelper.TextEncoding.GetString(
@@ -153,9 +157,13 @@ namespace SCQueryConnect
             }
             catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
             {
+                regProxyPassword = SaveHelper.RegRead("ProxyPassword", "");
+
                 // Fallback method for backwards compatibility
                 _proxyViewModel.ProxyPassword = Encoding.Default.GetString(
                     Convert.FromBase64String(regProxyPassword));
+
+                SaveHelper.RegDelete("ProxyPassword");
             }
 
             //cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
@@ -483,7 +491,7 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("URL", Url.Text);
             SaveHelper.RegWrite("Username", Username.Text);
 
-            SaveHelper.RegWrite("Password", Convert.ToBase64String(
+            SaveHelper.RegWrite("PasswordDpapi", Convert.ToBase64String(
                 _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(Password.Password))));
 
@@ -503,7 +511,7 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
             SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
 
-            SaveHelper.RegWrite("ProxyPassword", Convert.ToBase64String(
+            SaveHelper.RegWrite("ProxyPasswordDpapi", Convert.ToBase64String(
                 _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword))));
         }

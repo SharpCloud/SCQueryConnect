@@ -145,6 +145,16 @@ namespace SCQueryConnect.Helpers
             return true;
         }
 
-
+        public static void RegDelete(string keyName)
+        {
+            // Opening the registry key
+            var rk = Registry.CurrentUser;
+            var sk1 = rk.OpenSubKey(_RegKey, true);
+            var ret = (string) sk1?.GetValue(keyName.ToUpper());
+            if (ret != null)
+            {
+                sk1.DeleteValue(keyName);
+            }
+        }
     }
 }
