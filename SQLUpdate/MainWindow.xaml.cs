@@ -537,6 +537,10 @@ namespace SCQueryConnect
 
                     copy.SourceStoryPassword = null;
                 }
+                else
+                {
+                    copy.SourceStoryPasswordDpapi = null;
+                }
 
                 newConnections.Add(copy);
             }
