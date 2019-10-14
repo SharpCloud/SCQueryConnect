@@ -553,7 +553,7 @@ namespace SCQueryConnect
                 var json = JsonConvert.SerializeObject(connection);
                 var copy = JsonConvert.DeserializeObject<QueryData>(json);
 
-                var hasPassword = string.IsNullOrWhiteSpace(copy.SourceStoryPassword);
+                var hasPassword = !string.IsNullOrWhiteSpace(copy.SourceStoryPassword);
                 if (!hasPassword && !string.IsNullOrWhiteSpace(copy.SourceStoryPasswordDpapi))
                 {
                     copy.SourceStoryPassword = _encryptionHelper.TextEncoding.GetString(
