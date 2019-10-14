@@ -37,6 +37,8 @@ namespace SCQueryConnect
         [DataMember]
         public string SourceStoryPassword { get; set; }
         [DataMember]
+        public string SourceStoryPasswordDpapi { get; set; }
+        [DataMember]
         public string SourceStoryServer { get; set; }
         [IgnoreDataMember]
         public DataView QueryResults { get; set; }
@@ -85,6 +87,10 @@ namespace SCQueryConnect
         public override string ToString()
         {
             return Name;
+        }
+
+        public QueryData()
+        {
         }
 
         public QueryData(QueryData qd)

@@ -25,6 +25,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Newtonsoft.Json;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
 
@@ -218,7 +219,8 @@ namespace SCQueryConnect
             if (File.Exists(file))
             {
                 // load our previous settings
-                _connections = SaveHelper.DeserializeJSON<SmartObservableCollection<QueryData>>(File.ReadAllText(file));
+                var loaded = SaveHelper.DeserializeJSON<SmartObservableCollection<QueryData>>(File.ReadAllText(file));
+                _connections = CreateDecryptedPasswordConnections(loaded);
             }
             else
             {   // create some sample settings
@@ -499,7 +501,8 @@ namespace SCQueryConnect
 
             var localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
             Directory.CreateDirectory(localPath);
-            var s = SaveHelper.SerializeJSON(_connections);
+            var toSave = CreateEncryptedPasswordConnections(_connections);
+            var s = SaveHelper.SerializeJSON(toSave);
             File.WriteAllText(localPath + "/connections.json", s);
 
             SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());
@@ -514,6 +517,53 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ProxyPasswordDpapi", Convert.ToBase64String(
                 _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword))));
+        }
+
+        private SmartObservableCollection<QueryData> CreateEncryptedPasswordConnections(SmartObservableCollection<QueryData> connections)
+        {
+            var newConnections = new SmartObservableCollection<QueryData>();
+
+            foreach (var connection in connections)
+            {
+                var json = JsonConvert.SerializeObject(connection);
+                var copy = JsonConvert.DeserializeObject<QueryData>(json);
+                var hasPassword = !string.IsNullOrWhiteSpace(copy.SourceStoryPassword);
+
+                if (hasPassword)
+                {
+                    copy.SourceStoryPasswordDpapi = Convert.ToBase64String(
+                        _encryptionHelper.Encrypt(
+                            _encryptionHelper.TextEncoding.GetBytes(copy.SourceStoryPassword)));
+
+                    copy.SourceStoryPassword = null;
+                }
+
+                newConnections.Add(copy);
+            }
+
+            return newConnections;
+        }
+
+        private SmartObservableCollection<QueryData> CreateDecryptedPasswordConnections(SmartObservableCollection<QueryData> connections)
+        {
+            var newConnections = new SmartObservableCollection<QueryData>();
+
+            foreach (var connection in connections)
+            {
+                var json = JsonConvert.SerializeObject(connection);
+                var copy = JsonConvert.DeserializeObject<QueryData>(json);
+
+                var hasPassword = string.IsNullOrWhiteSpace(copy.SourceStoryPassword);
+                if (!hasPassword && !string.IsNullOrWhiteSpace(copy.SourceStoryPasswordDpapi))
+                {
+                    copy.SourceStoryPassword = _encryptionHelper.TextEncoding.GetString(
+                        _encryptionHelper.Decrypt(copy.SourceStoryPasswordDpapi));
+                }
+
+                newConnections.Add(copy);
+            }
+
+            return newConnections;
         }
 
         private void SaveSettings(QueryData qd)
