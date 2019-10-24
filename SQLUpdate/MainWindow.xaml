@@ -272,6 +272,13 @@
                             <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="Hyperlink_Click5" >
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="QueryConnect - Saved Data (Knowledge Base article)"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                         <Hyperlink Click="Hyperlink_Click4" >
                                             <Hyperlink.Inlines>
                                                 <Run Foreground="White" Text="Install Folder"/>

@@ -1094,7 +1094,12 @@ namespace SCQueryConnect
         {
             Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
         }
-    
+
+        private void Hyperlink_Click5(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://support.sharpcloud.com/en/support/solutions/articles/76000013227-queryconnect-saved-data");
+        }
+
         private void Proxy_OnClick(object sender, RoutedEventArgs e)
         {
             var proxy = new ProxySettings(_proxyViewModel);
