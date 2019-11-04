@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
@@ -25,7 +26,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Newtonsoft.Json;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
 
@@ -38,6 +38,14 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private bool _unpublishItems = false;
+        private Visibility _updatingMessageVisibility = Visibility.Collapsed;
+        private Visibility _connectionStringVisibility = Visibility.Visible;
+        private Visibility _filenameVisibility = Visibility.Collapsed;
+        private Visibility _sharepointVisibility = Visibility.Collapsed;
+        private Visibility _sourceStoryIdVisibility = Visibility.Collapsed;
+        private Visibility _rewriteDataSourceVisibility = Visibility.Collapsed;
+
         public string AppName
         {
             get
@@ -48,7 +56,7 @@ namespace SCQueryConnect
 
         public Visibility UpdatingMessageVisibility
         {
-            get { return _updatingMessageVisibility; }
+            get => _updatingMessageVisibility;
             set
             {
                 _updatingMessageVisibility = value;
@@ -56,18 +64,85 @@ namespace SCQueryConnect
             }
         }
 
-        private Visibility _updatingMessageVisibility = Visibility.Collapsed;
-
         public bool UnpublishItems
         {
-            get { return _unpublishItems; }
+            get => _unpublishItems;
             set
             {
                 _unpublishItems = value;
                 OnPropertyChanged("UnpublishItems");
             }
         }
-        private bool _unpublishItems = false;
+
+        public Visibility ConnectionStringVisibility
+        {
+            get => _connectionStringVisibility;
+
+            set
+            {
+                if (_connectionStringVisibility != value)
+                {
+                    _connectionStringVisibility = value;
+                    OnPropertyChanged(nameof(ConnectionStringVisibility));
+                }
+            }
+        }
+
+        public Visibility FilenameVisibility
+        {
+            get => _filenameVisibility;
+
+            set
+            {
+                if (_filenameVisibility != value)
+                {
+                    _filenameVisibility = value;
+                    OnPropertyChanged(nameof(FilenameVisibility));
+                }
+            }
+        }
+
+        public Visibility SharepointVisibility
+        {
+            get => _sharepointVisibility;
+
+            set
+            {
+                if (_sharepointVisibility != value)
+                {
+                    _sharepointVisibility = value;
+                    OnPropertyChanged(nameof(SharepointVisibility));
+                }
+            }
+        }
+
+        public Visibility SourceStoryIdVisibility
+        {
+            get => _sourceStoryIdVisibility;
+
+            set
+            {
+                if (_sourceStoryIdVisibility != value)
+                {
+                    _sourceStoryIdVisibility = value;
+                    OnPropertyChanged(nameof(SourceStoryIdVisibility));
+                }
+            }
+        }
+
+        public Visibility RewriteDataSourceVisibility
+        {
+            get => _rewriteDataSourceVisibility;
+
+            set
+            {
+                if (_rewriteDataSourceVisibility != value)
+                {
+                    _rewriteDataSourceVisibility = value;
+                    OnPropertyChanged(nameof(RewriteDataSourceVisibility));
+                }
+            }
+        }
 
         private QueryData SelectedQueryData => connectionList.SelectedItem as QueryData;
 
@@ -247,6 +322,22 @@ namespace SCQueryConnect
             }
         }
 
+        private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
+        {
+            var filepath = _connectionStringHelper.GetVariable(
+                SelectedQueryData.FormattedConnectionString,
+                DatabaseStrings.DataSourceKey);
+
+            try
+            {
+                _excelWriter.RewriteExcelFile(filepath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not rewrite Excel data source! {ex.Message}");
+            }
+        }
+
         private void HelpButtonClick(object sender, RoutedEventArgs e)
         {
             Process.Start("http://www.connectionstrings.com/");
@@ -286,7 +377,7 @@ namespace SCQueryConnect
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Could not connect to SharpCloud! " + ex.Message);
+                    MessageBox.Show($"Could not connect to SharpCloud! {ex.Message}");
                     return;
                 }
             }
@@ -916,11 +1007,11 @@ namespace SCQueryConnect
                 DataGrid.ItemsSource = SelectedQueryData.QueryResults;
                 DataGridRels.ItemsSource = SelectedQueryData.QueryResultsRels;
 
-                SetVisibeObjects(SelectedQueryData);
+                SetVisibleObjects(SelectedQueryData);
             }
         }
 
-        private void ConnectionString_LostFocus(object sender, RoutedEventArgs e)
+        private void SaveSettingsOnLostFocus(object sender, RoutedEventArgs e)
         {
             SaveSettings();
         }
@@ -976,47 +1067,52 @@ namespace SCQueryConnect
             connectionList.SelectedIndex = i;
         }
 
-        private void SetVisibeObjects(QueryData qd)
+        private void SetVisibleObjects(QueryData qd)
         {
             if (qd != null)
             {
-                var connectionStringVisibility = Visibility.Visible;
-                var filenameVisibility = Visibility.Collapsed;
-                var sharepointVisibility = Visibility.Collapsed;
-                var sourceStoryIdVisibility = Visibility.Collapsed;
-
                 switch (qd.ConnectionType)
                 {
-                    case DatabaseType.Access: 
+                    case DatabaseType.Access:
+                        ConnectionStringVisibility = Visibility.Collapsed;
+                        FilenameVisibility = Visibility.Visible;
+                        SharepointVisibility = Visibility.Collapsed;
+                        SourceStoryIdVisibility = Visibility.Collapsed;
+                        RewriteDataSourceVisibility = Visibility.Collapsed;
+                        break;
+
                     case DatabaseType.Excel: 
-                        connectionStringVisibility = Visibility.Collapsed;
-                        filenameVisibility = Visibility.Visible;
-                        sharepointVisibility = Visibility.Collapsed;
-                        sourceStoryIdVisibility = Visibility.Collapsed;
+                        ConnectionStringVisibility = Visibility.Collapsed;
+                        FilenameVisibility = Visibility.Visible;
+                        SharepointVisibility = Visibility.Collapsed;
+                        SourceStoryIdVisibility = Visibility.Collapsed;
+                        RewriteDataSourceVisibility = Visibility.Visible;
                         break;
 
                     case DatabaseType.SharepointList:
-                        connectionStringVisibility = Visibility.Collapsed;
-                        filenameVisibility = Visibility.Collapsed;
-                        sharepointVisibility = Visibility.Visible;
-                        sourceStoryIdVisibility = Visibility.Collapsed;
+                        ConnectionStringVisibility = Visibility.Collapsed;
+                        FilenameVisibility = Visibility.Collapsed;
+                        SharepointVisibility = Visibility.Visible;
+                        SourceStoryIdVisibility = Visibility.Collapsed;
+                        RewriteDataSourceVisibility = Visibility.Collapsed;
                         break;
 
                     case DatabaseType.SharpCloudExcel:
-                        connectionStringVisibility = Visibility.Collapsed;
-                        filenameVisibility = Visibility.Visible;
-                        sharepointVisibility = Visibility.Collapsed;
-                        sourceStoryIdVisibility = Visibility.Visible;
+                        ConnectionStringVisibility = Visibility.Collapsed;
+                        FilenameVisibility = Visibility.Visible;
+                        SharepointVisibility = Visibility.Collapsed;
+                        SourceStoryIdVisibility = Visibility.Visible;
+                        RewriteDataSourceVisibility = Visibility.Collapsed;
+                        break;
+
+                    default:
+                        ConnectionStringVisibility = Visibility.Visible;
+                        FilenameVisibility = Visibility.Collapsed;
+                        SharepointVisibility = Visibility.Collapsed;
+                        SourceStoryIdVisibility = Visibility.Collapsed;
+                        RewriteDataSourceVisibility = Visibility.Collapsed;
                         break;
                 }
-                lbl1.Visibility = connectionStringVisibility;
-                ConnectionString.Visibility = connectionStringVisibility;
-                lbl2.Visibility = filenameVisibility;
-                FileName.Visibility = filenameVisibility;
-                BrowseBut.Visibility = filenameVisibility;
-                lbl3.Visibility = sharepointVisibility;
-                SharePointURL.Visibility = sharepointVisibility;
-                SourceStoryId.Visibility = sourceStoryIdVisibility;
             }
         }
 

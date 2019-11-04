@@ -32,27 +32,50 @@ namespace SCQueryConnect.Common.Helpers
             return toReturn;
         }
 
-        public void WriteToExcel(
-            string filename,
-            string[,] itemsData,
-            string[,] relationshipsData)
+        public void RewriteExcelFile(string path)
         {
-            //Start Excel and get Application object.
             var excel = (_Application)new Application
             {
                 ScreenUpdating = false,
                 UserControl = false,
                 Visible = false
             };
-            
+
+            try
+            {
+                var workbook = (_Workbook)excel.Workbooks.Open(path);
+                excel.ScreenUpdating = false;
+
+                workbook.SaveAs(path);
+                workbook.Close();
+            }
+            finally
+            {
+                excel.Quit();
+            }
+        }
+
+        public void WriteToExcel(
+            string filename,
+            string[,] itemsData,
+            string[,] relationshipsData)
+        {
+            //Start Excel and get Application object.
+            var excel = (_Application) new Application
+            {
+                ScreenUpdating = false,
+                UserControl = false,
+                Visible = false
+            };
+
             excel.SheetsInNewWorkbook = 2;
 
             //Get a new workbook.
-            var workbook = (_Workbook)excel.Workbooks.Add(Missing.Value);
+            var workbook = (_Workbook) excel.Workbooks.Add(Missing.Value);
             excel.ScreenUpdating = false;
 
-            WriteData(itemsData, (_Worksheet)workbook.Sheets[1], "Items");
-            WriteData(relationshipsData, (_Worksheet)workbook.Sheets[2], "Relationships");
+            WriteData(itemsData, (_Worksheet) workbook.Sheets[1], "Items");
+            WriteData(relationshipsData, (_Worksheet) workbook.Sheets[2], "Relationships");
 
             workbook.SaveAs(filename);
             workbook.Close();

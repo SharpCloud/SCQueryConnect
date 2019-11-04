@@ -94,6 +94,8 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="80"></RowDefinition>
                                 <RowDefinition Height="50"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="*"></RowDefinition>
                                 <RowDefinition Height="50"></RowDefinition>
                             </Grid.RowDefinitions>
@@ -119,27 +121,35 @@
                             <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
-                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" />
+                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" Visibility="{Binding SourceStoryIdVisibility}" />
                             <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" x:Name="lbl2" />
-                            <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus"/>
-                            <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click">Choose file...</Button>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" Visibility="{Binding FilenameVisibility}" />
+                            <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus" Visibility="{Binding FilenameVisibility}"/>
+                            <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click" Visibility="{Binding FilenameVisibility}">Choose file...</Button>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" x:Name="lbl3" />
-                            <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" Visibility="{Binding SharepointVisibility}" />
+                            <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus" Visibility="{Binding SharepointVisibility}"/>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" x:Name="lbl1" />
-                            <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocus"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" Visibility="{Binding ConnectionStringVisibility}" />
+                            <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="SaveSettingsOnLostFocus" Visibility="{Binding ConnectionStringVisibility}"/>
 
                             <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
                             <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
 
-                            <TextBlock Grid.Row="5" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
+                            <TextBlock Grid.Row="5" Grid.Column="1" Margin="5" Foreground="White" TextWrapping="WrapWithOverflow" Visibility="{Binding RewriteDataSourceVisibility}">
+                                <Run>Rewriting the data source may help if data is not being read properly.</Run>
+                                <Run FontStyle="Italic">Warning:</Run>
+                                <Run>this may cause your file to become unusable in older versions of Excel.</Run>
+                            </TextBlock>
+
+                            <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="RewriteDataSourceClick" Visibility="{Binding RewriteDataSourceVisibility}">Rewrite Data Source</Button>
+
+                            <TextBlock Grid.Row="7" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
                                 Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
                             </TextBlock>
 
-                            <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
+                            <Button Grid.Row="8" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
                         </Grid>
                     </TabItem>
 
@@ -153,7 +163,7 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" Text="Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
-                            <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
+                            <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="SaveSettingsOnLostFocus"/>
                             <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
                             <Grid Grid.Row="3">
                                 <Grid.RowDefinitions>
@@ -179,7 +189,7 @@
 
                             <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5" Width="200" HorizontalAlignment="Left"></TextBlock>
                             <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right"></TextBlock>
-                            <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="ConnectionString_LostFocus"/>
+                            <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="SaveSettingsOnLostFocus"/>
                             <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
                             <Grid Grid.Row="3">
                                 <Grid.RowDefinitions>
