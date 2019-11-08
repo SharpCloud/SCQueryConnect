@@ -120,6 +120,9 @@
     <Compile Include="..\SQLUpdate\Bootstrapper.cs">
       <Link>Bootstrapper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Commands\GoToUrl.cs">
+      <Link>Commands\GoToUrl.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\BoolInverse.cs">
       <Link>Converters\BoolInverse.cs</Link>
     </Compile>

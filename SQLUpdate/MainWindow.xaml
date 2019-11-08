@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQLUpdate"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
+        xmlns:commands="clr-namespace:SCQueryConnect.Commands"
         mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
@@ -270,6 +271,10 @@
                     </TabItem>
 
                     <TabItem Header="About">
+                        <TabItem.Resources>
+                            <commands:GoToUrl x:Key="GoToUrl"/>
+                        </TabItem.Resources>
+
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -281,40 +286,47 @@
                             </StackPanel>
                             <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Click="Hyperlink_Click5" >
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0">
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://support.sharpcloud.com/en/support/solutions/articles/76000013227-queryconnect-saved-data">
                                         <Hyperlink.Inlines>
                                             <Run Foreground="White" Text="QueryConnect - Saved Data (Knowledge Base article)"/>
                                         </Hyperlink.Inlines>
                                     </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                        <Hyperlink Click="Hyperlink_Click4" >
-                                            <Hyperlink.Inlines>
-                                                <Run Foreground="White" Text="Install Folder"/>
-                                            </Hyperlink.Inlines>
-                                        </Hyperlink>
+                                    <Hyperlink Click="QC_Data_Folder_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Query Connect Data Folder"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                        <Hyperlink Click="Hyperlink_Click3" >
-                                            <Hyperlink.Inlines>
-                                                <Run Foreground="White" Text="Watch Video Guide"/>
-                                            </Hyperlink.Inlines>
-                                        </Hyperlink>
+                                    <Hyperlink Click="App_Directory_Hyperlink_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Install Folder"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                        <Hyperlink Click="Hyperlink_Click2">
-                                            <Hyperlink.Inlines>
-                                                <Run Foreground="White" Text="Download tools for Excel/Access"/>
-                                            </Hyperlink.Inlines>
-                                        </Hyperlink>
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://www.youtube.com/watch?v=cZUyQkVzg2E">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Watch Video Guide"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                        <Hyperlink Click="Hyperlink_Click">
-                                            <Hyperlink.Inlines>
-                                                <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
-                                            </Hyperlink.Inlines>
-                                        </Hyperlink>
+                                    <Hyperlink Click="Database_Engine_Hyperlink_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Download tools for Excel/Access"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://github.com/SharpCloud/SCQueryConnect">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
                                 </TextBlock>
                             </StackPanel>
                         </Grid>

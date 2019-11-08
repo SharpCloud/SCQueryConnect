@@ -158,6 +158,7 @@ namespace SCQueryConnect
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
+        private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
 
         public MainWindow(
             IConnectionStringHelper connectionStringHelper,
@@ -288,8 +289,7 @@ namespace SCQueryConnect
 
         private void LoadAllProfiles()
         {
-            var localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
-            var file = localPath + "/connections.json";
+            var file = _localPath + "/connections.json";
 
             if (File.Exists(file))
             {
@@ -590,11 +590,10 @@ namespace SCQueryConnect
 
             SaveSettings(SelectedQueryData);
 
-            var localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
-            Directory.CreateDirectory(localPath);
+            Directory.CreateDirectory(_localPath);
             var toSave = CreateEncryptedPasswordConnections(_connections);
             var s = SaveHelper.SerializeJSON(toSave);
-            File.WriteAllText(localPath + "/connections.json", s);
+            File.WriteAllText(_localPath + "/connections.json", s);
 
             SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
@@ -787,7 +786,7 @@ namespace SCQueryConnect
 
         private string GetFolder()
         {
-            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
+            var folder = _localPath;
             folder += "/data";
             Directory.CreateDirectory(folder);
             folder += "/" + SelectedQueryData.Name;
@@ -1171,29 +1170,14 @@ namespace SCQueryConnect
             Process.Start($"{Url.Text}/html/#/story/{StoryId.Text}");
         }
 
-        private void Hyperlink_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start($"https://github.com/SharpCloud/SCQueryConnect");
-        }
-
-        private void Hyperlink_Click2(object sender, RoutedEventArgs e)
+        private void Database_Engine_Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             UrlHelper.GoToAccessDatabaseEngine();
         }
 
-        private void Hyperlink_Click3(object sender, RoutedEventArgs e)
-        {
-            Process.Start($"https://www.youtube.com/watch?v=cZUyQkVzg2E");
-        }
-
-        private void Hyperlink_Click4(object sender, RoutedEventArgs e)
+        private void App_Directory_Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
-        }
-
-        private void Hyperlink_Click5(object sender, RoutedEventArgs e)
-        {
-            Process.Start("https://support.sharpcloud.com/en/support/solutions/articles/76000013227-queryconnect-saved-data");
         }
 
         private void Proxy_OnClick(object sender, RoutedEventArgs e)
@@ -1210,6 +1194,11 @@ namespace SCQueryConnect
             };
 
             dlg.ShowDialog();
+        }
+
+        private void QC_Data_Folder_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", _localPath);
         }
     }
 }
