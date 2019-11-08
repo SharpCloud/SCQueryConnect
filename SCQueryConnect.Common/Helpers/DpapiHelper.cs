@@ -11,10 +11,21 @@ namespace SCQueryConnect.Common.Helpers
 
         public byte[] Decrypt(string base64CipherText)
         {
-            return ProtectedData.Unprotect(
-                Convert.FromBase64String(base64CipherText),
-                null,
-                DataProtectionScope.LocalMachine);
+            byte[] bytes;
+
+            try
+            {
+                bytes = ProtectedData.Unprotect(
+                    Convert.FromBase64String(base64CipherText),
+                    null,
+                    DataProtectionScope.LocalMachine);
+            }
+            catch (Exception)
+            {
+                bytes = new byte[0];
+            }
+
+            return bytes;
         }
 
         public byte[] Encrypt(byte[] plainTextBytes)
