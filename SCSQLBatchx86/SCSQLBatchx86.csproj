@@ -70,9 +70,6 @@
     <Compile Include="..\SCSQLBatch\ConfigurationReader.cs">
       <Link>ConfigurationReader.cs</Link>
     </Compile>
-    <Compile Include="..\SCSQLBatch\ConsoleLogger.cs">
-      <Link>ConsoleLogger.cs</Link>
-    </Compile>
     <Compile Include="..\SCSQLBatch\IConfigurationReader.cs">
       <Link>IConfigurationReader.cs</Link>
     </Compile>

@@ -1,15 +1,20 @@
-﻿using SCQueryConnect.Common;
-using SCQueryConnect.Common.Helpers;
+﻿using SCQueryConnect.Common.Helpers;
 using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SCSQLBatch
+namespace SCQueryConnect.Common
 {
     public class ConsoleLogger : Logger
     {
+        private readonly string _logFile;
+
+        public ConsoleLogger(string logFile)
+        {
+            _logFile = logFile;
+        }
+
         public override Task Clear()
         {
             throw new NotSupportedException();
@@ -24,18 +29,17 @@ namespace SCSQLBatch
             }
 
             var message = FormatMessage(text);
-            var LogFile = ConfigurationManager.AppSettings["LogFile"];
-            if (!string.IsNullOrEmpty(LogFile) && LogFile != "LOGFILE")
+            if (!string.IsNullOrEmpty(_logFile) && _logFile != "LOGFILE")
             {
                 try
                 {
                     var helper = new PathHelper();
-                    var path = helper.GetAbsolutePath(LogFile);
+                    var path = helper.GetAbsolutePath(_logFile);
                     File.AppendAllText(path, message);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error writing to {LogFile}");
+                    Console.WriteLine($"Error writing to {_logFile}");
                     Console.WriteLine($"{ex.Message}");
                 }
             }

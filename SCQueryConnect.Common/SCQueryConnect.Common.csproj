@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DatabaseType.cs" />
     <Compile Include="DatabaseStrings.cs" />

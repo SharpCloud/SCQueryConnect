@@ -101,7 +101,6 @@
     <Compile Include="BatchLogic.cs" />
     <Compile Include="IConfigurationReader.cs" />
     <Compile Include="ConfigurationReader.cs" />
-    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

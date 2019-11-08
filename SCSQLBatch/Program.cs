@@ -1,6 +1,8 @@
 ﻿using Autofac;
+using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using System.Configuration;
 
 namespace SCSQLBatch
 {
@@ -30,7 +32,10 @@ namespace SCSQLBatch
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>();
-            builder.RegisterType<ConsoleLogger>().As<ILog>();
+            
+            var logFile = ConfigurationManager.AppSettings["LogFile"];
+            builder.RegisterType<ConsoleLogger>().As<ILog>().WithParameter("logFile", logFile);
+            
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>();
 
             return builder;
