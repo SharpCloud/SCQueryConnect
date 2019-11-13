@@ -489,6 +489,8 @@ namespace SCQueryConnect
                                 {
                                     col.Caption = regex.Replace(col.Caption, ".", 1);
                                 }
+
+                                col.ColumnName = col.ColumnName.Replace(".", "\x2024");
                             }
 
                             DataGrid.ItemsSource = dt.DefaultView;
