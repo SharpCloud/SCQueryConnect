@@ -471,7 +471,7 @@ namespace SCQueryConnect
 
 
 
-                        command.CommandText = _qcHelper.SanitiseSqlQuery(SQLString.Text);
+                        command.CommandText = SQLString.Text;
                         command.CommandType = CommandType.Text;
 
                         using (IDataReader reader = command.ExecuteReader())
@@ -521,7 +521,7 @@ namespace SCQueryConnect
                     connection.Open();
                     using (IDbCommand command = connection.CreateCommand())
                     {
-                        command.CommandText = _qcHelper.SanitiseSqlQuery(SQLStringRels.Text);
+                        command.CommandText = SQLStringRels.Text;
                         command.CommandType = CommandType.Text;
 
                         using (IDataReader reader = command.ExecuteReader())

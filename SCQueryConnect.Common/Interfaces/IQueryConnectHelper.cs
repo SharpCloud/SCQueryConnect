@@ -11,7 +11,6 @@ namespace SCQueryConnect.Common.Interfaces
         string AppName { get; }
 
         string GetStoryUrl(string input);
-        string SanitiseSqlQuery(string query);
         bool Validate(Story story, out string message);
         Task UpdateRelationships(IDbConnection connection, Story story, string sqlString);
         Task InitialiseDatabase(SharpCloudConfiguration config, string connectionString, DatabaseType dbType);

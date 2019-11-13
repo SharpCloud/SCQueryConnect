@@ -107,7 +107,7 @@ namespace SCQueryConnect.Common.Helpers
 
             using (IDbCommand command = connection.CreateCommand())
             {
-                command.CommandText = SanitiseSqlQuery(sqlString);
+                command.CommandText = sqlString;
                 command.CommandType = CommandType.Text;
 
                 await _logger.Log("Reading database for relationships");
@@ -349,11 +349,6 @@ namespace SCQueryConnect.Common.Helpers
             }
         }
 
-        public string SanitiseSqlQuery(string query)
-        {
-            return query.Replace('.', '#');
-        }
-
         private async Task UpdateItems(
             IDbConnection connection,
             Story story,
@@ -369,7 +364,7 @@ namespace SCQueryConnect.Common.Helpers
 
             using (IDbCommand command = connection.CreateCommand())
             {
-                command.CommandText = SanitiseSqlQuery(sqlString);
+                command.CommandText = sqlString;
                 command.CommandType = CommandType.Text;
 
                 await _logger.Log("Reading database");
