@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E741B813
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCSqlBatch.Tests", "SCSqlBatch.Tests\SCSqlBatch.Tests.csproj", "{BB5FDEE1-10F6-49E3-B04F-85227028B590}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCQueryConnect.Tests", "SCQueryConnect.Tests\SCQueryConnect.Tests.csproj", "{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,18 @@ Global
 		{BB5FDEE1-10F6-49E3-B04F-85227028B590}.SQLUpdatex86|Any CPU.Build.0 = Release|Any CPU
 		{BB5FDEE1-10F6-49E3-B04F-85227028B590}.SQLUpdatex86|x86.ActiveCfg = Release|Any CPU
 		{BB5FDEE1-10F6-49E3-B04F-85227028B590}.SQLUpdatex86|x86.Build.0 = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Debug|x86.Build.0 = Debug|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Release|x86.ActiveCfg = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.Release|x86.Build.0 = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.SQLUpdatex86|Any CPU.ActiveCfg = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.SQLUpdatex86|Any CPU.Build.0 = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.SQLUpdatex86|x86.ActiveCfg = Release|Any CPU
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04}.SQLUpdatex86|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,6 +134,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F274D204-7A2D-4692-BE65-0C9B6C6C9502} = {E741B813-0B3E-41F0-B031-0046AE90F93F}
 		{BB5FDEE1-10F6-49E3-B04F-85227028B590} = {E741B813-0B3E-41F0-B031-0046AE90F93F}
+		{BE98BA99-0A9C-454E-BE8C-77CC4E76BC04} = {E741B813-0B3E-41F0-B031-0046AE90F93F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3EB0D425-C030-4D58-996F-3E19384B3EF0}
