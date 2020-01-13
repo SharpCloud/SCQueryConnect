@@ -39,6 +39,8 @@ namespace SCQueryConnect
         [DataMember]
         public string SourceStoryPasswordDpapi { get; set; }
         [DataMember]
+        public string SourceStoryPasswordEntropy { get; set; }
+        [DataMember]
         public string SourceStoryServer { get; set; }
         [IgnoreDataMember]
         public DataView QueryResults { get; set; }

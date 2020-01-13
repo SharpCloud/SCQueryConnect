@@ -6,7 +6,7 @@ namespace SCQueryConnect.Common.Interfaces
     {
         Encoding TextEncoding { get; }
 
-        byte[] Decrypt(string base64CipherText);
-        byte[] Encrypt(byte[] plainTextBytes);
+        byte[] Decrypt(string base64CipherText, string entropy);
+        byte[] Encrypt(byte[] plainTextBytes, out byte[] entropy);
     }
 }

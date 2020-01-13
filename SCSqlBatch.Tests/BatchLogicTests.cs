@@ -184,7 +184,7 @@ namespace SCSqlBatch.Tests
 
             var encryptionHelper = Mock.Of<IEncryptionHelper>(h =>
                 h.TextEncoding == Encoding.UTF8 &&
-                h.Decrypt(It.IsAny<string>()) == Encoding.UTF8.GetBytes(passwordDpapiValue));
+                h.Decrypt(It.IsAny<string>(), It.IsAny<string>()) == Encoding.UTF8.GetBytes(passwordDpapiValue));
 
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();
@@ -308,7 +308,7 @@ namespace SCSqlBatch.Tests
 
             var encryptionHelper = Mock.Of<IEncryptionHelper>(h =>
                 h.TextEncoding == Encoding.UTF8 &&
-                h.Decrypt(It.IsAny<string>()) == Encoding.UTF8.GetBytes(proxyPasswordDpapiValue));
+                h.Decrypt(It.IsAny<string>(), It.IsAny<string>()) == Encoding.UTF8.GetBytes(proxyPasswordDpapiValue));
 
             var logger = Mock.Of<ILog>();
             var qcHelper = Mock.Of<IQueryConnectHelper>();

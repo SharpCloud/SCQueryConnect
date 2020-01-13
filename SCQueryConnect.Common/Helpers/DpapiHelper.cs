@@ -9,15 +9,19 @@ namespace SCQueryConnect.Common.Helpers
     {
         public Encoding TextEncoding { get; } = Encoding.UTF8;
 
-        public byte[] Decrypt(string base64CipherText)
+        public byte[] Decrypt(string base64CipherText, string entropy)
         {
             byte[] bytes;
+            
+            var entropyBytes = string.IsNullOrWhiteSpace(entropy)
+                ? null
+                : Convert.FromBase64String(entropy);
 
             try
             {
                 bytes = ProtectedData.Unprotect(
                     Convert.FromBase64String(base64CipherText),
-                    null,
+                    entropyBytes,
                     DataProtectionScope.LocalMachine);
             }
             catch (Exception)
@@ -28,12 +32,21 @@ namespace SCQueryConnect.Common.Helpers
             return bytes;
         }
 
-        public byte[] Encrypt(byte[] plainTextBytes)
+        public byte[] Encrypt(byte[] plainTextBytes, out byte[] entropy)
         {
+            entropy = CreateRandomEntropy();
+
             return ProtectedData.Protect(
                 plainTextBytes,
-                null,
+                entropy,
                 DataProtectionScope.LocalMachine);
+        }
+
+        private byte[] CreateRandomEntropy()
+        {
+            var entropy = new byte[100];
+            new RNGCryptoServiceProvider().GetBytes(entropy);
+            return entropy;
         }
     }
 }

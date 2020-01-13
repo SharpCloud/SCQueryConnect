@@ -32,6 +32,7 @@ namespace SCSQLBatch
             var password = _configurationReader.Get("password");
             var password64 = _configurationReader.Get("password64");
             var passwordDpapi = _configurationReader.Get("passwordDpapi");
+            var passwordDpapiEntropy = _configurationReader.Get("passwordDpapiEntropy");
             var url = _configurationReader.Get("url");
             var storyid = _configurationReader.Get("storyid");
             var connectionString = _configurationReader.Get("connectionString");
@@ -44,6 +45,7 @@ namespace SCSQLBatch
             var proxyPassword = _configurationReader.Get("proxyPassword");
             var proxyPassword64 = _configurationReader.Get("proxyPassword64");
             var proxyPasswordDpapi = _configurationReader.Get("proxyPasswordDpapi");
+            var proxyPasswordDpapiEntropy = _configurationReader.Get("proxyPasswordDpapiEntropy");
 
             // basic checks
             if (string.IsNullOrEmpty(userid) || userid == "USERID")
@@ -66,7 +68,7 @@ namespace SCSQLBatch
                 else
                 {
                     password = _encryptionHelper.TextEncoding.GetString(
-                        _encryptionHelper.Decrypt(passwordDpapi));
+                        _encryptionHelper.Decrypt(passwordDpapi, passwordDpapiEntropy));
                 }
 
                 if (string.IsNullOrEmpty(password))
@@ -114,7 +116,7 @@ namespace SCSQLBatch
                     else
                     {
                         proxyPassword = _encryptionHelper.TextEncoding.GetString(
-                            _encryptionHelper.Decrypt(proxyPasswordDpapi));
+                            _encryptionHelper.Decrypt(proxyPasswordDpapi, proxyPasswordDpapiEntropy));
                     }
                 }
 
