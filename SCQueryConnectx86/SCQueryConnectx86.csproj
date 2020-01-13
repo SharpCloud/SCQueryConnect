@@ -144,6 +144,9 @@
     <Compile Include="..\SQLUpdate\Interfaces\IConnectionNameValidator.cs">
       <Link>Interfaces\IConnectionNameValidator.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
+      <Link>Interfaces\IPostDeserializeAction.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
     </Compile>
