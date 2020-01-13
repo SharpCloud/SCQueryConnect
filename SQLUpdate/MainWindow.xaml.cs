@@ -4,6 +4,7 @@ using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
+using SCQueryConnect.Interfaces;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
@@ -150,6 +151,7 @@ namespace SCQueryConnect
         private SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
         private ProxyViewModel _proxyViewModel;
         private readonly IQueryConnectHelper _qcHelper;
+        private readonly IConnectionNameValidator _connectionNameValidator;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -161,6 +163,7 @@ namespace SCQueryConnect
         private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
 
         public MainWindow(
+            IConnectionNameValidator connectionNameValidator,
             IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
             IDbConnectionFactory dbConnectionFactory,
@@ -175,6 +178,7 @@ namespace SCQueryConnect
             Loaded += MainWindow_Loaded;
             DataContext = this;
 
+            _connectionNameValidator = connectionNameValidator;
             _connectionStringHelper = connectionStringHelper;
 
             _dataChecker = dataChecker;
@@ -664,7 +668,19 @@ namespace SCQueryConnect
         {
             if (qd != null)
             {
-                qd.Name = ConnectionName.Text;
+                var nameError = _connectionNameValidator.Validate(ConnectionName.Text);
+                var nameIsValid = string.IsNullOrWhiteSpace(nameError);
+                
+                if (nameIsValid)
+                {
+                    qd.Name = ConnectionName.Text;
+                }
+                else
+                {
+                    ConnectionName.Text = qd.Name;
+                    MessageBox.Show(nameError);
+                }
+                
                 qd.Description = ConnectionDescription.Text;
                 qd.ConnectionsString = ConnectionString.Text;
                 qd.QueryString = SQLString.Text;

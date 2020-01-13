@@ -2,6 +2,8 @@
 using Autofac.Core;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Helpers;
+using SCQueryConnect.Interfaces;
 using System;
 
 namespace SCQueryConnect
@@ -52,6 +54,7 @@ namespace SCQueryConnect
 
             builder.RegisterType<MainWindow>().InstancePerLifetimeScope();
             builder.RegisterType<ArchitectureDetector>().As<IArchitectureDetector>().InstancePerLifetimeScope();
+            builder.RegisterType<ConnectionNameValidator>().As<IConnectionNameValidator>().InstancePerLifetimeScope();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>().InstancePerLifetimeScope();
             builder.RegisterType<UIDataChecker>().As<IDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();

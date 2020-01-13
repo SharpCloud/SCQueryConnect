@@ -132,11 +132,17 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
       <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\ConnectionNameValidator.cs">
+      <Link>Helpers\ConnectionNameValidator.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
       <Link>Helpers\UrlHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IConnectionNameValidator.cs">
+      <Link>Interfaces\IConnectionNameValidator.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>

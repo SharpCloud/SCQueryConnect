@@ -146,7 +146,9 @@
     </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Commands\GoToUrl.cs" />
+    <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
+    <Compile Include="Interfaces\IConnectionNameValidator.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataChecker.cs" />
     <Compile Include="UIRelationshipsDataChecker.cs" />
