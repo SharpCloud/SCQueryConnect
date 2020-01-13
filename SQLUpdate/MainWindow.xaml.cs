@@ -342,11 +342,6 @@ namespace SCQueryConnect
             }
         }
 
-        private void HelpButtonClick(object sender, RoutedEventArgs e)
-        {
-            Process.Start("http://www.connectionstrings.com/");
-        }
-
         private IDbConnection GetDb()
         {
             return _dbConnectionFactory.GetDb(

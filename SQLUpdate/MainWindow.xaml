@@ -85,6 +85,7 @@
                                 </Setter.Value>
                             </Setter>
                         </Style>
+                        <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
 
                     <TabItem Header="1. Database Connection">
@@ -150,7 +151,15 @@
                                 Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
                             </TextBlock>
 
-                            <Button Grid.Row="8" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="HelpButtonClick">Help on Connections Strings</Button>
+                            <Button Grid.Row="8"
+                                    Grid.Column="1"
+                                    Command="{StaticResource GoToUrl}"
+                                    CommandParameter="https://www.connectionstrings.com/"
+                                    Height="40"
+                                    HorizontalAlignment="Left"
+                                    Width="250">
+                                Help on Connections Strings
+                            </Button>
                         </Grid>
                     </TabItem>
 
@@ -271,10 +280,6 @@
                     </TabItem>
 
                     <TabItem Header="About">
-                        <TabItem.Resources>
-                            <commands:GoToUrl x:Key="GoToUrl"/>
-                        </TabItem.Resources>
-
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
