@@ -9,7 +9,7 @@ namespace SCQueryConnect.Common.Helpers
     {
         public Encoding TextEncoding { get; } = Encoding.UTF8;
 
-        public byte[] Decrypt(string base64CipherText, string entropy)
+        public byte[] Decrypt(string base64CipherText, string entropy, DataProtectionScope scope)
         {
             byte[] bytes;
             
@@ -22,7 +22,7 @@ namespace SCQueryConnect.Common.Helpers
                 bytes = ProtectedData.Unprotect(
                     Convert.FromBase64String(base64CipherText),
                     entropyBytes,
-                    DataProtectionScope.LocalMachine);
+                    scope);
             }
             catch (Exception)
             {
@@ -32,14 +32,14 @@ namespace SCQueryConnect.Common.Helpers
             return bytes;
         }
 
-        public byte[] Encrypt(byte[] plainTextBytes, out byte[] entropy)
+        public byte[] Encrypt(byte[] plainTextBytes, out byte[] entropy, DataProtectionScope scope)
         {
             entropy = CreateRandomEntropy();
 
             return ProtectedData.Protect(
                 plainTextBytes,
                 entropy,
-                DataProtectionScope.LocalMachine);
+                scope);
         }
 
         private byte[] CreateRandomEntropy()

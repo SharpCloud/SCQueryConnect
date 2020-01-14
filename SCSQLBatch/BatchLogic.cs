@@ -2,6 +2,7 @@
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using System;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -68,7 +69,10 @@ namespace SCSQLBatch
                 else
                 {
                     password = _encryptionHelper.TextEncoding.GetString(
-                        _encryptionHelper.Decrypt(passwordDpapi, passwordDpapiEntropy));
+                        _encryptionHelper.Decrypt(
+                            passwordDpapi,
+                            passwordDpapiEntropy,
+                            DataProtectionScope.LocalMachine));
                 }
 
                 if (string.IsNullOrEmpty(password))
@@ -116,7 +120,10 @@ namespace SCSQLBatch
                     else
                     {
                         proxyPassword = _encryptionHelper.TextEncoding.GetString(
-                            _encryptionHelper.Decrypt(proxyPasswordDpapi, proxyPasswordDpapiEntropy));
+                            _encryptionHelper.Decrypt(
+                                proxyPasswordDpapi,
+                                proxyPasswordDpapiEntropy,
+                                DataProtectionScope.LocalMachine));
                     }
                 }
 

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace SCQueryConnect.Common.Interfaces
 {
@@ -6,7 +7,7 @@ namespace SCQueryConnect.Common.Interfaces
     {
         Encoding TextEncoding { get; }
 
-        byte[] Decrypt(string base64CipherText, string entropy);
-        byte[] Encrypt(byte[] plainTextBytes, out byte[] entropy);
+        byte[] Decrypt(string base64CipherText, string entropy, DataProtectionScope scope);
+        byte[] Encrypt(byte[] plainTextBytes, out byte[] entropy, DataProtectionScope scope);
     }
 }

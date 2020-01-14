@@ -213,7 +213,10 @@ namespace SCQueryConnect
             try
             {
                 Password.Password = _encryptionHelper.TextEncoding.GetString(
-                    _encryptionHelper.Decrypt(regPassword, regPasswordEntropy));
+                    _encryptionHelper.Decrypt(
+                        regPassword,
+                        regPasswordEntropy,
+                        DataProtectionScope.CurrentUser));
             }
             catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
             {
@@ -236,7 +239,10 @@ namespace SCQueryConnect
             try
             {
                 _proxyViewModel.ProxyPassword = _encryptionHelper.TextEncoding.GetString(
-                    _encryptionHelper.Decrypt(regProxyPassword, regProxyPasswordEntropy));
+                    _encryptionHelper.Decrypt(
+                        regProxyPassword,
+                        regProxyPasswordEntropy,
+                        DataProtectionScope.CurrentUser));
             }
             catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
             {
@@ -588,7 +594,8 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("PasswordDpapi", Convert.ToBase64String(
                 _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(Password.Password),
-                    out var entropy)));
+                    out var entropy,
+                    DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("PasswordDpapiEntropy", Convert.ToBase64String(entropy));
 
@@ -611,7 +618,8 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ProxyPasswordDpapi", Convert.ToBase64String(
                 _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword),
-                    out var proxyEntropy)));
+                    out var proxyEntropy,
+                    DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
         }
@@ -631,7 +639,8 @@ namespace SCQueryConnect
                     copy.SourceStoryPasswordDpapi = Convert.ToBase64String(
                         _encryptionHelper.Encrypt(
                             _encryptionHelper.TextEncoding.GetBytes(copy.SourceStoryPassword),
-                            out var entropy));
+                            out var entropy,
+                            DataProtectionScope.CurrentUser));
 
                     copy.SourceStoryPasswordEntropy = Convert.ToBase64String(entropy);
 
@@ -663,7 +672,8 @@ namespace SCQueryConnect
                     copy.SourceStoryPassword = _encryptionHelper.TextEncoding.GetString(
                         _encryptionHelper.Decrypt(
                             copy.SourceStoryPasswordDpapi,
-                            copy.SourceStoryPasswordEntropy));
+                            copy.SourceStoryPasswordEntropy,
+                            DataProtectionScope.CurrentUser));
                 }
 
                 newConnections.Add(copy);
@@ -877,11 +887,13 @@ namespace SCQueryConnect
 
                 var passwordBytes = _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(Password.Password),
-                    out var entropy);
+                    out var entropy,
+                    DataProtectionScope.LocalMachine);
 
                 var proxyPasswordBytes = _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword),
-                    out var proxyEntropy);
+                    out var proxyEntropy,
+                    DataProtectionScope.LocalMachine);
 
                 var content = File.ReadAllText(configFilename);
 
