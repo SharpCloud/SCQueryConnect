@@ -306,8 +306,12 @@ namespace SCQueryConnect
             if (File.Exists(file))
             {
                 // load our previous settings
-                var loaded = SaveHelper.DeserializeJSON<SmartObservableCollection<QueryData>>(File.ReadAllText(file));
-                _connections = CreateDecryptedPasswordConnections(loaded);
+                var loaded = SaveHelper.DeserializeJSON<QueryData[]>(File.ReadAllText(file));
+                
+                var collection = new SmartObservableCollection<QueryData>();
+                collection.AddRange(loaded.Where(qd => qd != null));
+                
+                _connections = CreateDecryptedPasswordConnections(collection);
             }
             else
             {   // create some sample settings
