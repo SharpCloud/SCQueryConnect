@@ -8,7 +8,7 @@
         xmlns:commands="clr-namespace:SCQueryConnect.Commands"
         mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
-        Title="{Binding AppName}" Height="580" Width="1225" Icon="favicon.ico" ResizeMode="CanResizeWithGrip">
+        Title="{Binding AppName}" Height="580" Width="1225" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
             <Grid.Resources>

@@ -54,7 +54,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>qc-icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\SQLUpdate\QC.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
@@ -196,10 +196,12 @@
       <Link>Views\SourceStorySettings.xaml.cs</Link>
     </Compile>
     <None Include="packages.config" />
-    <Resource Include="qc-icon.ico" />
     <None Include="..\SQLUpdate\app.config">
       <Link>app.config</Link>
     </None>
+    <Resource Include="..\SQLUpdate\QC.ico">
+      <Link>QC.ico</Link>
+    </Resource>
     <Content Include="..\SQLUpdate\SCSQLBatch.zip">
       <Link>SCSQLBatch.zip</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -250,11 +252,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\SQLUpdate\favicon.ico">
-      <Link>favicon.ico</Link>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\SQLUpdate\Images\logo_home.png">
