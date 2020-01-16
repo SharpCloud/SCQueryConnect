@@ -259,7 +259,8 @@
                                          AcceptsReturn="True"
                                          IsReadOnly="True"
                                          Foreground="{StaticResource QCBlue}"
-                                         Background="{StaticResource QCBackground}">
+                                         Background="{StaticResource QCBackground}"
+                                         TextChanged="TbResultsTextChanged">
                                 </TextBox>
                             </Grid>
                         </Grid>

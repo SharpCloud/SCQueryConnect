@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Directory = System.IO.Directory;
 using MessageBox = System.Windows.MessageBox;
@@ -1243,6 +1244,23 @@ namespace SCQueryConnect
         private void QC_Data_Folder_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", _localPath);
+        }
+
+        private void TbResultsTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                if (textBox.Text.Contains("ERROR"))
+                {
+                    textBox.Background = Brushes.DarkRed;
+                    textBox.Foreground = Brushes.Pink;
+                }
+                else
+                {
+                    textBox.Background = (SolidColorBrush)Application.Current.Resources["QCBackground"];
+                    textBox.Foreground = (SolidColorBrush) Application.Current.Resources["QCBlue"];
+                }
+            }
         }
     }
 }
