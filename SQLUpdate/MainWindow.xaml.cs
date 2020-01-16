@@ -849,7 +849,7 @@ namespace SCQueryConnect
 
                 if (File.Exists(configFilename))
                 {
-                    if (MessageBox.Show("Config files alredy exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    if (MessageBox.Show("Config files already exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                         return;
                 }
 
