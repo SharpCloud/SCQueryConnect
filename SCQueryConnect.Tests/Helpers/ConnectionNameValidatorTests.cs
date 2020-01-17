@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using SCQueryConnect.Helpers;
 
-namespace SCQueryConnect.Tests
+namespace SCQueryConnect.Tests.Helpers
 {
     [TestFixture]
     public class ConnectionNameValidatorTests

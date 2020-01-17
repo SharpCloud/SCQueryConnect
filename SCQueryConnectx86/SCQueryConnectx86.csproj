@@ -120,6 +120,9 @@
     <Compile Include="..\SQLUpdate\Bootstrapper.cs">
       <Link>Bootstrapper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Commands\ActionCommand.cs">
+      <Link>Commands\ActionCommand.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Commands\GoToUrl.cs">
       <Link>Commands\GoToUrl.cs</Link>
     </Compile>
@@ -140,6 +143,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
       <Link>Helpers\UrlHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IBatchSequenceViewModel.cs">
+      <Link>Interfaces\IBatchSequenceViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IConnectionNameValidator.cs">
       <Link>Interfaces\IConnectionNameValidator.cs</Link>
@@ -168,11 +174,17 @@
     <Compile Include="..\SQLUpdate\UIRelationshipsDataChecker.cs">
       <Link>UIRelationshipsDataChecker.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\BatchSequenceViewModel.cs">
+      <Link>ViewModels\BatchSequenceViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
       <Link>ViewModels\ProxyViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\SelectedStoryViewModel.cs">
       <Link>ViewModels\SelectedStoryViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
+      <Link>ViewModels\ViewModelLocator.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Views\ConnectionInfo.xaml.cs">
       <Link>Views\ConnectionInfo.xaml.cs</Link>

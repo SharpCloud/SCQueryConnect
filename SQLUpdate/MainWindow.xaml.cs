@@ -40,6 +40,9 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private static bool DetectIs32Bit => IntPtr.Size == 4;
+        private static string GetFileSuffix(bool b32bit) => b32bit ? "x86" : string.Empty;
+
         private bool _unpublishItems = false;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
         private Visibility _connectionStringVisibility = Visibility.Visible;
@@ -149,9 +152,10 @@ namespace SCQueryConnect
         private QueryData SelectedQueryData => connectionList.SelectedItem as QueryData;
 
         private string _lastUsedSharpCloudConnection;
-        private SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
         private ProxyViewModel _proxyViewModel;
+        private readonly SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
         private readonly IQueryConnectHelper _qcHelper;
+        private readonly IBatchSequenceViewModel _batchSequenceViewModel;
         private readonly IConnectionNameValidator _connectionNameValidator;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IDataChecker _dataChecker;
@@ -164,6 +168,7 @@ namespace SCQueryConnect
         private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
 
         public MainWindow(
+            IBatchSequenceViewModel batchSequenceViewModel,
             IConnectionNameValidator connectionNameValidator,
             IConnectionStringHelper connectionStringHelper,
             IDataChecker dataChecker,
@@ -178,6 +183,9 @@ namespace SCQueryConnect
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             DataContext = this;
+
+            _batchSequenceViewModel = batchSequenceViewModel;
+            _batchSequenceViewModel.SetConnections(_connections);
 
             _connectionNameValidator = connectionNameValidator;
             _connectionStringHelper = connectionStringHelper;
@@ -312,7 +320,9 @@ namespace SCQueryConnect
                 var collection = new SmartObservableCollection<QueryData>();
                 collection.AddRange(loaded.Where(qd => qd != null));
                 
-                _connections = CreateDecryptedPasswordConnections(collection);
+                var decrypted = CreateDecryptedPasswordConnections(collection);
+                _connections.Clear();
+                _connections.AddRange(decrypted);
             }
             else
             {   // create some sample settings
@@ -662,9 +672,9 @@ namespace SCQueryConnect
             return newConnections;
         }
 
-        private SmartObservableCollection<QueryData> CreateDecryptedPasswordConnections(SmartObservableCollection<QueryData> connections)
+        private IList<QueryData> CreateDecryptedPasswordConnections(IEnumerable<QueryData> connections)
         {
-            var newConnections = new SmartObservableCollection<QueryData>();
+            var newConnections = new List<QueryData>();
 
             foreach (var connection in connections)
             {
@@ -805,78 +815,81 @@ namespace SCQueryConnect
 
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
-            Process.Start(GetFolder());
+            Process.Start(GetFolder(SelectedQueryData.Name));
         }
 
         private void GenerateBatchFile32(object sender, RoutedEventArgs e)
         {
-            GenerateBatchFile(true);
+            GenerateBatchFile(true, ConnectionString.Text, string.Empty, SelectedQueryData);
         }
 
         private void GenerateBatchFile64(object sender, RoutedEventArgs e)
         {
-            GenerateBatchFile(false);
+            GenerateBatchFile(false, ConnectionString.Text, string.Empty, SelectedQueryData);
         }
 
         private void GenerateBatchFileThis(object sender, RoutedEventArgs e)
         {
-            GenerateBatchFile((IntPtr.Size == 4));
+            GenerateBatchFile(DetectIs32Bit, ConnectionString.Text, string.Empty, SelectedQueryData);
         }
 
-        private string GetFolder()
+        private string GetFolder(string queryName)
         {
-            var folder = _localPath;
-            folder += "/data";
+            var folder = $"{_localPath}/data";
             Directory.CreateDirectory(folder);
-            folder += "/" + SelectedQueryData.Name;
+            folder += "/" + queryName;
             Directory.CreateDirectory(folder);
-
             return folder;
         }
 
         private void GenerateBatchFile(bool b32bit)
         {
-            var suffix = b32bit ? "x86" : string.Empty;
-            string zipfile = $"SCSQLBatch{suffix}.zip";
+            var outputFolder = GenerateBatchFile(b32bit, ConnectionString.Text, string.Empty, SelectedQueryData);
+            Process.Start(outputFolder);
+        }
+
+        private string GenerateBatchFile(bool b32bit, string connectionString, string sequenceName, QueryData queryData)
+        {
+            var suffix = GetFileSuffix(b32bit);
+            var zipfile = $"SCSQLBatch{suffix}.zip";
+            
+            var outputFolder = GetFolder(Path.Combine(sequenceName, queryData.Name));
 
             if (!ValidateCreds())
-                return;
-
-            var folder = GetFolder();
+                return null;
 
             try
             {
-                var configFilename = folder + $"/SCSQLBatch{suffix}.exe.config";
+                var configFilename = outputFolder + $"/SCSQLBatch{suffix}.exe.config";
 
                 if (File.Exists(configFilename))
                 {
                     if (MessageBox.Show("Config files already exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-                        return;
+                        return null;
                 }
 
-                if (ConnectionString.Text.Contains("\""))
+                if (connectionString.Contains("\""))
                     MessageBox.Show(
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
                 try
                 {
-                    File.Delete($"{folder}/Autofac.dll");
-                    File.Delete($"{folder}/Newtonsoft.Json.dll");
-                    File.Delete($"{folder}/SC.Framework.dll");
-                    File.Delete($"{folder}/SC.API.ComInterop.dll");
-                    File.Delete($"{folder}/SC.Api.dll");
-                    File.Delete($"{folder}/SC.SharedModels.dll");
-                    File.Delete($"{folder}/SCSQLBatch{suffix}.exe");
-                    File.Delete($"{folder}/SCSQLBatch{suffix}.exe.config");
-                    File.Delete($"{folder}/SCSQLBatch.zip");
-                    File.Delete($"{folder}/SCQueryConnect.Common.dll");
+                    File.Delete($"{outputFolder}/Autofac.dll");
+                    File.Delete($"{outputFolder}/Newtonsoft.Json.dll");
+                    File.Delete($"{outputFolder}/SC.Framework.dll");
+                    File.Delete($"{outputFolder}/SC.API.ComInterop.dll");
+                    File.Delete($"{outputFolder}/SC.Api.dll");
+                    File.Delete($"{outputFolder}/SC.SharedModels.dll");
+                    File.Delete($"{outputFolder}/SCSQLBatch{suffix}.exe");
+                    File.Delete($"{outputFolder}/SCSQLBatch{suffix}.exe.config");
+                    File.Delete($"{outputFolder}/SCSQLBatch.zip");
+                    File.Delete($"{outputFolder}/SCQueryConnect.Common.dll");
 
-                    ZipFile.ExtractToDirectory(zipfile, folder);
+                    ZipFile.ExtractToDirectory(zipfile, outputFolder);
                 }
-                catch (Exception exception2)
+                catch (Exception e)
                 {
-                    MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {exception2.Message}");
-//                    MessageBox.Show("Sorry, we were unable to complete the process as we could not downlaod the files from the internet. Please make sure you have a working internet connection. " + exception2.Message, "NO CONNECTION");
-                    return;    
+                    MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {e.Message}");
+                    return null;
                 }
 
                 // set up the config
@@ -884,11 +897,11 @@ namespace SCQueryConnect
                 // Remove data source if type is SharpCloud; a temp file will
                 // be used, so an overwrite prompt will not appear
 
-                var connectionString = SelectedQueryData.GetBatchDBType == DatabaseStrings.SharpCloudExcel
+                var formattedConnection = queryData.GetBatchDBType == DatabaseStrings.SharpCloudExcel
                     ? _connectionStringHelper.SetDataSource(
-                        SelectedQueryData.FormattedConnectionString,
+                        queryData.FormattedConnectionString,
                         string.Empty)
-                    : SelectedQueryData.FormattedConnectionString;
+                    : queryData.FormattedConnectionString;
 
                 var passwordBytes = _encryptionHelper.Encrypt(
                     _encryptionHelper.TextEncoding.GetBytes(Password.Password),
@@ -907,10 +920,10 @@ namespace SCQueryConnect
                 content = ReplaceConfigSetting(content, "PASSWORD_DPAPI_ENTROPY", Convert.ToBase64String(entropy));
                 content = ReplaceConfigSetting(content, "https://my.sharpcloud.com", Url.Text);
                 content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", StoryId.Text);
-                content = ReplaceConfigSetting(content, "SQL", SelectedQueryData.GetBatchDBType);
-                content = ReplaceConfigSetting(content, "CONNECTIONSTRING", connectionString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "QUERYSTRING", SelectedQueryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "QUERYRELSSTRING", SelectedQueryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = ReplaceConfigSetting(content, "SQL", queryData.GetBatchDBType);
+                content = ReplaceConfigSetting(content, "CONNECTIONSTRING", formattedConnection.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = ReplaceConfigSetting(content, "QUERYSTRING", queryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
+                content = ReplaceConfigSetting(content, "QUERYRELSSTRING", queryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = ReplaceConfigSetting(content, "LOGFILE", $"Logfile.txt");
                 content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", UnpublishItems.ToString());
                 content = ReplaceConfigSetting(content, "PROXYADDRESS", _proxyViewModel.Proxy);
@@ -922,7 +935,7 @@ namespace SCQueryConnect
                 File.WriteAllText(configFilename, content);
 
                 // update the Logfile
-                var logfile = $"{folder}Logfile.txt";
+                var logfile = $"{outputFolder}Logfile.txt";
                 var contentNotes = new List<string>();
                 contentNotes.Add($"----------------------------------------------------------------------");
                 contentNotes.Add(b32bit
@@ -931,13 +944,14 @@ namespace SCQueryConnect
                 contentNotes.Add($"----------------------------------------------------------------------");
 
                 File.AppendAllLines(logfile, contentNotes);
-
-                Process.Start(folder);
+                return outputFolder;
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
             }
+
+            return null;
         }
 
         private static string ReplaceConfigSetting(
@@ -1260,6 +1274,83 @@ namespace SCQueryConnect
                     textBox.Background = (SolidColorBrush)Application.Current.Resources["QCBackground"];
                     textBox.Foreground = (SolidColorBrush) Application.Current.Resources["QCBlue"];
                 }
+            }
+        }
+
+        private void GenerateBatchSequenceClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var nameError = _connectionNameValidator.Validate(SequenceNameTextBox.Text);
+                var nameIsValid = string.IsNullOrWhiteSpace(nameError);
+
+                if (!nameIsValid)
+                {
+                    MessageBox.Show(nameError);
+                    return;
+                }
+
+                var sb = new StringBuilder();
+                var sequenceFolder = GetFolder(SequenceNameTextBox.Text);
+
+                var notEmpty = Directory.EnumerateFileSystemEntries(sequenceFolder).Any();
+                if (notEmpty)
+                {
+                    var result = MessageBox.Show(
+                        $"A folder named '{SequenceNameTextBox.Text}' already exist at this location, Do you want to replace?",
+                        "WARNING",
+                        MessageBoxButton.YesNo);
+
+                    if (result != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+                }
+
+                Directory.Delete(sequenceFolder, true);
+                GetFolder(SequenceNameTextBox.Text);
+                bool is32Bit;
+
+                switch (ArchitectureComboBox.SelectedItem)
+                {
+                    case BatchSequenceViewModel.Architecture64:
+                        is32Bit = true;
+                        break;
+
+                    case BatchSequenceViewModel.Architecture32:
+                        is32Bit = false;
+                        break;
+
+                    default:
+                        is32Bit = DetectIs32Bit;
+                        break;
+                }
+
+                var connections = _batchSequenceViewModel.IncludedConnections.Cast<QueryData>();
+                sb.AppendLine("@echo off");
+
+                foreach (var connection in connections)
+                {
+                    var path = GenerateBatchFile(
+                        is32Bit,
+                        connection.ConnectionsString,
+                        SequenceNameTextBox.Text,
+                        connection);
+
+                    var suffix = GetFileSuffix(is32Bit);
+                    var filename = $"SCSQLBatch{suffix}.exe";
+                    sb.AppendLine($"echo Running: {connection.Name}");
+                    sb.AppendLine($"\"{Path.Combine(path, filename)}\"");
+                }
+
+                var batchPath = Path.Combine(sequenceFolder, $"{SequenceNameTextBox.Text}.bat");
+                var content = sb.ToString();
+                File.WriteAllText(batchPath, content);
+                Process.Start(sequenceFolder);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {ex.Message}");
             }
         }
     }

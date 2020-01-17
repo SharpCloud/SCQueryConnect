@@ -3,16 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SQLUpdate"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         xmlns:commands="clr-namespace:SCQueryConnect.Commands"
         mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
-        Title="{Binding AppName}" Height="580" Width="1225" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
+        Title="{Binding AppName}" Height="580" Width="1230" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
         <Grid>
             <Grid.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
+                <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
             </Grid.Resources>
             
             <Grid.ColumnDefinitions>
@@ -280,6 +280,93 @@
                         </Grid>
                     </TabItem>
 
+                    <TabItem Header="Batch Sequence" >
+                        <Grid DataContext="{Binding BatchSequenceViewModel, Source={StaticResource ViewModelLocator}}">
+                            <Grid.Resources>
+                                <Style TargetType="ListBox">
+                                    <Setter Property="Background" Value="{StaticResource QCBackground}" />
+                                    <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                </Style>
+                            </Grid.Resources>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ListBox ItemsSource="{Binding ExcludedConnections}"
+                                     SelectedItem="{Binding SelectedExcludedConnection}">
+                            </ListBox>
+
+                            <StackPanel Grid.Column="1"
+                                        Grid.Row="0"
+                                        VerticalAlignment="Center">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                        <Setter Property="Margin" Value="5" />
+                                        <Setter Property="Width" Value="70" />
+                                    </Style>
+                                </StackPanel.Resources>
+
+                                <Button Command="{Binding AddToBatchCommand}"
+                                        CommandParameter="{Binding SelectedExcludedConnection}">
+                                    &gt;
+                                </Button>
+
+                                <Button Command="{Binding RemoveFromBatchCommand}"
+                                        CommandParameter="{Binding SelectedIncludedConnection}">
+                                    &lt;
+                                </Button>
+
+                                <Button Command="{Binding DecreaseBatchIndexCommand}"
+                                        CommandParameter="{Binding SelectedIncludedConnection}">
+                                    Up
+                                </Button>
+
+                                <Button Command="{Binding IncreaseBatchIndexCommand}"
+                                        CommandParameter="{Binding SelectedIncludedConnection}">
+                                    Down
+                                </Button>
+                            </StackPanel>
+
+                            <ListBox Grid.Column="2"
+                                     Grid.Row="0"
+                                     ItemsSource="{Binding IncludedConnections}"
+                                     SelectedItem="{Binding SelectedIncludedConnection}">
+                            </ListBox>
+
+                            <StackPanel Grid.Column="0"
+                                        Grid.ColumnSpan="3"
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,10"
+                                        Orientation="Horizontal">
+
+                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Sequence Name</TextBlock>
+
+                                <TextBox x:Name="SequenceNameTextBox" Width="200" Text="BatchSequence" />
+
+                                <ComboBox x:Name="ArchitectureComboBox"
+                                          ItemsSource="{Binding ArchitectureOptions}"
+                                          Margin="10,0"
+                                          SelectedItem="{Binding SelectedArchitecture}"
+                                          VerticalAlignment="Center"
+                                          Width="80">
+                                </ComboBox>
+
+                                <Button Click="GenerateBatchSequenceClick">
+                                    <TextBlock Margin="20,0">Generate Batch Sequence</TextBlock>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+
                     <TabItem Header="About">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -340,8 +427,9 @@
                 </TabControl>
             </Grid>
         </Grid>
-        <Grid x:Name="updatingMessageGrid" Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility}">
-            <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center" ></TextBlock>
+        
+        <Grid x:Name="updatingMessageGrid" Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility, FallbackValue=Collapsed}">
+            <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         </Grid>
     </Grid>
 </Window>
