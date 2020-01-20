@@ -9,10 +9,50 @@
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1230" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
     <Grid>
-        <Grid>
+        <Grid.Resources>
+            <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
+        </Grid.Resources>
+
+        <Grid Background="Black">
             <Grid.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
-                <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
+                <Style TargetType="TabControl">
+                    <Setter Property="IsTabStop" Value="False"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="#404040"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
+                </Style>
+                <Style TargetType="TabItem">
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid x:Name="gdBorder" Background="{StaticResource QCBackground}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="2,0" Height="30">
+                                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            ContentSource="Header" Margin="10,2"/>
+                                        </Border>
+                                    </StackPanel>
+                                    <Border x:Name="selectedBorder" Height="2" VerticalAlignment="Bottom" Background="{StaticResource QCBlue}"></Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="gdBorder" Property="Background" Value="{StaticResource QCBackground}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="gdBorder" Property="Background" Value="#111111" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
             </Grid.Resources>
             
             <Grid.ColumnDefinitions>
@@ -22,69 +62,120 @@
             </Grid.ColumnDefinitions>
 
             <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
-            <ListBox Grid.Column="0" x:Name="connectionList" Background="Transparent" Foreground="white" SelectionChanged="connectionList_SelectionChanged" Margin="0,0,0,50" >
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <Grid Background="Black" VerticalAlignment="Bottom" Height="50">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Button Click="NewConnectionClick" Grid.Row="0" Grid.Column="0" Height="40" VerticalAlignment="Top" Margin="5,5,0,5" >+New</Button>
-                <Button Click="CopyConnectionClick" Grid.Row="0" Grid.Column="1" Height="40" VerticalAlignment="Top" Background="#666666" Margin="5,5,0,5">Copy</Button>
-                <Button Click="UpConnectionClick" Grid.Row="0" Grid.Column="2" Height="40" VerticalAlignment="Top" Background="#666666"  Margin="5,5,0,5">Up</Button>
-                <Button Click="DownConnectionClick" Grid.Row="0" Grid.Column="3" Height="40" VerticalAlignment="Top" Background="#666666"  Margin="5,5,0,5">Down</Button>
-                <Button Click="DeleteConnectionClick" Grid.Row="0" Grid.Column="4" Height="40" VerticalAlignment="Top" Background="Red" Margin="5">Delete</Button>
-            </Grid>
-            <Grid Grid.Column="2" Background="Black">
-                <TabControl Background="{StaticResource QCBackground}" x:Name="BrowserTabs" BorderBrush="Transparent" MinWidth="750">
+
+            <TabControl Grid.Column="0"  BorderBrush="Transparent" SelectedItem="{Binding SolutionViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}">
+                <TabControl.Resources>
+                    <Style x:Key="DefaultListButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Setter Property="Background" Value="#666" />
+                        <Setter Property="Height" Value="40" />
+                        <Setter Property="Margin" Value="5,5,0,5" />
+                        <Setter Property="VerticalAlignment" Value="Top" />
+                    </Style>
+
+                    <Style x:Key="NewButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
+                        <Setter Property="Background" Value="{StaticResource QCBlue}" />
+                        <Setter Property="Content" Value="+New" />
+                        <Setter Property="Grid.Column" Value="0" />
+                    </Style>
+
+                    <Style x:Key="CopyButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
+                        <Setter Property="Content" Value="Copy" />
+                        <Setter Property="Grid.Column" Value="1" />
+                    </Style>
+
+                    <Style x:Key="UpButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
+                        <Setter Property="Content" Value="Up" />
+                        <Setter Property="Grid.Column" Value="2" />
+                    </Style>
+
+                    <Style x:Key="DownButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
+                        <Setter Property="Content" Value="Down" />
+                        <Setter Property="Grid.Column" Value="3" />
+                    </Style>
+
+                    <Style x:Key="DeleteButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
+                        <Setter Property="Background" Value="Red" />
+                        <Setter Property="Content" Value="Delete" />
+                        <Setter Property="Grid.Column" Value="4" />
+                        <Setter Property="Margin" Value="5" />
+                    </Style>
+
+                    <Style TargetType="ListBox">
+                        <Setter Property="Background" Value="{StaticResource QCBackground}" />
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                </TabControl.Resources>
+
+                <TabItem Header="Connections">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ListBox x:Name="connectionList" SelectionChanged="connectionList_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Grid Grid.Row="1" Height="50">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Click="NewConnectionClick" Style="{StaticResource NewButton}" />
+                            <Button Click="CopyConnectionClick" Style="{StaticResource CopyButton}" />
+                            <Button Click="UpConnectionClick" Style="{StaticResource UpButton}" />
+                            <Button Click="DownConnectionClick" Style="{StaticResource DownButton}" />
+                            <Button Click="DeleteConnectionClick" Style="{StaticResource DeleteButton}" />
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Solutions">
+                    <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ListBox ItemsSource="{Binding Solutions}" SelectedItem="{Binding SelectedSolution}" />
+
+                        <Grid Grid.Row="1" Height="50">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Click="NewConnectionClick" Style="{StaticResource NewButton}" />
+                            <Button Click="CopyConnectionClick" Style="{StaticResource CopyButton}" />
+                            <Button Click="UpConnectionClick" Style="{StaticResource UpButton}" />
+                            <Button Click="DownConnectionClick" Style="{StaticResource DownButton}" />
+                            <Button Click="DeleteConnectionClick" Style="{StaticResource DeleteButton}" />
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <Grid Grid.Column="2">
+                <TabControl Background="{StaticResource QCBackground}"
+                            x:Name="BrowserTabs"
+                            BorderBrush="Transparent"
+                            MinWidth="750"
+                            Visibility="{Binding SolutionViewModel.ConnectionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}">
                     <TabControl.Resources>
-                        <Style TargetType="TabControl">
-                            <Setter Property="IsTabStop" Value="False"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="BorderBrush" Value="#404040"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                            <Setter Property="Padding" Value="0"/>
-                        </Style>
-                        <Style TargetType="TabItem">
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="BorderBrush" Value="Transparent" />
-                            <Setter Property="Foreground" Value="White" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="TabItem">
-                                        <Grid x:Name="gdBorder" Background="{StaticResource QCBackground}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="2,0" Height="30">
-                                                    <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                            ContentSource="Header" Margin="10,2"/>
-                                                </Border>
-                                            </StackPanel>
-                                            <Border x:Name="selectedBorder" Height="2" VerticalAlignment="Bottom" Background="{StaticResource QCBlue}"></Border>
-                                        </Grid>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
-                                                <Setter TargetName="gdBorder" Property="Background" Value="{StaticResource QCBackground}" />
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="False">
-                                                <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
-                                                <Setter TargetName="gdBorder" Property="Background" Value="#111111" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
 
@@ -280,93 +371,6 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="Solution" >
-                        <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}">
-                            <Grid.Resources>
-                                <Style TargetType="ListBox">
-                                    <Setter Property="Background" Value="{StaticResource QCBackground}" />
-                                    <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
-                                </Style>
-                            </Grid.Resources>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <ListBox ItemsSource="{Binding ExcludedConnections}"
-                                     SelectedItem="{Binding SelectedExcludedConnection}">
-                            </ListBox>
-
-                            <StackPanel Grid.Column="1"
-                                        Grid.Row="0"
-                                        VerticalAlignment="Center">
-                                <StackPanel.Resources>
-                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                                        <Setter Property="Margin" Value="5" />
-                                        <Setter Property="Width" Value="70" />
-                                    </Style>
-                                </StackPanel.Resources>
-
-                                <Button Command="{Binding AddToSolutionCommand}"
-                                        CommandParameter="{Binding SelectedExcludedConnection}">
-                                    &gt;
-                                </Button>
-
-                                <Button Command="{Binding RemoveFromSolutionCommand}"
-                                        CommandParameter="{Binding SelectedIncludedConnection}">
-                                    &lt;
-                                </Button>
-
-                                <Button Command="{Binding DecreaseSolutionIndexCommand}"
-                                        CommandParameter="{Binding SelectedIncludedConnection}">
-                                    Up
-                                </Button>
-
-                                <Button Command="{Binding IncreaseSolutionIndexCommand}"
-                                        CommandParameter="{Binding SelectedIncludedConnection}">
-                                    Down
-                                </Button>
-                            </StackPanel>
-
-                            <ListBox Grid.Column="2"
-                                     Grid.Row="0"
-                                     ItemsSource="{Binding IncludedConnections}"
-                                     SelectedItem="{Binding SelectedIncludedConnection}">
-                            </ListBox>
-
-                            <StackPanel Grid.Column="0"
-                                        Grid.ColumnSpan="3"
-                                        Grid.Row="1"
-                                        HorizontalAlignment="Center"
-                                        Margin="0,10"
-                                        Orientation="Horizontal">
-
-                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Solution Name</TextBlock>
-
-                                <TextBox x:Name="SolutionNameTextBox" Width="200" Text="Solution" />
-
-                                <ComboBox x:Name="ArchitectureComboBox"
-                                          ItemsSource="{Binding ArchitectureOptions}"
-                                          Margin="10,0"
-                                          SelectedItem="{Binding SelectedArchitecture}"
-                                          VerticalAlignment="Center"
-                                          Width="80">
-                                </ComboBox>
-
-                                <Button Click="PublishSolutionClick">
-                                    <TextBlock Margin="20,0">Publish Solution</TextBlock>
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-                    </TabItem>
-
                     <TabItem Header="About">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -425,9 +429,96 @@
                         </Grid>
                     </TabItem>
                 </TabControl>
+
+                <Grid Background="{StaticResource QCBackground}"
+                      DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}"
+                      Visibility="{Binding SolutionsVisibility, FallbackValue=Collapsed}">
+                    <Grid.Resources>
+                        <Style TargetType="ListBox">
+                            <Setter Property="Background" Value="{StaticResource QCBackground}" />
+                            <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ListBox ItemsSource="{Binding ExcludedConnections}"
+                             SelectedItem="{Binding SelectedExcludedConnection}">
+                    </ListBox>
+
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0"
+                                VerticalAlignment="Center">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                <Setter Property="Margin" Value="5" />
+                                <Setter Property="Width" Value="70" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Button Command="{Binding AddToSolutionCommand}"
+                                CommandParameter="{Binding SelectedExcludedConnection}">
+                            &gt;
+                        </Button>
+
+                        <Button Command="{Binding RemoveFromSolutionCommand}"
+                                CommandParameter="{Binding SelectedIncludedConnection}">
+                            &lt;
+                        </Button>
+
+                        <Button Command="{Binding DecreaseSolutionIndexCommand}"
+                                CommandParameter="{Binding SelectedIncludedConnection}">
+                            Up
+                        </Button>
+
+                        <Button Command="{Binding IncreaseSolutionIndexCommand}"
+                                CommandParameter="{Binding SelectedIncludedConnection}">
+                            Down
+                        </Button>
+                    </StackPanel>
+
+                    <ListBox Grid.Column="2"
+                             Grid.Row="0"
+                             ItemsSource="{Binding IncludedConnections}"
+                             SelectedItem="{Binding SelectedIncludedConnection}">
+                    </ListBox>
+
+                    <StackPanel Grid.Column="0"
+                                Grid.ColumnSpan="3"
+                                Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                Margin="0,10"
+                                Orientation="Horizontal">
+
+                        <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Solution Name</TextBlock>
+
+                        <TextBox x:Name="SolutionNameTextBox" Width="200" Text="Solution" />
+
+                        <ComboBox x:Name="ArchitectureComboBox"
+                                  ItemsSource="{Binding ArchitectureOptions}"
+                                  Margin="10,0"
+                                  SelectedItem="{Binding SelectedArchitecture}"
+                                  VerticalAlignment="Center"
+                                  Width="80">
+                        </ComboBox>
+
+                        <Button Click="PublishSolutionClick">
+                            <TextBlock Margin="20,0">Publish Solution</TextBlock>
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
-        
+
         <Grid x:Name="updatingMessageGrid" Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility, FallbackValue=Collapsed}">
             <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         </Grid>

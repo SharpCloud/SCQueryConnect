@@ -10,6 +10,7 @@ using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
@@ -149,11 +150,27 @@ namespace SCQueryConnect
             }
         }
 
+        public ObservableCollection<QueryData> Connections
+        {
+            get => _connections;
+
+            set
+            {
+                if (_connections != value)
+                {
+                    _connections = value;
+                    OnPropertyChanged(nameof(Connections));
+
+                    _solutionViewModel.SetConnections(_connections);
+                }
+            }
+        }
+
         private QueryData SelectedQueryData => connectionList.SelectedItem as QueryData;
 
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
-        private readonly SmartObservableCollection<QueryData> _connections = new SmartObservableCollection<QueryData>();
+        private ObservableCollection<QueryData> _connections;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly ISolutionViewModel _solutionViewModel;
         private readonly IConnectionNameValidator _connectionNameValidator;
@@ -185,8 +202,6 @@ namespace SCQueryConnect
             DataContext = this;
 
             _solutionViewModel = solutionViewModel;
-            _solutionViewModel.SetConnections(_connections);
-
             _connectionNameValidator = connectionNameValidator;
             _connectionStringHelper = connectionStringHelper;
 
@@ -321,8 +336,7 @@ namespace SCQueryConnect
                 collection.AddRange(loaded.Where(qd => qd != null));
                 
                 var decrypted = CreateDecryptedPasswordConnections(collection);
-                _connections.Clear();
-                _connections.AddRange(decrypted);
+                Connections = new ObservableCollection<QueryData>(decrypted);
             }
             else
             {   // create some sample settings
@@ -639,9 +653,9 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
         }
 
-        private SmartObservableCollection<QueryData> CreateEncryptedPasswordConnections(SmartObservableCollection<QueryData> connections)
+        private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
         {
-            var newConnections = new SmartObservableCollection<QueryData>();
+            var newConnections = new ObservableCollection<QueryData>();
 
             foreach (var connection in connections)
             {

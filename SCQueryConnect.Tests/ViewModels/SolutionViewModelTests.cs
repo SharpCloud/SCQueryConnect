@@ -1,12 +1,17 @@
 ﻿using NUnit.Framework;
 using SCQueryConnect.ViewModels;
 using System.Linq;
+using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SCQueryConnect.Tests.ViewModels
 {
     [TestFixture]
     public class SolutionViewModelTests
     {
+        private const string SolutionName = "SolutionName";
+
         [Test]
         public void ConnectionsAreFiltered()
         {
@@ -20,11 +25,13 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = selectedName,
+                    Solution = SolutionName,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
-                    Name = availableName
+                    Name = availableName,
+                    Solution = SolutionName
                 }
             };
 
@@ -57,11 +64,13 @@ namespace SCQueryConnect.Tests.ViewModels
             {
                 new QueryData
                 {
-                    Name = dataA
+                    Name = dataA,
+                    Solution = SolutionName
                 },
                 new QueryData
                 {
-                    Name = dataB
+                    Name = dataB,
+                    Solution = SolutionName
                 }
             };
 
@@ -97,17 +106,20 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
+                    Solution = SolutionName,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
+                    Solution = SolutionName,
                     SolutionIndex = 2
                 }
             };
 
             var vm = new SolutionViewModel();
             vm.SetConnections(data);
+            vm.SelectedSolution = SolutionName;
 
             // Act
 
@@ -137,11 +149,13 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
+                    Solution = SolutionName,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
+                    Solution = SolutionName,
                     SolutionIndex = 2
                 }
             };
@@ -177,11 +191,13 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
+                    Solution = SolutionName,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
+                    Solution = SolutionName,
                     SolutionIndex = 2
                 }
             };
@@ -202,6 +218,58 @@ namespace SCQueryConnect.Tests.ViewModels
 
             var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
             Assert.AreEqual(0, excludedConnections.Length);
+        }
+
+        [Test]
+        public void SettingSelectedSolutionAlsoSetsQueryDataSelectedSolution()
+        {
+            // Arrange
+
+            var data = new[]
+            {
+                new QueryData(),
+                new QueryData()
+            };
+
+            var vm = new SolutionViewModel();
+            vm.SetConnections(data);
+
+            // Act
+
+            vm.SelectedSolution = SolutionName;
+
+            // Assert
+
+            var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
+            var allSet = connections.All(c => c.Solution == SolutionName);
+            
+            Assert.AreEqual(2, connections.Length);
+            Assert.IsTrue(allSet);
+        }
+
+        [Apartment(ApartmentState.STA)]
+        [TestCase("Connections", Visibility.Visible, Visibility.Collapsed)]
+        [TestCase("Solutions", Visibility.Collapsed, Visibility.Visible)]
+        public void SettingSelectedParentTabSetsVisibilities(
+            string tabHeader,
+            Visibility expectedConnectionsVisibility,
+            Visibility expectedSolutionsVisibility)
+        {
+            // Arrange
+
+            var vm = new SolutionViewModel();
+
+            // Act
+
+            vm.SelectedParentTab = new TabItem
+            {
+                Header = tabHeader
+            };
+
+            // Assert
+
+            Assert.AreEqual(expectedConnectionsVisibility, vm.ConnectionsVisibility);
+            Assert.AreEqual(expectedSolutionsVisibility, vm.SolutionsVisibility);
         }
     }
 }

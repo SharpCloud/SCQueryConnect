@@ -1,5 +1,6 @@
 ﻿using SCQueryConnect.Common;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Serialization;
 
@@ -49,7 +50,45 @@ namespace SCQueryConnect
         [IgnoreDataMember]
         public DataView QueryResultsRels { get; set; }
         [IgnoreDataMember]
-        public int SolutionIndex { get; set; } = DefaultSolutionIndex;
+        public string Solution { get; set; }
+
+        [IgnoreDataMember]
+        public int SolutionIndex
+        {
+            get
+            {
+                if (SolutionIndexes == null)
+                {
+                    SolutionIndexes = new Dictionary<string, int>();
+                }
+
+                var index = !string.IsNullOrWhiteSpace(Solution) && SolutionIndexes.ContainsKey(Solution)
+                    ? SolutionIndexes[Solution]
+                    : DefaultSolutionIndex;
+
+                return index;
+            }
+
+            set
+            {
+                if (SolutionIndexes == null)
+                {
+                    SolutionIndexes = new Dictionary<string, int>();
+                }
+
+                if (SolutionIndexes.ContainsKey(Solution))
+                {
+                    SolutionIndexes[Solution] = value;
+                }
+                else
+                {
+                    SolutionIndexes.Add(Solution, value);
+                }
+            }
+        }
+
+        [DataMember]
+        public Dictionary<string, int> SolutionIndexes { get; set; }
 
         public string FormattedConnectionString => ConnectionsString
             .Replace("{0}", FileName)
@@ -201,6 +240,11 @@ namespace SCQueryConnect
                 }
                 return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
             }
+        }
+
+        public void UnsetSolutionIndex(string solutionName)
+        {
+            SolutionIndexes.Remove(solutionName);
         }
     }
 }

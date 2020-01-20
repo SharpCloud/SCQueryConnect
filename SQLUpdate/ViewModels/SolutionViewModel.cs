@@ -2,9 +2,12 @@
 using SCQueryConnect.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace SCQueryConnect.ViewModels
@@ -19,6 +22,10 @@ namespace SCQueryConnect.ViewModels
         private QueryData _selectedExcludedConnection;
         private QueryData _selectedIncludedConnection;
         private string _selectedArchitecture;
+        private string _selectedSolution;
+        private TabItem _selectedParentTab;
+        private Visibility _connectionsVisibility;
+        private Visibility _solutionsVisibility;
 
         public const string ArchitectureAuto = "Auto";
         public const string Architecture64 = "64 bit";
@@ -84,6 +91,8 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
+        public ObservableCollection<string> Solutions { get; } = new ObservableCollection<string>();
+
         public ActionCommand<QueryData> AddToSolutionCommand { get; }
         public ActionCommand<QueryData> RemoveFromSolutionCommand { get; }
         public ActionCommand<QueryData> DecreaseSolutionIndexCommand { get; }
@@ -109,6 +118,80 @@ namespace SCQueryConnect.ViewModels
             Architecture64,
             Architecture32
         };
+
+        public string SelectedSolution
+        {
+            get => _selectedSolution;
+
+            set
+            {
+                if (_selectedSolution != value)
+                {
+                    _selectedSolution = value;
+                    OnPropertyChanged();
+
+                    foreach (var connection in _connections)
+                    {
+                        connection.Solution = value;
+                    }
+                }
+            }
+        }
+
+        public TabItem SelectedParentTab
+        {
+            get => _selectedParentTab;
+
+            set
+            {
+                if (_selectedParentTab != value)
+                {
+                    _selectedParentTab = value;
+                    OnPropertyChanged();
+
+                    switch (_selectedParentTab.Header)
+                    {
+                        case "Connections":
+                            ConnectionsVisibility = Visibility.Visible;
+                            SolutionsVisibility = Visibility.Collapsed;
+                            break;
+
+                        case "Solutions":
+                            ConnectionsVisibility = Visibility.Collapsed;
+                            SolutionsVisibility = Visibility.Visible;
+                            break;
+                    }
+                }
+            }
+        }
+
+        public Visibility ConnectionsVisibility
+        {
+            get => _connectionsVisibility;
+
+            set
+            {
+                if (_connectionsVisibility != value)
+                {
+                    _connectionsVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public Visibility SolutionsVisibility
+        {
+            get => _solutionsVisibility;
+
+            set
+            {
+                if (_solutionsVisibility != value)
+                {
+                    _solutionsVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public SolutionViewModel()
         {
@@ -166,7 +249,7 @@ namespace SCQueryConnect.ViewModels
 
         public void RemoveFromSolution(QueryData data)
         {
-            data.SolutionIndex = QueryData.DefaultSolutionIndex;
+            data.UnsetSolutionIndex(SelectedSolution);
             RefreshCollectionViews();
         }
 
