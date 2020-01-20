@@ -8,7 +8,7 @@ namespace SCQueryConnect
     [DataContract]
     public class QueryData
     {
-        public const int DefaultBatchSequenceIndex = -2;
+        public const int DefaultSolutionIndex = -2;
 
         [DataMember]
         public string Name { get; set; }
@@ -49,7 +49,7 @@ namespace SCQueryConnect
         [IgnoreDataMember]
         public DataView QueryResultsRels { get; set; }
         [IgnoreDataMember]
-        public int BatchSequenceIndex { get; set; } = DefaultBatchSequenceIndex;
+        public int SolutionIndex { get; set; } = DefaultSolutionIndex;
 
         public string FormattedConnectionString => ConnectionsString
             .Replace("{0}", FileName)

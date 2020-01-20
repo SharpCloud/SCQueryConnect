@@ -280,8 +280,8 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="Batch Sequence" >
-                        <Grid DataContext="{Binding BatchSequenceViewModel, Source={StaticResource ViewModelLocator}}">
+                    <TabItem Header="Solution" >
+                        <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}">
                             <Grid.Resources>
                                 <Style TargetType="ListBox">
                                     <Setter Property="Background" Value="{StaticResource QCBackground}" />
@@ -314,22 +314,22 @@
                                     </Style>
                                 </StackPanel.Resources>
 
-                                <Button Command="{Binding AddToBatchCommand}"
+                                <Button Command="{Binding AddToSolutionCommand}"
                                         CommandParameter="{Binding SelectedExcludedConnection}">
                                     &gt;
                                 </Button>
 
-                                <Button Command="{Binding RemoveFromBatchCommand}"
+                                <Button Command="{Binding RemoveFromSolutionCommand}"
                                         CommandParameter="{Binding SelectedIncludedConnection}">
                                     &lt;
                                 </Button>
 
-                                <Button Command="{Binding DecreaseBatchIndexCommand}"
+                                <Button Command="{Binding DecreaseSolutionIndexCommand}"
                                         CommandParameter="{Binding SelectedIncludedConnection}">
                                     Up
                                 </Button>
 
-                                <Button Command="{Binding IncreaseBatchIndexCommand}"
+                                <Button Command="{Binding IncreaseSolutionIndexCommand}"
                                         CommandParameter="{Binding SelectedIncludedConnection}">
                                     Down
                                 </Button>
@@ -348,9 +348,9 @@
                                         Margin="0,10"
                                         Orientation="Horizontal">
 
-                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Sequence Name</TextBlock>
+                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Solution Name</TextBlock>
 
-                                <TextBox x:Name="SequenceNameTextBox" Width="200" Text="BatchSequence" />
+                                <TextBox x:Name="SolutionNameTextBox" Width="200" Text="Solution" />
 
                                 <ComboBox x:Name="ArchitectureComboBox"
                                           ItemsSource="{Binding ArchitectureOptions}"
@@ -360,8 +360,8 @@
                                           Width="80">
                                 </ComboBox>
 
-                                <Button Click="GenerateBatchSequenceClick">
-                                    <TextBlock Margin="20,0">Generate Batch Sequence</TextBlock>
+                                <Button Click="PublishSolutionClick">
+                                    <TextBlock Margin="20,0">Publish Solution</TextBlock>
                                 </Button>
                             </StackPanel>
                         </Grid>

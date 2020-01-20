@@ -4,7 +4,6 @@ namespace SCQueryConnect.ViewModels
 {
     public class ViewModelLocator
     {
-        public static IBatchSequenceViewModel BatchSequenceViewModel =>
-            Bootstrapper.Resolve<IBatchSequenceViewModel>();
+        public static ISolutionViewModel SolutionViewModel => Bootstrapper.Resolve<ISolutionViewModel>();
     }
 }

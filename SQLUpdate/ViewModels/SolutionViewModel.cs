@@ -9,9 +9,9 @@ using System.Windows.Data;
 
 namespace SCQueryConnect.ViewModels
 {
-    public class BatchSequenceViewModel : IBatchSequenceViewModel
+    public class SolutionViewModel : ISolutionViewModel
     {
-        private const int BatchSequenceIndexMultiplier = 2;
+        private const int SolutionIndexMultiplier = 2;
 
         private ICollectionView _excludedConnections;
         private ICollectionView _includedConnections;
@@ -84,10 +84,10 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public ActionCommand<QueryData> AddToBatchCommand { get; }
-        public ActionCommand<QueryData> RemoveFromBatchCommand { get; }
-        public ActionCommand<QueryData> DecreaseBatchIndexCommand { get; }
-        public ActionCommand<QueryData> IncreaseBatchIndexCommand { get; }
+        public ActionCommand<QueryData> AddToSolutionCommand { get; }
+        public ActionCommand<QueryData> RemoveFromSolutionCommand { get; }
+        public ActionCommand<QueryData> DecreaseSolutionIndexCommand { get; }
+        public ActionCommand<QueryData> IncreaseSolutionIndexCommand { get; }
 
         public string SelectedArchitecture
         {
@@ -110,25 +110,25 @@ namespace SCQueryConnect.ViewModels
             Architecture32
         };
 
-        public BatchSequenceViewModel()
+        public SolutionViewModel()
         {
-            AddToBatchCommand = new ActionCommand<QueryData>(
-                AddToBatch,
+            AddToSolutionCommand = new ActionCommand<QueryData>(
+                AddToSolution,
                 qd => qd != null);
 
-            RemoveFromBatchCommand = new ActionCommand<QueryData>(
-                RemoveFromBatch,
+            RemoveFromSolutionCommand = new ActionCommand<QueryData>(
+                RemoveFromSolution,
                 qd => qd != null);
 
-            DecreaseBatchIndexCommand = new ActionCommand<QueryData>(
-                DecreaseBatchIndex,
-                qd => qd != null && qd.BatchSequenceIndex > 0);
+            DecreaseSolutionIndexCommand = new ActionCommand<QueryData>(
+                DecreaseSolutionIndex,
+                qd => qd != null && qd.SolutionIndex > 0);
 
-            IncreaseBatchIndexCommand = new ActionCommand<QueryData>(
-                IncreaseBatchIndex,
+            IncreaseSolutionIndexCommand = new ActionCommand<QueryData>(
+                IncreaseSolutionIndex,
                 qd => qd != null &&
-                      qd.BatchSequenceIndex / 2 < _connections.Count(c =>
-                          c.BatchSequenceIndex > QueryData.DefaultBatchSequenceIndex) - 1);
+                      qd.SolutionIndex / 2 < _connections.Count(c =>
+                          c.SolutionIndex > QueryData.DefaultSolutionIndex) - 1);
 
             SelectedArchitecture = ArchitectureAuto;
         }
@@ -139,68 +139,68 @@ namespace SCQueryConnect.ViewModels
 
             ExcludedConnections = new ListCollectionView((IList) connections)
             {
-                Filter = obj => ((QueryData)obj).BatchSequenceIndex <= QueryData.DefaultBatchSequenceIndex
+                Filter = obj => ((QueryData)obj).SolutionIndex <= QueryData.DefaultSolutionIndex
             };
 
             IncludedConnections = new ListCollectionView((IList) connections)
             {
-                Filter = obj => ((QueryData)obj).BatchSequenceIndex > QueryData.DefaultBatchSequenceIndex
+                Filter = obj => ((QueryData)obj).SolutionIndex > QueryData.DefaultSolutionIndex
             };
 
             var sort = new SortDescription(
-                nameof(QueryData.BatchSequenceIndex),
+                nameof(QueryData.SolutionIndex),
                 ListSortDirection.Ascending);
 
             ExcludedConnections.SortDescriptions.Add(sort);
             IncludedConnections.SortDescriptions.Add(sort);
         }
 
-        public void AddToBatch(QueryData data)
+        public void AddToSolution(QueryData data)
         {
             var count = _connections.Count(c =>
-                c.BatchSequenceIndex > QueryData.DefaultBatchSequenceIndex);
+                c.SolutionIndex > QueryData.DefaultSolutionIndex);
 
-            data.BatchSequenceIndex = count * BatchSequenceIndexMultiplier;
+            data.SolutionIndex = count * SolutionIndexMultiplier;
             RefreshCollectionViews();
         }
 
-        public void RemoveFromBatch(QueryData data)
+        public void RemoveFromSolution(QueryData data)
         {
-            data.BatchSequenceIndex = QueryData.DefaultBatchSequenceIndex;
+            data.SolutionIndex = QueryData.DefaultSolutionIndex;
             RefreshCollectionViews();
         }
 
-        public void DecreaseBatchIndex(QueryData data)
+        public void DecreaseSolutionIndex(QueryData data)
         {
-            var newIndex = data.BatchSequenceIndex - BatchSequenceIndexMultiplier - 1;
-            data.BatchSequenceIndex = newIndex;
+            var newIndex = data.SolutionIndex - SolutionIndexMultiplier - 1;
+            data.SolutionIndex = newIndex;
             RefreshCollectionViews();
             
-            DecreaseBatchIndexCommand.RaiseCanExecuteChanged();
-            IncreaseBatchIndexCommand.RaiseCanExecuteChanged();
+            DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
+            IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
         }
 
-        public void IncreaseBatchIndex(QueryData data)
+        public void IncreaseSolutionIndex(QueryData data)
         {
-            var newIndex = data.BatchSequenceIndex + BatchSequenceIndexMultiplier + 1;
-            data.BatchSequenceIndex = newIndex;
+            var newIndex = data.SolutionIndex + SolutionIndexMultiplier + 1;
+            data.SolutionIndex = newIndex;
             RefreshCollectionViews();
             
-            DecreaseBatchIndexCommand.RaiseCanExecuteChanged();
-            IncreaseBatchIndexCommand.RaiseCanExecuteChanged();
+            DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
+            IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
         }
 
         private void RefreshCollectionViews()
         {
-            // Reassign all batch index values
+            // Reassign all solution index values
             var ordered = _connections
-                .Where(c => c.BatchSequenceIndex > QueryData.DefaultBatchSequenceIndex)
-                .OrderBy(c => c.BatchSequenceIndex).ToArray();
+                .Where(c => c.SolutionIndex > QueryData.DefaultSolutionIndex)
+                .OrderBy(c => c.SolutionIndex).ToArray();
 
             for (var i = ordered.Length - 1; i >= 0; i--)
             {
                 var connection = ordered[i];
-                connection.BatchSequenceIndex = i * BatchSequenceIndexMultiplier;
+                connection.SolutionIndex = i * SolutionIndexMultiplier;
             }
 
             ExcludedConnections.Refresh();
@@ -209,10 +209,10 @@ namespace SCQueryConnect.ViewModels
 
         private void RaiseCanExecuteChangedForAllCommands()
         {
-            AddToBatchCommand.RaiseCanExecuteChanged();
-            RemoveFromBatchCommand.RaiseCanExecuteChanged();
-            DecreaseBatchIndexCommand.RaiseCanExecuteChanged();
-            IncreaseBatchIndexCommand.RaiseCanExecuteChanged();
+            AddToSolutionCommand.RaiseCanExecuteChanged();
+            RemoveFromSolutionCommand.RaiseCanExecuteChanged();
+            DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
+            IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

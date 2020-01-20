@@ -5,7 +5,7 @@ using System.Linq;
 namespace SCQueryConnect.Tests.ViewModels
 {
     [TestFixture]
-    public class BatchSequenceViewModelTests
+    public class SolutionViewModelTests
     {
         [Test]
         public void ConnectionsAreFiltered()
@@ -20,7 +20,7 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = selectedName,
-                    BatchSequenceIndex = 0
+                    SolutionIndex = 0
                 },
                 new QueryData
                 {
@@ -28,7 +28,7 @@ namespace SCQueryConnect.Tests.ViewModels
                 }
             };
 
-            var vm = new BatchSequenceViewModel();
+            var vm = new SolutionViewModel();
 
             // Act
 
@@ -65,13 +65,13 @@ namespace SCQueryConnect.Tests.ViewModels
                 }
             };
 
-            var vm = new BatchSequenceViewModel();
+            var vm = new SolutionViewModel();
             vm.SetConnections(data);
 
             // Act
 
-            vm.AddToBatch(data[1]);
-            vm.AddToBatch(data[0]);
+            vm.AddToSolution(data[1]);
+            vm.AddToSolution(data[0]);
 
             // Assert
 
@@ -97,21 +97,21 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    BatchSequenceIndex = 0
+                    SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    BatchSequenceIndex = 2
+                    SolutionIndex = 2
                 }
             };
 
-            var vm = new BatchSequenceViewModel();
+            var vm = new SolutionViewModel();
             vm.SetConnections(data);
 
             // Act
 
-            vm.RemoveFromBatch(data[0]);
+            vm.RemoveFromSolution(data[0]);
 
             // Assert
 
@@ -137,21 +137,21 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    BatchSequenceIndex = 0
+                    SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    BatchSequenceIndex = 2
+                    SolutionIndex = 2
                 }
             };
 
-            var vm = new BatchSequenceViewModel();
+            var vm = new SolutionViewModel();
             vm.SetConnections(data);
 
             // Act
 
-            vm.DecreaseBatchIndex(data[1]);
+            vm.DecreaseSolutionIndex(data[1]);
 
             // Assert
 
@@ -177,21 +177,21 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    BatchSequenceIndex = 0
+                    SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    BatchSequenceIndex = 2
+                    SolutionIndex = 2
                 }
             };
 
-            var vm = new BatchSequenceViewModel();
+            var vm = new SolutionViewModel();
             vm.SetConnections(data);
 
             // Act
 
-            vm.IncreaseBatchIndex(data[0]);
+            vm.IncreaseSolutionIndex(data[0]);
 
             // Assert
 

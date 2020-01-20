@@ -149,13 +149,13 @@
     <Compile Include="Commands\GoToUrl.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
-    <Compile Include="Interfaces\IBatchSequenceViewModel.cs" />
+    <Compile Include="Interfaces\ISolutionViewModel.cs" />
     <Compile Include="Interfaces\IConnectionNameValidator.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataChecker.cs" />
     <Compile Include="UIRelationshipsDataChecker.cs" />
-    <Compile Include="ViewModels\BatchSequenceViewModel.cs" />
+    <Compile Include="ViewModels\SolutionViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>

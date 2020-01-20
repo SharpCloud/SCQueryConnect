@@ -144,14 +144,14 @@
     <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
       <Link>Helpers\UrlHelper.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IBatchSequenceViewModel.cs">
-      <Link>Interfaces\IBatchSequenceViewModel.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IConnectionNameValidator.cs">
       <Link>Interfaces\IConnectionNameValidator.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
       <Link>Interfaces\IPostDeserializeAction.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\ISolutionViewModel.cs">
+      <Link>Interfaces\ISolutionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
@@ -174,14 +174,14 @@
     <Compile Include="..\SQLUpdate\UIRelationshipsDataChecker.cs">
       <Link>UIRelationshipsDataChecker.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\ViewModels\BatchSequenceViewModel.cs">
-      <Link>ViewModels\BatchSequenceViewModel.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
       <Link>ViewModels\ProxyViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\SelectedStoryViewModel.cs">
       <Link>ViewModels\SelectedStoryViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\SolutionViewModel.cs">
+      <Link>ViewModels\SolutionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
       <Link>ViewModels\ViewModelLocator.cs</Link>
