@@ -339,5 +339,33 @@ namespace SCQueryConnect.Tests.ViewModels
             var containsSolutionId = allKeys.Contains(solution.Id);
             Assert.IsFalse(containsSolutionId);
         }
+
+        [Test]
+        public void ConnectionsListsAreEmptyIfNoSolutionIsSelected()
+        {
+            // Arrange
+
+            var data = new[]
+            {
+                new QueryData(),
+                new QueryData()
+            };
+
+            var vm = new SolutionViewModel();
+            vm.SetConnections(data);
+            vm.AddNewSolution();
+
+            // Act
+
+            vm.SelectedSolution = null;
+
+            // Assert
+
+            var included = vm.IncludedConnections.Cast<QueryData>().Count();
+            var excluded = vm.ExcludedConnections.Cast<QueryData>().Count();
+            
+            Assert.AreEqual(0, included);
+            Assert.AreEqual(0, excluded);
+        }
     }
 }

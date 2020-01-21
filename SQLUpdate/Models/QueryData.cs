@@ -53,16 +53,23 @@ namespace SCQueryConnect.Models
         public string Solution { get; set; }
 
         [IgnoreDataMember]
-        public int SolutionIndex
+        public int? SolutionIndex
         {
             get
             {
+                var noSolution = string.IsNullOrWhiteSpace(Solution);
+
+                if (noSolution)
+                {
+                    return null;
+                }
+
                 if (SolutionIndexes == null)
                 {
                     SolutionIndexes = new Dictionary<string, int>();
                 }
 
-                var index = !string.IsNullOrWhiteSpace(Solution) && SolutionIndexes.ContainsKey(Solution)
+                var index = SolutionIndexes.ContainsKey(Solution)
                     ? SolutionIndexes[Solution]
                     : DefaultSolutionIndex;
 
@@ -78,11 +85,18 @@ namespace SCQueryConnect.Models
 
                 if (SolutionIndexes.ContainsKey(Solution))
                 {
-                    SolutionIndexes[Solution] = value;
+                    if (value.HasValue)
+                    {
+                        SolutionIndexes[Solution] = value.Value;
+                    }
+                    else
+                    {
+                        UnsetSolutionIndex(Solution);
+                    }
                 }
-                else
+                else if (value.HasValue)
                 {
-                    SolutionIndexes.Add(Solution, value);
+                    SolutionIndexes.Add(Solution, value.Value);
                 }
             }
         }

@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\ConnectionNameValidatorTests.cs" />
+    <Compile Include="Models\QueryDataTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\SolutionViewModelTests.cs" />
   </ItemGroup>

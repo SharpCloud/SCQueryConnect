@@ -134,14 +134,12 @@ namespace SCQueryConnect.ViewModels
                     _selectedSolution = value;
                     OnPropertyChanged();
 
-                    if (value != null)
+                    foreach (var connection in _connections)
                     {
-                        foreach (var connection in _connections)
-                        {
-                            connection.Solution = value.Id;
-                        }
+                        connection.Solution = value?.Id;
                     }
 
+                    RefreshCollectionViews();
                     RaiseCanExecuteChangedForAllCommands();
                 }
             }
@@ -239,12 +237,30 @@ namespace SCQueryConnect.ViewModels
 
             ExcludedConnections = new ListCollectionView((IList) connections)
             {
-                Filter = obj => ((QueryData)obj).SolutionIndex <= QueryData.DefaultSolutionIndex
+                Filter = obj =>
+                {
+                    var query = obj as QueryData;
+
+                    var included =
+                        query?.SolutionIndex != null &&
+                        query.SolutionIndex <= QueryData.DefaultSolutionIndex;
+
+                    return included;
+                }
             };
 
             IncludedConnections = new ListCollectionView((IList) connections)
             {
-                Filter = obj => ((QueryData)obj).SolutionIndex > QueryData.DefaultSolutionIndex
+                Filter = obj =>
+                {
+                    var query = obj as QueryData;
+
+                    var included =
+                        query?.SolutionIndex != null &&
+                        query.SolutionIndex > QueryData.DefaultSolutionIndex;
+
+                    return included;
+                }
             };
 
             var sort = new SortDescription(
