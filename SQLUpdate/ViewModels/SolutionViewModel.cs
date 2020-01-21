@@ -17,6 +17,9 @@ namespace SCQueryConnect.ViewModels
     {
         private const int SolutionIndexMultiplier = 2;
 
+        private readonly IConnectionNameValidator _nameValidator;
+        private readonly IMessageService _messageService;
+
         private ICollectionView _excludedConnections;
         private ICollectionView _includedConnections;
         private IList<QueryData> _connections;
@@ -144,17 +147,45 @@ namespace SCQueryConnect.ViewModels
             {
                 if (_selectedSolution != value)
                 {
+                    if (_selectedSolution != null)
+                    {
+                        _selectedSolution.PropertyChanged -= SelectedSolutionPropertyChanged;
+                    }
+
                     _selectedSolution = value;
                     OnPropertyChanged();
 
-                    foreach (var connection in _connections)
+                    if (_connections != null)
                     {
-                        connection.Solution = value?.Id;
+                        foreach (var connection in _connections)
+                        {
+                            connection.Solution = value?.Id;
+                        }
+
+                        RefreshCollectionViews();
                     }
 
-                    RefreshCollectionViews();
                     RaiseCanExecuteChangedForAllCommands();
+
+                    if (_selectedSolution != null)
+                    {
+                        _selectedSolution.PropertyChanged += SelectedSolutionPropertyChanged;
+                    }
                 }
+            }
+        }
+
+        private void SelectedSolutionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var args = (ExtendedPropertyChangedEventArgs) e;
+            var msg = _nameValidator.Validate((string) args.NewValue);
+            var isValid = string.IsNullOrWhiteSpace(msg);
+            
+            if (!isValid)
+            {
+                var solution = (Solution) sender;
+                solution.Name = (string) args.OldValue;
+                _messageService.ShowMessage(msg);
             }
         }
 
@@ -213,8 +244,13 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public SolutionViewModel()
+        public SolutionViewModel(
+            IConnectionNameValidator nameValidator,
+            IMessageService messageService)
         {
+            _nameValidator = nameValidator;
+            _messageService = messageService;
+
             AddNewSolutionCommand = new ActionCommand<object>(
                 obj => AddNewSolution(),
                 obj => true);

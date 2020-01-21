@@ -147,9 +147,12 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\GoToUrl.cs" />
+    <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
+    <Compile Include="Helpers\MessageService.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Interfaces\IActionCommand.cs" />
+    <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Interfaces\ISolutionViewModel.cs" />
     <Compile Include="Interfaces\IConnectionNameValidator.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />

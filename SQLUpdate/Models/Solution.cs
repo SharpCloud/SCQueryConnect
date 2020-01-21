@@ -18,17 +18,24 @@ namespace SCQueryConnect.Models
             {
                 if (_name != value)
                 {
+                    var oldValue = _name;
                     _name = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(oldValue, _name);
                 }
             }
         }
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged(
+            object oldValue,
+            object newValue,
+            [CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new ExtendedPropertyChangedEventArgs(
+                oldValue,
+                newValue,
+                propertyName));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
+using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
 using System.Linq;
@@ -36,7 +38,9 @@ namespace SCQueryConnect.Tests.ViewModels
                 }
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
 
             // Act
 
@@ -75,7 +79,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 }
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
 
             // Act
@@ -123,7 +130,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 Id = SolutionId
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
             vm.SelectedSolution = solution;
 
@@ -166,7 +176,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 }
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
 
             // Act
@@ -208,7 +221,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 }
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
 
             // Act
@@ -237,7 +253,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData()
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
             
             var solution = new Solution();
@@ -265,7 +284,9 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
 
             // Act
 
@@ -291,7 +312,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData()
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
 
             // Act
@@ -319,7 +343,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData()
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
             vm.AddNewSolution();
 
@@ -351,7 +378,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData()
             };
 
-            var vm = new SolutionViewModel();
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
             vm.SetConnections(data);
             vm.AddNewSolution();
 
@@ -366,6 +396,78 @@ namespace SCQueryConnect.Tests.ViewModels
             
             Assert.AreEqual(0, included);
             Assert.AreEqual(0, excluded);
+        }
+
+        [Test]
+        public void SolutionNameCannotBeInvalid()
+        {
+            // Arrange
+
+            const string invalidMessage = "Invalid";
+            const string newName = "NewName";
+            const string originalName = "OriginalName";
+
+            var validator = Mock.Of<IConnectionNameValidator>(v =>
+                v.Validate(newName) == invalidMessage);
+
+            var messageService = Mock.Of<IMessageService>();
+
+            var vm = new SolutionViewModel(validator, messageService)
+            {
+                SelectedSolution = new Solution
+                {
+                    Name = originalName
+                }
+            };
+
+            // Act
+
+            vm.SelectedSolution.Name = newName;
+
+            // Assert
+
+            Mock.Get(validator).Verify(v =>
+                v.Validate(newName));
+
+            Mock.Get(messageService).Verify(s =>
+                s.ShowMessage(invalidMessage));
+
+            Assert.AreEqual(originalName, vm.SelectedSolution.Name);
+        }
+
+        [Test]
+        public void EventHandlersAreRemovedWhenSelectedSolutionIsChanged()
+        {
+            // Arrange
+
+            const string solutionName1 = "SolutionName1";
+            const string solutionName2 = "SolutionName2";
+
+            var validator = Mock.Of<IConnectionNameValidator>();
+            var messageService = Mock.Of<IMessageService>();
+
+            var vm = new SolutionViewModel(validator, messageService);
+
+            var solution1 = new Solution();
+            var solution2 = new Solution();
+
+            vm.SelectedSolution = solution1;
+            vm.SelectedSolution = solution2;
+
+            // Act
+
+            solution1.Name = solutionName1;
+            solution2.Name = solutionName2;
+
+            // Assert
+
+            Mock.Get(validator).Verify(v =>
+                v.Validate(solutionName1),
+                Times.Never);
+
+            Mock.Get(validator).Verify(v =>
+                v.Validate(solutionName2),
+                Times.Once);
         }
     }
 }

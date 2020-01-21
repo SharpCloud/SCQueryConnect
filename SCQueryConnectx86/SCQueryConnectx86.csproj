@@ -135,8 +135,14 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
       <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
+      <Link>ExtendedPropertyChangedEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\ConnectionNameValidator.cs">
       <Link>Helpers\ConnectionNameValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\MessageService.cs">
+      <Link>Helpers\MessageService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
@@ -149,6 +155,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IConnectionNameValidator.cs">
       <Link>Interfaces\IConnectionNameValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
+      <Link>Interfaces\IMessageService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
       <Link>Interfaces\IPostDeserializeAction.cs</Link>
