@@ -331,36 +331,55 @@ namespace SCQueryConnect
             if (File.Exists(file))
             {
                 // load our previous settings
-                var loaded = SaveHelper.DeserializeJSON<QueryData[]>(File.ReadAllText(file));
+                var loadedSaveData = SaveHelper.DeserializeJSON<SaveData>(File.ReadAllText(file));
+
+                IList<QueryData> encrypted;
+                if (loadedSaveData.Connections == null && loadedSaveData.Solutions == null)
+                {
+                    encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
+                }
+                else
+                {
+                    encrypted = loadedSaveData.Connections;
+                    
+                    _solutionViewModel.Solutions =
+                        new ObservableCollection<Solution>(loadedSaveData.Solutions);
+                }
+
+                var filtered = encrypted?.Where(qd => qd != null);
                 
-                var collection = new SmartObservableCollection<QueryData>();
-                collection.AddRange(loaded.Where(qd => qd != null));
-                
-                var decrypted = CreateDecryptedPasswordConnections(collection);
+                var decrypted = CreateDecryptedPasswordConnections(filtered);
                 Connections = new ObservableCollection<QueryData>(decrypted);
             }
             else
-            {   // create some sample settings
-                if (SQLString.Text != "SELECT * FROM TABLE" && ConnectionString.Text != "Server=.; Integrated Security=true; Database=demo")
+            {
+                // create some sample settings
+                if (SQLString.Text != "SELECT * FROM TABLE" &&
+                    ConnectionString.Text != "Server=.; Integrated Security=true; Database=demo")
                 {
-                    // user papbably already has setting we should save from last time
+                    // user probably already has setting we should save from last time
                     // create one based on old settings - which are already set up
-                    var pqd = new QueryData((DatabaseType)Int32.Parse(SaveHelper.RegRead("DBType", "0")));
+                    var pqd = new QueryData((DatabaseType) Int32.Parse(SaveHelper.RegRead("DBType", "0")));
                     pqd.Name = "Previous Connection";
-                    pqd.ConnectionsString = SaveHelper.RegRead("ConnectionString", "Server=.; Integrated Security=true; Database=demo");
+                    pqd.ConnectionsString = SaveHelper.RegRead("ConnectionString",
+                        "Server=.; Integrated Security=true; Database=demo");
                     pqd.QueryString = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
                     pqd.StoryId = StoryId.Text;
                     _connections.Add(pqd);
                 }
 
                 // add some examples
-                _connections.Add(new QueryData(DatabaseType.Excel)); 
-                _connections.Add(new QueryData(DatabaseType.Access));
-                _connections.Add(new QueryData(DatabaseType.SharepointList));
-                _connections.Add(new QueryData(DatabaseType.SQL));
-                _connections.Add(new QueryData(DatabaseType.ODBC));
-                _connections.Add(new QueryData(DatabaseType.ADO));
-                _connections.Add(new QueryData(DatabaseType.SharpCloudExcel));
+
+                Connections = new ObservableCollection<QueryData>(new[]
+                {
+                    new QueryData(DatabaseType.Excel),
+                    new QueryData(DatabaseType.Access),
+                    new QueryData(DatabaseType.SharepointList),
+                    new QueryData(DatabaseType.SQL),
+                    new QueryData(DatabaseType.ODBC),
+                    new QueryData(DatabaseType.ADO),
+                    new QueryData(DatabaseType.SharpCloudExcel)
+                });
             }
         }
 
@@ -632,8 +651,15 @@ namespace SCQueryConnect
             SaveSettings(SelectedQueryData);
 
             Directory.CreateDirectory(_localPath);
-            var toSave = CreateEncryptedPasswordConnections(_connections);
-            var s = SaveHelper.SerializeJSON(toSave);
+            var connectionsToSave = CreateEncryptedPasswordConnections(_connections);
+
+            var saveData = new SaveData
+            {
+                Connections = connectionsToSave,
+                Solutions = _solutionViewModel.Solutions
+            };
+
+            var s = SaveHelper.SerializeJSON(saveData);
             File.WriteAllText(_localPath + "/connections.json", s);
 
             SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());

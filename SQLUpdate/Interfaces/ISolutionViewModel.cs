@@ -23,7 +23,7 @@ namespace SCQueryConnect.Interfaces
         QueryData SelectedExcludedConnection { get; set; }
         QueryData SelectedIncludedConnection { get; set; }
 
-        ObservableCollection<Solution> Solutions { get; }
+        ObservableCollection<Solution> Solutions { get; set; }
 
         string SelectedArchitecture { get; set; }
         string[] ArchitectureOptions { get; }

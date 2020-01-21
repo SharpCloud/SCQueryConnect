@@ -153,6 +153,7 @@
     <Compile Include="Interfaces\ISolutionViewModel.cs" />
     <Compile Include="Interfaces\IConnectionNameValidator.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />
+    <Compile Include="Models\SaveData.cs" />
     <Compile Include="Models\Solution.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataChecker.cs" />

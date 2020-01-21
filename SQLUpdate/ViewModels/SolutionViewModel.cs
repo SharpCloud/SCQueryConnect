@@ -22,6 +22,7 @@ namespace SCQueryConnect.ViewModels
         private IList<QueryData> _connections;
         private QueryData _selectedExcludedConnection;
         private QueryData _selectedIncludedConnection;
+        private ObservableCollection<Solution> _solutions = new ObservableCollection<Solution>();
         private string _selectedArchitecture;
         private Solution _selectedSolution;
         private TabItem _selectedParentTab;
@@ -92,7 +93,19 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public ObservableCollection<Solution> Solutions { get; } = new ObservableCollection<Solution>();
+        public ObservableCollection<Solution> Solutions
+        {
+            get => _solutions;
+
+            set
+            {
+                if (_solutions != value)
+                {
+                    _solutions = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public IActionCommand AddNewSolutionCommand { get; }
         public IActionCommand RemoveSolutionCommand { get; }
