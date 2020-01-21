@@ -1,4 +1,4 @@
-﻿using SCQueryConnect.Commands;
+﻿using SCQueryConnect.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,19 +12,22 @@ namespace SCQueryConnect.Interfaces
         ICollectionView ExcludedConnections { get; }
         ICollectionView IncludedConnections { get; }
 
-        ActionCommand<QueryData> AddToSolutionCommand { get; }
-        ActionCommand<QueryData> RemoveFromSolutionCommand { get; }
-        ActionCommand<QueryData> DecreaseSolutionIndexCommand { get; }
-        ActionCommand<QueryData> IncreaseSolutionIndexCommand { get; }
+        IActionCommand AddNewSolutionCommand { get; }
+        IActionCommand RemoveSolutionCommand { get; }
+
+        IActionCommand IncludeInSolutionCommand { get; }
+        IActionCommand ExcludeFromSolutionCommand { get; }
+        IActionCommand DecreaseSolutionIndexCommand { get; }
+        IActionCommand IncreaseSolutionIndexCommand { get; }
 
         QueryData SelectedExcludedConnection { get; set; }
         QueryData SelectedIncludedConnection { get; set; }
 
-        ObservableCollection<string> Solutions { get; }
+        ObservableCollection<Solution> Solutions { get; }
 
         string SelectedArchitecture { get; set; }
         string[] ArchitectureOptions { get; }
-        string SelectedSolution { get; set; }
+        Solution SelectedSolution { get; set; }
 
         TabItem SelectedParentTab { get; set; }
         Visibility ConnectionsVisibility { get; set; }

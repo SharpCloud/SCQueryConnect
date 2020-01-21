@@ -1,9 +1,9 @@
-﻿using System;
-using System.Windows.Input;
+﻿using SCQueryConnect.Interfaces;
+using System;
 
 namespace SCQueryConnect.Commands
 {
-    public class ActionCommand<T> : ICommand
+    public class ActionCommand<T> : IActionCommand
     {
         private readonly Action<T> _action;
         private readonly Func<T, bool> _canExecute;

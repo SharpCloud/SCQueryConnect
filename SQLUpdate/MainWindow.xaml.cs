@@ -1295,7 +1295,7 @@ namespace SCQueryConnect
         {
             try
             {
-                var nameError = _connectionNameValidator.Validate(SolutionNameTextBox.Text);
+                var nameError = _connectionNameValidator.Validate(_solutionViewModel.SelectedSolution.Name);
                 var nameIsValid = string.IsNullOrWhiteSpace(nameError);
 
                 if (!nameIsValid)
@@ -1305,13 +1305,13 @@ namespace SCQueryConnect
                 }
 
                 var sb = new StringBuilder();
-                var sequenceFolder = GetFolder(SolutionNameTextBox.Text);
+                var sequenceFolder = GetFolder(_solutionViewModel.SelectedSolution.Name);
 
                 var notEmpty = Directory.EnumerateFileSystemEntries(sequenceFolder).Any();
                 if (notEmpty)
                 {
                     var result = MessageBox.Show(
-                        $"A folder named '{SolutionNameTextBox.Text}' already exist at this location, Do you want to replace?",
+                        $"A folder named '{_solutionViewModel.SelectedSolution.Name}' already exist at this location, Do you want to replace?",
                         "WARNING",
                         MessageBoxButton.YesNo);
 
@@ -1322,7 +1322,7 @@ namespace SCQueryConnect
                 }
 
                 Directory.Delete(sequenceFolder, true);
-                GetFolder(SolutionNameTextBox.Text);
+                GetFolder(_solutionViewModel.SelectedSolution.Name);
                 bool is32Bit;
 
                 switch (ArchitectureComboBox.SelectedItem)
@@ -1348,7 +1348,7 @@ namespace SCQueryConnect
                     var path = GenerateBatchFile(
                         is32Bit,
                         connection.ConnectionsString,
-                        SolutionNameTextBox.Text,
+                        _solutionViewModel.SelectedSolution.Name,
                         connection);
 
                     var suffix = GetFileSuffix(is32Bit);
@@ -1357,7 +1357,7 @@ namespace SCQueryConnect
                     sb.AppendLine($"\"{Path.Combine(path, filename)}\"");
                 }
 
-                var batchPath = Path.Combine(sequenceFolder, $"{SolutionNameTextBox.Text}.bat");
+                var batchPath = Path.Combine(sequenceFolder, $"{_solutionViewModel.SelectedSolution.Name}.bat");
                 var content = sb.ToString();
                 File.WriteAllText(batchPath, content);
                 Process.Start(sequenceFolder);

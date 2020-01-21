@@ -242,9 +242,9 @@ namespace SCQueryConnect
             }
         }
 
-        public void UnsetSolutionIndex(string solutionName)
+        public void UnsetSolutionIndex(string solutionId)
         {
-            SolutionIndexes.Remove(solutionName);
+            SolutionIndexes.Remove(solutionId);
         }
     }
 }

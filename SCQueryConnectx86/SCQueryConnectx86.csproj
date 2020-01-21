@@ -144,6 +144,9 @@
     <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
       <Link>Helpers\UrlHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IActionCommand.cs">
+      <Link>Interfaces\IActionCommand.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IConnectionNameValidator.cs">
       <Link>Interfaces\IConnectionNameValidator.cs</Link>
     </Compile>
@@ -155,6 +158,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\Solution.cs">
+      <Link>Models\Solution.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>

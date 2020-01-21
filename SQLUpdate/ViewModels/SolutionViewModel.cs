@@ -1,5 +1,6 @@
 ﻿using SCQueryConnect.Commands;
 using SCQueryConnect.Interfaces;
+using SCQueryConnect.Models;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,7 +23,7 @@ namespace SCQueryConnect.ViewModels
         private QueryData _selectedExcludedConnection;
         private QueryData _selectedIncludedConnection;
         private string _selectedArchitecture;
-        private string _selectedSolution;
+        private Solution _selectedSolution;
         private TabItem _selectedParentTab;
         private Visibility _connectionsVisibility;
         private Visibility _solutionsVisibility;
@@ -91,12 +92,15 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public ObservableCollection<string> Solutions { get; } = new ObservableCollection<string>();
+        public ObservableCollection<Solution> Solutions { get; } = new ObservableCollection<Solution>();
 
-        public ActionCommand<QueryData> AddToSolutionCommand { get; }
-        public ActionCommand<QueryData> RemoveFromSolutionCommand { get; }
-        public ActionCommand<QueryData> DecreaseSolutionIndexCommand { get; }
-        public ActionCommand<QueryData> IncreaseSolutionIndexCommand { get; }
+        public IActionCommand AddNewSolutionCommand { get; }
+        public IActionCommand RemoveSolutionCommand { get; }
+
+        public IActionCommand IncludeInSolutionCommand { get; }
+        public IActionCommand ExcludeFromSolutionCommand { get; }
+        public IActionCommand DecreaseSolutionIndexCommand { get; }
+        public IActionCommand IncreaseSolutionIndexCommand { get; }
 
         public string SelectedArchitecture
         {
@@ -119,7 +123,7 @@ namespace SCQueryConnect.ViewModels
             Architecture32
         };
 
-        public string SelectedSolution
+        public Solution SelectedSolution
         {
             get => _selectedSolution;
 
@@ -130,10 +134,15 @@ namespace SCQueryConnect.ViewModels
                     _selectedSolution = value;
                     OnPropertyChanged();
 
-                    foreach (var connection in _connections)
+                    if (value != null)
                     {
-                        connection.Solution = value;
+                        foreach (var connection in _connections)
+                        {
+                            connection.Solution = value.Id;
+                        }
                     }
+
+                    RaiseCanExecuteChangedForAllCommands();
                 }
             }
         }
@@ -195,12 +204,20 @@ namespace SCQueryConnect.ViewModels
 
         public SolutionViewModel()
         {
-            AddToSolutionCommand = new ActionCommand<QueryData>(
-                AddToSolution,
+            AddNewSolutionCommand = new ActionCommand<object>(
+                obj => AddNewSolution(),
+                obj => true);
+            
+            RemoveSolutionCommand = new ActionCommand<Solution>(
+                RemoveSolution,
+                s => s != null);
+
+            IncludeInSolutionCommand = new ActionCommand<QueryData>(
+                IncludeInSolution,
                 qd => qd != null);
 
-            RemoveFromSolutionCommand = new ActionCommand<QueryData>(
-                RemoveFromSolution,
+            ExcludeFromSolutionCommand = new ActionCommand<QueryData>(
+                ExcludeFromSolution,
                 qd => qd != null);
 
             DecreaseSolutionIndexCommand = new ActionCommand<QueryData>(
@@ -238,7 +255,7 @@ namespace SCQueryConnect.ViewModels
             IncludedConnections.SortDescriptions.Add(sort);
         }
 
-        public void AddToSolution(QueryData data)
+        public void IncludeInSolution(QueryData data)
         {
             var count = _connections.Count(c =>
                 c.SolutionIndex > QueryData.DefaultSolutionIndex);
@@ -247,9 +264,9 @@ namespace SCQueryConnect.ViewModels
             RefreshCollectionViews();
         }
 
-        public void RemoveFromSolution(QueryData data)
+        public void ExcludeFromSolution(QueryData data)
         {
-            data.UnsetSolutionIndex(SelectedSolution);
+            data.UnsetSolutionIndex(SelectedSolution.Id);
             RefreshCollectionViews();
         }
 
@@ -273,6 +290,24 @@ namespace SCQueryConnect.ViewModels
             IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
         }
 
+        public void AddNewSolution()
+        {
+            var solution = new Solution();
+            Solutions.Add(solution);
+            SelectedSolution = solution;
+        }
+
+        public void RemoveSolution(Solution solution)
+        {
+            Solutions.Remove(solution);
+            SelectedSolution = null;
+
+            foreach (var connection in _connections)
+            {
+                connection.UnsetSolutionIndex(solution.Id);
+            }
+        }
+
         private void RefreshCollectionViews()
         {
             // Reassign all solution index values
@@ -292,8 +327,11 @@ namespace SCQueryConnect.ViewModels
 
         private void RaiseCanExecuteChangedForAllCommands()
         {
-            AddToSolutionCommand.RaiseCanExecuteChanged();
-            RemoveFromSolutionCommand.RaiseCanExecuteChanged();
+            AddNewSolutionCommand.RaiseCanExecuteChanged();
+            RemoveSolutionCommand.RaiseCanExecuteChanged();
+
+            IncludeInSolutionCommand.RaiseCanExecuteChanged();
+            ExcludeFromSolutionCommand.RaiseCanExecuteChanged();
             DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
             IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
         }

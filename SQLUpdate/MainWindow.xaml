@@ -148,7 +148,15 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <ListBox ItemsSource="{Binding Solutions}" SelectedItem="{Binding SelectedSolution}" />
+                        <ListBox ItemsSource="{Binding Solutions}" SelectedItem="{Binding SelectedSolution}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
                         <Grid Grid.Row="1" Height="50">
                             <Grid.ColumnDefinitions>
@@ -159,11 +167,15 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
-                            <Button Click="NewConnectionClick" Style="{StaticResource NewButton}" />
+                            <Button Command="{Binding AddNewSolutionCommand}" Style="{StaticResource NewButton}" />
                             <Button Click="CopyConnectionClick" Style="{StaticResource CopyButton}" />
                             <Button Click="UpConnectionClick" Style="{StaticResource UpButton}" />
                             <Button Click="DownConnectionClick" Style="{StaticResource DownButton}" />
-                            <Button Click="DeleteConnectionClick" Style="{StaticResource DeleteButton}" />
+
+                            <Button Command="{Binding RemoveSolutionCommand}"
+                                    CommandParameter="{Binding SelectedSolution}"
+                                    Style="{StaticResource DeleteButton}">
+                            </Button>
                         </Grid>
                     </Grid>
                 </TabItem>
@@ -465,12 +477,12 @@
                             </Style>
                         </StackPanel.Resources>
 
-                        <Button Command="{Binding AddToSolutionCommand}"
+                        <Button Command="{Binding IncludeInSolutionCommand}"
                                 CommandParameter="{Binding SelectedExcludedConnection}">
                             &gt;
                         </Button>
 
-                        <Button Command="{Binding RemoveFromSolutionCommand}"
+                        <Button Command="{Binding ExcludeFromSolutionCommand}"
                                 CommandParameter="{Binding SelectedIncludedConnection}">
                             &lt;
                         </Button>
@@ -501,7 +513,7 @@
 
                         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Solution Name</TextBlock>
 
-                        <TextBox x:Name="SolutionNameTextBox" Width="200" Text="Solution" />
+                        <TextBox Width="200" Text="{Binding SelectedSolution.Name}" />
 
                         <ComboBox x:Name="ArchitectureComboBox"
                                   ItemsSource="{Binding ArchitectureOptions}"

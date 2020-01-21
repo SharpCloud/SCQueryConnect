@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
 using System.Linq;
 using System.Threading;
@@ -10,28 +11,28 @@ namespace SCQueryConnect.Tests.ViewModels
     [TestFixture]
     public class SolutionViewModelTests
     {
-        private const string SolutionName = "SolutionName";
+        private const string SolutionId = "SolutionID";
 
         [Test]
         public void ConnectionsAreFiltered()
         {
             // Arrange
 
-            const string selectedName = "SelectedName";
-            const string availableName = "AvailableName";
+            const string includedName = "IncludedName";
+            const string excludedName = "ExcludedName";
 
             var data = new[]
             {
                 new QueryData
                 {
-                    Name = selectedName,
-                    Solution = SolutionName,
+                    Name = includedName,
+                    Solution = SolutionId,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
-                    Name = availableName,
-                    Solution = SolutionName
+                    Name = excludedName,
+                    Solution = SolutionId
                 }
             };
 
@@ -45,11 +46,11 @@ namespace SCQueryConnect.Tests.ViewModels
 
             var includedConnections = vm.IncludedConnections.Cast<QueryData>().ToArray();
             Assert.AreEqual(1, includedConnections.Length);
-            Assert.AreEqual(selectedName, includedConnections[0].Name);
+            Assert.AreEqual(includedName, includedConnections[0].Name);
 
             var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
             Assert.AreEqual(1, excludedConnections.Length);
-            Assert.AreEqual(availableName, excludedConnections[0].Name);
+            Assert.AreEqual(excludedName, excludedConnections[0].Name);
         }
 
         [Test]
@@ -65,12 +66,12 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    Solution = SolutionName
+                    Solution = SolutionId
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    Solution = SolutionName
+                    Solution = SolutionId
                 }
             };
 
@@ -79,8 +80,8 @@ namespace SCQueryConnect.Tests.ViewModels
 
             // Act
 
-            vm.AddToSolution(data[1]);
-            vm.AddToSolution(data[0]);
+            vm.IncludeInSolution(data[1]);
+            vm.IncludeInSolution(data[0]);
 
             // Assert
 
@@ -106,24 +107,29 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    Solution = SolutionName,
+                    Solution = SolutionId,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    Solution = SolutionName,
+                    Solution = SolutionId,
                     SolutionIndex = 2
                 }
             };
 
+            var solution = new Solution
+            {
+                Id = SolutionId
+            };
+
             var vm = new SolutionViewModel();
             vm.SetConnections(data);
-            vm.SelectedSolution = SolutionName;
+            vm.SelectedSolution = solution;
 
             // Act
 
-            vm.RemoveFromSolution(data[0]);
+            vm.ExcludeFromSolution(data[0]);
 
             // Assert
 
@@ -149,13 +155,13 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    Solution = SolutionName,
+                    Solution = SolutionId,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    Solution = SolutionName,
+                    Solution = SolutionId,
                     SolutionIndex = 2
                 }
             };
@@ -191,13 +197,13 @@ namespace SCQueryConnect.Tests.ViewModels
                 new QueryData
                 {
                     Name = dataA,
-                    Solution = SolutionName,
+                    Solution = SolutionId,
                     SolutionIndex = 0
                 },
                 new QueryData
                 {
                     Name = dataB,
-                    Solution = SolutionName,
+                    Solution = SolutionId,
                     SolutionIndex = 2
                 }
             };
@@ -233,15 +239,17 @@ namespace SCQueryConnect.Tests.ViewModels
 
             var vm = new SolutionViewModel();
             vm.SetConnections(data);
+            
+            var solution = new Solution();
 
             // Act
 
-            vm.SelectedSolution = SolutionName;
+            vm.SelectedSolution = solution;
 
             // Assert
 
             var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            var allSet = connections.All(c => c.Solution == SolutionName);
+            var allSet = connections.All(c => c.Solution == solution.Id);
             
             Assert.AreEqual(2, connections.Length);
             Assert.IsTrue(allSet);
@@ -270,6 +278,66 @@ namespace SCQueryConnect.Tests.ViewModels
 
             Assert.AreEqual(expectedConnectionsVisibility, vm.ConnectionsVisibility);
             Assert.AreEqual(expectedSolutionsVisibility, vm.SolutionsVisibility);
+        }
+
+        [Test]
+        public void AddNewSolutionAddsToSolution()
+        {
+            // Arrange
+
+            var data = new[]
+            {
+                new QueryData(),
+                new QueryData()
+            };
+
+            var vm = new SolutionViewModel();
+            vm.SetConnections(data);
+
+            // Act
+
+            vm.AddNewSolution();
+
+            // Assert
+
+            var solution = vm.Solutions.Single();
+            Assert.AreEqual(solution, vm.SelectedSolution);
+
+            var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
+            var allSet = connections.All(c => c.Solution == solution.Id);
+            Assert.IsTrue(allSet);
+        }
+
+        [Test]
+        public void DeleteSolutionRemovesToSolution()
+        {
+            // Arrange
+
+            var data = new[]
+            {
+                new QueryData(),
+                new QueryData()
+            };
+
+            var vm = new SolutionViewModel();
+            vm.SetConnections(data);
+            vm.AddNewSolution();
+
+            var solution = vm.SelectedSolution;
+
+            // Act
+
+            vm.RemoveSolution(solution);
+
+            // Assert
+
+            Assert.IsEmpty(vm.Solutions);
+            Assert.IsNull(vm.SelectedSolution);
+
+            var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
+            var allKeys = connections.SelectMany(c => c.SolutionIndexes.Keys);
+            var containsSolutionId = allKeys.Contains(solution.Id);
+            Assert.IsFalse(containsSolutionId);
         }
     }
 }
