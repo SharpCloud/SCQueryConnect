@@ -5,6 +5,7 @@ using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
+using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;

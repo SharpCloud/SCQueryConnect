@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Serialization;
 
-namespace SCQueryConnect
+namespace SCQueryConnect.Models
 {
     [DataContract]
     public class QueryData
