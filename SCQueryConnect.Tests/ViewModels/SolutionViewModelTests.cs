@@ -368,6 +368,82 @@ namespace SCQueryConnect.Tests.ViewModels
         }
 
         [Test]
+        public void SolutionCanBeMovedUp()
+        {
+            // Arrange
+
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
+            vm.AddNewSolution();
+            vm.AddNewSolution();
+
+            var solution1 = vm.Solutions[0];
+            var solution2 = vm.Solutions[1];
+
+            // Act
+
+            vm.MoveSolutionUp(solution2);
+
+            // Assert
+
+            Assert.AreEqual(solution2, vm.Solutions[0]);
+            Assert.AreEqual(solution1, vm.Solutions[1]);
+        }
+
+        [Test]
+        public void SolutionCanBeMovedDown()
+        {
+            // Arrange
+
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
+            vm.AddNewSolution();
+            vm.AddNewSolution();
+
+            var solution1 = vm.Solutions[0];
+            var solution2 = vm.Solutions[1];
+
+            // Act
+
+            vm.MoveSolutionDown(solution1);
+
+            // Assert
+
+            Assert.AreEqual(solution2, vm.Solutions[0]);
+            Assert.AreEqual(solution1, vm.Solutions[1]);
+        }
+
+        [Test]
+        public void SolutionCanBeCopied()
+        {
+            // Arrange
+
+            const string solutionName = "SolutionName";
+
+            var vm = new SolutionViewModel(
+                Mock.Of<IConnectionNameValidator>(),
+                Mock.Of<IMessageService>());
+
+            vm.AddNewSolution();
+            vm.SelectedSolution.Name = solutionName;
+
+            // Act
+
+            vm.Copy(vm.SelectedSolution);
+
+            // Assert
+
+            Assert.AreEqual(2, vm.Solutions.Count);
+            
+            Assert.AreEqual(vm.Solutions[0].Name, vm.Solutions[1].Name);
+            Assert.AreNotEqual(vm.Solutions[0].Id, vm.Solutions[1].Id);
+        }
+
+        [Test]
         public void ConnectionsListsAreEmptyIfNoSolutionIsSelected()
         {
             // Arrange

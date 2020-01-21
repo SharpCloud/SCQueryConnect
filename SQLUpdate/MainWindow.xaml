@@ -168,9 +168,21 @@
                             </Grid.ColumnDefinitions>
 
                             <Button Command="{Binding AddNewSolutionCommand}" Style="{StaticResource NewButton}" />
-                            <Button Click="CopyConnectionClick" Style="{StaticResource CopyButton}" />
-                            <Button Click="UpConnectionClick" Style="{StaticResource UpButton}" />
-                            <Button Click="DownConnectionClick" Style="{StaticResource DownButton}" />
+
+                            <Button Command="{Binding CopySolutionCommand}"
+                                    CommandParameter="{Binding SelectedSolution}"
+                                    Style="{StaticResource CopyButton}">
+                            </Button>
+
+                            <Button Command="{Binding MoveSolutionUpCommand}"
+                                    CommandParameter="{Binding SelectedSolution}"
+                                    Style="{StaticResource UpButton}">
+                            </Button>
+                            
+                            <Button Command="{Binding MoveSolutionDownCommand}"
+                                    CommandParameter="{Binding SelectedSolution}"
+                                    Style="{StaticResource DownButton}">
+                            </Button>
 
                             <Button Command="{Binding RemoveSolutionCommand}"
                                     CommandParameter="{Binding SelectedSolution}"

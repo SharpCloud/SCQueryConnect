@@ -13,6 +13,9 @@ namespace SCQueryConnect.Interfaces
         ICollectionView IncludedConnections { get; }
 
         IActionCommand AddNewSolutionCommand { get; }
+        IActionCommand MoveSolutionUpCommand { get; }
+        IActionCommand MoveSolutionDownCommand { get; }
+        IActionCommand CopySolutionCommand { get; }
         IActionCommand RemoveSolutionCommand { get; }
 
         IActionCommand IncludeInSolutionCommand { get; }

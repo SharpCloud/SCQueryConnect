@@ -1,6 +1,8 @@
-﻿using SCQueryConnect.Commands;
+﻿using Newtonsoft.Json;
+using SCQueryConnect.Commands;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -111,6 +113,9 @@ namespace SCQueryConnect.ViewModels
         }
 
         public IActionCommand AddNewSolutionCommand { get; }
+        public IActionCommand MoveSolutionUpCommand { get; }
+        public IActionCommand MoveSolutionDownCommand { get; }
+        public IActionCommand CopySolutionCommand { get; }
         public IActionCommand RemoveSolutionCommand { get; }
 
         public IActionCommand IncludeInSolutionCommand { get; }
@@ -254,7 +259,19 @@ namespace SCQueryConnect.ViewModels
             AddNewSolutionCommand = new ActionCommand<object>(
                 obj => AddNewSolution(),
                 obj => true);
-            
+
+            MoveSolutionUpCommand = new ActionCommand<Solution>(
+                MoveSolutionUp,
+                s => Solutions.IndexOf(s) > 0);
+
+            MoveSolutionDownCommand = new ActionCommand<Solution>(
+                MoveSolutionDown,
+                s => Solutions.IndexOf(s) < Solutions.Count - 1);
+
+            CopySolutionCommand = new ActionCommand<Solution>(
+                Copy,
+                s => s != null);
+
             RemoveSolutionCommand = new ActionCommand<Solution>(
                 RemoveSolution,
                 s => s != null);
@@ -373,6 +390,31 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
+        public void MoveSolutionUp(Solution solution)
+        {
+            var index = Solutions.IndexOf(solution);
+            Solutions.Move(index, index - 1);
+            RaiseCanExecuteChangedForAllCommands();
+        }
+
+        public void MoveSolutionDown(Solution solution)
+        {
+            var index = Solutions.IndexOf(solution);
+            Solutions.Move(index, index + 1);
+            RaiseCanExecuteChangedForAllCommands();
+        }
+
+        public void Copy(Solution solution)
+        {
+            var json = JsonConvert.SerializeObject(solution);
+            var copy = JsonConvert.DeserializeObject<Solution>(json);
+            copy.Id = Guid.NewGuid().ToString();
+
+            var index = Solutions.IndexOf(solution);
+            Solutions.Insert(index + 1, copy);
+            RaiseCanExecuteChangedForAllCommands();
+        }
+
         private void RefreshCollectionViews()
         {
             // Reassign all solution index values
@@ -393,6 +435,9 @@ namespace SCQueryConnect.ViewModels
         private void RaiseCanExecuteChangedForAllCommands()
         {
             AddNewSolutionCommand.RaiseCanExecuteChanged();
+            MoveSolutionUpCommand.RaiseCanExecuteChanged();
+            MoveSolutionDownCommand.RaiseCanExecuteChanged();
+            CopySolutionCommand.RaiseCanExecuteChanged();
             RemoveSolutionCommand.RaiseCanExecuteChanged();
 
             IncludeInSolutionCommand.RaiseCanExecuteChanged();
