@@ -63,7 +63,7 @@
 
             <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
 
-            <TabControl Grid.Column="0"  BorderBrush="Transparent" SelectedItem="{Binding SolutionViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}">
+            <TabControl Grid.Column="0"  BorderBrush="Transparent" SelectedItem="{Binding MainViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}">
                 <TabControl.Resources>
                     <Style x:Key="DefaultListButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Setter Property="Background" Value="#666" />
@@ -198,7 +198,7 @@
                             x:Name="BrowserTabs"
                             BorderBrush="Transparent"
                             MinWidth="750"
-                            Visibility="{Binding SolutionViewModel.ConnectionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}">
+                            Visibility="{Binding MainViewModel.ConnectionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}">
                     <TabControl.Resources>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
@@ -456,7 +456,7 @@
 
                 <Grid Background="{StaticResource QCBackground}"
                       DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}"
-                      Visibility="{Binding SolutionsVisibility, FallbackValue=Collapsed}">
+                      Visibility="{Binding MainViewModel.SolutionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}">
                     <Grid.Resources>
                         <Style TargetType="ListBox">
                             <Setter Property="Background" Value="{StaticResource QCBackground}" />

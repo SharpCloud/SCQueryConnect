@@ -9,8 +9,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace SCQueryConnect.ViewModels
@@ -29,9 +27,6 @@ namespace SCQueryConnect.ViewModels
         private ObservableCollection<Solution> _solutions = new ObservableCollection<Solution>();
         private string _selectedArchitecture;
         private Solution _selectedSolution;
-        private TabItem _selectedParentTab;
-        private Visibility _connectionsVisibility;
-        private Visibility _solutionsVisibility;
 
         public const string ArchitectureAuto = "Auto";
         public const string Architecture64 = "64 bit";
@@ -181,61 +176,6 @@ namespace SCQueryConnect.ViewModels
                 var solution = (Solution) sender;
                 solution.Name = (string) args.OldValue;
                 _messageService.ShowMessage(msg);
-            }
-        }
-
-        public TabItem SelectedParentTab
-        {
-            get => _selectedParentTab;
-
-            set
-            {
-                if (_selectedParentTab != value)
-                {
-                    _selectedParentTab = value;
-                    OnPropertyChanged();
-
-                    switch (_selectedParentTab.Header)
-                    {
-                        case "Connections":
-                            ConnectionsVisibility = Visibility.Visible;
-                            SolutionsVisibility = Visibility.Collapsed;
-                            break;
-
-                        case "Solutions":
-                            ConnectionsVisibility = Visibility.Collapsed;
-                            SolutionsVisibility = Visibility.Visible;
-                            break;
-                    }
-                }
-            }
-        }
-
-        public Visibility ConnectionsVisibility
-        {
-            get => _connectionsVisibility;
-
-            set
-            {
-                if (_connectionsVisibility != value)
-                {
-                    _connectionsVisibility = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public Visibility SolutionsVisibility
-        {
-            get => _solutionsVisibility;
-
-            set
-            {
-                if (_solutionsVisibility != value)
-                {
-                    _solutionsVisibility = value;
-                    OnPropertyChanged();
-                }
             }
         }
 

@@ -6,9 +6,6 @@ using SCQueryConnect.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace SCQueryConnect.Tests.ViewModels
 {
@@ -207,33 +204,6 @@ namespace SCQueryConnect.Tests.ViewModels
 
             var excluded = GetExcludedConnections(vm);
             Assert.IsEmpty(excluded);
-        }
-
-        [Apartment(ApartmentState.STA)]
-        [TestCase("Connections", Visibility.Visible, Visibility.Collapsed)]
-        [TestCase("Solutions", Visibility.Collapsed, Visibility.Visible)]
-        public void SettingSelectedParentTabSetsVisibilities(
-            string tabHeader,
-            Visibility expectedConnectionsVisibility,
-            Visibility expectedSolutionsVisibility)
-        {
-            // Arrange
-
-            var vm = new SolutionViewModel(
-                Mock.Of<IConnectionNameValidator>(),
-                Mock.Of<IMessageService>());
-
-            // Act
-
-            vm.SelectedParentTab = new TabItem
-            {
-                Header = tabHeader
-            };
-
-            // Assert
-
-            Assert.AreEqual(expectedConnectionsVisibility, vm.ConnectionsVisibility);
-            Assert.AreEqual(expectedSolutionsVisibility, vm.SolutionsVisibility);
         }
 
         [Test]
