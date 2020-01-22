@@ -17,14 +17,13 @@ namespace SCQueryConnect.ViewModels
 {
     public class SolutionViewModel : ISolutionViewModel
     {
-        private const int SolutionIndexMultiplier = 2;
-
+        private readonly IActionCommand[] _allActions;
         private readonly IConnectionNameValidator _nameValidator;
         private readonly IMessageService _messageService;
 
         private ICollectionView _excludedConnections;
         private ICollectionView _includedConnections;
-        private IList<QueryData> _connections;
+        private IList<QueryData> _connections = new List<QueryData>();
         private QueryData _selectedExcludedConnection;
         private QueryData _selectedIncludedConnection;
         private ObservableCollection<Solution> _solutions = new ObservableCollection<Solution>();
@@ -120,8 +119,8 @@ namespace SCQueryConnect.ViewModels
 
         public IActionCommand IncludeInSolutionCommand { get; }
         public IActionCommand ExcludeFromSolutionCommand { get; }
-        public IActionCommand DecreaseSolutionIndexCommand { get; }
-        public IActionCommand IncreaseSolutionIndexCommand { get; }
+        public IActionCommand MoveConnectionUp { get; }
+        public IActionCommand MoveConnectionDown { get; }
 
         public string SelectedArchitecture
         {
@@ -160,16 +159,7 @@ namespace SCQueryConnect.ViewModels
                     _selectedSolution = value;
                     OnPropertyChanged();
 
-                    if (_connections != null)
-                    {
-                        foreach (var connection in _connections)
-                        {
-                            connection.Solution = value?.Id;
-                        }
-
-                        RefreshCollectionViews();
-                    }
-
+                    RefreshCollectionViews();
                     RaiseCanExecuteChangedForAllCommands();
 
                     if (_selectedSolution != null)
@@ -261,11 +251,11 @@ namespace SCQueryConnect.ViewModels
                 obj => true);
 
             MoveSolutionUpCommand = new ActionCommand<Solution>(
-                MoveSolutionUp,
+                s => MoveItemUp(s, Solutions),
                 s => Solutions.IndexOf(s) > 0);
 
             MoveSolutionDownCommand = new ActionCommand<Solution>(
-                MoveSolutionDown,
+                s => MoveItemDown(s, Solutions),
                 s => Solutions.IndexOf(s) < Solutions.Count - 1);
 
             CopySolutionCommand = new ActionCommand<Solution>(
@@ -284,15 +274,21 @@ namespace SCQueryConnect.ViewModels
                 ExcludeFromSolution,
                 qd => qd != null);
 
-            DecreaseSolutionIndexCommand = new ActionCommand<QueryData>(
-                DecreaseSolutionIndex,
-                qd => qd != null && qd.SolutionIndex > 0);
+            MoveConnectionUp = new ActionCommand<QueryData>(
+                qd => MoveItemUp(qd.Id, SelectedSolution.ConnectionIds),
+                qd => qd != null && SelectedSolution.ConnectionIds.IndexOf(qd.Id) > 0);
 
-            IncreaseSolutionIndexCommand = new ActionCommand<QueryData>(
-                IncreaseSolutionIndex,
-                qd => qd != null &&
-                      qd.SolutionIndex / 2 < _connections.Count(c =>
-                          c.SolutionIndex > QueryData.DefaultSolutionIndex) - 1);
+            MoveConnectionDown = new ActionCommand<QueryData>(
+                qd => MoveItemDown(qd.Id, SelectedSolution.ConnectionIds),
+                qd => qd != null && 
+                      SelectedSolution.ConnectionIds.IndexOf(qd.Id) < _connections.Count - 1);
+
+            _allActions = GetType()
+                .GetProperties()
+                .Where(p => p.PropertyType == typeof(IActionCommand))
+                .Select(p => p.GetValue(this))
+                .Cast<IActionCommand>()
+                .ToArray();
 
             SelectedArchitecture = ArchitectureAuto;
         }
@@ -304,72 +300,34 @@ namespace SCQueryConnect.ViewModels
             ExcludedConnections = new ListCollectionView((IList) connections)
             {
                 Filter = obj =>
-                {
-                    var query = obj as QueryData;
-
-                    var included =
-                        query?.SolutionIndex != null &&
-                        query.SolutionIndex <= QueryData.DefaultSolutionIndex;
-
-                    return included;
-                }
+                    SelectedSolution != null &&
+                    !SelectedSolution.ConnectionIds.Contains(((QueryData)obj).Id)
             };
 
-            IncludedConnections = new ListCollectionView((IList) connections)
+            IncludedConnections = new ListCollectionView((IList)connections)
             {
                 Filter = obj =>
-                {
-                    var query = obj as QueryData;
-
-                    var included =
-                        query?.SolutionIndex != null &&
-                        query.SolutionIndex > QueryData.DefaultSolutionIndex;
-
-                    return included;
-                }
+                    SelectedSolution != null &&
+                    SelectedSolution.ConnectionIds.Contains(((QueryData)obj).Id)
             };
 
             var sort = new SortDescription(
-                nameof(QueryData.SolutionIndex),
+                nameof(QueryData.DisplayOrder),
                 ListSortDirection.Ascending);
 
-            ExcludedConnections.SortDescriptions.Add(sort);
             IncludedConnections.SortDescriptions.Add(sort);
         }
 
         public void IncludeInSolution(QueryData data)
         {
-            var count = _connections.Count(c =>
-                c.SolutionIndex > QueryData.DefaultSolutionIndex);
-
-            data.SolutionIndex = count * SolutionIndexMultiplier;
+            SelectedSolution.ConnectionIds.Add(data.Id);
             RefreshCollectionViews();
         }
 
         public void ExcludeFromSolution(QueryData data)
         {
-            data.UnsetSolutionIndex(SelectedSolution.Id);
+            SelectedSolution.ConnectionIds.Remove(data.Id);
             RefreshCollectionViews();
-        }
-
-        public void DecreaseSolutionIndex(QueryData data)
-        {
-            var newIndex = data.SolutionIndex - SolutionIndexMultiplier - 1;
-            data.SolutionIndex = newIndex;
-            RefreshCollectionViews();
-            
-            DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
-            IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
-        }
-
-        public void IncreaseSolutionIndex(QueryData data)
-        {
-            var newIndex = data.SolutionIndex + SolutionIndexMultiplier + 1;
-            data.SolutionIndex = newIndex;
-            RefreshCollectionViews();
-            
-            DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
-            IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
         }
 
         public void AddNewSolution()
@@ -383,24 +341,21 @@ namespace SCQueryConnect.ViewModels
         {
             Solutions.Remove(solution);
             SelectedSolution = null;
-
-            foreach (var connection in _connections)
-            {
-                connection.UnsetSolutionIndex(solution.Id);
-            }
         }
 
-        public void MoveSolutionUp(Solution solution)
+        public void MoveItemUp<T>(T item, ObservableCollection<T> collection)
         {
-            var index = Solutions.IndexOf(solution);
-            Solutions.Move(index, index - 1);
+            var index = collection.IndexOf(item);
+            collection.Move(index, index - 1);
+            RefreshCollectionViews();
             RaiseCanExecuteChangedForAllCommands();
         }
 
-        public void MoveSolutionDown(Solution solution)
+        public void MoveItemDown<T>(T item, ObservableCollection<T> collection)
         {
-            var index = Solutions.IndexOf(solution);
-            Solutions.Move(index, index + 1);
+            var index = collection.IndexOf(item);
+            collection.Move(index, index + 1);
+            RefreshCollectionViews();
             RaiseCanExecuteChangedForAllCommands();
         }
 
@@ -417,33 +372,22 @@ namespace SCQueryConnect.ViewModels
 
         private void RefreshCollectionViews()
         {
-            // Reassign all solution index values
-            var ordered = _connections
-                .Where(c => c.SolutionIndex > QueryData.DefaultSolutionIndex)
-                .OrderBy(c => c.SolutionIndex).ToArray();
-
-            for (var i = ordered.Length - 1; i >= 0; i--)
+            for (int i = 0; i < SelectedSolution?.ConnectionIds.Count; i++)
             {
-                var connection = ordered[i];
-                connection.SolutionIndex = i * SolutionIndexMultiplier;
+                var data = _connections.Single(c => c.Id == SelectedSolution.ConnectionIds[i]);
+                data.DisplayOrder = i;
             }
 
-            ExcludedConnections.Refresh();
-            IncludedConnections.Refresh();
+            ExcludedConnections?.Refresh();
+            IncludedConnections?.Refresh();
         }
 
         private void RaiseCanExecuteChangedForAllCommands()
         {
-            AddNewSolutionCommand.RaiseCanExecuteChanged();
-            MoveSolutionUpCommand.RaiseCanExecuteChanged();
-            MoveSolutionDownCommand.RaiseCanExecuteChanged();
-            CopySolutionCommand.RaiseCanExecuteChanged();
-            RemoveSolutionCommand.RaiseCanExecuteChanged();
-
-            IncludeInSolutionCommand.RaiseCanExecuteChanged();
-            ExcludeFromSolutionCommand.RaiseCanExecuteChanged();
-            DecreaseSolutionIndexCommand.RaiseCanExecuteChanged();
-            IncreaseSolutionIndexCommand.RaiseCanExecuteChanged();
+            foreach (var action in _allActions)
+            {
+                action.RaiseCanExecuteChanged();
+            }
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

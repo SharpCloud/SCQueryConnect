@@ -1,6 +1,5 @@
 ﻿using SCQueryConnect.Common;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Serialization;
 
@@ -9,7 +8,23 @@ namespace SCQueryConnect.Models
     [DataContract]
     public class QueryData
     {
-        public const int DefaultSolutionIndex = -2;
+        private string _id;
+
+        [DataMember]
+        public string Id
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_id))
+                {
+                    _id = Guid.NewGuid().ToString();
+                }
+
+                return _id;
+            }
+            
+            set => _id = value;
+        }
 
         [DataMember]
         public string Name { get; set; }
@@ -50,59 +65,7 @@ namespace SCQueryConnect.Models
         [IgnoreDataMember]
         public DataView QueryResultsRels { get; set; }
         [IgnoreDataMember]
-        public string Solution { get; set; }
-
-        [IgnoreDataMember]
-        public int? SolutionIndex
-        {
-            get
-            {
-                var noSolution = string.IsNullOrWhiteSpace(Solution);
-
-                if (noSolution)
-                {
-                    return null;
-                }
-
-                if (SolutionIndexes == null)
-                {
-                    SolutionIndexes = new Dictionary<string, int>();
-                }
-
-                var index = SolutionIndexes.ContainsKey(Solution)
-                    ? SolutionIndexes[Solution]
-                    : DefaultSolutionIndex;
-
-                return index;
-            }
-
-            set
-            {
-                if (SolutionIndexes == null)
-                {
-                    SolutionIndexes = new Dictionary<string, int>();
-                }
-
-                if (SolutionIndexes.ContainsKey(Solution))
-                {
-                    if (value.HasValue)
-                    {
-                        SolutionIndexes[Solution] = value.Value;
-                    }
-                    else
-                    {
-                        UnsetSolutionIndex(Solution);
-                    }
-                }
-                else if (value.HasValue)
-                {
-                    SolutionIndexes.Add(Solution, value.Value);
-                }
-            }
-        }
-
-        [DataMember]
-        public Dictionary<string, int> SolutionIndexes { get; set; }
+        public int DisplayOrder { get; set; }
 
         public string FormattedConnectionString => ConnectionsString
             .Replace("{0}", FileName)
@@ -254,11 +217,6 @@ namespace SCQueryConnect.Models
                 }
                 return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
             }
-        }
-
-        public void UnsetSolutionIndex(string solutionId)
-        {
-            SolutionIndexes.Remove(solutionId);
         }
     }
 }

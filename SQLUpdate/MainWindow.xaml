@@ -499,12 +499,12 @@
                             &lt;
                         </Button>
 
-                        <Button Command="{Binding DecreaseSolutionIndexCommand}"
+                        <Button Command="{Binding MoveConnectionUp}"
                                 CommandParameter="{Binding SelectedIncludedConnection}">
                             Up
                         </Button>
 
-                        <Button Command="{Binding IncreaseSolutionIndexCommand}"
+                        <Button Command="{Binding MoveConnectionDown}"
                                 CommandParameter="{Binding SelectedIncludedConnection}">
                             Down
                         </Button>

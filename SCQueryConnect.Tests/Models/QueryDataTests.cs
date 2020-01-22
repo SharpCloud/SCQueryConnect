@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using SCQueryConnect.Models;
-using System.Collections.Generic;
+using System;
 
 namespace SCQueryConnect.Tests.Models
 {
@@ -8,50 +8,24 @@ namespace SCQueryConnect.Tests.Models
     public class QueryDataTests
     {
         [Test]
-        public void SettingExistingSolutionIndexToNullRemovesSolutionIndexesEntry()
+        public void IdIsGeneratedAndPersistent()
         {
             // Arrange
 
-            const string solutionId = "SolutionID";
-
-            var query = new QueryData
-            {
-                Solution = solutionId,
-                SolutionIndexes = new Dictionary<string, int>
-                {
-                    [solutionId] = 39
-                }
-            };
+            var data = new QueryData();
 
             // Act
 
-            query.SolutionIndex = null;
+            var id1 = data.Id;
+            var id2 = data.Id;
 
             // Assert
 
-            Assert.IsEmpty(query.SolutionIndexes);
-        }
+            Assert.IsNotEmpty(id1);
+            Assert.AreEqual(id1, id2);
 
-        [Test]
-        public void SettingNewSolutionIndexToNullRemovesSolutionIndexesEntry()
-        {
-            // Arrange
-
-            const string solutionId = "SolutionID";
-
-            var query = new QueryData
-            {
-                Solution = solutionId,
-                SolutionIndexes = new Dictionary<string, int>()
-            };
-
-            // Act
-
-            query.SolutionIndex = null;
-
-            // Assert
-
-            Assert.IsEmpty(query.SolutionIndexes);
+            var canParse = Guid.TryParse(id1, out _);
+            Assert.IsTrue(canParse);
         }
     }
 }

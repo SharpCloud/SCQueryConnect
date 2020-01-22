@@ -171,9 +171,6 @@
     <Compile Include="..\SQLUpdate\Models\QueryData.cs">
       <Link>Models\QueryData.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Models\SaveData.cs">
-      <Link>Models\SaveData.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Models\Solution.cs">
       <Link>Models\Solution.cs</Link>
     </Compile>

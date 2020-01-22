@@ -280,10 +280,10 @@ namespace SCQueryConnect
                 SaveHelper.RegDelete("ProxyPassword");
             }
 
-            //cbDatabase.SelectedIndex = Int32.Parse(SaveHelper.RegRead("DBType", "0"));
-
             LoadAllProfiles();
             connectionList.ItemsSource = _connections;
+            
+            _solutionViewModel.Solutions = LoadSolutions();
 
             // choose our last settings
             connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
@@ -324,6 +324,20 @@ namespace SCQueryConnect
             }
         }
 
+        private ObservableCollection<Solution> LoadSolutions()
+        {
+            var file = _localPath + "/solutions.json";
+
+            if (!File.Exists(file))
+            {
+                return new ObservableCollection<Solution>();
+            }
+
+            var solutions = SaveHelper.DeserializeJSON<IList<Solution>>(File.ReadAllText(file));
+            var collection = new ObservableCollection<Solution>(solutions);
+            return collection;
+        }
+
         private void LoadAllProfiles()
         {
             var file = _localPath + "/connections.json";
@@ -331,23 +345,8 @@ namespace SCQueryConnect
             if (File.Exists(file))
             {
                 // load our previous settings
-                var loadedSaveData = SaveHelper.DeserializeJSON<SaveData>(File.ReadAllText(file));
-
-                IList<QueryData> encrypted;
-                if (loadedSaveData.Connections == null && loadedSaveData.Solutions == null)
-                {
-                    encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
-                }
-                else
-                {
-                    encrypted = loadedSaveData.Connections;
-                    
-                    _solutionViewModel.Solutions =
-                        new ObservableCollection<Solution>(loadedSaveData.Solutions);
-                }
-
+                var encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
                 var filtered = encrypted?.Where(qd => qd != null);
-                
                 var decrypted = CreateDecryptedPasswordConnections(filtered);
                 Connections = new ObservableCollection<QueryData>(decrypted);
             }
@@ -651,16 +650,13 @@ namespace SCQueryConnect
             SaveSettings(SelectedQueryData);
 
             Directory.CreateDirectory(_localPath);
-            var connectionsToSave = CreateEncryptedPasswordConnections(_connections);
+            
+            var connections = CreateEncryptedPasswordConnections(_connections);
+            var connectionsJson = SaveHelper.SerializeJSON(connections);
+            File.WriteAllText(_localPath + "/connections.json", connectionsJson);
 
-            var saveData = new SaveData
-            {
-                Connections = connectionsToSave,
-                Solutions = _solutionViewModel.Solutions
-            };
-
-            var s = SaveHelper.SerializeJSON(saveData);
-            File.WriteAllText(_localPath + "/connections.json", s);
+            var solutionsJson = SaveHelper.SerializeJSON(_solutionViewModel.Solutions);
+            File.WriteAllText(_localPath + "/solutions.json", solutionsJson);
 
             SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());

@@ -20,8 +20,8 @@ namespace SCQueryConnect.Interfaces
 
         IActionCommand IncludeInSolutionCommand { get; }
         IActionCommand ExcludeFromSolutionCommand { get; }
-        IActionCommand DecreaseSolutionIndexCommand { get; }
-        IActionCommand IncreaseSolutionIndexCommand { get; }
+        IActionCommand MoveConnectionUp { get; }
+        IActionCommand MoveConnectionDown { get; }
 
         QueryData SelectedExcludedConnection { get; set; }
         QueryData SelectedIncludedConnection { get; set; }

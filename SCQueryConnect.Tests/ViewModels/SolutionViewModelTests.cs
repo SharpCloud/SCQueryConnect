@@ -3,6 +3,8 @@ using NUnit.Framework;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -13,28 +15,23 @@ namespace SCQueryConnect.Tests.ViewModels
     [TestFixture]
     public class SolutionViewModelTests
     {
-        private const string SolutionId = "SolutionID";
+        private const string Id1 = "ID1";
+        private const string Id2 = "ID2";
 
         [Test]
         public void ConnectionsAreFiltered()
         {
             // Arrange
 
-            const string includedName = "IncludedName";
-            const string excludedName = "ExcludedName";
-
             var data = new[]
             {
                 new QueryData
                 {
-                    Name = includedName,
-                    Solution = SolutionId,
-                    SolutionIndex = 0
+                    Id = Id1
                 },
                 new QueryData
                 {
-                    Name = excludedName,
-                    Solution = SolutionId
+                    Id = Id2
                 }
             };
 
@@ -42,19 +39,19 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IConnectionNameValidator>(),
                 Mock.Of<IMessageService>());
 
+            vm.SetConnections(data);
+
             // Act
 
-            vm.SetConnections(data);
+            vm.SelectedSolution = CreateSolution(Id1);
 
             // Assert
 
-            var includedConnections = vm.IncludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(1, includedConnections.Length);
-            Assert.AreEqual(includedName, includedConnections[0].Name);
+            var included = GetIncludedConnections(vm).Single();
+            Assert.AreEqual(Id1, included.Id);
 
-            var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(1, excludedConnections.Length);
-            Assert.AreEqual(excludedName, excludedConnections[0].Name);
+            var excluded = GetExcludedConnections(vm).Single();
+            Assert.AreEqual(Id2, excluded.Id);
         }
 
         [Test]
@@ -62,20 +59,15 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            const string dataA = "DataA";
-            const string dataB = "DataB";
-
             var data = new[]
             {
                 new QueryData
                 {
-                    Name = dataA,
-                    Solution = SolutionId
+                    Id = Id1
                 },
                 new QueryData
                 {
-                    Name = dataB,
-                    Solution = SolutionId
+                    Id = Id2
                 }
             };
 
@@ -84,6 +76,7 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IMessageService>());
 
             vm.SetConnections(data);
+            vm.SelectedSolution = new Solution();
 
             // Act
 
@@ -92,13 +85,13 @@ namespace SCQueryConnect.Tests.ViewModels
 
             // Assert
 
-            var includedConnections = vm.IncludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(2, includedConnections.Length);
-            Assert.AreEqual(dataB, includedConnections[0].Name);
-            Assert.AreEqual(dataA, includedConnections[1].Name);
+            var included = GetIncludedConnections(vm);
+            Assert.AreEqual(2, included.Count);
+            Assert.AreEqual(Id2, included[0].Id);
+            Assert.AreEqual(Id1, included[1].Id);
 
-            var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(0, excludedConnections.Length);
+            var excluded = GetExcludedConnections(vm);
+            Assert.IsEmpty(excluded);
         }
 
         [Test]
@@ -106,28 +99,16 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            const string dataA = "DataA";
-            const string dataB = "DataB";
-
             var data = new[]
             {
                 new QueryData
                 {
-                    Name = dataA,
-                    Solution = SolutionId,
-                    SolutionIndex = 0
+                    Id = Id1
                 },
                 new QueryData
                 {
-                    Name = dataB,
-                    Solution = SolutionId,
-                    SolutionIndex = 2
+                    Id = Id2
                 }
-            };
-
-            var solution = new Solution
-            {
-                Id = SolutionId
             };
 
             var vm = new SolutionViewModel(
@@ -135,7 +116,7 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IMessageService>());
 
             vm.SetConnections(data);
-            vm.SelectedSolution = solution;
+            vm.SelectedSolution = CreateSolution(Id1, Id2);
 
             // Act
 
@@ -143,13 +124,11 @@ namespace SCQueryConnect.Tests.ViewModels
 
             // Assert
 
-            var includedConnections = vm.IncludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(1, includedConnections.Length);
-            Assert.AreEqual(dataB, includedConnections[0].Name);
+            var included = GetIncludedConnections(vm).Single();
+            Assert.AreEqual(Id2, included.Id);
 
-            var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(1, excludedConnections.Length);
-            Assert.AreEqual(dataA, excludedConnections[0].Name);
+            var excluded = GetExcludedConnections(vm).Single();
+            Assert.AreEqual(Id1, excluded.Id);
         }
 
         [Test]
@@ -157,22 +136,15 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            const string dataA = "DataA";
-            const string dataB = "DataB";
-
             var data = new[]
             {
                 new QueryData
                 {
-                    Name = dataA,
-                    Solution = SolutionId,
-                    SolutionIndex = 0
+                    Id = Id1
                 },
                 new QueryData
                 {
-                    Name = dataB,
-                    Solution = SolutionId,
-                    SolutionIndex = 2
+                    Id = Id2
                 }
             };
 
@@ -181,20 +153,21 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IMessageService>());
 
             vm.SetConnections(data);
+            vm.SelectedSolution = CreateSolution(Id1, Id2);
 
             // Act
 
-            vm.DecreaseSolutionIndex(data[1]);
+            vm.MoveItemUp(Id2, vm.SelectedSolution.ConnectionIds);
 
             // Assert
 
-            var includedConnections = vm.IncludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(2, includedConnections.Length);
-            Assert.AreEqual(dataB, includedConnections[0].Name);
-            Assert.AreEqual(dataA, includedConnections[1].Name);
+            var included = GetIncludedConnections(vm);
+            Assert.AreEqual(2, included.Count);
+            Assert.AreEqual(Id2, included[0].Id);
+            Assert.AreEqual(Id1, included[1].Id);
 
-            var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(0, excludedConnections.Length);
+            var excluded = GetExcludedConnections(vm);
+            Assert.IsEmpty(excluded);
         }
 
         [Test]
@@ -202,22 +175,15 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            const string dataA = "DataA";
-            const string dataB = "DataB";
-
             var data = new[]
             {
                 new QueryData
                 {
-                    Name = dataA,
-                    Solution = SolutionId,
-                    SolutionIndex = 0
+                    Id = Id1
                 },
                 new QueryData
                 {
-                    Name = dataB,
-                    Solution = SolutionId,
-                    SolutionIndex = 2
+                    Id = Id2
                 }
             };
 
@@ -226,52 +192,21 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IMessageService>());
 
             vm.SetConnections(data);
+            vm.SelectedSolution = CreateSolution(Id1, Id2);
 
             // Act
 
-            vm.IncreaseSolutionIndex(data[0]);
+            vm.MoveItemDown(Id1, vm.SelectedSolution.ConnectionIds);
 
             // Assert
 
-            var includedConnections = vm.IncludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(2, includedConnections.Length);
-            Assert.AreEqual(dataB, includedConnections[0].Name);
-            Assert.AreEqual(dataA, includedConnections[1].Name);
+            var included = GetIncludedConnections(vm);
+            Assert.AreEqual(2, included.Count);
+            Assert.AreEqual(Id2, included[0].Id);
+            Assert.AreEqual(Id1, included[1].Id);
 
-            var excludedConnections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            Assert.AreEqual(0, excludedConnections.Length);
-        }
-
-        [Test]
-        public void SettingSelectedSolutionAlsoSetsQueryDataSelectedSolution()
-        {
-            // Arrange
-
-            var data = new[]
-            {
-                new QueryData(),
-                new QueryData()
-            };
-
-            var vm = new SolutionViewModel(
-                Mock.Of<IConnectionNameValidator>(),
-                Mock.Of<IMessageService>());
-
-            vm.SetConnections(data);
-            
-            var solution = new Solution();
-
-            // Act
-
-            vm.SelectedSolution = solution;
-
-            // Assert
-
-            var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            var allSet = connections.All(c => c.Solution == solution.Id);
-            
-            Assert.AreEqual(2, connections.Length);
-            Assert.IsTrue(allSet);
+            var excluded = GetExcludedConnections(vm);
+            Assert.IsEmpty(excluded);
         }
 
         [Apartment(ApartmentState.STA)]
@@ -306,17 +241,9 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            var data = new[]
-            {
-                new QueryData(),
-                new QueryData()
-            };
-
             var vm = new SolutionViewModel(
                 Mock.Of<IConnectionNameValidator>(),
                 Mock.Of<IMessageService>());
-
-            vm.SetConnections(data);
 
             // Act
 
@@ -326,10 +253,6 @@ namespace SCQueryConnect.Tests.ViewModels
 
             var solution = vm.Solutions.Single();
             Assert.AreEqual(solution, vm.SelectedSolution);
-
-            var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            var allSet = connections.All(c => c.Solution == solution.Id);
-            Assert.IsTrue(allSet);
         }
 
         [Test]
@@ -339,8 +262,14 @@ namespace SCQueryConnect.Tests.ViewModels
 
             var data = new[]
             {
-                new QueryData(),
-                new QueryData()
+                new QueryData
+                {
+                    Id = Id1
+                },
+                new QueryData
+                {
+                    Id = Id2
+                }
             };
 
             var vm = new SolutionViewModel(
@@ -360,11 +289,6 @@ namespace SCQueryConnect.Tests.ViewModels
 
             Assert.IsEmpty(vm.Solutions);
             Assert.IsNull(vm.SelectedSolution);
-
-            var connections = vm.ExcludedConnections.Cast<QueryData>().ToArray();
-            var allKeys = connections.SelectMany(c => c.SolutionIndexes.Keys);
-            var containsSolutionId = allKeys.Contains(solution.Id);
-            Assert.IsFalse(containsSolutionId);
         }
 
         [Test]
@@ -384,7 +308,7 @@ namespace SCQueryConnect.Tests.ViewModels
 
             // Act
 
-            vm.MoveSolutionUp(solution2);
+            vm.MoveItemUp(solution2, vm.Solutions);
 
             // Assert
 
@@ -409,7 +333,7 @@ namespace SCQueryConnect.Tests.ViewModels
 
             // Act
 
-            vm.MoveSolutionDown(solution1);
+            vm.MoveItemDown(solution1, vm.Solutions);
 
             // Assert
 
@@ -438,7 +362,7 @@ namespace SCQueryConnect.Tests.ViewModels
             // Assert
 
             Assert.AreEqual(2, vm.Solutions.Count);
-            
+
             Assert.AreEqual(vm.Solutions[0].Name, vm.Solutions[1].Name);
             Assert.AreNotEqual(vm.Solutions[0].Id, vm.Solutions[1].Id);
         }
@@ -467,11 +391,11 @@ namespace SCQueryConnect.Tests.ViewModels
 
             // Assert
 
-            var included = vm.IncludedConnections.Cast<QueryData>().Count();
-            var excluded = vm.ExcludedConnections.Cast<QueryData>().Count();
-            
-            Assert.AreEqual(0, included);
-            Assert.AreEqual(0, excluded);
+            var included = GetIncludedConnections(vm);
+            Assert.IsEmpty(included);
+
+            var excluded = GetExcludedConnections(vm);
+            Assert.IsEmpty(excluded);
         }
 
         [Test]
@@ -544,6 +468,24 @@ namespace SCQueryConnect.Tests.ViewModels
             Mock.Get(validator).Verify(v =>
                 v.Validate(solutionName2),
                 Times.Once);
+        }
+
+        private static Solution CreateSolution(params string[] connectionIds)
+        {
+            return new Solution
+            {
+                ConnectionIds = new ObservableCollection<string>(connectionIds)
+            };
+        }
+
+        private static IList<QueryData> GetIncludedConnections(ISolutionViewModel vm)
+        {
+            return vm.IncludedConnections.Cast<QueryData>().ToArray();
+        }
+
+        private static IList<QueryData> GetExcludedConnections(ISolutionViewModel vm)
+        {
+            return vm.ExcludedConnections.Cast<QueryData>().ToArray();
         }
     }
 }
