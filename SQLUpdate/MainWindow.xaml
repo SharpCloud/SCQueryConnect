@@ -63,8 +63,50 @@
 
             <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
 
-            <TabControl Grid.Column="0"  BorderBrush="Transparent" SelectedItem="{Binding MainViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}">
+            <TabControl Grid.Column="0"
+                        BorderBrush="Transparent"
+                        SelectedItem="{Binding MainViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}"
+                        TabStripPlacement="Left">
                 <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Grid x:Name="gdBorder" Background="{StaticResource QCBackground}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="0,10">
+                                                <ContentPresenter x:Name="ContentSite"
+                                                                  VerticalAlignment="Center"
+                                                                  HorizontalAlignment="Center"
+                                                                  ContentSource="Header"
+                                                                  Margin="10,2">
+                                                    <ContentPresenter.LayoutTransform>
+                                                        <RotateTransform Angle="270" />
+                                                    </ContentPresenter.LayoutTransform>
+                                                </ContentPresenter>
+                                            </Border>
+                                        </StackPanel>
+                                        <Border x:Name="selectedBorder" Width="2" HorizontalAlignment="Right" Background="{StaticResource QCBlue}" />
+                                    </Grid>
+                                    
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="gdBorder" Property="Background" Value="{StaticResource QCBackground}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
+                                            <Setter TargetName="gdBorder" Property="Background" Value="#111111" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
                     <Style x:Key="DefaultListButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Setter Property="Background" Value="#666" />
                         <Setter Property="Height" Value="40" />
