@@ -1314,7 +1314,22 @@ namespace SCQueryConnect
             }
         }
 
-        private void PublishSolutionClick(object sender, RoutedEventArgs e)
+        private void PublishSolutionClick32(object sender, RoutedEventArgs e)
+        {
+            PublishSolution(true);
+        }
+
+        private void PublishSolutionClick64(object sender, RoutedEventArgs e)
+        {
+            PublishSolution(false);
+        }
+
+        private void PublishSolutionClickAuto(object sender, RoutedEventArgs e)
+        {
+            PublishSolution(DetectIs32Bit);
+        }
+
+        private void PublishSolution(bool is32Bit)
         {
             try
             {
@@ -1346,22 +1361,6 @@ namespace SCQueryConnect
 
                 Directory.Delete(sequenceFolder, true);
                 GetFolder(_solutionViewModel.SelectedSolution.Name);
-                bool is32Bit;
-
-                switch (ArchitectureComboBox.SelectedItem)
-                {
-                    case SolutionViewModel.Architecture64:
-                        is32Bit = true;
-                        break;
-
-                    case SolutionViewModel.Architecture32:
-                        is32Bit = false;
-                        break;
-
-                    default:
-                        is32Bit = DetectIs32Bit;
-                        break;
-                }
 
                 var connections = _solutionViewModel.IncludedConnections.Cast<QueryData>();
                 sb.AppendLine("@echo off");

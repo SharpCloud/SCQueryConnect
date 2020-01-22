@@ -25,12 +25,7 @@ namespace SCQueryConnect.ViewModels
         private QueryData _selectedExcludedConnection;
         private QueryData _selectedIncludedConnection;
         private ObservableCollection<Solution> _solutions = new ObservableCollection<Solution>();
-        private string _selectedArchitecture;
         private Solution _selectedSolution;
-
-        public const string ArchitectureAuto = "Auto";
-        public const string Architecture64 = "64 bit";
-        public const string Architecture32 = "32 bit";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -116,27 +111,6 @@ namespace SCQueryConnect.ViewModels
         public IActionCommand ExcludeFromSolutionCommand { get; }
         public IActionCommand MoveConnectionUp { get; }
         public IActionCommand MoveConnectionDown { get; }
-
-        public string SelectedArchitecture
-        {
-            get => _selectedArchitecture;
-            
-            set
-            {
-                if (_selectedArchitecture != value)
-                {
-                    _selectedArchitecture = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string[] ArchitectureOptions { get; } =
-        {
-            ArchitectureAuto,
-            Architecture64,
-            Architecture32
-        };
 
         public Solution SelectedSolution
         {
@@ -229,8 +203,6 @@ namespace SCQueryConnect.ViewModels
                 .Select(p => p.GetValue(this))
                 .Cast<IActionCommand>()
                 .ToArray();
-
-            SelectedArchitecture = ArchitectureAuto;
         }
 
         public void SetConnections(IList<QueryData> connections)

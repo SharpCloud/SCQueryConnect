@@ -25,9 +25,6 @@ namespace SCQueryConnect.Interfaces
         QueryData SelectedIncludedConnection { get; set; }
 
         ObservableCollection<Solution> Solutions { get; set; }
-
-        string SelectedArchitecture { get; set; }
-        string[] ArchitectureOptions { get; }
         Solution SelectedSolution { get; set; }
 
         void SetConnections(IList<QueryData> connections);
