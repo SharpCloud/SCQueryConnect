@@ -21,7 +21,9 @@ namespace SCQueryConnect.Common.Helpers
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
+        private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
+        private readonly IResourceUrlDataChecker _resourceUrlDataChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
@@ -44,7 +46,9 @@ namespace SCQueryConnect.Common.Helpers
             IDbConnectionFactory dbConnectionFactory,
             IExcelWriter excelWriter,
             ILog log,
+            IPanelsDataChecker panelsDataChecker,
             IRelationshipsDataChecker relationshipsDataChecker,
+            IResourceUrlDataChecker resourceUrlDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory)
         {
             _architectureDetector = architectureDetector;
@@ -53,7 +57,9 @@ namespace SCQueryConnect.Common.Helpers
             _dbConnectionFactory = dbConnectionFactory;
             _excelWriter = excelWriter;
             _logger = log;
+            _panelsDataChecker = panelsDataChecker;
             _relationshipsDataChecker = relationshipsDataChecker;
+            _resourceUrlDataChecker = resourceUrlDataChecker;
             _sharpCloudApiFactory = sharpCloudApiFactory;
         }
 
@@ -307,12 +313,22 @@ namespace SCQueryConnect.Common.Helpers
                     {
                         connection.Open();
 
+                        var panelMetadata = await GetPanelMetadata(
+                            connection,
+                            settings.QueryStringPanels);
+
+                        var resourceUrlMetadata = await GetResourceUrlMetadata(
+                            connection,
+                            settings.QueryStringResourceUrls);
+
                         await UpdateItems(
                             connection,
                             story,
                             settings.QueryString,
                             settings.MaxRowCount,
-                            settings.UnpublishItems);
+                            settings.UnpublishItems,
+                            panelMetadata,
+                            resourceUrlMetadata);
 
                         await UpdateRelationships(connection, story, settings.QueryStringRels);
                         await _logger.Log("Saving Changes");
@@ -354,7 +370,9 @@ namespace SCQueryConnect.Common.Helpers
             Story story,
             string sqlString,
             int maxRowCount,
-            bool unpublishItems)
+            bool unpublishItems,
+            IList<PanelMetadata> panelMetadata,
+            IList<ResourceUrlMetadata> resourceUrlMetadata)
         {
             if (string.IsNullOrWhiteSpace(sqlString))
             {
@@ -423,7 +441,7 @@ namespace SCQueryConnect.Common.Helpers
                         return;
                     }
 
-                    // create our string arrar
+                    // create our string array
                     var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
                     // add the headers
                     for (int i = 0; i < reader.FieldCount; i++)
@@ -450,8 +468,7 @@ namespace SCQueryConnect.Common.Helpers
                     string errorMessage;
                     if (unpublishItems)
                     {
-                        List<Guid> updatedItems;
-                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out updatedItems))
+                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out var updatedItems, panelMetadata, resourceUrlMetadata))
                         {
                             await _logger.Log(errorMessage);
                         }
@@ -479,7 +496,7 @@ namespace SCQueryConnect.Common.Helpers
                     }
                     else
                     {
-                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage))
+                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out _, panelMetadata, resourceUrlMetadata))
                         {
                             await _logger.Log(errorMessage);
                         }
@@ -498,6 +515,142 @@ namespace SCQueryConnect.Common.Helpers
         private async Task LogError(string message)
         {
             await _logger.Log($"ERROR: {message}");
+        }
+
+        private async Task<IList<ResourceUrlMetadata>> GetResourceUrlMetadata(
+            IDbConnection connection,
+            string sqlString)
+        {
+            ResourceUrlMetadata Mapper(Func<string, string> fieldExtractor)
+            {
+                var metadata = new ResourceUrlMetadata
+                {
+                    Description = fieldExtractor(ResourceUrlDataChecker.DescriptionHeader),
+                    ItemExternalId = fieldExtractor(ResourceUrlDataChecker.ExternalIdHeader),
+                    Name = fieldExtractor(ResourceUrlDataChecker.ResourceNameHeader),
+                    Url = fieldExtractor(ResourceUrlDataChecker.UrlHeader)
+                };
+
+                return metadata;
+            }
+
+            return await GetMetadata(
+                connection,
+                sqlString,
+                ResourceUrlDataChecker.RequiredHeadings,
+                "resource URL",
+                _resourceUrlDataChecker,
+                Mapper);
+        }
+
+        private async Task<IList<PanelMetadata>> GetPanelMetadata(
+            IDbConnection connection,
+            string sqlString)
+        {
+            PanelMetadata Mapper(Func<string, string> fieldExtractor)
+            {
+                PanelMetadata metadata = null;
+                var panelTypeString = fieldExtractor(PanelsDataChecker.PanelTypeHeader);
+
+                var success = Enum.TryParse(
+                    panelTypeString,
+                    true,
+                    out Panel.PanelType panelType);
+
+                if (success)
+                {
+                    metadata = new PanelMetadata
+                    {
+                        Title = fieldExtractor(PanelsDataChecker.TitleHeader),
+                        ItemExternalId = fieldExtractor(PanelsDataChecker.ExternalIdHeader),
+                        PanelType = panelType,
+                        Data = fieldExtractor(PanelsDataChecker.DataHeader)
+                    };
+                }
+
+                return metadata;
+            }
+
+            return await GetMetadata(
+                connection,
+                sqlString,
+                PanelsDataChecker.RequiredHeadings,
+                "query",
+                _panelsDataChecker,
+                Mapper);
+        }
+
+        private async Task<IList<T>> GetMetadata<T>(
+            IDbConnection connection,
+            string sqlString,
+            HashSet<string> columnHeadings,
+            string description,
+            IDataChecker dataChecker,
+            Func<Func<string, string>, T> mapper)
+            where T : new()
+        {
+            var metadataList = new List<T>();
+
+            if (string.IsNullOrWhiteSpace(sqlString))
+            {
+                await _logger.Log($"No {description} query detected");
+                return metadataList;
+            }
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = sqlString;
+                command.CommandType = CommandType.Text;
+
+                await _logger.Log("Reading database");
+                using (var reader = command.ExecuteReader())
+                {
+                    var isOk = dataChecker.CheckData(reader);
+                    if (!isOk)
+                    {
+                        return metadataList;
+                    }
+
+                    var indexes = columnHeadings.ToDictionary(
+                        k => k,
+                        k => -1,
+                        StringComparer.OrdinalIgnoreCase);
+
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        try
+                        {
+                            var headerText = reader.GetName(i);
+
+                            if (indexes.ContainsKey(headerText))
+                            {
+                                indexes[headerText] = i;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            await _logger.Log($"Could not read {description} header column {i}");
+                            throw;
+                        }
+                    }
+
+                    while (reader.Read())
+                    {
+                        var objects = new object[reader.FieldCount];
+                        reader.GetValues(objects);
+
+                        var metadata = mapper(heading =>
+                            (string) objects[indexes[heading]]);
+
+                        if (metadata != null)
+                        {
+                            metadataList.Add(metadata);
+                        }
+                    }
+                }
+            }
+
+            return metadataList;
         }
     }
 }

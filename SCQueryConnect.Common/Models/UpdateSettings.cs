@@ -4,7 +4,9 @@
     {
         public string TargetStoryId { get; set; }
         public string QueryString { get; set; }
+        public string QueryStringPanels { get; set; }
         public string QueryStringRels { get; set; }
+        public string QueryStringResourceUrls { get; set; }
         public string ConnectionString { get; set; }
         public DatabaseType DBType { get; set; }
         public int MaxRowCount { get; set; }

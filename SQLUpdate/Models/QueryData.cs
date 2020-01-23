@@ -41,6 +41,10 @@ namespace SCQueryConnect.Models
         [DataMember]
         public string QueryStringRels { get; set; }
         [DataMember]
+        public string QueryStringPanels { get; set; }
+        [DataMember]
+        public string QueryStringResourceUrls { get; set; }
+        [DataMember]
         public string FileName { get; set; }
         [DataMember]
         public string SharePointURL { get; set; }
@@ -64,6 +68,8 @@ namespace SCQueryConnect.Models
         public DataView QueryResults { get; set; }
         [IgnoreDataMember]
         public DataView QueryResultsRels { get; set; }
+        [IgnoreDataMember]
+        public DataView QueryResultsPanels { get; set; }
         [IgnoreDataMember]
         public DataView QueryResultsResourceUrls { get; set; }
         [IgnoreDataMember]
@@ -141,8 +147,9 @@ namespace SCQueryConnect.Models
                     SharePointURL = "";
                     ConnectionsString = "Server=.; Integrated Security=true; Database=demo";
                     QueryString = "SELECT * FROM TABLE";
+                    QueryStringPanels = "";
                     QueryStringRels = "";
-                    // "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
+                    QueryStringResourceUrls = "";
                     break;
                 case DatabaseType.ODBC:
                     Name = "ODBC Example";
@@ -150,8 +157,9 @@ namespace SCQueryConnect.Models
                     SharePointURL = "";
                     ConnectionsString = "DSN=DatasourceName";
                     QueryString = "SELECT * FROM TABLE";
+                    QueryStringPanels = "";
                     QueryStringRels = "";
-                    //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+                    QueryStringResourceUrls = "";
                     break;
                 case DatabaseType.ADO:
                     Name = "ADO/OLEDB Example";
@@ -160,7 +168,9 @@ namespace SCQueryConnect.Models
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;";
                     QueryString = "SELECT * FROM TABLE";
-                    QueryStringRels = "";//"SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+                    QueryStringPanels = "";
+                    QueryStringRels = "";
+                    QueryStringResourceUrls = "";
                     break;
                 case DatabaseType.Excel:
                     Name = "Excel Example";
@@ -169,7 +179,9 @@ namespace SCQueryConnect.Models
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml; HDR = YES'";
                     QueryString = "SELECT * from [Sheet1$]";
-                    QueryStringRels = ""; // "/*Uncomment to use*/\n/*SELECT * from [Sheet2$]*/";
+                    QueryStringPanels = "";
+                    QueryStringRels = "";
+                    QueryStringResourceUrls = "";
                     break;
                 case DatabaseType.Access:
                     Name = "Access Example";
@@ -177,16 +189,18 @@ namespace SCQueryConnect.Models
                     SharePointURL = "";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0}";
                     QueryString = "SELECT * FROM TABLE";
+                    QueryStringPanels = "";
                     QueryStringRels = "";
-                    //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
+                    QueryStringResourceUrls = "";
                     break;
                 case DatabaseType.SharepointList:
                     Name = "SharePoint List Example";
                     SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
                     QueryString = "SELECT * FROM LISTITEM";
-                    QueryStringRels = ""; 
-                    //    "/*Uncomment to use*/\n/*SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE*/";
+                    QueryStringPanels = "";
+                    QueryStringRels = "";
+                    QueryStringResourceUrls = "";
                     break;
                 case DatabaseType.SharpCloudExcel:
                     Name = "SharpCloud (Excel) Example";
@@ -203,7 +217,9 @@ namespace SCQueryConnect.Models
                         "HDR = YES'";
 
                     QueryString = "SELECT * from [Items$]";
+                    QueryStringPanels = "";
                     QueryStringRels = "SELECT * from [Relationships$]";
+                    QueryStringResourceUrls = "";
                     break;
             }
         }

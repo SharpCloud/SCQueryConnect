@@ -68,6 +68,8 @@ namespace SCQueryConnect
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>().InstancePerLifetimeScope();
             builder.RegisterType<UILogger>().As<ILog>().InstancePerLifetimeScope();
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>().InstancePerLifetimeScope();
+            builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>().InstancePerLifetimeScope();
+            builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>().InstancePerLifetimeScope();
 
             return builder;
         }

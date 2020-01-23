@@ -184,6 +184,8 @@ namespace SCQueryConnect
         private readonly ILog _logger;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
+        private readonly IPanelsDataChecker _panelsDataChecker;
+        private readonly IResourceUrlDataChecker _resourceUrlDataChecker;
         private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
 
         public MainWindow(
@@ -197,7 +199,9 @@ namespace SCQueryConnect
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory,
             ILog logger,
-            IQueryConnectHelper qcHelper)
+            IQueryConnectHelper qcHelper,
+            IPanelsDataChecker panelsDataChecker,
+            IResourceUrlDataChecker resourceUrlDataChecker)
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
@@ -218,6 +222,12 @@ namespace SCQueryConnect
             _relationshipsChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrRels);
 
             _sharpCloudApiFactory = sharpCloudApiFactory;
+
+            _panelsDataChecker = panelsDataChecker;
+            _panelsDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrPanels);
+
+            _resourceUrlDataChecker = resourceUrlDataChecker;
+            _resourceUrlDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrResourceUrls);
 
             _logger = logger;
             ((UILogger) _logger).Output = tbResults;
@@ -527,9 +537,18 @@ namespace SCQueryConnect
         {
             await PreviewSql(
                 SqlStringResourceUrls.Text,
-                null,
+                _resourceUrlDataChecker,
                 DataGridResourceUrls,
                 d => d.QueryResultsResourceUrls);
+        }
+
+        private async void PreviewPanelsClick(object sender, RoutedEventArgs e)
+        {
+            await PreviewSql(
+                SqlStringPanels.Text,
+                _panelsDataChecker,
+                DataGridPanels,
+                d => d.QueryResultsPanels);
         }
 
         private async Task PreviewSql(
@@ -732,6 +751,8 @@ namespace SCQueryConnect
                 qd.FileName = FileName.Text;
                 qd.SharePointURL = SharePointURL.Text;
                 qd.SourceStoryId = SourceStoryId.Text;
+                qd.QueryStringPanels = SqlStringPanels.Text;
+                qd.QueryStringResourceUrls = SqlStringResourceUrls.Text;
             }
         }
 
@@ -781,7 +802,7 @@ namespace SCQueryConnect
             SaveSettings();
 
             await _logger.Clear();
-            int maxRowCount = 1000;
+            int maxRowCount;
 
             try
             {
@@ -798,7 +819,9 @@ namespace SCQueryConnect
             {
                 TargetStoryId = StoryId.Text,
                 QueryString = SQLString.Text,
+                QueryStringPanels = SqlStringPanels.Text,
                 QueryStringRels = SQLStringRels.Text,
+                QueryStringResourceUrls = SqlStringResourceUrls.Text,
                 ConnectionString = SelectedQueryData.FormattedConnectionString,
                 DBType = SelectedQueryData.ConnectionType,
                 MaxRowCount = maxRowCount,
@@ -1068,6 +1091,8 @@ namespace SCQueryConnect
                 SharePointURL.Text = SelectedQueryData.SharePointURL;
                 txtExampleRels.Text = "Example: " + SelectedQueryData.GetExampleRelQuery;
                 SourceStoryId.Text = SelectedQueryData.SourceStoryId;
+                SqlStringPanels.Text = SelectedQueryData.QueryStringPanels;
+                SqlStringResourceUrls.Text = SelectedQueryData.QueryStringResourceUrls;
 
                 tbLastRun.Text = SelectedQueryData.LastRunDate;
                 tbResults.Text = SelectedQueryData.LogData;

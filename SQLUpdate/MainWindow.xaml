@@ -446,9 +446,36 @@
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Style="{StaticResource DbResultsTextBlock}" />
-                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterrResourceUrls" Visibility="Collapsed" />
-                                        <Button Click="RunClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain 'ExternalID', 'ResourceName', 'Description', and 'URL' columns" x:Name="txterrResourceUrls" Visibility="Collapsed" />
+                                        <Button Click="PreviewResourceUrlsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid x:Name="DataGridResourceUrls" Grid.Row="1" />
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Panels">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="100" />
+                                        <RowDefinition Height="3" />
+                                        <RowDefinition Height="3*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Style="{StaticResource QueryStringTextBlock}" />
+                                    <TextBox x:Name="SqlStringPanels" Grid.Row="1" Text="SELECT * FROM TABLE" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <GridSplitter Grid.Row="2" />
+
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Style="{StaticResource DbResultsTextBlock}" />
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain 'ExternalID', 'Title', 'PanelType', and 'Data' columns" x:Name="txterrPanels" Visibility="Collapsed" />
+                                        <Button Click="PreviewPanelsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <DataGrid x:Name="DataGridPanels" Grid.Row="1" />
                                     </Grid>
                                 </Grid>
                             </TabItem>

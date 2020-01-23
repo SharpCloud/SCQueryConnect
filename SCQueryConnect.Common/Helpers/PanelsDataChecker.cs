@@ -6,19 +6,19 @@ using System.Linq;
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class ResourceUrlDataChecker : DataChecker, IResourceUrlDataChecker
+    public class PanelsDataChecker : DataChecker, IPanelsDataChecker
     {
-        public const string ExternalIdHeader = "ExternalId";
-        public const string ResourceNameHeader = "ResourceName";
-        public const string DescriptionHeader = "Description";
-        public const string UrlHeader = "URL";
+        public const string ExternalIdHeader = "ExternalID";
+        public const string TitleHeader = "Title";
+        public const string PanelTypeHeader = "PanelType";
+        public const string DataHeader = "Data";
 
         public static HashSet<string> RequiredHeadings = new HashSet<string>
         {
             ExternalIdHeader,
-            ResourceNameHeader,
-            DescriptionHeader,
-            UrlHeader
+            TitleHeader,
+            PanelTypeHeader,
+            DataHeader
         };
 
         protected override bool CheckDataIsValid(IDataReader reader)
