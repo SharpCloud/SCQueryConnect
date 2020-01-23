@@ -15,12 +15,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
-using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -176,7 +177,7 @@ namespace SCQueryConnect
         private readonly ISolutionViewModel _solutionViewModel;
         private readonly IConnectionNameValidator _connectionNameValidator;
         private readonly IConnectionStringHelper _connectionStringHelper;
-        private readonly IDataChecker _dataChecker;
+        private readonly IItemDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IExcelWriter _excelWriter;
@@ -189,7 +190,7 @@ namespace SCQueryConnect
             ISolutionViewModel solutionViewModel,
             IConnectionNameValidator connectionNameValidator,
             IConnectionStringHelper connectionStringHelper,
-            IDataChecker dataChecker,
+            IItemDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
             IEncryptionHelper encryptionHelper,
             IExcelWriter excelWriter,
@@ -206,8 +207,8 @@ namespace SCQueryConnect
             _connectionNameValidator = connectionNameValidator;
             _connectionStringHelper = connectionStringHelper;
 
-            _dataChecker = dataChecker;
-            ((UIDataChecker) _dataChecker).ErrorText = txterr;
+            _itemDataChecker = itemDataChecker;
+            ((UIItemDataChecker) _itemDataChecker).ErrorText = txterr;
 
             _dbConnectionFactory = dbConnectionFactory;
             _encryptionHelper = encryptionHelper;
@@ -506,84 +507,45 @@ namespace SCQueryConnect
 
         private async void RunClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                await InitialiseSharpCloudDataIfNeeded();
-
-                using (IDbConnection connection = GetDb())
-                {
-                    connection.Open();
-                    using (IDbCommand command = connection.CreateCommand())
-                    {
-
-                        if (connection is OleDbConnection) { 
-                            DataTable schemaTable = ((OleDbConnection)connection).GetOleDbSchemaTable(
-                                OleDbSchemaGuid.Tables,
-                                new object[] {null, null, null, "TABLE"});
-
-                            Debug.Write( schemaTable.ToString());
-                        }
-
-
-
-                        command.CommandText = SQLString.Text;
-                        command.CommandType = CommandType.Text;
-
-                        using (IDataReader reader = command.ExecuteReader())
-                        {
-                            _dataChecker.CheckDataIsOK(reader);
-
-                            DataTable dt = new DataTable();
-                            dt.Load(reader);
-
-                            var regex = new Regex(Regex.Escape("#"));
-                            for (var c = 0; c < dt.Columns.Count; c++)
-                            {
-                                var col = dt.Columns[c];
-                                if (col.Caption.ToLower().StartsWith("tags#"))
-                                {
-                                    col.Caption = regex.Replace(col.Caption, ".", 1);
-                                }
-                            }
-
-                            DataGrid.ItemsSource = dt.DefaultView;
-                            SelectedQueryData.QueryResults = dt.DefaultView;
-
-                            for (var col = 0; col < DataGrid.Columns.Count; col++)
-                            {
-                                DataGrid.Columns[col].Header = dt.Columns[col].Caption;
-                            }
-                        }
-                    }
-                }
-
-                SetLastUsedSharpCloudConnection();
-            }
-            catch (Exception ex)
-            {
-                ProcessRunException(ex);
-            }
+            await PreviewSql(
+                SQLString.Text,
+                _itemDataChecker,
+                DataGrid,
+                d => d.QueryResults);
         }
 
         private async void RunClickRels(object sender, RoutedEventArgs e)
         {
-            await InitialiseSharpCloudDataIfNeeded();
+            await PreviewSql(
+                SQLStringRels.Text,
+                _relationshipsChecker,
+                DataGridRels,
+                d => d.QueryResultsRels);
+        }
 
+        private async Task PreviewSql(
+            string query,
+            IDataChecker dataChecker,
+            DataGrid dataGrid,
+            Expression<Func<QueryData, DataView>> dataViewSelector)
+        {
             try
             {
-                using (IDbConnection connection = GetDb())
+                await InitialiseSharpCloudDataIfNeeded();
+
+                using (var connection = GetDb())
                 {
                     connection.Open();
-                    using (IDbCommand command = connection.CreateCommand())
+                    using (var command = connection.CreateCommand())
                     {
-                        command.CommandText = SQLStringRels.Text;
+                        command.CommandText = query;
                         command.CommandType = CommandType.Text;
 
-                        using (IDataReader reader = command.ExecuteReader())
+                        using (var reader = command.ExecuteReader())
                         {
-                            _relationshipsChecker.CheckDataIsOKRels(reader);
+                            dataChecker.CheckData(reader);
 
-                            DataTable dt = new DataTable();
+                            var dt = new DataTable();
                             dt.Load(reader);
 
                             var regex = new Regex(Regex.Escape("#"));
@@ -596,12 +558,14 @@ namespace SCQueryConnect
                                 }
                             }
 
-                            DataGridRels.ItemsSource = dt.DefaultView;
-                            SelectedQueryData.QueryResultsRels = dt.DefaultView;
+                            dataGrid.ItemsSource = dt.DefaultView;
 
-                            for (var col = 0; col < DataGridRels.Columns.Count; col++)
+                            var prop = (PropertyInfo)((MemberExpression)dataViewSelector.Body).Member;
+                            prop.SetValue(SelectedQueryData, dt.DefaultView, null);
+
+                            for (var col = 0; col < dataGrid.Columns.Count; col++)
                             {
-                                DataGridRels.Columns[col].Header = dt.Columns[col].Caption;
+                                dataGrid.Columns[col].Header = dt.Columns[col].Caption;
                             }
                         }
                     }

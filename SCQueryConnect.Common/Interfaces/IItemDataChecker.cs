@@ -1,6 +1,6 @@
 ﻿namespace SCQueryConnect.Common.Interfaces
 {
-    public interface IRelationshipsDataChecker : IDataChecker
+    public interface IItemDataChecker : IDataChecker
     {
     }
 }

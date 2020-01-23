@@ -60,7 +60,7 @@ namespace SCQueryConnect
             builder.RegisterType<SolutionViewModel>().As<ISolutionViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ConnectionNameValidator>().As<IConnectionNameValidator>().InstancePerLifetimeScope();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>().InstancePerLifetimeScope();
-            builder.RegisterType<UIDataChecker>().As<IDataChecker>().InstancePerLifetimeScope();
+            builder.RegisterType<UIItemDataChecker>().As<IItemDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>().InstancePerLifetimeScope();

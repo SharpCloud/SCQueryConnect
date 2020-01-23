@@ -17,7 +17,7 @@ namespace SCQueryConnect.Common.Helpers
     {
         private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
-        private readonly IDataChecker _dataChecker;
+        private readonly IItemDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
@@ -40,7 +40,7 @@ namespace SCQueryConnect.Common.Helpers
         public QueryConnectHelper(
             IArchitectureDetector architectureDetector,
             IConnectionStringHelper connectionStringHelper,
-            IDataChecker dataChecker,
+            IItemDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
             IExcelWriter excelWriter,
             ILog log,
@@ -49,7 +49,7 @@ namespace SCQueryConnect.Common.Helpers
         {
             _architectureDetector = architectureDetector;
             _connectionStringHelper = connectionStringHelper;
-            _dataChecker = dataChecker;
+            _itemDataChecker = itemDataChecker;
             _dbConnectionFactory = dbConnectionFactory;
             _excelWriter = excelWriter;
             _logger = log;
@@ -117,7 +117,7 @@ namespace SCQueryConnect.Common.Helpers
                 
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    if (!_relationshipsDataChecker.CheckDataIsOKRels(reader))
+                    if (!_relationshipsDataChecker.CheckData(reader))
                     {
                         await LogError("Invalid SQL");
                         return;
@@ -370,7 +370,7 @@ namespace SCQueryConnect.Common.Helpers
                 await _logger.Log("Reading database");
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    var isOk = _dataChecker.CheckDataIsOK(reader);
+                    var isOk = _itemDataChecker.CheckData(reader);
                     if (!isOk)
                     {
                         return;

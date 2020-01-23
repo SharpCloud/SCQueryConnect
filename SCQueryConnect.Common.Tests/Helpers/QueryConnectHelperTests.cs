@@ -20,7 +20,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
         private QueryConnectHelper CreateQueryConnectHelper(
             IArchitectureDetector architectureDetector = null,
             IConnectionStringHelper connectionStringHelper = null,
-            IDataChecker dataChecker = null,
+            IItemDataChecker itemDataChecker = null,
             IDbConnectionFactory dbConnectionFactory = null,
             IExcelWriter excelWriter = null,
             ILog log = null,
@@ -30,7 +30,7 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             return new QueryConnectHelper(
                 architectureDetector ?? Mock.Of<IArchitectureDetector>(),
                 connectionStringHelper ?? Mock.Of<IConnectionStringHelper>(),
-                dataChecker ?? Mock.Of<IDataChecker>(),
+                itemDataChecker ?? Mock.Of<IItemDataChecker>(),
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
                 excelWriter ?? Mock.Of<IExcelWriter>(),
                 log ?? Mock.Of<ILog>(),

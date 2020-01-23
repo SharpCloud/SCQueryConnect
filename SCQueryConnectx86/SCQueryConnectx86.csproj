@@ -183,8 +183,8 @@
     <Compile Include="..\SQLUpdate\Properties\Resources.Designer.cs">
       <Link>Properties\Resources.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\UIDataChecker.cs">
-      <Link>UIDataChecker.cs</Link>
+    <Compile Include="..\SQLUpdate\UiItemDataChecker.cs">
+      <Link>UiItemDataChecker.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\UILogger.cs">
       <Link>UILogger.cs</Link>

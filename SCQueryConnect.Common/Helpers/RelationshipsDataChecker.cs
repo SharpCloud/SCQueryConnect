@@ -26,7 +26,7 @@ namespace SCQueryConnect.Common.Helpers
             "INTERNAL ID 2"
         };
 
-        public bool CheckDataIsOKRels(IDataReader reader)
+        public bool CheckData(IDataReader reader)
         {
             bool bOK1 = false;
             bool bOK2 = false;

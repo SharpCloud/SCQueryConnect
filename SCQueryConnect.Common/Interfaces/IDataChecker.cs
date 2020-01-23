@@ -4,6 +4,6 @@ namespace SCQueryConnect.Common.Interfaces
 {
     public interface IDataChecker
     {
-        bool CheckDataIsOK(IDataReader reader);
+        bool CheckData(IDataReader reader);
     }
 }

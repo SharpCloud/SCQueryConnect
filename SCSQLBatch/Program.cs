@@ -26,7 +26,7 @@ namespace SCSQLBatch
             builder.RegisterType<BatchLogic>();
             builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>();
-            builder.RegisterType<DataChecker>().As<IDataChecker>();
+            builder.RegisterType<ItemDataChecker>().As<IItemDataChecker>();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();

@@ -3,11 +3,11 @@ using System.Data;
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class DataChecker : IDataChecker
+    public class ItemDataChecker : IItemDataChecker
     {
-        public bool CheckDataIsOK(IDataReader reader)
+        public bool CheckData(IDataReader reader)
         {
-            bool bOK = false;
+            var bOK = false;
 
             for (int i = 0; i < reader.FieldCount; i++)
             {

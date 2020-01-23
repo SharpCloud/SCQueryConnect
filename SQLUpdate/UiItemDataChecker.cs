@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace SCQueryConnect
 {
-    public class UIDataChecker : DataChecker
+    public class UIItemDataChecker : ItemDataChecker
     {
         internal TextBlock ErrorText { private get; set; }
 
