@@ -65,6 +65,8 @@ namespace SCQueryConnect.Models
         [IgnoreDataMember]
         public DataView QueryResultsRels { get; set; }
         [IgnoreDataMember]
+        public DataView QueryResultsResourceUrls { get; set; }
+        [IgnoreDataMember]
         public int DisplayOrder { get; set; }
 
         public string FormattedConnectionString => ConnectionsString

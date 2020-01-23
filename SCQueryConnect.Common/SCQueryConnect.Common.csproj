@@ -64,13 +64,16 @@
     <Compile Include="DatabaseStrings.cs" />
     <Compile Include="Helpers\ArchitectureDetector.cs" />
     <Compile Include="Helpers\ConnectionStringHelper.cs" />
+    <Compile Include="Helpers\DataChecker.cs" />
     <Compile Include="Helpers\DbConnectionFactory.cs" />
     <Compile Include="Helpers\DpapiHelper.cs" />
     <Compile Include="Helpers\ExcelWriter.cs" />
+    <Compile Include="Helpers\ResourceUrlDataChecker.cs" />
     <Compile Include="Helpers\ItemDataChecker.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="Helpers\SharpCloudApiFactory.cs" />
     <Compile Include="Interfaces\IArchitectureDetector.cs" />
+    <Compile Include="Interfaces\IDataCheckerValidityProcessor.cs" />
     <Compile Include="Interfaces\IEncryptionHelper.cs" />
     <Compile Include="Interfaces\IExcelWriter.cs" />
     <Compile Include="Interfaces\IConnectionStringHelper.cs" />
@@ -79,6 +82,7 @@
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IItemDataChecker.cs" />
     <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />
+    <Compile Include="Interfaces\IResourceUrlDataChecker.cs" />
     <Compile Include="Interfaces\ISharpCloudApiFactory.cs" />
     <Compile Include="Interfaces\IQueryConnectHelper.cs" />
     <Compile Include="Logger.cs" />

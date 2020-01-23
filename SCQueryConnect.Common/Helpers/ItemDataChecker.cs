@@ -3,29 +3,25 @@ using System.Data;
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class ItemDataChecker : IItemDataChecker
+    public class ItemDataChecker : DataChecker, IItemDataChecker
     {
-        public bool CheckData(IDataReader reader)
+        protected override bool CheckDataIsValid(IDataReader reader)
         {
-            var bOK = false;
+            var isOk = false;
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 var heading = reader.GetName(i).ToUpper();
+                
                 if (heading == "NAME")
-                    bOK = true;
+                    isOk = true;
                 else if (heading == "EXTERNAL ID")
-                    bOK = true;
+                    isOk = true;
                 else if (heading == "EXTERNALID")
-                    bOK = true;
+                    isOk = true;
             }
 
-            ProcessDataValidity(bOK);
-            return bOK;
-        }
-
-        protected virtual void ProcessDataValidity(bool isOk)
-        {
+            return isOk;
         }
     }
 }

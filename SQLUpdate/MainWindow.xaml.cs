@@ -208,14 +208,14 @@ namespace SCQueryConnect
             _connectionStringHelper = connectionStringHelper;
 
             _itemDataChecker = itemDataChecker;
-            ((UIItemDataChecker) _itemDataChecker).ErrorText = txterr;
+            _itemDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterr);
 
             _dbConnectionFactory = dbConnectionFactory;
             _encryptionHelper = encryptionHelper;
             _excelWriter = excelWriter;
 
             _relationshipsChecker = relationshipsDataChecker;
-            ((UIRelationshipsDataChecker) _relationshipsChecker).RelationshipErrorText = txterrRels;
+            _relationshipsChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrRels);
 
             _sharpCloudApiFactory = sharpCloudApiFactory;
 
@@ -521,6 +521,15 @@ namespace SCQueryConnect
                 _relationshipsChecker,
                 DataGridRels,
                 d => d.QueryResultsRels);
+        }
+
+        private async void PreviewResourceUrlsClick(object sender, RoutedEventArgs e)
+        {
+            await PreviewSql(
+                SqlStringResourceUrls.Text,
+                null,
+                DataGridResourceUrls,
+                d => d.QueryResultsResourceUrls);
         }
 
         private async Task PreviewSql(

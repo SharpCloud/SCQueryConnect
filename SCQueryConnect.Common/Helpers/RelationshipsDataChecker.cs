@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SCQueryConnect.Common.Helpers
 {
-    public class RelationshipsDataChecker : IRelationshipsDataChecker
+    public class RelationshipsDataChecker : DataChecker, IRelationshipsDataChecker
     {
         private readonly string[] _validItem1Headings =
         {
@@ -26,7 +26,7 @@ namespace SCQueryConnect.Common.Helpers
             "INTERNAL ID 2"
         };
 
-        public bool CheckData(IDataReader reader)
+        protected override bool CheckDataIsValid(IDataReader reader)
         {
             bool bOK1 = false;
             bool bOK2 = false;
@@ -43,12 +43,7 @@ namespace SCQueryConnect.Common.Helpers
             }
 
             var isOk = bOK1 && bOK2;
-            ProcessDataValidity(isOk);
             return isOk;
-        }
-
-        protected virtual void ProcessDataValidity(bool isOk)
-        {
         }
     }
 }
