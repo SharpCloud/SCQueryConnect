@@ -236,8 +236,7 @@
             </TabControl>
 
             <Grid Grid.Column="2">
-                <TabControl Background="{StaticResource QCBackground}"
-                            x:Name="BrowserTabs"
+                <TabControl x:Name="BrowserTabs"
                             BorderBrush="Transparent"
                             MinWidth="750"
                             Visibility="{Binding MainViewModel.ConnectionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}">
@@ -246,133 +245,139 @@
                     </TabControl.Resources>
 
                     <TabItem Header="1. Database Connection">
-                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="40"></RowDefinition>
-                                <RowDefinition Height="40"></RowDefinition>
-                                <RowDefinition Height="auto"></RowDefinition>
-                                <RowDefinition Height="80"></RowDefinition>
-                                <RowDefinition Height="50"></RowDefinition>
-                                <RowDefinition Height="auto"></RowDefinition>
-                                <RowDefinition Height="auto"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="50"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="140"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.Resources>
-                                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                                    <Setter Property="Margin" Value="5" />
-                                </Style>
-                            </Grid.Resources>
-
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
-                            <TextBox Grid.Row="0" x:Name="ConnectionName" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
-                            <TextBox Grid.Row="0" x:Name="txtDatabaseType" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
-
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
-                            <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
-
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
-                            <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" Visibility="{Binding SourceStoryIdVisibility}" />
-                            <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
-
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" Visibility="{Binding FilenameVisibility}" />
-                            <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus" Visibility="{Binding FilenameVisibility}"/>
-                            <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click" Visibility="{Binding FilenameVisibility}">Choose file...</Button>
-
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" Visibility="{Binding SharepointVisibility}" />
-                            <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus" Visibility="{Binding SharepointVisibility}"/>
-
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" Visibility="{Binding ConnectionStringVisibility}" />
-                            <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="SaveSettingsOnLostFocus" Visibility="{Binding ConnectionStringVisibility}"/>
-
-                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
-                            <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
-
-                            <TextBlock Grid.Row="5" Grid.Column="1" Margin="5" Foreground="White" TextWrapping="WrapWithOverflow" Visibility="{Binding RewriteDataSourceVisibility}">
-                                <Run>Rewriting the data source may help if data is not being read properly.</Run>
-                                <Run FontStyle="Italic">Warning:</Run>
-                                <Run>this may cause your file to become unusable in older versions of Excel.</Run>
-                            </TextBlock>
-
-                            <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="RewriteDataSourceClick" Visibility="{Binding RewriteDataSourceVisibility}">Rewrite Data Source</Button>
-
-                            <TextBlock Grid.Row="7" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
-                                Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
-                            </TextBlock>
-
-                            <Button Grid.Row="8"
-                                    Grid.Column="1"
-                                    Command="{StaticResource GoToUrl}"
-                                    CommandParameter="https://www.connectionstrings.com/"
-                                    Height="40"
-                                    HorizontalAlignment="Left"
-                                    Width="250">
-                                Help on Connections Strings
-                            </Button>
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="2. Item Query" >
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"></RowDefinition>
-                                <RowDefinition Height="100"></RowDefinition>
-                                <RowDefinition Height="3"></RowDefinition>
-                                <RowDefinition Height="3*"></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Text="Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
-                            <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="SaveSettingsOnLostFocus"/>
-                            <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
-                            <Grid Grid.Row="3">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"></RowDefinition>
-                                    <RowDefinition ></RowDefinition>
+                                    <RowDefinition Height="40"></RowDefinition>
+                                    <RowDefinition Height="40"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="80"></RowDefinition>
+                                    <RowDefinition Height="50"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="50"></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
-                                <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
-                                <Button Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0">Preview SQL Results</Button>
-                                <DataGrid x:Name="DataGrid" Grid.Row="1" Margin="5"/>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="140"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                        <Setter Property="Margin" Value="5" />
+                                    </Style>
+                                </Grid.Resources>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
+                                <TextBox Grid.Row="0" x:Name="ConnectionName" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
+                                <TextBox Grid.Row="0" x:Name="txtDatabaseType" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
+                                <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
+                                <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" Visibility="{Binding SourceStoryIdVisibility}" />
+                                <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" Visibility="{Binding FilenameVisibility}" />
+                                <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus" Visibility="{Binding FilenameVisibility}"/>
+                                <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click" Visibility="{Binding FilenameVisibility}">Choose file...</Button>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" Visibility="{Binding SharepointVisibility}" />
+                                <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus" Visibility="{Binding SharepointVisibility}"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" Visibility="{Binding ConnectionStringVisibility}" />
+                                <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="SaveSettingsOnLostFocus" Visibility="{Binding ConnectionStringVisibility}"/>
+
+                                <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
+                                <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
+
+                                <TextBlock Grid.Row="5" Grid.Column="1" Margin="5" Foreground="White" TextWrapping="WrapWithOverflow" Visibility="{Binding RewriteDataSourceVisibility}">
+                                    <Run>Rewriting the data source may help if data is not being read properly.</Run>
+                                    <Run FontStyle="Italic">Warning:</Run>
+                                    <Run>this may cause your file to become unusable in older versions of Excel.</Run>
+                                </TextBlock>
+
+                                <Button Grid.Row="6" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="RewriteDataSourceClick" Visibility="{Binding RewriteDataSourceVisibility}">Rewrite Data Source</Button>
+
+                                <TextBlock Grid.Row="7" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
+                                    Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
+                                </TextBlock>
+
+                                <Button Grid.Row="8"
+                                        Grid.Column="1"
+                                        Command="{StaticResource GoToUrl}"
+                                        CommandParameter="https://www.connectionstrings.com/"
+                                        Height="40"
+                                        HorizontalAlignment="Left"
+                                        Width="250">
+                                    Help on Connections Strings
+                                </Button>
                             </Grid>
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="2a. Relationship Query" >
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"></RowDefinition>
-                                <RowDefinition Height="100"></RowDefinition>
-                                <RowDefinition Height="3"></RowDefinition>
-                                <RowDefinition Height="3*"></RowDefinition>
-                            </Grid.RowDefinitions>
+                    <TabItem Header="2. Query">
+                        <TabControl Background="{StaticResource QCBackground}">
+                            <TabItem Header="Item">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition Height="100"></RowDefinition>
+                                        <RowDefinition Height="3"></RowDefinition>
+                                        <RowDefinition Height="3*"></RowDefinition>
+                                    </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5" Width="200" HorizontalAlignment="Left"></TextBlock>
-                            <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right"></TextBlock>
-                            <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="SaveSettingsOnLostFocus"/>
-                            <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
-                            <Grid Grid.Row="3">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"></RowDefinition>
-                                    <RowDefinition ></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
-                                <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
-                                <Button Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" >Preview SQL Results</Button>
-                                <DataGrid x:Name="DataGridRels" Grid.Row="1" Margin="5"/>
-                            </Grid>
-                        </Grid>
+                                    <TextBlock Grid.Row="0" Text="Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
+                                    <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30"></RowDefinition>
+                                            <RowDefinition ></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="DB Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
+                                        <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
+                                        <Button Click="RunClick" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0">Preview SQL Results</Button>
+                                        <DataGrid x:Name="DataGrid" Grid.Row="1" Margin="5"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Relationship">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition Height="100"></RowDefinition>
+                                        <RowDefinition Height="3"></RowDefinition>
+                                        <RowDefinition Height="3*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Text="Relationships Query String:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5" Width="200" HorizontalAlignment="Left"></TextBlock>
+                                    <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right"></TextBlock>
+                                    <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" Margin="5" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="WrapWithOverflow" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30"></RowDefinition>
+                                            <RowDefinition ></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="Relationshsips DB Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
+                                        <TextBlock Background="Red" Grid.Row="0" Foreground="White" FontWeight="Bold" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Margin="5,5,5,0" Visibility="Collapsed"></TextBlock>
+                                        <Button Click="RunClickRels" Grid.Row="0" HorizontalAlignment="Right" Width="180" Margin="5,5,5,0" >Preview SQL Results</Button>
+                                        <DataGrid x:Name="DataGridRels" Grid.Row="1" Margin="5"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
                     </TabItem>
 
                     <TabItem Header="3. Update Story" >
-                        <Grid>
+                        <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="250"></RowDefinition>
                                 <RowDefinition Height="3"></RowDefinition>
@@ -424,7 +429,7 @@
                     </TabItem>
 
                     <TabItem Header="4. Create batch files">
-                        <Grid>
+                        <Grid Background="{StaticResource QCBackground}">
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="10"/>
                                 <Button Click="GenerateBatchFileThis" Height="50" Width="220" Margin="5,0" FontSize="16" >Generate Batch Files Now...</Button>
@@ -438,7 +443,7 @@
                     </TabItem>
 
                     <TabItem Header="About">
-                        <Grid>
+                        <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
