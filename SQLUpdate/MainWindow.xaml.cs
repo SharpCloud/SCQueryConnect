@@ -1304,6 +1304,11 @@ namespace SCQueryConnect
                     textBox.Background = Brushes.DarkRed;
                     textBox.Foreground = Brushes.Pink;
                 }
+                else if (textBox.Text.Contains("WARNING"))
+                {
+                    textBox.Background = Brushes.DarkGoldenrod;
+                    textBox.Foreground = Brushes.LightGoldenrodYellow;
+                }
                 else
                 {
                     textBox.Background = (SolidColorBrush)Application.Current.Resources["QCBackground"];

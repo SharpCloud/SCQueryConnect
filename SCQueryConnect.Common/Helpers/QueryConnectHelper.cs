@@ -517,11 +517,16 @@ namespace SCQueryConnect.Common.Helpers
             await _logger.Log($"ERROR: {message}");
         }
 
+        private async Task LogWarning(string message)
+        {
+            await _logger.Log($"WARNING: {message}");
+        }
+
         private async Task<IList<ResourceUrlMetadata>> GetResourceUrlMetadata(
             IDbConnection connection,
             string sqlString)
         {
-            ResourceUrlMetadata Mapper(Func<string, string> fieldExtractor)
+            async Task<ResourceUrlMetadata> Mapper(Func<string, string> fieldExtractor)
             {
                 var metadata = new ResourceUrlMetadata
                 {
@@ -547,7 +552,7 @@ namespace SCQueryConnect.Common.Helpers
             IDbConnection connection,
             string sqlString)
         {
-            PanelMetadata Mapper(Func<string, string> fieldExtractor)
+            async Task<PanelMetadata> Mapper(Func<string, string> fieldExtractor)
             {
                 PanelMetadata metadata = null;
                 var panelTypeString = fieldExtractor(PanelsDataChecker.PanelTypeHeader);
@@ -566,6 +571,18 @@ namespace SCQueryConnect.Common.Helpers
                         PanelType = panelType,
                         Data = fieldExtractor(PanelsDataChecker.DataHeader)
                     };
+                }
+                else
+                {
+
+                    var validValues = Enum.GetValues(typeof(Panel.PanelType))
+                        .Cast<Panel.PanelType>()
+                        .Select(t => t.ToString())
+                        .Where(t => string.Compare(t, "Undefined", StringComparison.OrdinalIgnoreCase) != 0);
+
+                    var valid = string.Join(", ", validValues);
+
+                    await LogWarning($"Unrecognized panel type '{panelTypeString}' ignored. Valid values are [{valid}]");
                 }
 
                 return metadata;
@@ -586,7 +603,7 @@ namespace SCQueryConnect.Common.Helpers
             HashSet<string> columnHeadings,
             string description,
             IDataChecker dataChecker,
-            Func<Func<string, string>, T> mapper)
+            Func<Func<string, string>, Task<T>> mapper)
             where T : new()
         {
             var metadataList = new List<T>();
@@ -639,7 +656,7 @@ namespace SCQueryConnect.Common.Helpers
                         var objects = new object[reader.FieldCount];
                         reader.GetValues(objects);
 
-                        var metadata = mapper(heading =>
+                        var metadata = await mapper(heading =>
                             (string) objects[indexes[heading]]);
 
                         if (metadata != null)
