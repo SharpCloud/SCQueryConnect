@@ -27,10 +27,12 @@ namespace SCSQLBatch
             builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>();
             builder.RegisterType<ItemDataChecker>().As<IItemDataChecker>();
+            builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>();
+            builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>();
             
             var logFile = ConfigurationManager.AppSettings["LogFile"];
