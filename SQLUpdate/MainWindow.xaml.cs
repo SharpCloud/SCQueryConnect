@@ -825,7 +825,8 @@ namespace SCQueryConnect
                 ConnectionString = SelectedQueryData.FormattedConnectionString,
                 DBType = SelectedQueryData.ConnectionType,
                 MaxRowCount = maxRowCount,
-                UnpublishItems = UnpublishItems
+                UnpublishItems = UnpublishItems,
+                BuildRelationships = cbBuildRelationships.IsChecked == true
             };
 
             await _qcHelper.UpdateSharpCloud(config, settings);

@@ -11,5 +11,6 @@
         public DatabaseType DBType { get; set; }
         public int MaxRowCount { get; set; }
         public bool UnpublishItems { get; set; }
+        public bool BuildRelationships { get; set; }
     }
 }
