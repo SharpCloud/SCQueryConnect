@@ -39,6 +39,7 @@ namespace SCSQLBatch
             var connectionString = _configurationReader.Get("connectionString");
             var queryString = _configurationReader.Get("queryString");
             var queryStringRels = _configurationReader.Get("queryStringRels");
+            bool.TryParse(_configurationReader.Get("buildRelationships"), out var buildRelationships);
             bool.TryParse(_configurationReader.Get("unpublishItems"), out var unpubItems);
             var proxy = _configurationReader.Get("proxy");
             bool.TryParse(_configurationReader.Get("proxyAnonymous"), out var proxyAnonymous);
@@ -149,6 +150,7 @@ namespace SCSQLBatch
 
             var settings = new UpdateSettings
             {
+                BuildRelationships = buildRelationships,
                 TargetStoryId = storyid,
                 QueryString = queryString,
                 QueryStringRels = queryStringRels,
