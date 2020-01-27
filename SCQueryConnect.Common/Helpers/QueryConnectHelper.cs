@@ -322,8 +322,8 @@ namespace SCQueryConnect.Common.Helpers
                             settings.UnpublishItems);
 
                         await UpdateRelationships(connection, story, settings.QueryStringRels);
-                        await GetPanelMetadata(connection, settings.QueryStringPanels, story);
                         await GetResourceUrlMetadata(connection, settings.QueryStringResourceUrls, story);
+                        await GetPanelMetadata(connection, settings.QueryStringPanels, story);
 
                         if (settings.BuildRelationships)
                         {
@@ -627,17 +627,25 @@ namespace SCQueryConnect.Common.Helpers
 
             foreach (var m in resourceUrlMetadata)
             {
-                var existing = story.Resource_FindByName(m.Name);
+                var item = story.Item_FindByExternalId(m.ItemExternalId);
 
-                if (existing == null)
+                if (item != null)
                 {
-                    var item = story.Item_FindByExternalId(m.ItemExternalId);
-                    item?.Resource_AddName(m.Name, m.Description, m.Url);
+                    var existing = item.Resource_FindByName(m.Name);
+
+                    if (existing == null)
+                    {
+                        item.Resource_AddName(m.Name, m.Description, m.Url);
+                    }
+                    else
+                    {
+                        existing.Description = m.Description;
+                        existing.Url = new Uri(m.Url);
+                    }
                 }
                 else
                 {
-                    existing.Description = m.Description;
-                    existing.Url = new Uri(m.Url);
+                    await LogWarning($"Cannot find item with external ID: {m.ItemExternalId}");
                 }
             }
         }
@@ -698,6 +706,7 @@ namespace SCQueryConnect.Common.Helpers
 
                 if (item == null)
                 {
+                    await LogWarning($"Cannot find item with external ID: {m.ItemExternalId}");
                     continue;
                 }
 
