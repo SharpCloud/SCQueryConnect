@@ -314,24 +314,16 @@ namespace SCQueryConnect.Common.Helpers
                     {
                         connection.Open();
 
-                        var panelMetadata = await GetPanelMetadata(
-                            connection,
-                            settings.QueryStringPanels);
-
-                        var resourceUrlMetadata = await GetResourceUrlMetadata(
-                            connection,
-                            settings.QueryStringResourceUrls);
-
                         await UpdateItems(
                             connection,
                             story,
                             settings.QueryString,
                             settings.MaxRowCount,
-                            settings.UnpublishItems,
-                            panelMetadata,
-                            resourceUrlMetadata);
+                            settings.UnpublishItems);
 
                         await UpdateRelationships(connection, story, settings.QueryStringRels);
+                        await GetPanelMetadata(connection, settings.QueryStringPanels, story);
+                        await GetResourceUrlMetadata(connection, settings.QueryStringResourceUrls, story);
 
                         if (settings.BuildRelationships)
                         {
@@ -457,9 +449,7 @@ namespace SCQueryConnect.Common.Helpers
             Story story,
             string sqlString,
             int maxRowCount,
-            bool unpublishItems,
-            IList<PanelMetadata> panelMetadata,
-            IList<ResourceUrlMetadata> resourceUrlMetadata)
+            bool unpublishItems)
         {
             if (string.IsNullOrWhiteSpace(sqlString))
             {
@@ -555,7 +545,7 @@ namespace SCQueryConnect.Common.Helpers
                     string errorMessage;
                     if (unpublishItems)
                     {
-                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out var updatedItems, panelMetadata, resourceUrlMetadata))
+                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out var updatedItems))
                         {
                             await _logger.Log(errorMessage);
                         }
@@ -583,7 +573,7 @@ namespace SCQueryConnect.Common.Helpers
                     }
                     else
                     {
-                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out _, panelMetadata, resourceUrlMetadata))
+                        if (!story.UpdateStoryWithArray(arrayValues, false, out errorMessage, out _))
                         {
                             await _logger.Log(errorMessage);
                         }
@@ -609,11 +599,12 @@ namespace SCQueryConnect.Common.Helpers
             await _logger.Log($"WARNING: {message}");
         }
 
-        private async Task<IList<ResourceUrlMetadata>> GetResourceUrlMetadata(
+        private async Task GetResourceUrlMetadata(
             IDbConnection connection,
-            string sqlString)
+            string sqlString,
+            Story story)
         {
-            async Task<ResourceUrlMetadata> Mapper(Func<string, string> fieldExtractor)
+            Task<ResourceUrlMetadata> Mapper(Func<string, string> fieldExtractor)
             {
                 var metadata = new ResourceUrlMetadata
                 {
@@ -623,21 +614,38 @@ namespace SCQueryConnect.Common.Helpers
                     Url = fieldExtractor(ResourceUrlDataChecker.UrlHeader)
                 };
 
-                return metadata;
+                return Task.FromResult(metadata);
             }
 
-            return await GetMetadata(
+            var resourceUrlMetadata = await GetMetadata(
                 connection,
                 sqlString,
                 ResourceUrlDataChecker.RequiredHeadings,
                 "resource URL",
                 _resourceUrlDataChecker,
                 Mapper);
+
+            foreach (var m in resourceUrlMetadata)
+            {
+                var existing = story.Resource_FindByName(m.Name);
+
+                if (existing == null)
+                {
+                    var item = story.Item_FindByExternalId(m.ItemExternalId);
+                    item?.Resource_AddName(m.Name, m.Description, m.Url);
+                }
+                else
+                {
+                    existing.Description = m.Description;
+                    existing.Url = new Uri(m.Url);
+                }
+            }
         }
 
-        private async Task<IList<PanelMetadata>> GetPanelMetadata(
+        private async Task GetPanelMetadata(
             IDbConnection connection,
-            string sqlString)
+            string sqlString,
+            Story story)
         {
             async Task<PanelMetadata> Mapper(Func<string, string> fieldExtractor)
             {
@@ -669,19 +677,55 @@ namespace SCQueryConnect.Common.Helpers
 
                     var valid = string.Join(", ", validValues);
 
-                    await LogWarning($"Unrecognized panel type '{panelTypeString}' ignored. Valid values are [{valid}]");
+                    await LogWarning(
+                        $"Unrecognized panel type '{panelTypeString}' ignored. Valid values are [{valid}]");
                 }
 
                 return metadata;
             }
 
-            return await GetMetadata(
+            var panelMetadata = await GetMetadata(
                 connection,
                 sqlString,
                 PanelsDataChecker.RequiredHeadings,
                 "query",
                 _panelsDataChecker,
                 Mapper);
+
+            foreach (var m in panelMetadata)
+            {
+                var item = story.Item_FindByExternalId(m.ItemExternalId);
+
+                if (item == null)
+                {
+                    continue;
+                }
+
+                var addPanel = false;
+                var existing = item.Panel_FindByTitle(m.Title);
+
+                if (existing == null)
+                {
+                    addPanel = true;
+                }
+                else
+                {
+                    if (existing.Type == m.PanelType)
+                    {
+                        existing.Data = m.Data;
+                    }
+                    else
+                    {
+                        addPanel = true;
+                        item.Panel_DeleteByTitle(m.Title);
+                    }
+                }
+
+                if (addPanel)
+                {
+                    item.Panel_Add(m.Title, m.PanelType, m.Data);
+                }
+            }
         }
 
         private async Task<IList<T>> GetMetadata<T>(
@@ -744,7 +788,7 @@ namespace SCQueryConnect.Common.Helpers
                         reader.GetValues(objects);
 
                         var metadata = await mapper(heading =>
-                            (string) objects[indexes[heading]]);
+                            objects[indexes[heading]].ToString());
 
                         if (metadata != null)
                         {
