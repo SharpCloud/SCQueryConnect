@@ -46,6 +46,7 @@ namespace SCQueryConnect
         private static bool DetectIs32Bit => IntPtr.Size == 4;
         private static string GetFileSuffix(bool b32bit) => b32bit ? "x86" : string.Empty;
 
+        private bool _buildRelationships = false;
         private bool _unpublishItems = false;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
         private Visibility _connectionStringVisibility = Visibility.Visible;
@@ -69,6 +70,16 @@ namespace SCQueryConnect
             {
                 _updatingMessageVisibility = value;
                 OnPropertyChanged("UpdatingMessageVisibility");
+            }
+        }
+
+        public bool BuildRelationships
+        {
+            get => _buildRelationships;
+            set
+            {
+                _buildRelationships = value;
+                OnPropertyChanged("BuildRelationships");
             }
         }
 
@@ -299,12 +310,6 @@ namespace SCQueryConnect
             // choose our last settings
             connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
             BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
-
-            bool unpub;
-            if (bool.TryParse(SaveHelper.RegRead("UnpublishItems", "false"), out unpub))
-                UnpublishItems = unpub;
-            else
-                UnpublishItems = false;
 
             EventManager.RegisterClassHandler(
                 typeof(TextBox),
@@ -742,7 +747,8 @@ namespace SCQueryConnect
                     ConnectionName.Text = qd.Name;
                     MessageBox.Show(nameError);
                 }
-                
+
+                qd.BuildRelationships = BuildRelationships;
                 qd.Description = ConnectionDescription.Text;
                 qd.ConnectionsString = ConnectionString.Text;
                 qd.QueryString = SQLString.Text;
@@ -753,6 +759,7 @@ namespace SCQueryConnect
                 qd.SourceStoryId = SourceStoryId.Text;
                 qd.QueryStringPanels = SqlStringPanels.Text;
                 qd.QueryStringResourceUrls = SqlStringResourceUrls.Text;
+                qd.UnpublishItems = UnpublishItems;
             }
         }
 
@@ -826,7 +833,7 @@ namespace SCQueryConnect
                 DBType = SelectedQueryData.ConnectionType,
                 MaxRowCount = maxRowCount,
                 UnpublishItems = UnpublishItems,
-                BuildRelationships = cbBuildRelationships.IsChecked == true
+                BuildRelationships = BuildRelationships
             };
 
             await _qcHelper.UpdateSharpCloud(config, settings);
@@ -959,6 +966,7 @@ namespace SCQueryConnect
                 content = ReplaceConfigSetting(content, "QUERYSTRING", queryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = ReplaceConfigSetting(content, "QUERYRELSSTRING", queryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = ReplaceConfigSetting(content, "LOGFILE", $"Logfile.txt");
+                content = ReplaceConfigSetting(content, "BUILDRELATIONSHIPS", BuildRelationships.ToString());
                 content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", UnpublishItems.ToString());
                 content = ReplaceConfigSetting(content, "PROXYADDRESS", _proxyViewModel.Proxy);
                 content = ReplaceConfigSetting(content, "PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
@@ -1081,6 +1089,7 @@ namespace SCQueryConnect
         {
             if (SelectedQueryData != null)
             {
+                BuildRelationships = SelectedQueryData.BuildRelationships;
                 ConnectionName.Text = SelectedQueryData.Name;
                 ConnectionDescription.Text = SelectedQueryData.Description;
                 txtDatabaseType.Text = SelectedQueryData.ConnectionType.ToString();
@@ -1094,6 +1103,7 @@ namespace SCQueryConnect
                 SourceStoryId.Text = SelectedQueryData.SourceStoryId;
                 SqlStringPanels.Text = SelectedQueryData.QueryStringPanels;
                 SqlStringResourceUrls.Text = SelectedQueryData.QueryStringResourceUrls;
+                UnpublishItems = SelectedQueryData.UnpublishItems;
 
                 tbLastRun.Text = SelectedQueryData.LastRunDate;
                 tbResults.Text = SelectedQueryData.LogData;

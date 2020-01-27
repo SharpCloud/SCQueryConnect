@@ -27,6 +27,8 @@ namespace SCQueryConnect.Models
         }
 
         [DataMember]
+        public bool BuildRelationships { get; set; }
+        [DataMember]
         public string Name { get; set; }
         [DataMember]
         public string Description { get; set; }
@@ -64,6 +66,8 @@ namespace SCQueryConnect.Models
         public string SourceStoryPasswordEntropy { get; set; }
         [DataMember]
         public string SourceStoryServer { get; set; }
+        [DataMember]
+        public bool UnpublishItems { get; set; }
         [IgnoreDataMember]
         public DataView QueryResults { get; set; }
         [IgnoreDataMember]
