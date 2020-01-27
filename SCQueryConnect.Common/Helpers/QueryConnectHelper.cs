@@ -688,7 +688,7 @@ namespace SCQueryConnect.Common.Helpers
                 connection,
                 sqlString,
                 PanelsDataChecker.RequiredHeadings,
-                "query",
+                "panel",
                 _panelsDataChecker,
                 Mapper);
 
@@ -745,6 +745,7 @@ namespace SCQueryConnect.Common.Helpers
                 return metadataList;
             }
 
+            await _logger.Log($"Processing {description} query...");
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = sqlString;
@@ -798,6 +799,7 @@ namespace SCQueryConnect.Common.Helpers
                 }
             }
 
+            await _logger.Log($"Processed {description} query: found {metadataList.Count} items");
             return metadataList;
         }
     }
