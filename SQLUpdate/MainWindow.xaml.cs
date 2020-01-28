@@ -48,7 +48,6 @@ namespace SCQueryConnect
 
         private bool _buildRelationships = false;
         private bool _unpublishItems = false;
-        private IQueryItem _selectedQueryItem;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
         private Visibility _connectionStringVisibility = Visibility.Visible;
         private Visibility _filenameVisibility = Visibility.Collapsed;
@@ -177,19 +176,47 @@ namespace SCQueryConnect
                 }
             }
         }
-        
-        public IQueryItem SelectedQueryItem
+
+        private static IQueryItem FindSelectedQueryItem(IQueryItem item)
         {
-            get => _selectedQueryItem;
-            set
+            if (item is QueryData qd && qd.IsSelected)
             {
-                if (_selectedQueryItem != value)
+                return item;
+            }
+            
+            if (item is QueryBatch qb)
+            {
+                return qb.Connections.FirstOrDefault(c => FindSelectedQueryItem(c) != null);
+            }
+
+            return null;
+        }
+
+        private static void SelectQueryItem(IQueryItem item, string id)
+        {
+            if (item is QueryData qd)
+            {
+                qd.IsSelected = qd.Id == id;
+            }
+
+            if (item is QueryBatch qb)
+            {
+                foreach (var c in qb.Connections)
                 {
-                    _selectedQueryItem = value;
-                    OnPropertyChanged(nameof(SelectedQueryItem));
+                    SelectQueryItem(c, id);
                 }
             }
         }
+
+        private void SetSelectedQueryItem(string id)
+        {
+            foreach (var c in Connections)
+            {
+                SelectQueryItem(c, id);
+            }
+        }
+
+        public IQueryItem SelectedQueryItem => Connections.FirstOrDefault(c => FindSelectedQueryItem(c) != null);
 
         private QueryData SelectedQueryData => (QueryData) SelectedQueryItem;
 
@@ -315,12 +342,12 @@ namespace SCQueryConnect
             }
 
             LoadAllProfiles();
-            connectionList.ItemsSource = _connections;
-            
             _solutionViewModel.Solutions = LoadSolutions();
 
             // choose our last settings
-            connectionList.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveConnection", "0")));
+            var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
+            SetSelectedQueryItem(active);
+            
             BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
 
             EventManager.RegisterClassHandler(
@@ -686,7 +713,7 @@ namespace SCQueryConnect
             var solutionsJson = SaveHelper.SerializeJSON(_solutionViewModel.Solutions);
             File.WriteAllText(_localPath + "/solutions.json", solutionsJson);
 
-            SaveHelper.RegWrite("ActiveConnection", connectionList.SelectedIndex.ToString());
+            SaveHelper.RegWrite("ActiveConnection", SelectedQueryItem.Id);
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
             SaveHelper.RegWrite("UnpublishItems", UnpublishItems.ToString());
@@ -1043,83 +1070,53 @@ namespace SCQueryConnect
 
             if (newWnd.ShowDialog() == true)
             {
-                _connections.Add(new QueryData(newWnd.SelectedButton));
-                connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
+                var queryData = new QueryData(newWnd.SelectedButton);
+                _connections.Add(queryData);
+                SetSelectedQueryItem(queryData.Id);
                 BrowserTabs.SelectedIndex = 0; // go back to the first tab
             }
         }
 
         private void CopyConnectionClick(object sender, RoutedEventArgs e)
         {
-            var qdNew = new QueryData(SelectedQueryData);
-            _connections.Add(qdNew);
-            connectionList.SelectedIndex = _connections.Count - 1; // highlight the new item
+            var queryData = new QueryData(SelectedQueryData);
+            _connections.Add(queryData);
+            SetSelectedQueryItem(queryData.Id);
             BrowserTabs.SelectedIndex = 0; // go back to the  first tab
         }
-        private void UpConnectionClick(object sender, RoutedEventArgs e)
-        {
-            int i = connectionList.SelectedIndex;
-            if (i > 0)
-            {
-                i--;
 
-                var selected = SelectedQueryData; // Keep reference to query data
-                _connections.Remove(selected);
-                _connections.Insert(i, selected);
-                connectionList.SelectedIndex = i;
-            }
-
-        }
-        private void DownConnectionClick(object sender, RoutedEventArgs e)
-        {
-            int i = connectionList.SelectedIndex;
-            if (i < _connections.Count-1)
-            {
-                i++;
-
-                var selected = SelectedQueryData; // Keep reference to query data
-                _connections.Remove(selected);
-                _connections.Insert(i, selected);
-                connectionList.SelectedIndex = i;
-            }
-        }
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
         {
-            int i = connectionList.SelectedIndex;
-            if (_connections.Count > 1)
-            {
-                _connections.Remove(SelectedQueryData);
-                connectionList.SelectedIndex = i;
-            }
+            Connections.Remove(SelectedQueryItem);
         }
 
-        private void connectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (SelectedQueryData != null)
+            if (e.NewValue is QueryData queryData)
             {
-                BuildRelationships = SelectedQueryData.BuildRelationships;
-                ConnectionName.Text = SelectedQueryData.Name;
-                ConnectionDescription.Text = SelectedQueryData.Description;
-                txtDatabaseType.Text = SelectedQueryData.ConnectionType.ToString();
-                ConnectionString.Text = SelectedQueryData.ConnectionsString;
-                SQLString.Text = SelectedQueryData.QueryString;
-                StoryId.Text = SelectedQueryData.StoryId;
-                SQLStringRels.Text = SelectedQueryData.QueryStringRels;
-                FileName.Text = SelectedQueryData.FileName;
-                SharePointURL.Text = SelectedQueryData.SharePointURL;
-                txtExampleRels.Text = "Example: " + SelectedQueryData.GetExampleRelQuery;
-                SourceStoryId.Text = SelectedQueryData.SourceStoryId;
-                SqlStringPanels.Text = SelectedQueryData.QueryStringPanels;
-                SqlStringResourceUrls.Text = SelectedQueryData.QueryStringResourceUrls;
-                UnpublishItems = SelectedQueryData.UnpublishItems;
+                BuildRelationships = queryData.BuildRelationships;
+                ConnectionName.Text = queryData.Name;
+                ConnectionDescription.Text = queryData.Description;
+                txtDatabaseType.Text = queryData.ConnectionType.ToString();
+                ConnectionString.Text = queryData.ConnectionsString;
+                SQLString.Text = queryData.QueryString;
+                StoryId.Text = queryData.StoryId;
+                SQLStringRels.Text = queryData.QueryStringRels;
+                FileName.Text = queryData.FileName;
+                SharePointURL.Text = queryData.SharePointURL;
+                txtExampleRels.Text = "Example: " + queryData.GetExampleRelQuery;
+                SourceStoryId.Text = queryData.SourceStoryId;
+                SqlStringPanels.Text = queryData.QueryStringPanels;
+                SqlStringResourceUrls.Text = queryData.QueryStringResourceUrls;
+                UnpublishItems = queryData.UnpublishItems;
 
-                tbLastRun.Text = SelectedQueryData.LastRunDate;
-                tbResults.Text = SelectedQueryData.LogData;
+                tbLastRun.Text = queryData.LastRunDate;
+                tbResults.Text = queryData.LogData;
 
-                DataGrid.ItemsSource = SelectedQueryData.QueryResults;
-                DataGridRels.ItemsSource = SelectedQueryData.QueryResultsRels;
+                DataGrid.ItemsSource = queryData.QueryResults;
+                DataGridRels.ItemsSource = queryData.QueryResultsRels;
 
-                SetVisibleObjects(SelectedQueryData);
+                SetVisibleObjects(queryData);
             }
         }
 
@@ -1171,12 +1168,6 @@ namespace SCQueryConnect
         private void ConnectionString_LostFocusName(object sender, RoutedEventArgs e)
         {
             SaveSettings();
-
-            // refresh the list
-            var i = connectionList.SelectedIndex;
-            connectionList.ItemsSource = null;
-            connectionList.ItemsSource = _connections;
-            connectionList.SelectedIndex = i;
         }
 
         private void SetVisibleObjects(QueryData qd)

@@ -64,193 +64,56 @@
 
             <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
 
-            <TreeView Grid.Column="0"
-                      Background="{StaticResource QCBackground}"
-                      DataContext="{Binding Parent, ElementName=Root}"
-                      ItemsSource="{Binding Connections}">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type models:QueryBatch}" ItemsSource="{Binding Connections}">
-                        <TextBlock Foreground="White" Text="{Binding Name}" />
-                    </HierarchicalDataTemplate>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                    <DataTemplate DataType="{x:Type models:QueryData}">
-                        <TextBlock Foreground="White" Text="{Binding Name}" />
-                    </DataTemplate>
-                </TreeView.Resources>
-            </TreeView>
+                <TreeView x:Name="QueryItemTree"
+                          Background="{StaticResource QCBackground}"
+                          DataContext="{Binding Parent, ElementName=Root}"
+                          ItemsSource="{Binding Connections}"
+                          SelectedItemChanged="TreeViewSelectedItemChanged">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
 
-            <TabControl Grid.Column="0"
-                        BorderBrush="Transparent"
-                        SelectedItem="{Binding MainViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}"
-                        TabStripPlacement="Left"
-                        Visibility="Collapsed">
-                <TabControl.Resources>
-                    <Style TargetType="TabItem">
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="BorderBrush" Value="Transparent" />
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="TabItem">
-                                    <Grid x:Name="gdBorder" Background="{StaticResource QCBackground}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="0,10">
-                                                <ContentPresenter x:Name="ContentSite"
-                                                                  VerticalAlignment="Center"
-                                                                  HorizontalAlignment="Center"
-                                                                  ContentSource="Header"
-                                                                  Margin="10,2">
-                                                    <ContentPresenter.LayoutTransform>
-                                                        <RotateTransform Angle="270" />
-                                                    </ContentPresenter.LayoutTransform>
-                                                </ContentPresenter>
-                                            </Border>
-                                        </StackPanel>
-                                        <Border x:Name="selectedBorder" Width="2" HorizontalAlignment="Right" Background="{StaticResource QCBlue}" />
-                                    </Grid>
-                                    
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
-                                            <Setter TargetName="gdBorder" Property="Background" Value="{StaticResource QCBackground}" />
-                                        </Trigger>
-                                        <Trigger Property="IsSelected" Value="False">
-                                            <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
-                                            <Setter TargetName="gdBorder" Property="Background" Value="#111111" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type models:QueryBatch}" ItemsSource="{Binding Connections}">
+                            <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                        </HierarchicalDataTemplate>
 
-                    <Style x:Key="DefaultListButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                        <Setter Property="Background" Value="#666" />
-                        <Setter Property="Height" Value="40" />
-                        <Setter Property="Margin" Value="5,5,0,5" />
-                        <Setter Property="VerticalAlignment" Value="Top" />
-                    </Style>
+                        <DataTemplate DataType="{x:Type models:QueryData}">
+                            <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
 
-                    <Style x:Key="NewButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
-                        <Setter Property="Background" Value="{StaticResource QCBlue}" />
-                        <Setter Property="Content" Value="+New" />
-                        <Setter Property="Grid.Column" Value="0" />
-                    </Style>
+                <Grid Grid.Row="1" Margin="2.5">
+                    <Grid.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                            <Setter Property="Background" Value="#666" />
+                            <Setter Property="Height" Value="40" />
+                            <Setter Property="Margin" Value="2.5" />
+                            <Setter Property="VerticalAlignment" Value="Top" />
+                        </Style>
+                    </Grid.Resources>
 
-                    <Style x:Key="CopyButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
-                        <Setter Property="Content" Value="Copy" />
-                        <Setter Property="Grid.Column" Value="1" />
-                    </Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
 
-                    <Style x:Key="UpButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
-                        <Setter Property="Content" Value="Up" />
-                        <Setter Property="Grid.Column" Value="2" />
-                    </Style>
-
-                    <Style x:Key="DownButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
-                        <Setter Property="Content" Value="Down" />
-                        <Setter Property="Grid.Column" Value="3" />
-                    </Style>
-
-                    <Style x:Key="DeleteButton" TargetType="Button" BasedOn="{StaticResource DefaultListButton}">
-                        <Setter Property="Background" Value="Red" />
-                        <Setter Property="Content" Value="Delete" />
-                        <Setter Property="Grid.Column" Value="4" />
-                        <Setter Property="Margin" Value="5" />
-                    </Style>
-
-                    <Style TargetType="ListBox">
-                        <Setter Property="Background" Value="{StaticResource QCBackground}" />
-                        <Setter Property="Foreground" Value="White" />
-                    </Style>
-                </TabControl.Resources>
-
-                <TabItem Header="Connections">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <ListBox x:Name="connectionList" SelectionChanged="connectionList_SelectionChanged">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-
-                        <Grid Grid.Row="1" Height="50">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-
-                            <Button Click="NewConnectionClick" Style="{StaticResource NewButton}" />
-                            <Button Click="CopyConnectionClick" Style="{StaticResource CopyButton}" />
-                            <Button Click="UpConnectionClick" Style="{StaticResource UpButton}" />
-                            <Button Click="DownConnectionClick" Style="{StaticResource DownButton}" />
-                            <Button Click="DeleteConnectionClick" Style="{StaticResource DeleteButton}" />
-                        </Grid>
-                    </Grid>
-                </TabItem>
-
-                <TabItem Header="Solutions">
-                    <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <ListBox ItemsSource="{Binding Solutions}" SelectedItem="{Binding SelectedSolution}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-
-                        <Grid Grid.Row="1" Height="50">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-
-                            <Button Command="{Binding AddNewSolutionCommand}" Style="{StaticResource NewButton}" />
-
-                            <Button Command="{Binding CopySolutionCommand}"
-                                    CommandParameter="{Binding SelectedSolution}"
-                                    Style="{StaticResource CopyButton}">
-                            </Button>
-
-                            <Button Command="{Binding MoveSolutionUpCommand}"
-                                    CommandParameter="{Binding SelectedSolution}"
-                                    Style="{StaticResource UpButton}">
-                            </Button>
-                            
-                            <Button Command="{Binding MoveSolutionDownCommand}"
-                                    CommandParameter="{Binding SelectedSolution}"
-                                    Style="{StaticResource DownButton}">
-                            </Button>
-
-                            <Button Command="{Binding RemoveSolutionCommand}"
-                                    CommandParameter="{Binding SelectedSolution}"
-                                    Style="{StaticResource DeleteButton}">
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </TabItem>
-            </TabControl>
+                    <Button Grid.Column="0" Click="NewConnectionClick" Background="{StaticResource QCBlue}">+New</Button>
+                    <Button Grid.Column="1" Click="CopyConnectionClick">Copy</Button>
+                    <Button Grid.Column="2" Click="DeleteConnectionClick" Background="Red">Delete</Button>
+                </Grid>
+            </Grid>
 
             <Grid Grid.Column="2">
                 <TabControl x:Name="BrowserTabs"

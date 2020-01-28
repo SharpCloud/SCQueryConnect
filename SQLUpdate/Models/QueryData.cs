@@ -1,6 +1,8 @@
 ﻿using SCQueryConnect.Common;
 using System;
+using System.ComponentModel;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using SCQueryConnect.Interfaces;
 
@@ -9,7 +11,41 @@ namespace SCQueryConnect.Models
     [DataContract]
     public class QueryData : IQueryItem
     {
+        private bool _isExpanded;
+        private bool _isSelected;
         private string _id;
+        private string _name;
+        private string _description;
+
+        [IgnoreDataMember]
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+
+            set
+            {
+                if (_isExpanded != value)
+                {
+                    _isExpanded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [IgnoreDataMember]
+        public bool IsSelected
+        {
+            get => _isSelected;
+
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [DataMember]
         public string Id
@@ -29,10 +65,37 @@ namespace SCQueryConnect.Models
 
         [DataMember]
         public bool BuildRelationships { get; set; }
+
         [DataMember]
-        public string Name { get; set; }
+        public string Name
+        {
+            get => _name;
+
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         [DataMember]
-        public string Description { get; set; }
+        public string Description
+        {
+            get => _description;
+
+            set
+            {
+                if (_description != value)
+                {
+                    _description = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         [DataMember]
         public DatabaseType ConnectionType { get; set; }
         [DataMember]
@@ -240,6 +303,13 @@ namespace SCQueryConnect.Models
                 }
                 return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
