@@ -145,7 +145,8 @@
             <Grid Grid.Column="2">
                 <TabControl x:Name="BrowserTabs"
                             BorderBrush="Transparent"
-                            MinWidth="750">
+                            MinWidth="750"
+                            Visibility="{Binding QueryConfigVisibility, FallbackValue=Collapsed}">
                     <TabControl.Resources>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
@@ -516,7 +517,7 @@
                     </TabItem>
                 </TabControl>
 
-                <Grid Visibility="Collapsed"
+                <Grid Visibility="{Binding FolderConfigVisibility, FallbackValue=Collapsed}"
                       Background="{StaticResource QCBackground}">
                     <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}"
                           Margin="80,80,80,0">

@@ -56,6 +56,9 @@ namespace SCQueryConnect
         private Visibility _sourceStoryIdVisibility = Visibility.Collapsed;
         private Visibility _rewriteDataSourceVisibility = Visibility.Collapsed;
 
+        private Visibility _queryConfigVisibility = Visibility.Collapsed;
+        private Visibility _folderConfigVisibility = Visibility.Collapsed;
+
         private readonly QueryBatch _queryRootNode = new QueryBatch
         {
             Id = QueryBatch.RootId
@@ -169,6 +172,34 @@ namespace SCQueryConnect
             }
         }
 
+        public Visibility QueryConfigVisibility
+        {
+            get => _queryConfigVisibility;
+
+            set
+            {
+                if (_queryConfigVisibility != value)
+                {
+                    _queryConfigVisibility = value;
+                    OnPropertyChanged(nameof(QueryConfigVisibility));
+                }
+            }
+        }
+
+        public Visibility FolderConfigVisibility
+        {
+            get => _folderConfigVisibility;
+
+            set
+            {
+                if (_folderConfigVisibility != value)
+                {
+                    _folderConfigVisibility = value;
+                    OnPropertyChanged(nameof(FolderConfigVisibility));
+                }
+            }
+        }
+
         public ObservableCollection<IQueryItem> Connections
         {
             get => _connections;
@@ -187,7 +218,7 @@ namespace SCQueryConnect
 
         private static IQueryItem FindSelectedQueryItem(IQueryItem item)
         {
-            if (item is QueryData qd && qd.IsSelected)
+            if (item.IsSelected)
             {
                 return item;
             }
@@ -1133,6 +1164,14 @@ namespace SCQueryConnect
                 DataGridRels.ItemsSource = queryData.QueryResultsRels;
 
                 SetVisibleObjects(queryData);
+
+                FolderConfigVisibility = Visibility.Collapsed;
+                QueryConfigVisibility = Visibility.Visible;
+            }
+            else if (e.NewValue is QueryBatch)
+            {
+                FolderConfigVisibility = Visibility.Visible;
+                QueryConfigVisibility = Visibility.Collapsed;
             }
         }
 
