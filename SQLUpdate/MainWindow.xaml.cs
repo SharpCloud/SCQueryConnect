@@ -212,6 +212,12 @@ namespace SCQueryConnect
                     OnPropertyChanged(nameof(Connections));
 
                     _queryRootNode.Connections = _connections;
+
+                    var first = Connections.FirstOrDefault();
+                    if (first != null)
+                    {
+                        SetSelectedQueryItem(first.Id);
+                    }
                 }
             }
         }
@@ -752,7 +758,11 @@ namespace SCQueryConnect
             var solutionsJson = SaveHelper.SerializeJSON(_solutionViewModel.Solutions);
             File.WriteAllText(_localPath + "/solutions.json", solutionsJson);
 
-            SaveHelper.RegWrite("ActiveConnection", SelectedQueryItem.Id);
+            if (SelectedQueryItem != null)
+            {
+                SaveHelper.RegWrite("ActiveConnection", SelectedQueryItem.Id);
+            }
+
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
             SaveHelper.RegWrite("UnpublishItems", UnpublishItems.ToString());
