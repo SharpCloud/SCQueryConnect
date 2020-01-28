@@ -1509,7 +1509,6 @@ namespace SCQueryConnect
             if (source != null &&
                 e.OriginalSource is FrameworkElement fe)
             {
-                var moveToEnd = false;
                 var index = 0;
                 var dropTarget = fe.DataContext as IQueryItem;
                 var sourceParent = source.ParentFolder ?? _queryRootNode;
@@ -1527,23 +1526,23 @@ namespace SCQueryConnect
                 }
                 else
                 {
-                    moveToEnd = true;
+                    index = _queryRootNode.Connections.Count;
                     source.ParentFolder = _queryRootNode;
                 }
 
-                if (moveToEnd)
+                var mousePos = e.GetPosition(this);
+
+                if (mousePos.Y > _startPoint.Y)
+                {
+                    index++;
+                }
+
+                if (index > source.ParentFolder.Connections.Count)
                 {
                     source.ParentFolder.Connections.Add(source);
                 }
                 else
                 {
-                    var mousePos = e.GetPosition(this);
-
-                    if (mousePos.Y > _startPoint.Y)
-                    {
-                        index++;
-                    }
-
                     source.ParentFolder.Connections.Insert(index, source);
                 }
             }
