@@ -883,13 +883,6 @@ namespace SCQueryConnect
             await Task.Delay(20);
         }
 
-        private bool TypeIsNumeric(Type type)
-        {
-            return type == typeof(double) || type == typeof(int) || type == typeof(float) || type == typeof(decimal) ||
-                type == typeof(short) || type == typeof(long) || type == typeof(byte) || type == typeof(SByte) ||
-                type == typeof(UInt16) || type == typeof(UInt32) || type == typeof(UInt64);
-        }
-
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
             Process.Start(GetFolder(SelectedQueryData.Name));
@@ -1039,27 +1032,6 @@ namespace SCQueryConnect
         {
             var updated = configText.Replace($"\"{oldValue}\"", $"\"{newValue}\"");
             return updated;
-        }
-
-        static void CopyResourceFile(string resFolder, string folder, string filename)
-        {
-            var appFolder = System.AppDomain.CurrentDomain.BaseDirectory;
-
-            var sourceFileName = $"{appFolder}/{resFolder}/{filename}";
-            var destFileName = $"{folder}/{filename}";
-
-            File.Copy(sourceFileName, destFileName, true);
-        }
-
-        static void CopyResourceFileFromWeb(string folder, string filename)
-        {
-            var remote = string.Format("{0}/{1}", "https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdate/SQLBatch6", filename);
-            var local = string.Format("{0}/{1}", folder, filename);
-
-            using (WebClient Client = new WebClient())
-            {
-                Client.DownloadFile(remote, local);
-            }
         }
 
         private void NewConnectionClick(object sender, RoutedEventArgs e)
