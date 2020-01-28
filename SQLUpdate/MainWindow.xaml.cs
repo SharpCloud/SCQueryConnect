@@ -1077,6 +1077,14 @@ namespace SCQueryConnect
             }
         }
 
+        private void NewQueryFolderClick(object sender, RoutedEventArgs e)
+        {
+            var queryBatch = new QueryBatch();
+            Connections.Add(queryBatch);
+            SetSelectedQueryItem(queryBatch.Id);
+            BrowserTabs.SelectedIndex = 0; // go back to the first tab
+        }
+
         private void CopyConnectionClick(object sender, RoutedEventArgs e)
         {
             var queryData = new QueryData(SelectedQueryData);

@@ -11,9 +11,9 @@ namespace SCQueryConnect.Models
         private bool _isExpanded;
         private bool _isSelected;
         private string _id;
-        private string _name;
+        private string _name = "New Folder";
         private string _description;
-        private ObservableCollection<QueryData> _connections;
+        private ObservableCollection<QueryData> _connections = new ObservableCollection<QueryData>();
 
         public bool IsExpanded
         {

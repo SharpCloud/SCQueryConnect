@@ -144,7 +144,7 @@ namespace SCQueryConnect.Models
         public int DisplayOrder { get; set; }
 
         public string FormattedConnectionString => ConnectionsString
-            .Replace("{0}", FileName)
+            ?.Replace("{0}", FileName)
             .Replace("{1}", SharePointURL)
             .Replace("{source-story-id}", SourceStoryId)
             .Replace("{source-story-user-name}", SourceStoryUserName)
