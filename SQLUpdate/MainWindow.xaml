@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         xmlns:commands="clr-namespace:SCQueryConnect.Commands"
+        xmlns:models="clr-namespace:SCQueryConnect.Models"
         mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1230" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
-    <Grid>
+    <Grid x:Name="Root">
         <Grid.Resources>
             <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
         </Grid.Resources>
@@ -63,10 +64,26 @@
 
             <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
 
+            <TreeView Grid.Column="0"
+                      Background="{StaticResource QCBackground}"
+                      DataContext="{Binding Parent, ElementName=Root}"
+                      ItemsSource="{Binding Connections}">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type models:QueryBatch}" ItemsSource="{Binding Connections}">
+                        <TextBlock Foreground="White" Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+
+                    <DataTemplate DataType="{x:Type models:QueryData}">
+                        <TextBlock Foreground="White" Text="{Binding Name}" />
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+
             <TabControl Grid.Column="0"
                         BorderBrush="Transparent"
                         SelectedItem="{Binding MainViewModel.SelectedParentTab, Source={StaticResource ViewModelLocator}}"
-                        TabStripPlacement="Left">
+                        TabStripPlacement="Left"
+                        Visibility="Collapsed">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="BorderThickness" Value="0" />
@@ -238,8 +255,7 @@
             <Grid Grid.Column="2">
                 <TabControl x:Name="BrowserTabs"
                             BorderBrush="Transparent"
-                            MinWidth="750"
-                            Visibility="{Binding MainViewModel.ConnectionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}">
+                            MinWidth="750">
                     <TabControl.Resources>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
@@ -285,7 +301,7 @@
 
                                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" Visibility="{Binding FilenameVisibility}" />
                                 <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus" Visibility="{Binding FilenameVisibility}"/>
-                                <Button Grid.Row="3" x:Name="BrowseBut" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseBut_Click" Visibility="{Binding FilenameVisibility}">Choose file...</Button>
+                                <Button Grid.Row="3" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseForDataSourceClick" Visibility="{Binding FilenameVisibility}">Choose file...</Button>
 
                                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" Visibility="{Binding SharepointVisibility}" />
                                 <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus" Visibility="{Binding SharepointVisibility}"/>
@@ -610,7 +626,7 @@
                     </TabItem>
                 </TabControl>
 
-                <Grid Visibility="{Binding MainViewModel.SolutionsVisibility, Source={StaticResource ViewModelLocator}, FallbackValue=Collapsed}"
+                <Grid Visibility="Collapsed"
                       Background="{StaticResource QCBackground}">
                     <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}"
                           Margin="80,80,80,0">

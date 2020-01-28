@@ -48,6 +48,7 @@ namespace SCQueryConnect
 
         private bool _buildRelationships = false;
         private bool _unpublishItems = false;
+        private IQueryItem _selectedQueryItem;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
         private Visibility _connectionStringVisibility = Visibility.Visible;
         private Visibility _filenameVisibility = Visibility.Collapsed;
@@ -163,7 +164,7 @@ namespace SCQueryConnect
             }
         }
 
-        public ObservableCollection<QueryData> Connections
+        public ObservableCollection<IQueryItem> Connections
         {
             get => _connections;
 
@@ -173,17 +174,28 @@ namespace SCQueryConnect
                 {
                     _connections = value;
                     OnPropertyChanged(nameof(Connections));
-
-                    _solutionViewModel.SetConnections(_connections);
+                }
+            }
+        }
+        
+        public IQueryItem SelectedQueryItem
+        {
+            get => _selectedQueryItem;
+            set
+            {
+                if (_selectedQueryItem != value)
+                {
+                    _selectedQueryItem = value;
+                    OnPropertyChanged(nameof(SelectedQueryItem));
                 }
             }
         }
 
-        private QueryData SelectedQueryData => connectionList.SelectedItem as QueryData;
+        private QueryData SelectedQueryData => (QueryData) SelectedQueryItem;
 
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
-        private ObservableCollection<QueryData> _connections;
+        private ObservableCollection<IQueryItem> _connections;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly ISolutionViewModel _solutionViewModel;
         private readonly IConnectionNameValidator _connectionNameValidator;
@@ -364,7 +376,7 @@ namespace SCQueryConnect
                 var encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
                 var filtered = encrypted?.Where(qd => qd != null);
                 var decrypted = CreateDecryptedPasswordConnections(filtered);
-                Connections = new ObservableCollection<QueryData>(decrypted);
+                Connections = new ObservableCollection<IQueryItem>(decrypted);
             }
             else
             {
@@ -385,7 +397,7 @@ namespace SCQueryConnect
 
                 // add some examples
 
-                Connections = new ObservableCollection<QueryData>(new[]
+                Connections = new ObservableCollection<IQueryItem>(new[]
                 {
                     new QueryData(DatabaseType.Excel),
                     new QueryData(DatabaseType.Access),
@@ -400,8 +412,13 @@ namespace SCQueryConnect
 
         private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
         {
+            RewriteDataSource(SelectedQueryData);
+        }
+
+        private void RewriteDataSource(QueryData queryData)
+        {
             var filepath = _connectionStringHelper.GetVariable(
-                SelectedQueryData.FormattedConnectionString,
+                queryData.FormattedConnectionString,
                 DatabaseStrings.DataSourceKey);
 
             try
@@ -414,11 +431,11 @@ namespace SCQueryConnect
             }
         }
 
-        private IDbConnection GetDb()
+        private IDbConnection GetDb(QueryData queryData)
         {
             return _dbConnectionFactory.GetDb(
-                SelectedQueryData.FormattedConnectionString,
-                SelectedQueryData.ConnectionType);
+                queryData.FormattedConnectionString,
+                queryData.ConnectionType);
         }
 
         private SharpCloudConfiguration GetApiConfiguration()
@@ -437,14 +454,19 @@ namespace SCQueryConnect
 
         private async void TestConnectionClick(object sender, RoutedEventArgs e)
         {
-            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel)
+            await TestConnection(SelectedQueryData);
+        }
+
+        private async Task TestConnection(QueryData queryData)
+        {
+            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel)
             {
                 try
                 {
                     await _qcHelper.InitialiseDatabase(
                         GetApiConfiguration(),
-                        SelectedQueryData.FormattedConnectionString,
-                        SelectedQueryData.ConnectionType);
+                        queryData.FormattedConnectionString,
+                        queryData.ConnectionType);
                 }
                 catch (Exception ex)
                 {
@@ -455,7 +477,7 @@ namespace SCQueryConnect
 
             try
             {
-                using (IDbConnection connection = GetDb())
+                using (IDbConnection connection = GetDb(queryData))
                 {
                     connection.Open();
                     MessageBox.Show("Hooray! It looks like it's worked!");
@@ -471,20 +493,24 @@ namespace SCQueryConnect
 
         private void ReviewConnectionClick(object sender, RoutedEventArgs e)
         {
-            string info = string.Format("Internal Connection Type:\n{0}\n\nConnection String:\n{1}",
-                SelectedQueryData.GetBatchDBType,
-                SelectedQueryData.FormattedConnectionString);
+            ReviewConnection(SelectedQueryData);
+        }
+
+        private void ReviewConnection(QueryData queryData)
+        {
+            var info = string.Format("Internal Connection Type:\n{0}\n\nConnection String:\n{1}",
+                queryData.GetBatchDBType,
+                queryData.FormattedConnectionString);
 
             var dlg = new ConnectionInfo(info);
             dlg.ShowDialog();
-            //MessageBox.Show(info, "Internal Connection Info");
         }
 
-        private void SetLastUsedSharpCloudConnection()
+        private void SetLastUsedSharpCloudConnection(QueryData queryData)
         {
-            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel)
+            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel)
             {
-                _lastUsedSharpCloudConnection = SelectedQueryData.FormattedConnectionString;
+                _lastUsedSharpCloudConnection = queryData.FormattedConnectionString;
             }
         }
 
@@ -493,15 +519,15 @@ namespace SCQueryConnect
         /// when running queries against data when the query is run for the first time;
         /// subsequent runs should be able to use local data to speed up the process.
         /// </summary>
-        private async Task InitialiseSharpCloudDataIfNeeded()
+        private async Task InitialiseSharpCloudDataIfNeeded(QueryData queryData)
         {
-            if (SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel &&
-                SelectedQueryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
+            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel &&
+                queryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
             {
                 await _qcHelper.InitialiseDatabase(
                     GetApiConfiguration(),
-                    SelectedQueryData.FormattedConnectionString,
-                    SelectedQueryData.ConnectionType);
+                    queryData.FormattedConnectionString,
+                    queryData.ConnectionType);
             }
         }
 
@@ -523,6 +549,7 @@ namespace SCQueryConnect
         private async void RunClick(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
+                SelectedQueryData,
                 SQLString.Text,
                 _itemDataChecker,
                 DataGrid,
@@ -532,6 +559,7 @@ namespace SCQueryConnect
         private async void RunClickRels(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
+                SelectedQueryData,
                 SQLStringRels.Text,
                 _relationshipsChecker,
                 DataGridRels,
@@ -541,6 +569,7 @@ namespace SCQueryConnect
         private async void PreviewResourceUrlsClick(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
+                SelectedQueryData,
                 SqlStringResourceUrls.Text,
                 _resourceUrlDataChecker,
                 DataGridResourceUrls,
@@ -550,6 +579,7 @@ namespace SCQueryConnect
         private async void PreviewPanelsClick(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
+                SelectedQueryData,
                 SqlStringPanels.Text,
                 _panelsDataChecker,
                 DataGridPanels,
@@ -557,6 +587,7 @@ namespace SCQueryConnect
         }
 
         private async Task PreviewSql(
+            QueryData queryData,
             string query,
             IDataChecker dataChecker,
             DataGrid dataGrid,
@@ -564,9 +595,9 @@ namespace SCQueryConnect
         {
             try
             {
-                await InitialiseSharpCloudDataIfNeeded();
+                await InitialiseSharpCloudDataIfNeeded(queryData);
 
-                using (var connection = GetDb())
+                using (var connection = GetDb(queryData))
                 {
                     connection.Open();
                     using (var command = connection.CreateCommand())
@@ -604,7 +635,7 @@ namespace SCQueryConnect
                     }
                 }
 
-                SetLastUsedSharpCloudConnection();
+                SetLastUsedSharpCloudConnection(queryData);
             }
             catch (Exception ex)
             {
@@ -673,7 +704,7 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
         }
 
-        private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
+        private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<IQueryItem> connections)
         {
             var newConnections = new ObservableCollection<QueryData>();
 
@@ -801,6 +832,11 @@ namespace SCQueryConnect
 
         private async void UpdateSharpCloud(object sender, RoutedEventArgs e)
         {
+            await UpdateSharpCloud(SelectedQueryData);
+        }
+
+        private async Task UpdateSharpCloud(QueryData queryData)
+        {
             if (!ValidateCreds())
                 return;
 
@@ -829,8 +865,8 @@ namespace SCQueryConnect
                 QueryStringPanels = SqlStringPanels.Text,
                 QueryStringRels = SQLStringRels.Text,
                 QueryStringResourceUrls = SqlStringResourceUrls.Text,
-                ConnectionString = SelectedQueryData.FormattedConnectionString,
-                DBType = SelectedQueryData.ConnectionType,
+                ConnectionString = queryData.FormattedConnectionString,
+                DBType = queryData.ConnectionType,
                 MaxRowCount = maxRowCount,
                 UnpublishItems = UnpublishItems,
                 BuildRelationships = BuildRelationships
@@ -838,9 +874,9 @@ namespace SCQueryConnect
 
             await _qcHelper.UpdateSharpCloud(config, settings);
 
-            SelectedQueryData.LogData = tbResults.Text;
-            SelectedQueryData.LastRunDateTime = DateTime.Now;
-            tbLastRun.Text = SelectedQueryData.LastRunDate;
+            queryData.LogData = tbResults.Text;
+            queryData.LastRunDateTime = DateTime.Now;
+            tbLastRun.Text = queryData.LastRunDate;
             SaveSettings();
 
             UpdatingMessageVisibility = Visibility.Collapsed;
@@ -1220,7 +1256,7 @@ namespace SCQueryConnect
             }
         }
 
-        private void BrowseBut_Click(object sender, RoutedEventArgs e)
+        private void BrowseForDataSourceClick(object sender, RoutedEventArgs e)
         {
             var ord = new OpenFileDialog();
 

@@ -157,6 +157,8 @@
     <Compile Include="Interfaces\ISolutionViewModel.cs" />
     <Compile Include="Interfaces\IConnectionNameValidator.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />
+    <Compile Include="Interfaces\IQueryItem.cs" />
+    <Compile Include="Models\QueryBatch.cs" />
     <Compile Include="Models\Solution.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataCheckerValidityProcessor.cs" />

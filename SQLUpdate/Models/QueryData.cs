@@ -2,11 +2,12 @@
 using System;
 using System.Data;
 using System.Runtime.Serialization;
+using SCQueryConnect.Interfaces;
 
 namespace SCQueryConnect.Models
 {
     [DataContract]
-    public class QueryData
+    public class QueryData : IQueryItem
     {
         private string _id;
 
