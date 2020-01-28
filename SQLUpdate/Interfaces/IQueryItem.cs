@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SCQueryConnect.Models;
+using System.ComponentModel;
 
 namespace SCQueryConnect.Interfaces
 {
@@ -9,5 +10,7 @@ namespace SCQueryConnect.Interfaces
         string Description { get; set; }
         bool IsExpanded { get; set; }
         bool IsSelected { get; set; }
+        QueryBatch ParentFolder { get; set; }
+        string ParentFolderId { get; set; }
     }
 }

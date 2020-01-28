@@ -48,12 +48,18 @@ namespace SCQueryConnect
 
         private bool _buildRelationships = false;
         private bool _unpublishItems = false;
+        private Point _startPoint;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
         private Visibility _connectionStringVisibility = Visibility.Visible;
         private Visibility _filenameVisibility = Visibility.Collapsed;
         private Visibility _sharepointVisibility = Visibility.Collapsed;
         private Visibility _sourceStoryIdVisibility = Visibility.Collapsed;
         private Visibility _rewriteDataSourceVisibility = Visibility.Collapsed;
+
+        private readonly QueryBatch _queryRootNode = new QueryBatch
+        {
+            Id = QueryBatch.RootId
+        };
 
         public string AppName
         {
@@ -173,6 +179,8 @@ namespace SCQueryConnect
                 {
                     _connections = value;
                     OnPropertyChanged(nameof(Connections));
+
+                    _queryRootNode.Connections = _connections;
                 }
             }
         }
@@ -1408,6 +1416,97 @@ namespace SCQueryConnect
             catch (Exception ex)
             {
                 MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {ex.Message}");
+            }
+        }
+
+        private void QueryItemTreePreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition(this);
+        }
+
+        private void QueryItemTreeMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var mousePos = e.GetPosition(this);
+                var diff = _startPoint - mousePos;
+
+                if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance
+                    || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+                {
+                    if (e.OriginalSource is FrameworkElement element &&
+                        element.DataContext is IQueryItem item)
+                    {
+                        var dragData = new DataObject(item);
+                        DragDrop.DoDragDrop(element, dragData, DragDropEffects.Move);
+                    }
+                }
+            }
+        }
+
+        private void QueryItemTreeDragEnter(object sender, DragEventArgs e)
+        {
+            e.Effects = sender is TreeViewItem
+                ? DragDropEffects.Move
+                : DragDropEffects.None;
+            
+            e.Handled = true;
+        }
+
+        private void QueryItemTreeDrop(object sender, DragEventArgs e)
+        {
+            IQueryItem source = null;
+
+            if (e.Data.GetData(typeof(QueryData)) is QueryData qd)
+            {
+                source = qd;
+            }
+            
+            if (e.Data.GetData(typeof(QueryBatch)) is QueryBatch qb)
+            {
+                source = qb;
+            }
+
+            if (source != null &&
+                e.OriginalSource is FrameworkElement fe)
+            {
+                var moveToEnd = false;
+                var index = 0;
+                var dropTarget = fe.DataContext as IQueryItem;
+                var sourceParent = source.ParentFolder ?? _queryRootNode;
+                sourceParent.Connections.Remove(source);
+
+                if (dropTarget is QueryData)
+                {
+                    var dropParent = dropTarget.ParentFolder ?? _queryRootNode;
+                    index = dropParent.Connections.IndexOf(dropTarget);
+                    source.ParentFolder = dropParent;
+                }
+                else if (dropTarget is QueryBatch qbTarget)
+                {
+                    source.ParentFolder = qbTarget;
+                }
+                else
+                {
+                    moveToEnd = true;
+                    source.ParentFolder = _queryRootNode;
+                }
+
+                if (moveToEnd)
+                {
+                    source.ParentFolder.Connections.Add(source);
+                }
+                else
+                {
+                    var mousePos = e.GetPosition(this);
+
+                    if (mousePos.Y > _startPoint.Y)
+                    {
+                        index++;
+                    }
+
+                    source.ParentFolder.Connections.Insert(index, source);
+                }
             }
         }
     }

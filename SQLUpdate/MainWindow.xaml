@@ -70,28 +70,53 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TreeView x:Name="QueryItemTree"
-                          Background="{StaticResource QCBackground}"
-                          DataContext="{Binding Parent, ElementName=Root}"
-                          ItemsSource="{Binding Connections}"
-                          SelectedItemChanged="TreeViewSelectedItemChanged">
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource StretchedTreeViewItem}">
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                        </Style>
-                    </TreeView.ItemContainerStyle>
+                <Border Grid.Column="0"
+                        Background="{StaticResource QCBackground}"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type models:QueryBatch}" ItemsSource="{Binding Connections}">
-                            <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
-                        </HierarchicalDataTemplate>
+                        <TreeView x:Name="QueryItemTree"
+                              AllowDrop="True"
+                              Background="{StaticResource QCBackground}"
+                              BorderThickness="0"
+                              DataContext="{Binding Parent, ElementName=Root}"
+                              DragOver="QueryItemTreeDragEnter"
+                              Drop="QueryItemTreeDrop"
+                              ItemsSource="{Binding Connections}"
+                              PreviewMouseLeftButtonDown="QueryItemTreePreviewMouseLeftButtonDown"
+                              PreviewMouseMove="QueryItemTreeMouseMove"
+                              SelectedItemChanged="TreeViewSelectedItemChanged">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource StretchedTreeViewItem}">
+                                    <EventSetter Event="TreeViewItem.DragOver" Handler="QueryItemTreeDragEnter"></EventSetter>
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                                </Style>
+                            </TreeView.ItemContainerStyle>
 
-                        <DataTemplate DataType="{x:Type models:QueryData}">
-                            <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
-                        </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type models:QueryBatch}" ItemsSource="{Binding Connections}">
+                                    <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                </HierarchicalDataTemplate>
+
+                                <DataTemplate DataType="{x:Type models:QueryData}">
+                                    <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                </DataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
+
+                        <Grid AllowDrop="True"
+                              Background="{StaticResource QCBackground}"
+                              Drop="QueryItemTreeDrop"
+                              Grid.Row="1">
+                        </Grid>
+                    </Grid>
+                </Border>
 
                 <Grid Grid.Row="1" Margin="2.5">
                     <Grid.Resources>

@@ -16,6 +16,7 @@ namespace SCQueryConnect.Models
         private string _id;
         private string _name;
         private string _description;
+        private QueryBatch _parentFolder;
 
         [IgnoreDataMember]
         public bool IsExpanded
@@ -140,8 +141,24 @@ namespace SCQueryConnect.Models
         public DataView QueryResultsPanels { get; set; }
         [IgnoreDataMember]
         public DataView QueryResultsResourceUrls { get; set; }
+        
         [IgnoreDataMember]
-        public int DisplayOrder { get; set; }
+        public QueryBatch ParentFolder
+        {
+            get => _parentFolder;
+
+            set
+            {
+                _parentFolder = value;
+
+                ParentFolderId = _parentFolder == null
+                    ? QueryBatch.RootId
+                    : _parentFolder.Id;
+            }
+        }
+        
+        [DataMember]
+        public string ParentFolderId { get; set; }
 
         public string FormattedConnectionString => ConnectionsString
             ?.Replace("{0}", FileName)

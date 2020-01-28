@@ -8,12 +8,15 @@ namespace SCQueryConnect.Models
 {
     public class QueryBatch : IQueryItem
     {
+        public const string RootId = "RootId";
+
         private bool _isExpanded;
         private bool _isSelected;
         private string _id;
         private string _name = "New Folder";
         private string _description;
-        private ObservableCollection<QueryData> _connections = new ObservableCollection<QueryData>();
+        private ObservableCollection<IQueryItem> _connections = new ObservableCollection<IQueryItem>();
+        private QueryBatch _parentFolder;
 
         public bool IsExpanded
         {
@@ -86,7 +89,7 @@ namespace SCQueryConnect.Models
             }
         }
 
-        public ObservableCollection<QueryData> Connections
+        public ObservableCollection<IQueryItem> Connections
         {
             get => _connections;
 
@@ -99,6 +102,19 @@ namespace SCQueryConnect.Models
                 }
             }
         }
+
+        public QueryBatch ParentFolder
+        {
+            get => _parentFolder;
+
+            set
+            {
+                _parentFolder = value;
+                ParentFolderId = _parentFolder.Id;
+            }
+        }
+
+        public string ParentFolderId { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

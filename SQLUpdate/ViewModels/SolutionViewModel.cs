@@ -222,12 +222,6 @@ namespace SCQueryConnect.ViewModels
                     SelectedSolution != null &&
                     SelectedSolution.ConnectionIds.Contains(((QueryData)obj).Id)
             };
-
-            var sort = new SortDescription(
-                nameof(QueryData.DisplayOrder),
-                ListSortDirection.Ascending);
-
-            IncludedConnections.SortDescriptions.Add(sort);
         }
 
         public void IncludeInSolution(QueryData data)
@@ -287,7 +281,6 @@ namespace SCQueryConnect.ViewModels
             for (int i = 0; i < SelectedSolution?.ConnectionIds.Count; i++)
             {
                 var data = _connections.Single(c => c.Id == SelectedSolution.ConnectionIds[i]);
-                data.DisplayOrder = i;
             }
 
             ExcludedConnections?.Refresh();
