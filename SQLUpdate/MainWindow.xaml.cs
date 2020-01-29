@@ -216,16 +216,26 @@ namespace SCQueryConnect
             }
         }
 
+        private QueryData FindQueryData(Func<QueryData, bool> predicate)
+        {
+            return FindQueryData(_queryRootNode, predicate);
+        }
+
         private static QueryData FindQueryData(QueryData data, Func<QueryData, bool> predicate)
         {
             var result = predicate(data);
-            
+
             if (result)
             {
                 return data;
             }
 
             return data.Connections?.FirstOrDefault(c => FindQueryData(c, predicate) != null);
+        }
+
+        private void SelectQueryData(string id)
+        {
+            SelectQueryData(_queryRootNode, id);
         }
 
         private void SelectQueryData(QueryData queryData, string id)
@@ -384,7 +394,7 @@ namespace SCQueryConnect
 
             // choose our last settings
             var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
-            SelectQueryData(_queryRootNode, active);
+            SelectQueryData(active);
 
             BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
 
@@ -444,7 +454,7 @@ namespace SCQueryConnect
 
                 foreach (var c in decrypted)
                 {
-                    var folder = FindQueryData(_queryRootNode, qd => qd.Id == c.ParentFolderId);
+                    var folder = FindQueryData(qd => qd.Id == c.ParentFolderId);
                     c.ParentFolder = folder;
                 }
 
@@ -1115,7 +1125,7 @@ namespace SCQueryConnect
             {
                 var queryData = new QueryData(newWnd.SelectedButton);
                 _connections.Add(queryData);
-                SelectQueryData(_queryRootNode, queryData.Id);
+                SelectQueryData(queryData.Id);
                 BrowserTabs.SelectedIndex = 0; // go back to the first tab
             }
         }
@@ -1129,7 +1139,7 @@ namespace SCQueryConnect
             };
             
             Connections.Add(queryData);
-            SelectQueryData(_queryRootNode, queryData.Id);
+            SelectQueryData(queryData.Id);
             BrowserTabs.SelectedIndex = 0; // go back to the first tab
         }
 
@@ -1137,7 +1147,7 @@ namespace SCQueryConnect
         {
             var queryData = new QueryData(SelectedQueryData);
             _connections.Add(queryData);
-            SelectQueryData(_queryRootNode, queryData.Id);
+            SelectQueryData(queryData.Id);
             BrowserTabs.SelectedIndex = 0; // go back to the  first tab
         }
 
