@@ -739,10 +739,7 @@ namespace SCQueryConnect
 
             SaveHelper.RegWrite("PasswordDpapiEntropy", Convert.ToBase64String(entropy));
 
-            SaveSettings(SelectedQueryData);
-
             Directory.CreateDirectory(_localPath);
-            
             var connections = CreateEncryptedPasswordConnections(_connections);
             var connectionsJson = SaveHelper.SerializeJSON(connections);
             File.WriteAllText(_localPath + "/connections.json", connectionsJson);
@@ -830,49 +827,7 @@ namespace SCQueryConnect
             return newConnections;
         }
 
-        private void SaveSettings(QueryData queryData)
-        {
-            //if (queryData == null)
-            //{
-            //    return;
-            //}
-
-            //var nameTextBox = queryData.Connections == null
-            //    ? ConnectionName
-            //    : FolderName;
-
-            //var nameError = _connectionNameValidator.Validate(nameTextBox.Text);
-            //var nameIsValid = string.IsNullOrWhiteSpace(nameError);
-
-            //if (nameIsValid)
-            //{
-            //    queryData.Name = nameTextBox.Text;
-            //}
-            //else
-            //{
-            //    nameTextBox.Text = queryData.Name;
-            //    MessageBox.Show(nameError);
-            //}
-
-            //if (queryData.Connections == null) // Connection
-            //{
-            //    queryData.BuildRelationships = BuildRelationships;
-            //    queryData.Description = ConnectionDescription.Text;
-            //    queryData.ConnectionsString = ConnectionString.Text;
-            //    queryData.QueryString = SQLString.Text;
-            //    queryData.StoryId = StoryId.Text;
-            //    queryData.QueryStringRels = SQLStringRels.Text;
-            //    queryData.FileName = FileName.Text;
-            //    queryData.SharePointURL = SharePointURL.Text;
-            //    queryData.SourceStoryId = SourceStoryId.Text;
-            //    queryData.QueryStringPanels = SqlStringPanels.Text;
-            //    queryData.QueryStringResourceUrls = SqlStringResourceUrls.Text;
-            //    queryData.UnpublishItems = UnpublishItems;
-            //    queryData.Description = ConnectionDescription.Text;
-            //}
-        }
-
-        private bool ValidateCreds()
+        private bool ValidateCreds(QueryData queryData)
         {
             if (string.IsNullOrEmpty(Url.Text))
             {
@@ -892,14 +847,13 @@ namespace SCQueryConnect
                 Password.Focus();
                 return false;
             }
-            if (string.IsNullOrEmpty(StoryId.Text))
+            if (string.IsNullOrEmpty(queryData.StoryId))
             {
                 MessageBox.Show("Please enter a story ID");
                 StoryId.Focus();
                 return false;
             }
-            Guid test;
-            if ( !Guid.TryParse(StoryId.Text, out test))
+            if ( !Guid.TryParse(queryData.StoryId, out _))
             {
                 MessageBox.Show("Story ID must be a GUID");
                 StoryId.Focus();
@@ -910,19 +864,25 @@ namespace SCQueryConnect
 
         private async void UpdateSharpCloud(object sender, RoutedEventArgs e)
         {
-            await UpdateSharpCloud(SelectedQueryData);
+            await UpdateSharpCloud(SelectedQueryData, true);
         }
 
-        private async Task UpdateSharpCloud(QueryData queryData)
+        private async Task UpdateSharpCloud(QueryData queryData, bool clearLog)
         {
-            if (!ValidateCreds())
+            if (!ValidateCreds(queryData))
+            {
                 return;
+            }
 
             UpdatingMessageVisibility = Visibility.Visible;
             await Task.Delay(20);
             SaveSettings();
 
-            await _logger.Clear();
+            if (clearLog)
+            {
+                await _logger.Clear();
+            }
+
             int maxRowCount;
 
             try
@@ -938,11 +898,11 @@ namespace SCQueryConnect
 
             var settings = new UpdateSettings
             {
-                TargetStoryId = SelectedQueryData.StoryId,
-                QueryString = SelectedQueryData.QueryString,
-                QueryStringPanels = SelectedQueryData.QueryStringPanels,
-                QueryStringRels = SelectedQueryData.QueryStringRels,
-                QueryStringResourceUrls = SelectedQueryData.QueryStringResourceUrls,
+                TargetStoryId = queryData.StoryId,
+                QueryString = queryData.QueryString,
+                QueryStringPanels = queryData.QueryStringPanels,
+                QueryStringRels = queryData.QueryStringRels,
+                QueryStringResourceUrls = queryData.QueryStringResourceUrls,
                 ConnectionString = queryData.FormattedConnectionString,
                 DBType = queryData.ConnectionType,
                 MaxRowCount = maxRowCount,
@@ -1002,8 +962,10 @@ namespace SCQueryConnect
             
             var outputFolder = GetFolder(Path.Combine(sequenceName, queryData.Name));
 
-            if (!ValidateCreds())
+            if (!ValidateCreds(queryData))
+            {
                 return null;
+            }
 
             try
             {
@@ -1066,7 +1028,7 @@ namespace SCQueryConnect
                 content = ReplaceConfigSetting(content, "PASSWORD_DPAPI", Convert.ToBase64String(passwordBytes));
                 content = ReplaceConfigSetting(content, "PASSWORD_DPAPI_ENTROPY", Convert.ToBase64String(entropy));
                 content = ReplaceConfigSetting(content, "https://my.sharpcloud.com", Url.Text);
-                content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", StoryId.Text);
+                content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", queryData.StoryId);
                 content = ReplaceConfigSetting(content, "SQL", queryData.GetBatchDBType);
                 content = ReplaceConfigSetting(content, "CONNECTIONSTRING", formattedConnection.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = ReplaceConfigSetting(content, "QUERYSTRING", queryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
@@ -1183,19 +1145,6 @@ namespace SCQueryConnect
             }
         }
 
-        private void SaveSettingsOnLostFocus(object sender, RoutedEventArgs e)
-        {
-            SaveSettings();
-        }
-
-        private void LostFocusStoryID(object sender, RoutedEventArgs e)
-        {
-            var textBox = sender as TextBox;
-            var idString = textBox.Text;
-            textBox.Text = _qcHelper.GetStoryUrl(idString);
-            SaveSettings();
-        }
-
         private void FileName_LostFocus(object sender, RoutedEventArgs e)
         {
             if (SelectedQueryData.ConnectionType == DatabaseType.Excel ||
@@ -1205,11 +1154,6 @@ namespace SCQueryConnect
                 var validated = _excelWriter.GetValidFilename(filenameBox.Text);
                 filenameBox.Text = validated;
             }
-            SaveSettings();
-        }
-
-        private void ConnectionString_LostFocusName(object sender, RoutedEventArgs e)
-        {
             SaveSettings();
         }
 
@@ -1517,6 +1461,38 @@ namespace SCQueryConnect
                 }
 
                 source.ParentFolder.IsExpanded = true;
+            }
+        }
+
+        private async void RunFolderClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe &&
+                fe.DataContext is QueryData connectionFolder)
+            {
+                async Task RunUpdates(QueryData queryData)
+                {
+                    if (queryData.Connections == null)
+                    {
+                        await _logger.Log($"--- Running '{queryData.Name}'");
+                        await UpdateSharpCloud(queryData, false);
+                    }
+                    else
+                    {
+                        foreach (var data in queryData.Connections)
+                        {
+                            await RunUpdates(data);
+                        }
+                    }
+                }
+
+                if (connectionFolder.Connections == null)
+                {
+                    await _logger.Log("Nothing to do: no connections to run");
+                }
+                else
+                {
+                    await RunUpdates(connectionFolder);
+                }
             }
         }
     }

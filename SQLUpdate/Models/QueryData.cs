@@ -21,6 +21,7 @@ namespace SCQueryConnect.Models
         private QueryData _parentFolder;
         private ObservableCollection<QueryData> _connections;
         private string _sharePointUrl;
+        private string _storyId;
 
         [IgnoreDataMember]
         public bool IsExpanded
@@ -107,8 +108,28 @@ namespace SCQueryConnect.Models
         public string ConnectionsString { get; set; }
         [DataMember]
         public string QueryString { get; set; }
+
         [DataMember]
-        public string StoryId { get; set; }
+        public string StoryId
+        {
+            get => _storyId;
+
+            set
+            {
+                var newValue = value;
+                if (newValue != null && newValue.Contains("#/story"))
+                {
+                    var mid = newValue.Substring(newValue.IndexOf("#/story", StringComparison.Ordinal) + 8);
+                    if (mid.Length >= 36)
+                    {
+                        newValue = mid.Substring(0, 36);
+                    }
+                }
+
+                _storyId = newValue;
+            }
+        }
+
         [DataMember]
         public string QueryStringRels { get; set; }
         [DataMember]
