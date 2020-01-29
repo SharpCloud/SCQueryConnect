@@ -145,29 +145,20 @@
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\GoToUrl.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\MessageService.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Interfaces\IActionCommand.cs" />
-    <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
-    <Compile Include="Interfaces\ISolutionViewModel.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />
-    <Compile Include="Models\Solution.cs" />
     <Compile Include="UILogger.cs" />
     <Compile Include="UIDataCheckerValidityProcessor.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\SolutionViewModel.cs" />
-    <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BoolInverse.cs" />
-    <Compile Include="Converters\BOOLToCollapsed.cs" />
-    <Compile Include="Converters\BoolToVisibility.cs" />
     <Compile Include="Helpers\SaveHelper.cs" />
     <Compile Include="Models\QueryData.cs" />
     <Compile Include="ViewModels\ProxyViewModel.cs" />

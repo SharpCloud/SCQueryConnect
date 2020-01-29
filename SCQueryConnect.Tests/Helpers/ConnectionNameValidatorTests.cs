@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SCQueryConnect.Helpers;
+using System.Windows.Controls;
 
 namespace SCQueryConnect.Tests.Helpers
 {
@@ -16,11 +17,11 @@ namespace SCQueryConnect.Tests.Helpers
 
             // Act
 
-            var result = validator.Validate(name);
+            var result = validator.Validate(name, null);
 
             // Assert
 
-            Assert.AreEqual(string.Empty, result);
+            Assert.AreEqual(ValidationResult.ValidResult, result);
         }
 
         [TestCase("My<Filename", "<")]
@@ -39,12 +40,13 @@ namespace SCQueryConnect.Tests.Helpers
 
             // Act
 
-            var result = validator.Validate(name);
+            var result = validator.Validate(name, null);
 
             // Assert
 
             var expected = $"Connection names cannot contain '{reason}'";
-            Assert.AreEqual(expected, result);
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual(expected, result.ErrorContent);
         }
 
         [TestCase("CON")]
@@ -77,12 +79,13 @@ namespace SCQueryConnect.Tests.Helpers
 
             // Act
 
-            var result = validator.Validate(name);
+            var result = validator.Validate(name, null);
 
             // Assert
 
             var expected = $"The Name '{name}' is not valid";
-            Assert.AreEqual(expected, result);
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual(expected, result.ErrorContent);
         }
 
         [Test]
@@ -94,12 +97,13 @@ namespace SCQueryConnect.Tests.Helpers
 
             // Act
 
-            var result = validator.Validate("Connection.");
+            var result = validator.Validate("Connection.", null);
 
             // Assert
 
             const string expected = "Names cannot end with '.'";
-            Assert.AreEqual(expected, result);
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual(expected, result.ErrorContent);
         }
     }
 }

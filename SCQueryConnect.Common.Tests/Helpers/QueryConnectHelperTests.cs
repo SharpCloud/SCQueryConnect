@@ -3,20 +3,16 @@ using NUnit.Framework;
 using SC.Api.Interfaces;
 using SC.API.ComInterop.Models;
 using SC.Entities.Models;
-using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
-using System.Threading.Tasks;
 using Category = SC.Entities.Models.Category;
 
-namespace SCQueryConnect.Helpers.Tests.Helpers
+namespace SCQueryConnect.Common.Tests.Helpers
 {
     [TestFixture]
     public class MainWindowHelperTests
     {
-        private const string StoryId = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
-
         private QueryConnectHelper CreateQueryConnectHelper(
             IArchitectureDetector architectureDetector = null,
             IConnectionStringHelper connectionStringHelper = null,
@@ -24,7 +20,9 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
             IDbConnectionFactory dbConnectionFactory = null,
             IExcelWriter excelWriter = null,
             ILog log = null,
+            IPanelsDataChecker panelsDataChecker = null,
             IRelationshipsDataChecker relationshipsDataChecker = null,
+            IResourceUrlDataChecker resourceUrlDataChecker = null,
             ISharpCloudApiFactory sharpCloudApiFactory = null)
         {
             return new QueryConnectHelper(
@@ -34,59 +32,10 @@ namespace SCQueryConnect.Helpers.Tests.Helpers
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
                 excelWriter ?? Mock.Of<IExcelWriter>(),
                 log ?? Mock.Of<ILog>(),
+                panelsDataChecker ?? Mock.Of<IPanelsDataChecker>(),
                 relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
+                resourceUrlDataChecker ?? Mock.Of<IResourceUrlDataChecker>(),
                 sharpCloudApiFactory ?? Mock.Of<ISharpCloudApiFactory>());
-        }
-
-        [Test]
-        public void ReturnsStoryIdFromUrlWithView()
-        {
-            // Arrange
-
-            var input = "http://hostname.com/html/#/story/5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2/view/4e204f07-2598-469a-bdeb-583afd599cdc";
-            var helper = CreateQueryConnectHelper();
-
-            // Act
-
-            var output = helper.GetStoryUrl(input);
-
-            // Assert
-
-            Assert.AreEqual(StoryId, output);
-        }
-
-        [Test]
-        public void ReturnsStoryIdFromUrlWithoutView()
-        {
-            // Arrange
-
-            var input = "http://hostname.com/html/#/story/5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
-            var helper = CreateQueryConnectHelper();
-
-            // Act
-
-            var output = helper.GetStoryUrl(input);
-
-            // Assert
-
-            Assert.AreEqual(StoryId, output);
-        }
-
-        [Test]
-        public void ReturnsStoryIdIfProvided()
-        {
-            // Arrange
-
-            var input = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
-            var helper = CreateQueryConnectHelper();
-
-            // Act
-
-            var output = helper.GetStoryUrl(input);
-
-            // Assert
-
-            Assert.AreEqual(StoryId, output);
         }
 
         [Test]

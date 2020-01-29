@@ -120,20 +120,11 @@
     <Compile Include="..\SQLUpdate\Bootstrapper.cs">
       <Link>Bootstrapper.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Commands\ActionCommand.cs">
-      <Link>Commands\ActionCommand.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Commands\GoToUrl.cs">
       <Link>Commands\GoToUrl.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Converters\BoolInverse.cs">
       <Link>Converters\BoolInverse.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Converters\BOOLToCollapsed.cs">
-      <Link>Converters\BOOLToCollapsed.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Converters\BoolToVisibility.cs">
-      <Link>Converters\BoolToVisibility.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
       <Link>ExtendedPropertyChangedEventArgs.cs</Link>
@@ -153,26 +144,17 @@
     <Compile Include="..\SQLUpdate\Interfaces\IActionCommand.cs">
       <Link>Interfaces\IActionCommand.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
-      <Link>Interfaces\IMainViewModel.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
       <Link>Interfaces\IMessageService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
       <Link>Interfaces\IPostDeserializeAction.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\ISolutionViewModel.cs">
-      <Link>Interfaces\ISolutionViewModel.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Models\QueryData.cs">
       <Link>Models\QueryData.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Models\Solution.cs">
-      <Link>Models\Solution.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
@@ -186,20 +168,11 @@
     <Compile Include="..\SQLUpdate\UILogger.cs">
       <Link>UILogger.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
-      <Link>ViewModels\MainViewModel.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
       <Link>ViewModels\ProxyViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\SelectedStoryViewModel.cs">
       <Link>ViewModels\SelectedStoryViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\ViewModels\SolutionViewModel.cs">
-      <Link>ViewModels\SolutionViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
-      <Link>ViewModels\ViewModelLocator.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Views\ConnectionInfo.xaml.cs">
       <Link>Views\ConnectionInfo.xaml.cs</Link>

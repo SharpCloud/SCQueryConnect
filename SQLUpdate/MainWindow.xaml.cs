@@ -276,7 +276,6 @@ namespace SCQueryConnect
         private ProxyViewModel _proxyViewModel;
         private ObservableCollection<QueryData> _connections;
         private readonly IQueryConnectHelper _qcHelper;
-        private readonly ISolutionViewModel _solutionViewModel;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IItemDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -290,7 +289,6 @@ namespace SCQueryConnect
         private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
 
         public MainWindow(
-            ISolutionViewModel solutionViewModel,
             IConnectionStringHelper connectionStringHelper,
             IItemDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
@@ -307,7 +305,6 @@ namespace SCQueryConnect
             Loaded += MainWindow_Loaded;
             DataContext = this;
 
-            _solutionViewModel = solutionViewModel;
             _connectionStringHelper = connectionStringHelper;
 
             _itemDataChecker = itemDataChecker;
@@ -387,7 +384,6 @@ namespace SCQueryConnect
             }
 
             LoadAllProfiles();
-            _solutionViewModel.Solutions = LoadSolutions();
 
             // choose our last settings
             var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
@@ -422,20 +418,6 @@ namespace SCQueryConnect
                     passwordBox.SelectAll();
                 }
             }
-        }
-
-        private ObservableCollection<Solution> LoadSolutions()
-        {
-            var file = _localPath + "/solutions.json";
-
-            if (!File.Exists(file))
-            {
-                return new ObservableCollection<Solution>();
-            }
-
-            var solutions = SaveHelper.DeserializeJSON<IList<Solution>>(File.ReadAllText(file));
-            var collection = new ObservableCollection<Solution>(solutions);
-            return collection;
         }
 
         private void LoadAllProfiles()
@@ -743,9 +725,6 @@ namespace SCQueryConnect
             var connections = CreateEncryptedPasswordConnections(_connections);
             var connectionsJson = SaveHelper.SerializeJSON(connections);
             File.WriteAllText(_localPath + "/connections.json", connectionsJson);
-
-            var solutionsJson = SaveHelper.SerializeJSON(_solutionViewModel.Solutions);
-            File.WriteAllText(_localPath + "/solutions.json", solutionsJson);
 
             if (SelectedQueryData != null)
             {
@@ -1313,33 +1292,33 @@ namespace SCQueryConnect
             }
         }
 
-        private void PublishSolutionClick32(object sender, RoutedEventArgs e)
+        private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
         {
-            PublishSolution(true);
+            PublishBatchFolder(SelectedQueryData, true);
         }
 
-        private void PublishSolutionClick64(object sender, RoutedEventArgs e)
+        private void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
         {
-            PublishSolution(false);
+            PublishBatchFolder(SelectedQueryData, false);
         }
 
-        private void PublishSolutionClickAuto(object sender, RoutedEventArgs e)
+        private void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
         {
-            PublishSolution(DetectIs32Bit);
+            PublishBatchFolder(SelectedQueryData, DetectIs32Bit);
         }
 
-        private void PublishSolution(bool is32Bit)
+        private void PublishBatchFolder(QueryData queryData, bool is32Bit)
         {
             try
             {
                 var sb = new StringBuilder();
-                var sequenceFolder = GetFolder(_solutionViewModel.SelectedSolution.Name);
+                var sequenceFolder = GetFolder(queryData.Name);
 
                 var notEmpty = Directory.EnumerateFileSystemEntries(sequenceFolder).Any();
                 if (notEmpty)
                 {
                     var result = MessageBox.Show(
-                        $"A folder named '{_solutionViewModel.SelectedSolution.Name}' already exist at this location, Do you want to replace?",
+                        $"A folder named '{queryData.Name}' already exist at this location, Do you want to replace?",
                         "WARNING",
                         MessageBoxButton.YesNo);
 
@@ -1350,17 +1329,33 @@ namespace SCQueryConnect
                 }
 
                 Directory.Delete(sequenceFolder, true);
-                GetFolder(_solutionViewModel.SelectedSolution.Name);
+                GetFolder(queryData.Name);
 
-                var connections = _solutionViewModel.IncludedConnections.Cast<QueryData>();
+                void Flatten(QueryData qd, IList<QueryData> output)
+                {
+                    if (qd.Connections == null)
+                    {
+                        output.Add(qd);
+                    }
+                    else
+                    {
+                        foreach (var c in qd.Connections)
+                        {
+                            Flatten(c, output);
+                        }
+                    }
+                }
+
+                var connections = new List<QueryData>();
+                Flatten(queryData, connections);
+                
                 sb.AppendLine("@echo off");
-
                 foreach (var connection in connections)
                 {
                     var path = GenerateBatchFile(
                         is32Bit,
                         connection.ConnectionsString,
-                        _solutionViewModel.SelectedSolution.Name,
+                        queryData.Name,
                         connection);
 
                     var suffix = GetFileSuffix(is32Bit);
@@ -1369,7 +1364,7 @@ namespace SCQueryConnect
                     sb.AppendLine($"\"{Path.Combine(path, filename)}\"");
                 }
 
-                var batchPath = Path.Combine(sequenceFolder, $"{_solutionViewModel.SelectedSolution.Name}.bat");
+                var batchPath = Path.Combine(sequenceFolder, $"{queryData.Name}.bat");
                 var content = sb.ToString();
                 File.WriteAllText(batchPath, content);
                 Process.Start(sequenceFolder);
