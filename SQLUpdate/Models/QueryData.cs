@@ -1,22 +1,26 @@
 ﻿using SCQueryConnect.Common;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using SCQueryConnect.Interfaces;
 
 namespace SCQueryConnect.Models
 {
     [DataContract]
-    public class QueryData : IQueryItem
+    public class QueryData
     {
-        private bool _isExpanded;
+        public const string RootId = "RootId";
+
+        private bool _isExpanded = true;
         private bool _isSelected;
         private string _id;
         private string _name;
         private string _description;
-        private QueryBatch _parentFolder;
+        private QueryData _parentFolder;
+        private ObservableCollection<QueryData> _connections;
+        private string _sharePointUrl;
 
         [IgnoreDataMember]
         public bool IsExpanded
@@ -113,8 +117,32 @@ namespace SCQueryConnect.Models
         public string QueryStringResourceUrls { get; set; }
         [DataMember]
         public string FileName { get; set; }
+
         [DataMember]
-        public string SharePointURL { get; set; }
+        public string SharePointURL
+        {
+            get => _sharePointUrl;
+            set
+            {
+                var newValue = value;
+
+                // note - the list ID can be found by reading data from the following url
+                // SharePointURL/_api/web/lists
+                // TODO give the user a way of seacrching for the list ID..
+                // currently this can easily be done from Excel.
+
+                if (newValue != null &&
+                    newValue.ToUpper().Contains("LIST="))
+                {
+                    // user has provided a good link with a specified list.
+                    // make sure the list is a guid 
+                    newValue = newValue.Replace("%7B", "{").Replace("%2D", "-").Replace("%7D", "}");
+                }
+
+                _sharePointUrl = newValue;
+            }
+        }
+
         [DataMember]
         public DateTime? LastRunDateTime { get; set; }
         [DataMember]
@@ -143,7 +171,7 @@ namespace SCQueryConnect.Models
         public DataView QueryResultsResourceUrls { get; set; }
         
         [IgnoreDataMember]
-        public QueryBatch ParentFolder
+        public QueryData ParentFolder
         {
             get => _parentFolder;
 
@@ -152,13 +180,28 @@ namespace SCQueryConnect.Models
                 _parentFolder = value;
 
                 ParentFolderId = _parentFolder == null
-                    ? QueryBatch.RootId
+                    ? RootId
                     : _parentFolder.Id;
             }
         }
         
         [DataMember]
         public string ParentFolderId { get; set; }
+
+        [DataMember]
+        public ObservableCollection<QueryData> Connections
+        {
+            get => _connections;
+
+            set
+            {
+                if (_connections != value)
+                {
+                    _connections = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public string FormattedConnectionString => ConnectionsString
             ?.Replace("{0}", FileName)
@@ -309,7 +352,7 @@ namespace SCQueryConnect.Models
             }
         }
 
-        public string GetExampleRelQuery
+        public string ExampleRelQuery
         {
             get
             {

@@ -165,17 +165,11 @@
     <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
       <Link>Interfaces\IPostDeserializeAction.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IQueryItem.cs">
-      <Link>Interfaces\IQueryItem.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\ISolutionViewModel.cs">
       <Link>Interfaces\ISolutionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Models\QueryBatch.cs">
-      <Link>Models\QueryBatch.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Models\QueryData.cs">
       <Link>Models\QueryData.cs</Link>

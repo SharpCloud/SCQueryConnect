@@ -100,13 +100,9 @@
                             </TreeView.ItemContainerStyle>
 
                             <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type models:QueryBatch}" ItemsSource="{Binding Connections}">
+                                <HierarchicalDataTemplate DataType="{x:Type models:QueryData}" ItemsSource="{Binding Connections}">
                                     <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
                                 </HierarchicalDataTemplate>
-
-                                <DataTemplate DataType="{x:Type models:QueryData}">
-                                    <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
-                                </DataTemplate>
                             </TreeView.Resources>
                         </TreeView>
 
@@ -179,26 +175,26 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
-                                <TextBox Grid.Row="0" x:Name="ConnectionName" Grid.Column="1" Text="Name" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name, FallbackValue='Name'}" DataContext="{Binding SelectedQueryData}" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
                                 <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
-                                <TextBox Grid.Row="0" x:Name="txtDatabaseType" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="Connection Type" />
+                                <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="{Binding ConnectionType, FallbackValue='Connection Type'}" DataContext="{Binding SelectedQueryData}" />
 
                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
-                                <TextBox Grid.Row="1" x:Name="ConnectionDescription" Grid.Column="1" Text="Description" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Description, FallbackValue='Description'}" DataContext="{Binding SelectedQueryData}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="ConnectionString_LostFocusName"/>
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Visibility, ElementName=SourceStoryId}" />
-                                <TextBox Grid.Row="2" x:Name="SourceStoryId" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" Visibility="{Binding SourceStoryIdVisibility}" />
-                                <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Visibility, ElementName=SourceStoryId}" Click="StorySourceSettings_Click">More...</Button>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Source Story ID/URL:" Style="{StaticResource Label}" Visibility="{Binding Parent.SourceStoryIdVisibility, ElementName=Root}" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Height="30" Margin="5,5,250,5" LostFocus="LostFocusStoryID" Visibility="{Binding Parent.SourceStoryIdVisibility, ElementName=Root}" Text="{Binding SourceStoryId}" DataContext="{Binding SelectedQueryData}" />
+                                <Button Grid.Row="2" Grid.Column="1" Height="30" HorizontalAlignment="Right" Width="150" Visibility="{Binding Parent.SourceStoryIdVisibility, ElementName=Root}" Click="StorySourceSettings_Click">More...</Button>
 
                                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Filename:" Style="{StaticResource Label}" Visibility="{Binding FilenameVisibility}" />
-                                <TextBox Grid.Row="3" x:Name="FileName" Grid.Column="1" Text="C:/Docs/filename.xls" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus" Visibility="{Binding FilenameVisibility}"/>
+                                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls'}" DataContext="{Binding SelectedQueryData}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="FileName_LostFocus" Visibility="{Binding Parent.FilenameVisibility, ElementName=Root}"/>
                                 <Button Grid.Row="3" Grid.Column="1" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Click="BrowseForDataSourceClick" Visibility="{Binding FilenameVisibility}">Choose file...</Button>
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Sharepoint URL:" Style="{StaticResource Label}" Visibility="{Binding SharepointVisibility}" />
-                                <TextBox Grid.Row="3" x:Name="SharePointURL" Grid.Column="1" Text="https://yoursite.sharepoint.com;LIST={listGuid}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="Sharepoint_LostFocus" Visibility="{Binding SharepointVisibility}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="SharePoint URL:" Style="{StaticResource Label}" Visibility="{Binding SharepointVisibility}" />
+                                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SharePointURL, FallbackValue='https://yoursite.sharepoint.com;LIST={listGuid}'}" DataContext="{Binding SelectedQueryData}" TextWrapping="WrapWithOverflow" Margin="5" Visibility="{Binding Parent.SharepointVisibility, ElementName=Root}"/>
 
                                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection String:" Style="{StaticResource Label}" Visibility="{Binding ConnectionStringVisibility}" />
-                                <TextBox Grid.Row="3" x:Name="ConnectionString" Grid.Column="1" Text="Server=.; Integrated Security=true; Database=demo" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="SaveSettingsOnLostFocus" Visibility="{Binding ConnectionStringVisibility}"/>
+                                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ConnectionsString, FallbackValue='Server=.; Integrated Security=true; Database=demo'}" DataContext="{Binding SelectedQueryData}" TextWrapping="WrapWithOverflow" Margin="5" LostFocus="SaveSettingsOnLostFocus" Visibility="{Binding Parent.ConnectionStringVisibility, ElementName=Root}"/>
 
                                 <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
                                 <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
@@ -288,7 +284,7 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBox x:Name="SQLString" Grid.Row="1" Text="SELECT * FROM TABLE" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <TextBox Grid.Row="1" Text="{Binding QueryString, FallbackValue='SELECT * FROM TABLE'}" DataContext="{Binding SelectedQueryData}" LostFocus="SaveSettingsOnLostFocus"/>
                                     <GridSplitter Grid.Row="2" />
                                     
                                     <Grid Grid.Row="3">
@@ -315,8 +311,11 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right" />
-                                    <TextBox x:Name="SQLStringRels" Grid.Row="1" Text="SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right">
+                                        <Run Text="Example:" />
+                                        <Run Text="{Binding ExampleRelQuery, Mode=OneWay}" DataContext="{Binding SelectedQueryData}" />
+                                    </TextBlock>
+                                    <TextBox Grid.Row="1" Text="{Binding QueryStringRels, FallbackValue='SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE'}" DataContext="{Binding SelectedQueryData}" LostFocus="SaveSettingsOnLostFocus"/>
                                     <GridSplitter Grid.Row="2" ></GridSplitter>
 
                                     <Grid Grid.Row="3">
@@ -343,7 +342,7 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBox x:Name="SqlStringResourceUrls" Grid.Row="1" Text="SELECT * FROM TABLE" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <TextBox Grid.Row="1" Text="{Binding QueryStringResourceUrls, FallbackValue='SELECT * FROM TABLE'}" DataContext="{Binding SelectedQueryData}" LostFocus="SaveSettingsOnLostFocus"/>
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -370,7 +369,7 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBox x:Name="SqlStringPanels" Grid.Row="1" Text="SELECT * FROM TABLE" LostFocus="SaveSettingsOnLostFocus"/>
+                                    <TextBox Grid.Row="1" Text="{Binding QueryStringPanels, FallbackValue='SELECT * FROM TABLE'}" DataContext="{Binding SelectedQueryData}" LostFocus="SaveSettingsOnLostFocus"/>
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -412,7 +411,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Story ID or URL:" Style="{StaticResource Label}" Width="100"></TextBlock>
-                                    <TextBox x:Name="StoryId" Width="270" LostFocus="LostFocusStoryID"></TextBox>
+                                    <TextBox x:Name="StoryId" Width="270" Text="{Binding StoryId}" DataContext="{Binding SelectedQueryData}" LostFocus="LostFocusStoryID"></TextBox>
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>
@@ -428,8 +427,9 @@
                                 <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
                                     <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="5,0"></TextBlock>
-                                    <TextBlock x:Name="tbLastRun" Text="Now" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
+                                    <TextBlock Text="{Binding LastRunDate, FallbackValue='Now'}" DataContext="{Binding SelectedQueryData}" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
                                 </StackPanel>
+                                
                                 <TextBox x:Name="tbResults"
                                          Width="Auto"
                                          Margin="5,35,5,5"
@@ -438,6 +438,8 @@
                                          IsReadOnly="True"
                                          Foreground="{StaticResource QCBlue}"
                                          Background="{StaticResource QCBackground}"
+                                         Text="{Binding LogData}"
+                                         DataContext="{Binding SelectedQueryData}"
                                          TextChanged="TbResultsTextChanged">
                                 </TextBox>
                             </Grid>
@@ -519,8 +521,8 @@
 
                 <Grid Visibility="{Binding FolderConfigVisibility, FallbackValue=Collapsed}"
                       Background="{StaticResource QCBackground}">
-                    <Grid DataContext="{Binding SolutionViewModel, Source={StaticResource ViewModelLocator}}"
-                          Margin="80,80,80,0">
+                    <Grid DataContext="{Binding SelectedQueryData}"
+                          Margin="60,60,60,0">
                         <Grid.Resources>
                             <Style TargetType="ListBox">
                                 <Setter Property="Background" Value="{StaticResource QCBackground}" />
@@ -528,97 +530,57 @@
                             </Style>
                         </Grid.Resources>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Grid Grid.Column="0"
-                              Grid.ColumnSpan="3"
-                              Grid.Row="0"
-                              Margin="0,0,0,10">
+                        <Grid Grid.Row="0" Margin="0,0,0,30">
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Solution Name:</TextBlock>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                            <TextBox Grid.Column="1" Height="30" HorizontalAlignment="Stretch" Text="{Binding SelectedSolution.Name}" />
+                            <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Folder Name:</TextBlock>
+                            <TextBox Grid.Column="1" Grid.Row="0" x:Name="FolderName" Height="30" Text="{Binding Name}" />
+                            <Button Grid.Column="2" Grid.Row="0" Margin="5,0,0,0" Padding="20,0">Run Now</Button>
+
+                            <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,5,10,0" VerticalAlignment="Center">Description:</TextBlock>
+                            <TextBox Grid.Column="1" Grid.Row="1" Margin="0,5,0,0" Height="30" Text="{Binding Description}" />
                         </Grid>
 
-                        <TextBlock Grid.Row="1">
-                            Available Connections:
-                        </TextBlock>
+                        <!-- Update output -->
+                        <Grid Grid.Row="1">
+                            <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}"></TextBlock>
 
-                        <TextBlock Grid.Row="1" Grid.Column="2">
-                            To Publish:
-                        </TextBlock>
-                        
-                        <ListBox Grid.Row="2"
-                                 ItemsSource="{Binding ExcludedConnections}"
-                                 SelectedItem="{Binding SelectedExcludedConnection}">
-                        </ListBox>
+                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="0,0,10,0"></TextBlock>
+                                <TextBlock x:Name="tbFolderLastRun" Text="Now" TextAlignment="Right" Foreground="White"></TextBlock>
+                            </StackPanel>
 
-                        <StackPanel Grid.Column="1"
-                                    Grid.Row="2"
-                                    Margin="10,0"
-                                    VerticalAlignment="Center">
-                            <StackPanel.Resources>
-                                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                                    <Setter Property="Margin" Value="0,5" />
-                                    <Setter Property="Padding" Value="5" />
-                                    <Setter Property="Width" Value="90" />
-                                </Style>
-                            </StackPanel.Resources>
+                            <TextBox x:Name="tbFolderResults"
+                                     Width="Auto"
+                                     Margin="0,35,0,5"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     IsReadOnly="True"
+                                     Foreground="{StaticResource QCBlue}"
+                                     Background="{StaticResource QCBackground}"
+                                     TextChanged="TbResultsTextChanged">
+                            </TextBox>
+                        </Grid>
 
-                            <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0">
-                                Unpublish/Publish
-                            </TextBlock>
-                            
-                            <Button Command="{Binding IncludeInSolutionCommand}"
-                                    CommandParameter="{Binding SelectedExcludedConnection}">
-                                &gt;
-                            </Button>
-
-                            <Button Command="{Binding ExcludeFromSolutionCommand}"
-                                    CommandParameter="{Binding SelectedIncludedConnection}">
-                                &lt;
-                            </Button>
-
-                            <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0">
-                                Publish Run Order
-                            </TextBlock>
-                            
-                            <Button Command="{Binding MoveConnectionUp}"
-                                    CommandParameter="{Binding SelectedIncludedConnection}">
-                                Move Up
-                            </Button>
-
-                            <Button Command="{Binding MoveConnectionDown}"
-                                    CommandParameter="{Binding SelectedIncludedConnection}">
-                                Move Down
-                            </Button>
-                        </StackPanel>
-
-                        <ListBox Grid.Column="2"
-                                 Grid.Row="2"
-                                 ItemsSource="{Binding IncludedConnections}"
-                                 SelectedItem="{Binding SelectedIncludedConnection}">
-                        </ListBox>
-
+                        <!-- Publish buttons -->
                         <StackPanel Grid.Column="0"
-                                    Grid.ColumnSpan="3"
-                                    Grid.Row="3"
+                                    Grid.Row="2"
                                     HorizontalAlignment="Center"
                                     Margin="0,10">
                             <StackPanel.Resources>

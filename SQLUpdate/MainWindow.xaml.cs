@@ -59,9 +59,9 @@ namespace SCQueryConnect
         private Visibility _queryConfigVisibility = Visibility.Collapsed;
         private Visibility _folderConfigVisibility = Visibility.Collapsed;
 
-        private readonly QueryBatch _queryRootNode = new QueryBatch
+        private readonly QueryData _queryRootNode = new QueryData
         {
-            Id = QueryBatch.RootId
+            Id = QueryData.RootId
         };
 
         public string AppName
@@ -200,7 +200,7 @@ namespace SCQueryConnect
             }
         }
 
-        public ObservableCollection<IQueryItem> Connections
+        public ObservableCollection<QueryData> Connections
         {
             get => _connections;
 
@@ -212,62 +212,59 @@ namespace SCQueryConnect
                     OnPropertyChanged(nameof(Connections));
 
                     _queryRootNode.Connections = _connections;
-
-                    var first = Connections.FirstOrDefault();
-                    if (first != null)
-                    {
-                        SetSelectedQueryItem(first.Id);
-                    }
                 }
             }
         }
 
-        private static IQueryItem FindSelectedQueryItem(IQueryItem item)
+        private static QueryData FindQueryData(QueryData data, Func<QueryData, bool> predicate)
         {
-            if (item.IsSelected)
-            {
-                return item;
-            }
+            var result = predicate(data);
             
-            if (item is QueryBatch qb)
+            if (result)
             {
-                return qb.Connections.FirstOrDefault(c => FindSelectedQueryItem(c) != null);
+                return data;
             }
 
-            return null;
+            return data.Connections?.FirstOrDefault(c => FindQueryData(c, predicate) != null);
         }
 
-        private static void SelectQueryItem(IQueryItem item, string id)
+        private void SelectQueryData(QueryData queryData, string id)
         {
-            if (item is QueryData qd)
+            queryData.IsSelected = queryData.Id == id;
+
+            if (queryData.IsSelected)
             {
-                qd.IsSelected = qd.Id == id;
+                SelectedQueryData = queryData;
             }
 
-            if (item is QueryBatch qb)
+            if (queryData.Connections != null)
             {
-                foreach (var c in qb.Connections)
+                foreach (var c in queryData.Connections)
                 {
-                    SelectQueryItem(c, id);
+                    SelectQueryData(c, id);
                 }
             }
         }
 
-        private void SetSelectedQueryItem(string id)
+        private QueryData _selectedQueryData;
+        
+        public QueryData SelectedQueryData
         {
-            foreach (var c in Connections)
+            get => _selectedQueryData;
+
+            set
             {
-                SelectQueryItem(c, id);
+                if (_selectedQueryData != value)
+                {
+                    _selectedQueryData = value;
+                    OnPropertyChanged(nameof(SelectedQueryData));
+                }
             }
         }
-
-        public IQueryItem SelectedQueryItem => Connections.FirstOrDefault(c => FindSelectedQueryItem(c) != null);
-
-        private QueryData SelectedQueryData => (QueryData) SelectedQueryItem;
 
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
-        private ObservableCollection<IQueryItem> _connections;
+        private ObservableCollection<QueryData> _connections;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly ISolutionViewModel _solutionViewModel;
         private readonly IConnectionNameValidator _connectionNameValidator;
@@ -332,12 +329,8 @@ namespace SCQueryConnect
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ConnectionString.Text = SaveHelper.RegRead("ConnectionString",
-                "Server=.; Integrated Security=true; Database=demo");
-            SQLString.Text = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
             Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
             Username.Text = SaveHelper.RegRead("Username", "");
-            StoryId.Text = SaveHelper.RegRead("StoryID", "");
 
             var regPassword = SaveHelper.RegRead("PasswordDpapi", "");
             var regPasswordEntropy = SaveHelper.RegRead("PasswordDpapiEntropy", null);
@@ -391,8 +384,8 @@ namespace SCQueryConnect
 
             // choose our last settings
             var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
-            SetSelectedQueryItem(active);
-            
+            SelectQueryData(_queryRootNode, active);
+
             BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
 
             EventManager.RegisterClassHandler(
@@ -448,28 +441,20 @@ namespace SCQueryConnect
                 var encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
                 var filtered = encrypted?.Where(qd => qd != null);
                 var decrypted = CreateDecryptedPasswordConnections(filtered);
-                Connections = new ObservableCollection<IQueryItem>(decrypted);
+
+                foreach (var c in decrypted)
+                {
+                    var folder = FindQueryData(_queryRootNode, qd => qd.Id == c.ParentFolderId);
+                    c.ParentFolder = folder;
+                }
+
+                Connections = new ObservableCollection<QueryData>(decrypted);
             }
             else
             {
-                // create some sample settings
-                if (SQLString.Text != "SELECT * FROM TABLE" &&
-                    ConnectionString.Text != "Server=.; Integrated Security=true; Database=demo")
-                {
-                    // user probably already has setting we should save from last time
-                    // create one based on old settings - which are already set up
-                    var pqd = new QueryData((DatabaseType) Int32.Parse(SaveHelper.RegRead("DBType", "0")));
-                    pqd.Name = "Previous Connection";
-                    pqd.ConnectionsString = SaveHelper.RegRead("ConnectionString",
-                        "Server=.; Integrated Security=true; Database=demo");
-                    pqd.QueryString = SaveHelper.RegRead("SQLString", "SELECT * FROM TABLE");
-                    pqd.StoryId = StoryId.Text;
-                    _connections.Add(pqd);
-                }
-
                 // add some examples
 
-                Connections = new ObservableCollection<IQueryItem>(new[]
+                Connections = new ObservableCollection<QueryData>(new[]
                 {
                     new QueryData(DatabaseType.Excel),
                     new QueryData(DatabaseType.Access),
@@ -622,7 +607,7 @@ namespace SCQueryConnect
         {
             await PreviewSql(
                 SelectedQueryData,
-                SQLString.Text,
+                SelectedQueryData.QueryString,
                 _itemDataChecker,
                 DataGrid,
                 d => d.QueryResults);
@@ -632,7 +617,7 @@ namespace SCQueryConnect
         {
             await PreviewSql(
                 SelectedQueryData,
-                SQLStringRels.Text,
+                SelectedQueryData.QueryStringRels,
                 _relationshipsChecker,
                 DataGridRels,
                 d => d.QueryResultsRels);
@@ -642,7 +627,7 @@ namespace SCQueryConnect
         {
             await PreviewSql(
                 SelectedQueryData,
-                SqlStringResourceUrls.Text,
+                SelectedQueryData.QueryStringResourceUrls,
                 _resourceUrlDataChecker,
                 DataGridResourceUrls,
                 d => d.QueryResultsResourceUrls);
@@ -652,7 +637,7 @@ namespace SCQueryConnect
         {
             await PreviewSql(
                 SelectedQueryData,
-                SqlStringPanels.Text,
+                SelectedQueryData.QueryStringPanels,
                 _panelsDataChecker,
                 DataGridPanels,
                 d => d.QueryResultsPanels);
@@ -758,9 +743,9 @@ namespace SCQueryConnect
             var solutionsJson = SaveHelper.SerializeJSON(_solutionViewModel.Solutions);
             File.WriteAllText(_localPath + "/solutions.json", solutionsJson);
 
-            if (SelectedQueryItem != null)
+            if (SelectedQueryData != null)
             {
-                SaveHelper.RegWrite("ActiveConnection", SelectedQueryItem.Id);
+                SaveHelper.RegWrite("ActiveConnection", SelectedQueryData.Id);
             }
 
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
@@ -780,7 +765,7 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
         }
 
-        private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<IQueryItem> connections)
+        private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
         {
             var newConnections = new ObservableCollection<QueryData>();
 
@@ -838,36 +823,46 @@ namespace SCQueryConnect
             return newConnections;
         }
 
-        private void SaveSettings(QueryData qd)
+        private void SaveSettings(QueryData queryData)
         {
-            if (qd != null)
-            {
-                var nameError = _connectionNameValidator.Validate(ConnectionName.Text);
-                var nameIsValid = string.IsNullOrWhiteSpace(nameError);
-                
-                if (nameIsValid)
-                {
-                    qd.Name = ConnectionName.Text;
-                }
-                else
-                {
-                    ConnectionName.Text = qd.Name;
-                    MessageBox.Show(nameError);
-                }
+            //if (queryData == null)
+            //{
+            //    return;
+            //}
 
-                qd.BuildRelationships = BuildRelationships;
-                qd.Description = ConnectionDescription.Text;
-                qd.ConnectionsString = ConnectionString.Text;
-                qd.QueryString = SQLString.Text;
-                qd.StoryId = StoryId.Text;
-                qd.QueryStringRels = SQLStringRels.Text;
-                qd.FileName = FileName.Text;
-                qd.SharePointURL = SharePointURL.Text;
-                qd.SourceStoryId = SourceStoryId.Text;
-                qd.QueryStringPanels = SqlStringPanels.Text;
-                qd.QueryStringResourceUrls = SqlStringResourceUrls.Text;
-                qd.UnpublishItems = UnpublishItems;
-            }
+            //var nameTextBox = queryData.Connections == null
+            //    ? ConnectionName
+            //    : FolderName;
+
+            //var nameError = _connectionNameValidator.Validate(nameTextBox.Text);
+            //var nameIsValid = string.IsNullOrWhiteSpace(nameError);
+
+            //if (nameIsValid)
+            //{
+            //    queryData.Name = nameTextBox.Text;
+            //}
+            //else
+            //{
+            //    nameTextBox.Text = queryData.Name;
+            //    MessageBox.Show(nameError);
+            //}
+
+            //if (queryData.Connections == null) // Connection
+            //{
+            //    queryData.BuildRelationships = BuildRelationships;
+            //    queryData.Description = ConnectionDescription.Text;
+            //    queryData.ConnectionsString = ConnectionString.Text;
+            //    queryData.QueryString = SQLString.Text;
+            //    queryData.StoryId = StoryId.Text;
+            //    queryData.QueryStringRels = SQLStringRels.Text;
+            //    queryData.FileName = FileName.Text;
+            //    queryData.SharePointURL = SharePointURL.Text;
+            //    queryData.SourceStoryId = SourceStoryId.Text;
+            //    queryData.QueryStringPanels = SqlStringPanels.Text;
+            //    queryData.QueryStringResourceUrls = SqlStringResourceUrls.Text;
+            //    queryData.UnpublishItems = UnpublishItems;
+            //    queryData.Description = ConnectionDescription.Text;
+            //}
         }
 
         private bool ValidateCreds()
@@ -936,11 +931,11 @@ namespace SCQueryConnect
 
             var settings = new UpdateSettings
             {
-                TargetStoryId = StoryId.Text,
-                QueryString = SQLString.Text,
-                QueryStringPanels = SqlStringPanels.Text,
-                QueryStringRels = SQLStringRels.Text,
-                QueryStringResourceUrls = SqlStringResourceUrls.Text,
+                TargetStoryId = SelectedQueryData.StoryId,
+                QueryString = SelectedQueryData.QueryString,
+                QueryStringPanels = SelectedQueryData.QueryStringPanels,
+                QueryStringRels = SelectedQueryData.QueryStringRels,
+                QueryStringResourceUrls = SelectedQueryData.QueryStringResourceUrls,
                 ConnectionString = queryData.FormattedConnectionString,
                 DBType = queryData.ConnectionType,
                 MaxRowCount = maxRowCount,
@@ -952,7 +947,6 @@ namespace SCQueryConnect
 
             queryData.LogData = tbResults.Text;
             queryData.LastRunDateTime = DateTime.Now;
-            tbLastRun.Text = queryData.LastRunDate;
             SaveSettings();
 
             UpdatingMessageVisibility = Visibility.Collapsed;
@@ -990,7 +984,7 @@ namespace SCQueryConnect
 
         private void GenerateBatchFile(bool b32Bit)
         {
-            var outputFolder = GenerateBatchFile(b32Bit, ConnectionString.Text, string.Empty, SelectedQueryData);
+            var outputFolder = GenerateBatchFile(b32Bit, SelectedQueryData.ConnectionsString, string.Empty, SelectedQueryData);
             Process.Start(outputFolder);
         }
 
@@ -1121,16 +1115,21 @@ namespace SCQueryConnect
             {
                 var queryData = new QueryData(newWnd.SelectedButton);
                 _connections.Add(queryData);
-                SetSelectedQueryItem(queryData.Id);
+                SelectQueryData(_queryRootNode, queryData.Id);
                 BrowserTabs.SelectedIndex = 0; // go back to the first tab
             }
         }
 
         private void NewQueryFolderClick(object sender, RoutedEventArgs e)
         {
-            var queryBatch = new QueryBatch();
-            Connections.Add(queryBatch);
-            SetSelectedQueryItem(queryBatch.Id);
+            var queryData = new QueryData
+            {
+                Name = "New Folder",
+                Connections = new ObservableCollection<QueryData>()
+            };
+            
+            Connections.Add(queryData);
+            SelectQueryData(_queryRootNode, queryData.Id);
             BrowserTabs.SelectedIndex = 0; // go back to the first tab
         }
 
@@ -1138,47 +1137,37 @@ namespace SCQueryConnect
         {
             var queryData = new QueryData(SelectedQueryData);
             _connections.Add(queryData);
-            SetSelectedQueryItem(queryData.Id);
+            SelectQueryData(_queryRootNode, queryData.Id);
             BrowserTabs.SelectedIndex = 0; // go back to the  first tab
         }
 
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
         {
-            Connections.Remove(SelectedQueryItem);
+            Connections.Remove(SelectedQueryData);
         }
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue is QueryData queryData)
+            SelectedQueryData = e.NewValue as QueryData;
+
+            if (SelectedQueryData == null)
             {
-                BuildRelationships = queryData.BuildRelationships;
-                ConnectionName.Text = queryData.Name;
-                ConnectionDescription.Text = queryData.Description;
-                txtDatabaseType.Text = queryData.ConnectionType.ToString();
-                ConnectionString.Text = queryData.ConnectionsString;
-                SQLString.Text = queryData.QueryString;
-                StoryId.Text = queryData.StoryId;
-                SQLStringRels.Text = queryData.QueryStringRels;
-                FileName.Text = queryData.FileName;
-                SharePointURL.Text = queryData.SharePointURL;
-                txtExampleRels.Text = "Example: " + queryData.GetExampleRelQuery;
-                SourceStoryId.Text = queryData.SourceStoryId;
-                SqlStringPanels.Text = queryData.QueryStringPanels;
-                SqlStringResourceUrls.Text = queryData.QueryStringResourceUrls;
-                UnpublishItems = queryData.UnpublishItems;
+                return;
+            }
 
-                tbLastRun.Text = queryData.LastRunDate;
-                tbResults.Text = queryData.LogData;
+            if (SelectedQueryData.Connections == null)
+            {
+                DataGrid.ItemsSource = SelectedQueryData.QueryResults;
+                DataGridRels.ItemsSource = SelectedQueryData.QueryResultsRels;
+                DataGridResourceUrls.ItemsSource = SelectedQueryData.QueryResultsResourceUrls;
+                DataGridPanels.ItemsSource = SelectedQueryData.QueryResultsPanels;
 
-                DataGrid.ItemsSource = queryData.QueryResults;
-                DataGridRels.ItemsSource = queryData.QueryResultsRels;
-
-                SetVisibleObjects(queryData);
+                SetVisibleObjects(SelectedQueryData);
 
                 FolderConfigVisibility = Visibility.Collapsed;
                 QueryConfigVisibility = Visibility.Visible;
             }
-            else if (e.NewValue is QueryBatch)
+            else
             {
                 FolderConfigVisibility = Visibility.Visible;
                 QueryConfigVisibility = Visibility.Collapsed;
@@ -1207,26 +1196,6 @@ namespace SCQueryConnect
                 var validated = _excelWriter.GetValidFilename(filenameBox.Text);
                 filenameBox.Text = validated;
             }
-            SaveSettings();
-        }
-
-        private void Sharepoint_LostFocus(object sender, RoutedEventArgs e)
-        {
-            // note - the list ID can be found by reading data from the following url
-            // SharePointURL/_api/web/lists
-            // TODO give the user a way of seacrching for the list ID..
-            // currently this can easily be done from Excel.
-
-            var text = SharePointURL.Text;
-            if (text.ToUpper().Contains("LIST="))
-            {
-                // user has provided a good link with a specified list.
-                // make sure the list is a guid 
-                text = text.Replace("%7B", "{").Replace("%2D", "-").Replace("%7D", "}");
-            }
-            SelectedQueryData.SharePointURL = text;
-            SharePointURL.Text = text;
-
             SaveSettings();
         }
 
@@ -1303,7 +1272,6 @@ namespace SCQueryConnect
             if (ord.ShowDialog() == true)
             {
                 SelectedQueryData.FileName = ord.FileName;
-                FileName.Text = ord.FileName;
             }
         }
 
@@ -1330,13 +1298,13 @@ namespace SCQueryConnect
             if (dialogResult == true)
             {
                 var story = sel.SelectedStoryLites.First();
-                StoryId.Text = story.Id;
+                SelectedQueryData.StoryId = story.Id;
             }
         }
 
         private void ViewStoryClick(object sender, RoutedEventArgs e)
         {
-            Process.Start($"{Url.Text}/html/#/story/{StoryId.Text}");
+            Process.Start($"{Url.Text}/html/#/story/{SelectedQueryData.StoryId}");
         }
 
         private void Database_Engine_Hyperlink_Click(object sender, RoutedEventArgs e)
@@ -1484,7 +1452,7 @@ namespace SCQueryConnect
                     || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
                 {
                     if (e.OriginalSource is FrameworkElement element &&
-                        element.DataContext is IQueryItem item)
+                        element.DataContext is QueryData item)
                     {
                         var dragData = new DataObject(item);
                         DragDrop.DoDragDrop(element, dragData, DragDropEffects.Move);
@@ -1504,35 +1472,27 @@ namespace SCQueryConnect
 
         private void QueryItemTreeDrop(object sender, DragEventArgs e)
         {
-            IQueryItem source = null;
 
-            if (e.Data.GetData(typeof(QueryData)) is QueryData qd)
-            {
-                source = qd;
-            }
-            
-            if (e.Data.GetData(typeof(QueryBatch)) is QueryBatch qb)
-            {
-                source = qb;
-            }
-
-            if (source != null &&
+            if (e.Data.GetData(typeof(QueryData)) is QueryData source &&
                 e.OriginalSource is FrameworkElement fe)
             {
                 var index = 0;
-                var dropTarget = fe.DataContext as IQueryItem;
+                var dropTarget = fe.DataContext as QueryData;
                 var sourceParent = source.ParentFolder ?? _queryRootNode;
                 sourceParent.Connections.Remove(source);
 
-                if (dropTarget is QueryData)
+                if (dropTarget != null)
                 {
-                    var dropParent = dropTarget.ParentFolder ?? _queryRootNode;
-                    index = dropParent.Connections.IndexOf(dropTarget);
-                    source.ParentFolder = dropParent;
-                }
-                else if (dropTarget is QueryBatch qbTarget)
-                {
-                    source.ParentFolder = qbTarget;
+                    if (dropTarget.Connections == null)
+                    {
+                        var dropParent = dropTarget.ParentFolder ?? _queryRootNode;
+                        index = dropParent.Connections.IndexOf(dropTarget);
+                        source.ParentFolder = dropParent;
+                    }
+                    else
+                    {
+                        source.ParentFolder = dropTarget;
+                    }
                 }
                 else
                 {
@@ -1555,6 +1515,8 @@ namespace SCQueryConnect
                 {
                     source.ParentFolder.Connections.Insert(index, source);
                 }
+
+                source.ParentFolder.IsExpanded = true;
             }
         }
     }
