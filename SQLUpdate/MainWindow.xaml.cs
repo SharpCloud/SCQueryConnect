@@ -329,7 +329,7 @@ namespace SCQueryConnect
             _resourceUrlDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrResourceUrls);
 
             _logger = logger;
-            ((UILogger) _logger).Output = tbResults;
+            ((UILogger) _logger).Initialise(tbResults, tbFolderResults);
 
             _qcHelper = qcHelper;
         }
@@ -952,7 +952,7 @@ namespace SCQueryConnect
 
             await _qcHelper.UpdateSharpCloud(config, settings);
 
-            queryData.LogData = tbResults.Text;
+            queryData.LogData = ((UILogger) _logger).GetLogText();
             queryData.LastRunDateTime = DateTime.Now;
             SaveSettings();
 
@@ -1164,6 +1164,7 @@ namespace SCQueryConnect
 
             if (SelectedQueryData.Connections == null)
             {
+                tbResults.Text = SelectedQueryData.LogData;
                 DataGrid.ItemsSource = SelectedQueryData.QueryResults;
                 DataGridRels.ItemsSource = SelectedQueryData.QueryResultsRels;
                 DataGridResourceUrls.ItemsSource = SelectedQueryData.QueryResultsResourceUrls;
@@ -1176,6 +1177,7 @@ namespace SCQueryConnect
             }
             else
             {
+                tbFolderResults.Text = SelectedQueryData.LogData;
                 FolderConfigVisibility = Visibility.Visible;
                 QueryConfigVisibility = Visibility.Collapsed;
             }

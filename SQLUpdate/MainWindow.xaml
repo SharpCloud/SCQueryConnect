@@ -460,8 +460,6 @@
                                          IsReadOnly="True"
                                          Foreground="{StaticResource QCBlue}"
                                          Background="{StaticResource QCBackground}"
-                                         Text="{Binding LogData}"
-                                         DataContext="{Binding SelectedQueryData}"
                                          TextChanged="TbResultsTextChanged">
                                 </TextBox>
                             </Grid>
