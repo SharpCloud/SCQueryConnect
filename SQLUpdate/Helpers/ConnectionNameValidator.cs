@@ -1,10 +1,11 @@
-﻿using SCQueryConnect.Interfaces;
-using System;
+﻿using System;
+using System.Globalization;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace SCQueryConnect.Helpers
 {
-    public class ConnectionNameValidator : IConnectionNameValidator
+    public class ConnectionNameValidator : ValidationRule
     {
         private static readonly char[] InvalidChars =
         {
@@ -51,8 +52,9 @@ namespace SCQueryConnect.Helpers
             CheckNameDoesNotEndWithDot
         };
 
-        public string Validate(string connectionName)
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
+            var connectionName = value as string;
             var message = string.Empty;
 
             foreach (var check in _validationChecks)
@@ -66,7 +68,14 @@ namespace SCQueryConnect.Helpers
                 }
             }
 
-            return message;
+            var isValid = string.IsNullOrWhiteSpace(message);
+            
+            if (isValid)
+            {
+                return ValidationResult.ValidResult;
+            }
+
+            return new ValidationResult(false, message);
         }
 
         private static string CheckForInvalidCharacters(string connectionName)

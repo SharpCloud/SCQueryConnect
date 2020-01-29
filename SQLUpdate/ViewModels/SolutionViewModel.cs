@@ -16,7 +16,7 @@ namespace SCQueryConnect.ViewModels
     public class SolutionViewModel : ISolutionViewModel
     {
         private readonly IActionCommand[] _allActions;
-        private readonly IConnectionNameValidator _nameValidator;
+        //private readonly IConnectionNameValidator _nameValidator;
         private readonly IMessageService _messageService;
 
         private ICollectionView _excludedConnections;
@@ -141,23 +141,23 @@ namespace SCQueryConnect.ViewModels
 
         private void SelectedSolutionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var args = (ExtendedPropertyChangedEventArgs) e;
-            var msg = _nameValidator.Validate((string) args.NewValue);
-            var isValid = string.IsNullOrWhiteSpace(msg);
+            //var args = (ExtendedPropertyChangedEventArgs) e;
+            //var msg = _nameValidator.Validate((string) args.NewValue);
+            //var isValid = string.IsNullOrWhiteSpace(msg);
             
-            if (!isValid)
-            {
-                var solution = (Solution) sender;
-                solution.Name = (string) args.OldValue;
-                _messageService.ShowMessage(msg);
-            }
+            //if (!isValid)
+            //{
+            //    var solution = (Solution) sender;
+            //    solution.Name = (string) args.OldValue;
+            //    _messageService.ShowMessage(msg);
+            //}
         }
 
         public SolutionViewModel(
-            IConnectionNameValidator nameValidator,
+            //IConnectionNameValidator nameValidator,
             IMessageService messageService)
         {
-            _nameValidator = nameValidator;
+            //_nameValidator = nameValidator;
             _messageService = messageService;
 
             AddNewSolutionCommand = new ActionCommand<object>(

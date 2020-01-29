@@ -277,7 +277,6 @@ namespace SCQueryConnect
         private ObservableCollection<QueryData> _connections;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly ISolutionViewModel _solutionViewModel;
-        private readonly IConnectionNameValidator _connectionNameValidator;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IItemDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -292,7 +291,6 @@ namespace SCQueryConnect
 
         public MainWindow(
             ISolutionViewModel solutionViewModel,
-            IConnectionNameValidator connectionNameValidator,
             IConnectionStringHelper connectionStringHelper,
             IItemDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
@@ -310,7 +308,6 @@ namespace SCQueryConnect
             DataContext = this;
 
             _solutionViewModel = solutionViewModel;
-            _connectionNameValidator = connectionNameValidator;
             _connectionStringHelper = connectionStringHelper;
 
             _itemDataChecker = itemDataChecker;
@@ -1389,15 +1386,6 @@ namespace SCQueryConnect
         {
             try
             {
-                var nameError = _connectionNameValidator.Validate(_solutionViewModel.SelectedSolution.Name);
-                var nameIsValid = string.IsNullOrWhiteSpace(nameError);
-
-                if (!nameIsValid)
-                {
-                    MessageBox.Show(nameError);
-                    return;
-                }
-
                 var sb = new StringBuilder();
                 var sequenceFolder = GetFolder(_solutionViewModel.SelectedSolution.Name);
 

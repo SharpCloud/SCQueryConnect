@@ -6,6 +6,7 @@
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         xmlns:commands="clr-namespace:SCQueryConnect.Commands"
         xmlns:models="clr-namespace:SCQueryConnect.Models"
+        xmlns:helpers="clr-namespace:SCQueryConnect.Helpers"
         mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1230" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
@@ -53,6 +54,13 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+                </Style>
+                <Style x:Key="TextBoxWithValidation" TargetType="{x:Type TextBox}">
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="True">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
             </Grid.Resources>
             
@@ -175,7 +183,23 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
-                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name, FallbackValue='Name'}" DataContext="{Binding SelectedQueryData}" TextWrapping="WrapWithOverflow" Margin="5,5,250,5" LostFocus="ConnectionString_LostFocusName"/>
+
+                                <TextBox Grid.Row="0"
+                                         Grid.Column="1"
+                                         DataContext="{Binding SelectedQueryData}"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5,5,250,5"
+                                         LostFocus="ConnectionString_LostFocusName"
+                                         Style="{StaticResource TextBoxWithValidation}">
+                                    <TextBox.Text>
+                                        <Binding Path="Name" FallbackValue="Name">
+                                            <Binding.ValidationRules>
+                                                <helpers:ConnectionNameValidator />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+
                                 <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
                                 <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="{Binding ConnectionType, FallbackValue='Connection Type'}" DataContext="{Binding SelectedQueryData}" />
 
@@ -550,7 +574,17 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Folder Name:</TextBlock>
-                            <TextBox Grid.Column="1" Grid.Row="0" x:Name="FolderName" Height="30" Text="{Binding Name}" />
+
+                            <TextBox Grid.Column="1" Grid.Row="0" x:Name="FolderName" Height="30" Style="{StaticResource TextBoxWithValidation}">
+                                <TextBox.Text>
+                                    <Binding Path="Name" FallbackValue="Name">
+                                        <Binding.ValidationRules>
+                                            <helpers:ConnectionNameValidator />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            
                             <Button Grid.Column="2" Grid.Row="0" Margin="5,0,0,0" Padding="20,0">Run Now</Button>
 
                             <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,5,10,0" VerticalAlignment="Center">Description:</TextBlock>

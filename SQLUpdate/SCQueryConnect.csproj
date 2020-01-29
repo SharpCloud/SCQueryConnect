@@ -155,7 +155,6 @@
     <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Interfaces\ISolutionViewModel.cs" />
-    <Compile Include="Interfaces\IConnectionNameValidator.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />
     <Compile Include="Models\Solution.cs" />
     <Compile Include="UILogger.cs" />
