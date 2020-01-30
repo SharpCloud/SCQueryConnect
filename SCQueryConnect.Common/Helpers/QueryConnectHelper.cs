@@ -606,7 +606,7 @@ namespace SCQueryConnect.Common.Helpers
                 connection,
                 sqlString,
                 ResourceUrlDataChecker.RequiredHeadings,
-                "resource URL",
+                "Resource URL",
                 _resourceUrlDataChecker,
                 Mapper);
 
@@ -681,7 +681,7 @@ namespace SCQueryConnect.Common.Helpers
                 connection,
                 sqlString,
                 PanelsDataChecker.RequiredHeadings,
-                "panel",
+                "Panel",
                 _panelsDataChecker,
                 Mapper);
 
@@ -735,11 +735,11 @@ namespace SCQueryConnect.Common.Helpers
 
             if (string.IsNullOrWhiteSpace(sqlString))
             {
-                await _logger.Log($"No {description} query detected");
+                await _logger.Log($"No {description} Query detected");
                 return metadataList;
             }
 
-            await _logger.Log($"Processing {description} query...");
+            await _logger.Log($"Processing {description} Query...");
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = sqlString;
@@ -793,7 +793,7 @@ namespace SCQueryConnect.Common.Helpers
                 }
             }
 
-            await _logger.Log($"Processed {description} query: found {metadataList.Count} items");
+            await _logger.Log($"Processed {description} Query: found {metadataList.Count} items");
             return metadataList;
         }
     }
