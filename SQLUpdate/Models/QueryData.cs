@@ -22,6 +22,8 @@ namespace SCQueryConnect.Models
         private ObservableCollection<QueryData> _connections;
         private string _sharePointUrl;
         private string _storyId;
+        private bool _buildRelationships;
+        private bool _unpublishItems;
 
         [IgnoreDataMember]
         public bool IsFolder => Connections != null;
@@ -71,9 +73,6 @@ namespace SCQueryConnect.Models
             
             set => _id = value;
         }
-
-        [DataMember]
-        public bool BuildRelationships { get; set; }
 
         [DataMember]
         public string Name
@@ -183,8 +182,37 @@ namespace SCQueryConnect.Models
         public string SourceStoryPasswordEntropy { get; set; }
         [DataMember]
         public string SourceStoryServer { get; set; }
+
         [DataMember]
-        public bool UnpublishItems { get; set; }
+        public bool BuildRelationships
+        {
+            get => _buildRelationships;
+
+            set
+            {
+                if (_buildRelationships != value)
+                {
+                    _buildRelationships = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [DataMember]
+        public bool UnpublishItems
+        {
+            get => _unpublishItems;
+
+            set
+            {
+                if (_unpublishItems != value)
+                {
+                    _unpublishItems = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         [IgnoreDataMember]
         public DataView QueryResults { get; set; }
         [IgnoreDataMember]

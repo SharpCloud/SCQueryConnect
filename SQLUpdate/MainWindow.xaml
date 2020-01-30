@@ -457,10 +457,22 @@
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>
+                                
                                 <StackPanel HorizontalAlignment="Center">
-                                    <CheckBox x:Name="cbUnpub" Foreground="{StaticResource QCBlue}" IsChecked="{Binding UnpublishItems, Mode=TwoWay}" ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">Unpublish unmatched items</CheckBox>
-                                    <CheckBox x:Name="cbBuildRelationships" Foreground="{StaticResource QCBlue}" IsChecked="{Binding BuildRelationships, Mode=TwoWay}">Build Relationships</CheckBox>
+                                    <CheckBox DataContext="{Binding SelectedQueryData}"
+                                              Foreground="{StaticResource QCBlue}"
+                                              IsChecked="{Binding UnpublishItems, Mode=TwoWay}"
+                                              ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">
+                                        Unpublish unmatched items
+                                    </CheckBox>
+
+                                    <CheckBox DataContext="{Binding SelectedQueryData}"
+                                              Foreground="{StaticResource QCBlue}"
+                                              IsChecked="{Binding BuildRelationships, Mode=TwoWay}">
+                                        Build Relationships
+                                    </CheckBox>
                                 </StackPanel>
+                                
                                 <Button Click="UpdateSharpCloud" Width="270" Margin="100,10" Height="40">Update Story Now..</Button>
                             </StackPanel>
                             <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>

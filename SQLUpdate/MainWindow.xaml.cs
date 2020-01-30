@@ -46,8 +46,6 @@ namespace SCQueryConnect
         private static bool DetectIs32Bit => IntPtr.Size == 4;
         private static string GetFileSuffix(bool b32bit) => b32bit ? "x86" : string.Empty;
 
-        private bool _buildRelationships = false;
-        private bool _unpublishItems = false;
         private Point _startPoint;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
         private Visibility _connectionStringVisibility = Visibility.Visible;
@@ -79,26 +77,6 @@ namespace SCQueryConnect
             {
                 _updatingMessageVisibility = value;
                 OnPropertyChanged("UpdatingMessageVisibility");
-            }
-        }
-
-        public bool BuildRelationships
-        {
-            get => _buildRelationships;
-            set
-            {
-                _buildRelationships = value;
-                OnPropertyChanged("BuildRelationships");
-            }
-        }
-
-        public bool UnpublishItems
-        {
-            get => _unpublishItems;
-            set
-            {
-                _unpublishItems = value;
-                OnPropertyChanged("UnpublishItems");
             }
         }
 
@@ -750,8 +728,6 @@ namespace SCQueryConnect
 
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
-            SaveHelper.RegWrite("UnpublishItems", UnpublishItems.ToString());
-
             SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
             SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
             SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
@@ -902,8 +878,8 @@ namespace SCQueryConnect
                 ConnectionString = queryData.FormattedConnectionString,
                 DBType = queryData.ConnectionType,
                 MaxRowCount = maxRowCount,
-                UnpublishItems = UnpublishItems,
-                BuildRelationships = BuildRelationships
+                UnpublishItems = queryData.UnpublishItems,
+                BuildRelationships = queryData.BuildRelationships
             };
 
             await _qcHelper.UpdateSharpCloud(config, settings);
@@ -1030,8 +1006,8 @@ namespace SCQueryConnect
                 content = ReplaceConfigSetting(content, "QUERYSTRING", queryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = ReplaceConfigSetting(content, "QUERYRELSSTRING", queryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
                 content = ReplaceConfigSetting(content, "LOGFILE", $"Logfile.txt");
-                content = ReplaceConfigSetting(content, "BUILDRELATIONSHIPS", BuildRelationships.ToString());
-                content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", UnpublishItems.ToString());
+                content = ReplaceConfigSetting(content, "BUILDRELATIONSHIPS", queryData.BuildRelationships.ToString());
+                content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", queryData.UnpublishItems.ToString());
                 content = ReplaceConfigSetting(content, "PROXYADDRESS", _proxyViewModel.Proxy);
                 content = ReplaceConfigSetting(content, "PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
                 content = ReplaceConfigSetting(content, "PROXYUSERNAME", _proxyViewModel.ProxyUserName);
