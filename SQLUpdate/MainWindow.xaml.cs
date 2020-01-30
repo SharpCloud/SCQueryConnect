@@ -1428,12 +1428,16 @@ namespace SCQueryConnect
 
         private void QueryItemTreeDrop(object sender, DragEventArgs e)
         {
-
             if (e.Data.GetData(typeof(QueryData)) is QueryData source &&
                 e.OriginalSource is FrameworkElement fe)
             {
-                var index = 0;
                 var dropTarget = fe.DataContext as QueryData;
+                if (source == dropTarget)
+                {
+                    return;
+                }
+
+                var index = 0;
                 var sourceParent = source.ParentFolder ?? _queryRootNode;
                 sourceParent.Connections.Remove(source);
 
