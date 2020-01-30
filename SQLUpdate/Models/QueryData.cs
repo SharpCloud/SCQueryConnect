@@ -24,6 +24,9 @@ namespace SCQueryConnect.Models
         private string _storyId;
 
         [IgnoreDataMember]
+        public bool IsFolder => Connections != null;
+
+        [IgnoreDataMember]
         public bool IsExpanded
         {
             get => _isExpanded;

@@ -247,7 +247,7 @@ namespace SCQueryConnect
                 SelectedQueryData = queryData;
             }
 
-            if (queryData.Connections != null)
+            if (queryData.IsFolder)
             {
                 foreach (var c in queryData.Connections)
                 {
@@ -420,6 +420,25 @@ namespace SCQueryConnect
             }
         }
 
+        private static void RecursivelyApply(
+            QueryData queryData,
+            bool excludeFolders,
+            Action<QueryData> action)
+        {
+            if (!excludeFolders || !queryData.IsFolder)
+            {
+                action(queryData);
+            }
+
+            if (queryData.IsFolder)
+            {
+                foreach (var c in queryData.Connections)
+                {
+                    RecursivelyApply(c, excludeFolders, action);
+                }
+            }
+        }
+
         private void LoadAllProfiles()
         {
             var file = _localPath + "/connections.json";
@@ -430,14 +449,12 @@ namespace SCQueryConnect
                 var encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
                 var filtered = encrypted?.Where(qd => qd != null);
                 var decrypted = CreateDecryptedPasswordConnections(filtered);
-
-                foreach (var c in decrypted)
-                {
-                    var folder = FindQueryData(qd => qd.Id == c.ParentFolderId);
-                    c.ParentFolder = folder;
-                }
-
                 Connections = new ObservableCollection<QueryData>(decrypted);
+
+                RecursivelyApply(_queryRootNode, false, qd =>
+                {
+                    qd.ParentFolder = FindQueryData(d => d.Id == qd.ParentFolderId);
+                });
             }
             else
             {
@@ -1103,7 +1120,13 @@ namespace SCQueryConnect
                 return;
             }
 
-            if (SelectedQueryData.Connections == null)
+            if (SelectedQueryData.IsFolder)
+            {
+                tbFolderResults.Text = SelectedQueryData.LogData;
+                FolderConfigVisibility = Visibility.Visible;
+                QueryConfigVisibility = Visibility.Collapsed;
+            }
+            else
             {
                 tbResults.Text = SelectedQueryData.LogData;
                 DataGrid.ItemsSource = SelectedQueryData.QueryResults;
@@ -1115,12 +1138,6 @@ namespace SCQueryConnect
 
                 FolderConfigVisibility = Visibility.Collapsed;
                 QueryConfigVisibility = Visibility.Visible;
-            }
-            else
-            {
-                tbFolderResults.Text = SelectedQueryData.LogData;
-                FolderConfigVisibility = Visibility.Visible;
-                QueryConfigVisibility = Visibility.Collapsed;
             }
         }
 
@@ -1333,16 +1350,16 @@ namespace SCQueryConnect
 
                 void Flatten(QueryData qd, IList<QueryData> output)
                 {
-                    if (qd.Connections == null)
-                    {
-                        output.Add(qd);
-                    }
-                    else
+                    if (qd.IsFolder)
                     {
                         foreach (var c in qd.Connections)
                         {
                             Flatten(c, output);
                         }
+                    }
+                    else
+                    {
+                        output.Add(qd);
                     }
                 }
 
@@ -1422,15 +1439,15 @@ namespace SCQueryConnect
 
                 if (dropTarget != null)
                 {
-                    if (dropTarget.Connections == null)
+                    if (dropTarget.IsFolder)
+                    {
+                        source.ParentFolder = dropTarget;
+                    }
+                    else
                     {
                         var dropParent = dropTarget.ParentFolder ?? _queryRootNode;
                         index = dropParent.Connections.IndexOf(dropTarget);
                         source.ParentFolder = dropParent;
-                    }
-                    else
-                    {
-                        source.ParentFolder = dropTarget;
                     }
                 }
                 else
@@ -1466,27 +1483,27 @@ namespace SCQueryConnect
             {
                 async Task RunUpdates(QueryData queryData)
                 {
-                    if (queryData.Connections == null)
-                    {
-                        await _logger.Log($"--- Running '{queryData.Name}'");
-                        await UpdateSharpCloud(queryData, false);
-                    }
-                    else
+                    if (queryData.IsFolder)
                     {
                         foreach (var data in queryData.Connections)
                         {
                             await RunUpdates(data);
                         }
                     }
+                    else
+                    {
+                        await _logger.Log($"--- Running '{queryData.Name}'");
+                        await UpdateSharpCloud(queryData, false);
+                    }
                 }
 
-                if (connectionFolder.Connections == null)
+                if (connectionFolder.IsFolder)
                 {
-                    await _logger.Log("Nothing to do: no connections to run");
+                    await RunUpdates(connectionFolder);
                 }
                 else
                 {
-                    await RunUpdates(connectionFolder);
+                    await _logger.Log("Nothing to do: no connections to run");
                 }
             }
         }
