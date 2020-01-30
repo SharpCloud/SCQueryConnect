@@ -6,6 +6,7 @@
         xmlns:commands="clr-namespace:SCQueryConnect.Commands"
         xmlns:models="clr-namespace:SCQueryConnect.Models"
         xmlns:helpers="clr-namespace:SCQueryConnect.Helpers"
+        xmlns:converters="clr-namespace:SCQueryConnect.Converters"
         mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
         Title="{Binding AppName}" Height="580" Width="1230" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
@@ -104,8 +105,28 @@
                             </TreeView.ItemContainerStyle>
 
                             <TreeView.Resources>
+                                <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
+
                                 <HierarchicalDataTemplate DataType="{x:Type models:QueryData}" ItemsSource="{Binding Connections}">
-                                    <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Margin" Value="5,0" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                                <Setter Property="Width" Value="12" />
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <Image Source="Images/Folder.png"
+                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
+                                        </Image>
+
+                                        <Image Source="Images/Database.png"
+                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false}">
+                                        </Image>
+
+                                        <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                    </StackPanel>
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>
                         </TreeView>

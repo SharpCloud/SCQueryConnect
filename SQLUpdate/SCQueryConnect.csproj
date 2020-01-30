@@ -146,6 +146,7 @@
     </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Commands\GoToUrl.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\MessageService.cs" />
@@ -245,6 +246,8 @@
     </None>
     <AppDesigner Include="Properties\" />
     <Resource Include="QC.ico" />
+    <Resource Include="Images\Folder.png" />
+    <Resource Include="Images\Database.png" />
     <Content Include="SCSQLBatch.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

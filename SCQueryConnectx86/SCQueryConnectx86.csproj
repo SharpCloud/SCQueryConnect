@@ -126,6 +126,9 @@
     <Compile Include="..\SQLUpdate\Converters\BoolInverse.cs">
       <Link>Converters\BoolInverse.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\BoolToVisibilityConverter.cs">
+      <Link>Converters\BoolToVisibilityConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
       <Link>ExtendedPropertyChangedEventArgs.cs</Link>
     </Compile>
@@ -201,6 +204,12 @@
     </None>
     <Resource Include="..\SQLUpdate\QC.ico">
       <Link>QC.ico</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Database.png">
+      <Link>Images\Database.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Folder.png">
+      <Link>Images\Folder.png</Link>
     </Resource>
     <Content Include="..\SQLUpdate\SCSQLBatch.zip">
       <Link>SCSQLBatch.zip</Link>
