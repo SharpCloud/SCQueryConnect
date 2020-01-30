@@ -13,7 +13,7 @@ namespace SCQueryConnect.Models
     {
         public const string RootId = "RootId";
 
-        private bool _isExpanded = true;
+        private bool _isExpanded;
         private bool _isSelected;
         private string _id;
         private string _name;
@@ -26,7 +26,7 @@ namespace SCQueryConnect.Models
         [IgnoreDataMember]
         public bool IsFolder => Connections != null;
 
-        [IgnoreDataMember]
+        [DataMember]
         public bool IsExpanded
         {
             get => _isExpanded;
