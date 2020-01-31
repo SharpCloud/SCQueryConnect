@@ -54,9 +54,6 @@ namespace SCQueryConnect
         private Visibility _sourceStoryIdVisibility = Visibility.Collapsed;
         private Visibility _rewriteDataSourceVisibility = Visibility.Collapsed;
 
-        private Visibility _queryConfigVisibility = Visibility.Collapsed;
-        private Visibility _folderConfigVisibility = Visibility.Collapsed;
-
         private readonly QueryData _queryRootNode;
 
         public string AppName
@@ -143,34 +140,6 @@ namespace SCQueryConnect
                 {
                     _rewriteDataSourceVisibility = value;
                     OnPropertyChanged(nameof(RewriteDataSourceVisibility));
-                }
-            }
-        }
-
-        public Visibility QueryConfigVisibility
-        {
-            get => _queryConfigVisibility;
-
-            set
-            {
-                if (_queryConfigVisibility != value)
-                {
-                    _queryConfigVisibility = value;
-                    OnPropertyChanged(nameof(QueryConfigVisibility));
-                }
-            }
-        }
-
-        public Visibility FolderConfigVisibility
-        {
-            get => _folderConfigVisibility;
-
-            set
-            {
-                if (_folderConfigVisibility != value)
-                {
-                    _folderConfigVisibility = value;
-                    OnPropertyChanged(nameof(FolderConfigVisibility));
                 }
             }
         }
@@ -1139,8 +1108,6 @@ namespace SCQueryConnect
             if (SelectedQueryData.IsFolder)
             {
                 tbFolderResults.Text = SelectedQueryData.LogData;
-                FolderConfigVisibility = Visibility.Visible;
-                QueryConfigVisibility = Visibility.Collapsed;
             }
             else
             {
@@ -1151,9 +1118,6 @@ namespace SCQueryConnect
                 DataGridPanels.ItemsSource = SelectedQueryData.QueryResultsPanels;
 
                 SetVisibleObjects(SelectedQueryData);
-
-                FolderConfigVisibility = Visibility.Collapsed;
-                QueryConfigVisibility = Visibility.Visible;
             }
         }
 

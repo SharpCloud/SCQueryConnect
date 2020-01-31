@@ -58,6 +58,7 @@
                         </Trigger>
                     </Style.Triggers>
                 </Style>
+                <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
             </Grid.Resources>
             
             <Grid.ColumnDefinitions>
@@ -169,7 +170,7 @@
                 <TabControl x:Name="BrowserTabs"
                             BorderBrush="Transparent"
                             MinWidth="750"
-                            Visibility="{Binding QueryConfigVisibility, FallbackValue=Collapsed}">
+                            Visibility="{Binding SelectedQueryData.IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                     <TabControl.Resources>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
@@ -572,7 +573,7 @@
                 </TabControl>
 
                 <!-- Connection Folder Config -->
-                <Grid Visibility="{Binding FolderConfigVisibility, FallbackValue=Collapsed}"
+                <Grid Visibility="{Binding SelectedQueryData.IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}"
                       Background="{StaticResource QCBackground}">
                     <Grid DataContext="{Binding SelectedQueryData}"
                           Margin="60,60,60,0">
