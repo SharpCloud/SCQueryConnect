@@ -1093,7 +1093,11 @@ namespace SCQueryConnect
                 : parent;
             
             parent.Connections.Remove(SelectedQueryData);
-            SelectQueryData(toSelect);
+            
+            if (toSelect != _queryRootNode)
+            {
+                SelectQueryData(toSelect);
+            }
         }
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
