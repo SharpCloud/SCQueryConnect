@@ -7,9 +7,18 @@
         xmlns:models="clr-namespace:SCQueryConnect.Models"
         xmlns:helpers="clr-namespace:SCQueryConnect.Helpers"
         xmlns:converters="clr-namespace:SCQueryConnect.Converters"
-        mc:Ignorable="d" Background="{StaticResource QCBackground}" Foreground="{StaticResource QCBlue}" FontSize="{StaticResource DefaultFontSize}"
+        mc:Ignorable="d"
+        Background="{StaticResource QCBackground}"
+        Foreground="{StaticResource QCBlue}"
+        FontSize="{StaticResource DefaultFontSize}"
         Closing="MainWindow_OnClosing"
-        Title="{Binding AppName}" Height="580" Width="1230" Icon="QC.ico" ResizeMode="CanResizeWithGrip">
+        Title="{Binding AppName}"
+        Height="580"
+        Width="1230"
+        Icon="QC.ico"
+        ResizeMode="CanResizeWithGrip"
+        UseLayoutRounding="True">
+
     <Grid x:Name="Root">
         <Grid Background="Black">
             <Grid.Resources>
@@ -141,12 +150,12 @@
                 </Border>
 
                 <!-- Button Panel -->
-                <Grid Grid.Row="1" Margin="2.5">
+                <Grid Grid.Row="1" Margin="2">
                     <Grid.Resources>
                         <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                             <Setter Property="Background" Value="#666" />
                             <Setter Property="Height" Value="40" />
-                            <Setter Property="Margin" Value="2.5" />
+                            <Setter Property="Margin" Value="2" />
                             <Setter Property="VerticalAlignment" Value="Top" />
                         </Style>
                     </Grid.Resources>
@@ -156,12 +165,33 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                         <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Click="NewConnectionClick" Background="{StaticResource QCBlue}">+New</Button>
-                    <Button Grid.Column="1" Click="NewQueryFolderClick" Background="{StaticResource QCBlue}">+Folder</Button>
-                    <Button Grid.Column="2" Click="CopyConnectionClick">Copy</Button>
-                    <Button Grid.Column="3" Click="DeleteConnectionClick" Background="Red">Delete</Button>
+                    <Button Grid.Column="0" Click="NewQueryFolderClick" Background="{StaticResource QCBlue}">
+                        <Image Source="Images/Folder_white.png" Width="24" />
+                    </Button>
+
+                    <Button Grid.Column="1" Click="NewConnectionClick" Background="{StaticResource QCBlue}">
+                        <Image Source="Images/Database_white.png" Width="24" />
+                    </Button>
+
+                    <Button Grid.Column="2" Click="CopyConnectionClick">
+                        <Image Source="Images/Up_white.png" Width="20" />
+                    </Button>
+
+                    <Button Grid.Column="3" Click="CopyConnectionClick">
+                        <Image Source="Images/Down_white.png" Width="20" />
+                    </Button>
+                    
+                    <Button Grid.Column="4" Click="CopyConnectionClick">
+                        <Image Source="Images/Copy_white.png" Width="22" />
+                    </Button>
+                    
+                    <Button Grid.Column="5" Click="DeleteConnectionClick" Background="Red">
+                        <Image Source="Images/Bin_white.png" Width="20" />
+                    </Button>
                 </Grid>
             </Grid>
 

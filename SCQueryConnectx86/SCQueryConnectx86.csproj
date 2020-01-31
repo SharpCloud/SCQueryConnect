@@ -211,6 +211,24 @@
     <Resource Include="..\SQLUpdate\Images\Folder.png">
       <Link>Images\Folder.png</Link>
     </Resource>
+    <Resource Include="..\SQLUpdate\Images\Bin_white.png">
+      <Link>Images\Bin_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Copy_white.png">
+      <Link>Images\Copy_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Database_white.png">
+      <Link>Images\Database_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Down_white.png">
+      <Link>Images\Down_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Folder_white.png">
+      <Link>Images\Folder_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Up_white.png">
+      <Link>Images\Up_white.png</Link>
+    </Resource>
     <Content Include="..\SQLUpdate\SCSQLBatch.zip">
       <Link>SCSQLBatch.zip</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

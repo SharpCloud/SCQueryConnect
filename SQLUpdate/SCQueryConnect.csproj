@@ -248,6 +248,12 @@
     <Resource Include="QC.ico" />
     <Resource Include="Images\Folder.png" />
     <Resource Include="Images\Database.png" />
+    <Resource Include="Images\Folder_white.png" />
+    <Resource Include="Images\Database_white.png" />
+    <Resource Include="Images\Copy_white.png" />
+    <Resource Include="Images\Bin_white.png" />
+    <Resource Include="Images\Up_white.png" />
+    <Resource Include="Images\Down_white.png" />
     <Content Include="SCSQLBatch.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
