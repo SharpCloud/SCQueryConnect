@@ -221,25 +221,6 @@ namespace SCQueryConnect.Models
         public DataView QueryResultsPanels { get; set; }
         [IgnoreDataMember]
         public DataView QueryResultsResourceUrls { get; set; }
-        
-        [IgnoreDataMember]
-        public QueryData ParentFolder
-        {
-            get => _parentFolder;
-
-            set
-            {
-                _parentFolder = value;
-
-                ParentFolderId = _parentFolder == null
-                    ? RootId
-                    : _parentFolder.Id;
-            }
-        }
-        
-        [DataMember]
-        public string ParentFolderId { get; set; }
-
         [DataMember]
         public ObservableCollection<QueryData> Connections
         {
@@ -267,6 +248,11 @@ namespace SCQueryConnect.Models
         {
             get
             {
+                if (IsFolder)
+                {
+                    return null;
+                }
+
                 switch (ConnectionType)
                 {
                     case DatabaseType.SQL:
@@ -408,6 +394,11 @@ namespace SCQueryConnect.Models
         {
             get
             {
+                if (IsFolder)
+                {
+                    return null;
+                }
+
                 switch (ConnectionType)
                 {
                     case DatabaseType.Excel:

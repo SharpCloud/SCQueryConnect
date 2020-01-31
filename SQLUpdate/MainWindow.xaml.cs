@@ -57,10 +57,7 @@ namespace SCQueryConnect
         private Visibility _queryConfigVisibility = Visibility.Collapsed;
         private Visibility _folderConfigVisibility = Visibility.Collapsed;
 
-        private readonly QueryData _queryRootNode = new QueryData
-        {
-            Id = QueryData.RootId
-        };
+        private readonly QueryData _queryRootNode;
 
         public string AppName
         {
@@ -195,9 +192,7 @@ namespace SCQueryConnect
         }
 
         private QueryData FindQueryData(Func<QueryData, bool> predicate)
-        {
-            return FindQueryData(_queryRootNode, predicate);
-        }
+            => FindQueryData(_queryRootNode, predicate);
 
         private static QueryData FindQueryData(QueryData data, Func<QueryData, bool> predicate)
         {
@@ -208,29 +203,62 @@ namespace SCQueryConnect
                 return data;
             }
 
-            return data.Connections?.FirstOrDefault(c => FindQueryData(c, predicate) != null);
-        }
+            QueryData toReturn = null;
 
-        private void SelectQueryData(string id)
-        {
-            SelectQueryData(_queryRootNode, id);
-        }
-
-        private void SelectQueryData(QueryData queryData, string id)
-        {
-            queryData.IsSelected = queryData.Id == id;
-
-            if (queryData.IsSelected)
+            if (data.Connections != null)
             {
-                SelectedQueryData = queryData;
+                foreach (var c in data.Connections)
+                {
+                    toReturn = FindQueryData(c, predicate);
+                    
+                    if (toReturn != null)
+                    {
+                        break;
+                    }
+                }
             }
 
-            if (queryData.IsFolder)
+            return toReturn;
+        }
+
+        private QueryData FindParent(QueryData queryData) => FindQueryData(qd =>
+            queryData != null &&
+            qd.Connections != null &&
+            qd.Connections.Any(c => c.Id == queryData.Id));
+
+        private void SelectQueryData(QueryData queryData)
+        {
+            if (queryData == null)
             {
-                foreach (var c in queryData.Connections)
-                {
-                    SelectQueryData(c, id);
-                }
+                return;
+            }
+
+            queryData.IsSelected = true;
+            SelectedQueryData = queryData;
+
+            var hierarchy = new List<QueryData>();
+
+            do
+            {
+                hierarchy.Add(queryData);
+                queryData = FindParent(queryData);
+            }
+            while (queryData != null);
+
+            var startIndex = hierarchy.Count - 2;
+
+            var treeViewItem = QueryItemTree.ItemContainerGenerator
+                .ContainerFromItem(hierarchy[startIndex]) as TreeViewItem;
+
+            for (var i = startIndex - 1; treeViewItem != null && i >= 0; i--)
+            {
+                treeViewItem = treeViewItem.ItemContainerGenerator
+                    .ContainerFromItem(hierarchy[i]) as TreeViewItem;
+            }
+
+            if (treeViewItem != null)
+            {
+                treeViewItem.IsSelected = true;
             }
         }
 
@@ -282,6 +310,9 @@ namespace SCQueryConnect
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             DataContext = this;
+
+            _queryRootNode = CreateNewFolder(QueryData.RootId);
+            _queryRootNode.Id = QueryData.RootId;
 
             _connectionStringHelper = connectionStringHelper;
 
@@ -365,9 +396,10 @@ namespace SCQueryConnect
 
             // choose our last settings
             var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
-            SelectQueryData(active);
+            var queryData = FindQueryData(qd => qd.Id == active);
+            SelectQueryData(queryData);
 
-            BrowserTabs.SelectedIndex = (Int32.Parse(SaveHelper.RegRead("ActiveTab", "0")));
+            BrowserTabs.SelectedIndex = (int.Parse(SaveHelper.RegRead("ActiveTab", "0")));
 
             EventManager.RegisterClassHandler(
                 typeof(TextBox),
@@ -398,7 +430,7 @@ namespace SCQueryConnect
             }
         }
 
-        private static void RecursivelyApply(
+        private static async Task RecursivelyApply(
             QueryData queryData,
             bool excludeFolders,
             Action<QueryData> action)
@@ -412,7 +444,7 @@ namespace SCQueryConnect
             {
                 foreach (var c in queryData.Connections)
                 {
-                    RecursivelyApply(c, excludeFolders, action);
+                    await RecursivelyApply(c, excludeFolders, action);
                 }
             }
         }
@@ -428,11 +460,6 @@ namespace SCQueryConnect
                 var filtered = encrypted?.Where(qd => qd != null);
                 var decrypted = CreateDecryptedPasswordConnections(filtered);
                 Connections = new ObservableCollection<QueryData>(decrypted);
-
-                RecursivelyApply(_queryRootNode, false, qd =>
-                {
-                    qd.ParentFolder = FindQueryData(d => d.Id == qd.ParentFolderId);
-                });
             }
             else
             {
@@ -1045,6 +1072,16 @@ namespace SCQueryConnect
             return updated;
         }
 
+        private static QueryData CreateNewFolder(string name)
+        {
+            return new QueryData
+            {
+                Name = name,
+                Connections = new ObservableCollection<QueryData>(),
+                ConnectionType = DatabaseType.Folder
+            };
+        }
+
         private void NewConnectionClick(object sender, RoutedEventArgs e)
         {
             var newWnd = new SelectDatabaseType
@@ -1056,21 +1093,16 @@ namespace SCQueryConnect
             {
                 var queryData = new QueryData(newWnd.SelectedButton);
                 _connections.Add(queryData);
-                SelectQueryData(queryData.Id);
+                SelectQueryData(queryData);
                 BrowserTabs.SelectedIndex = 0; // go back to the first tab
             }
         }
 
         private void NewQueryFolderClick(object sender, RoutedEventArgs e)
         {
-            var queryData = new QueryData
-            {
-                Name = "New Folder",
-                Connections = new ObservableCollection<QueryData>()
-            };
-            
+            var queryData = CreateNewFolder("New Folder");
             Connections.Add(queryData);
-            SelectQueryData(queryData.Id);
+            SelectQueryData(queryData);
             BrowserTabs.SelectedIndex = 0; // go back to the first tab
         }
 
@@ -1078,13 +1110,21 @@ namespace SCQueryConnect
         {
             var queryData = new QueryData(SelectedQueryData);
             _connections.Add(queryData);
-            SelectQueryData(queryData.Id);
+            SelectQueryData(queryData);
             BrowserTabs.SelectedIndex = 0; // go back to the  first tab
         }
 
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
         {
-            Connections.Remove(SelectedQueryData);
+            var parent = FindParent(SelectedQueryData);
+            var index = parent.Connections.IndexOf(SelectedQueryData) - 1;
+
+            var toSelect = index > -1
+                ? parent.Connections[index]
+                : parent;
+            
+            parent.Connections.Remove(SelectedQueryData);
+            SelectQueryData(toSelect);
         }
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1285,22 +1325,22 @@ namespace SCQueryConnect
             }
         }
 
-        private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
+        private async void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(SelectedQueryData, true);
+            await PublishBatchFolder(SelectedQueryData, true);
         }
 
-        private void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
+        private async void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(SelectedQueryData, false);
+            await PublishBatchFolder(SelectedQueryData, false);
         }
 
-        private void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
+        private async void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(SelectedQueryData, DetectIs32Bit);
+            await PublishBatchFolder(SelectedQueryData, DetectIs32Bit);
         }
 
-        private void PublishBatchFolder(QueryData queryData, bool is32Bit)
+        private async Task PublishBatchFolder(QueryData queryData, bool is32Bit)
         {
             try
             {
@@ -1324,23 +1364,8 @@ namespace SCQueryConnect
                 Directory.Delete(sequenceFolder, true);
                 GetFolder(queryData.Name);
 
-                void Flatten(QueryData qd, IList<QueryData> output)
-                {
-                    if (qd.IsFolder)
-                    {
-                        foreach (var c in qd.Connections)
-                        {
-                            Flatten(c, output);
-                        }
-                    }
-                    else
-                    {
-                        output.Add(qd);
-                    }
-                }
-
                 var connections = new List<QueryData>();
-                Flatten(queryData, connections);
+                await RecursivelyApply(queryData, true, connections.Add);
                 
                 sb.AppendLine("@echo off");
                 foreach (var connection in connections)
@@ -1414,26 +1439,27 @@ namespace SCQueryConnect
                 }
 
                 var index = 0;
-                var sourceParent = source.ParentFolder ?? _queryRootNode;
-                sourceParent.Connections.Remove(source);
+                var originalSourceParent = FindParent(source);
+                originalSourceParent.Connections.Remove(source);
+                QueryData updatedSourceParent;
 
                 if (dropTarget != null)
                 {
                     if (dropTarget.IsFolder)
                     {
-                        source.ParentFolder = dropTarget;
+                        updatedSourceParent = dropTarget;
                     }
                     else
                     {
-                        var dropParent = dropTarget.ParentFolder ?? _queryRootNode;
+                        var dropParent = FindParent(dropTarget) ?? _queryRootNode;
                         index = dropParent.Connections.IndexOf(dropTarget);
-                        source.ParentFolder = dropParent;
+                        updatedSourceParent = dropParent;
                     }
                 }
                 else
                 {
                     index = _queryRootNode.Connections.Count;
-                    source.ParentFolder = _queryRootNode;
+                    updatedSourceParent = _queryRootNode;
                 }
 
                 var mousePos = e.GetPosition(this);
@@ -1443,16 +1469,16 @@ namespace SCQueryConnect
                     index++;
                 }
 
-                if (index > source.ParentFolder.Connections.Count)
+                if (index > updatedSourceParent.Connections.Count)
                 {
-                    source.ParentFolder.Connections.Add(source);
+                    updatedSourceParent.Connections.Add(source);
                 }
                 else
                 {
-                    source.ParentFolder.Connections.Insert(index, source);
+                    updatedSourceParent.Connections.Insert(index, source);
                 }
 
-                source.ParentFolder.IsExpanded = true;
+                updatedSourceParent.IsExpanded = true;
             }
         }
 
@@ -1476,6 +1502,8 @@ namespace SCQueryConnect
                         await UpdateSharpCloud(queryData, false);
                     }
                 }
+
+                await RecursivelyApply(connectionFolder, true, async qd => await RunUpdates(qd));
 
                 if (connectionFolder.IsFolder)
                 {

@@ -8,6 +8,7 @@
         Excel,
         Access,
         SharepointList,
-        SharpCloudExcel
+        SharpCloudExcel,
+        Folder
     }
 }
