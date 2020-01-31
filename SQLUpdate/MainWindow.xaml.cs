@@ -1061,26 +1061,42 @@ namespace SCQueryConnect
             if (newWnd.ShowDialog() == true)
             {
                 var queryData = new QueryData(newWnd.SelectedButton);
-                _connections.Add(queryData);
-                SelectQueryData(queryData);
-                BrowserTabs.SelectedIndex = 0; // go back to the first tab
+                AddQueryData(queryData);
             }
         }
 
         private void NewQueryFolderClick(object sender, RoutedEventArgs e)
         {
             var queryData = CreateNewFolder("New Folder");
-            Connections.Add(queryData);
-            SelectQueryData(queryData);
-            BrowserTabs.SelectedIndex = 0; // go back to the first tab
+            AddQueryData(queryData);
+        }
+
+        private void MoveConnectionDown(object sender, RoutedEventArgs e)
+        {
+            var parent = FindParent(SelectedQueryData);
+            var index = parent.Connections.IndexOf(SelectedQueryData);
+            
+            if (index < parent.Connections.Count - 1)
+            {
+                parent.Connections.Move(index, index + 1);
+            }
+        }
+
+        private void MoveConnectionUp(object sender, RoutedEventArgs e)
+        {
+            var parent = FindParent(SelectedQueryData);
+            var index = parent.Connections.IndexOf(SelectedQueryData);
+
+            if (index > 0)
+            {
+                parent.Connections.Move(index, index - 1);
+            }
         }
 
         private void CopyConnectionClick(object sender, RoutedEventArgs e)
         {
             var queryData = new QueryData(SelectedQueryData);
-            _connections.Add(queryData);
-            SelectQueryData(queryData);
-            BrowserTabs.SelectedIndex = 0; // go back to the  first tab
+            AddQueryData(queryData);
         }
 
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
@@ -1098,6 +1114,13 @@ namespace SCQueryConnect
             {
                 SelectQueryData(toSelect);
             }
+        }
+
+        private void AddQueryData(QueryData queryData)
+        {
+            Connections.Add(queryData);
+            SelectQueryData(queryData);
+            BrowserTabs.SelectedIndex = 0; // go back to the first tab
         }
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
