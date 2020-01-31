@@ -299,7 +299,17 @@ namespace SCQueryConnect.Models
             QueryString = qd.QueryString;
             QueryStringRels = qd.QueryStringRels;
             FileName = qd.FileName;
-            SharePointURL = qd.SharePointURL;    
+            SharePointURL = qd.SharePointURL;
+
+            if (qd.IsFolder)
+            {
+                Connections = new ObservableCollection<QueryData>();
+
+                foreach (var c in qd.Connections)
+                {
+                    Connections.Add(new QueryData(c));
+                }
+            }
         }
 
         public QueryData(DatabaseType type)
