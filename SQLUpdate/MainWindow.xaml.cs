@@ -4,7 +4,6 @@ using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
-using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
@@ -20,7 +19,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -31,8 +29,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Directory = System.IO.Directory;
-using MessageBox = System.Windows.MessageBox;
 
 namespace SCQueryConnect
 {
@@ -365,7 +361,10 @@ namespace SCQueryConnect
 
             // choose our last settings
             var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
-            var queryData = FindQueryData(qd => qd.Id == active);
+            
+            var queryData = FindQueryData(qd => qd.Id == active)
+                            ?? FindQueryData(qd => !qd.IsFolder);
+
             SelectQueryData(queryData);
 
             BrowserTabs.SelectedIndex = (int.Parse(SaveHelper.RegRead("ActiveTab", "0")));
@@ -421,6 +420,7 @@ namespace SCQueryConnect
         private void LoadAllProfiles()
         {
             var file = _localPath + "/connections.json";
+            IList<QueryData> connections;
 
             if (File.Exists(file))
             {
@@ -428,13 +428,13 @@ namespace SCQueryConnect
                 var encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
                 var filtered = encrypted?.Where(qd => qd != null);
                 var decrypted = CreateDecryptedPasswordConnections(filtered);
-                Connections = new ObservableCollection<QueryData>(decrypted);
+                connections = new List<QueryData>(decrypted);
             }
             else
             {
                 // add some examples
 
-                Connections = new ObservableCollection<QueryData>(new[]
+                connections = new List<QueryData>(new[]
                 {
                     new QueryData(DatabaseType.Excel),
                     new QueryData(DatabaseType.Access),
@@ -444,6 +444,39 @@ namespace SCQueryConnect
                     new QueryData(DatabaseType.ADO),
                     new QueryData(DatabaseType.SharpCloudExcel)
                 });
+            }
+
+            var version = SaveHelper.RegRead(SaveHelper.VersionKey, string.Empty);
+            var migrate = false;
+
+            if (!string.IsNullOrWhiteSpace(version))
+            {
+                var regex = new Regex(@"^.* v([0-9])+\.([0-9])+\.([0-9])+\.([0-9])+$");
+                var match = regex.Match(version);
+                int.TryParse(match.Groups[1].Value, out var major);
+                int.TryParse(match.Groups[2].Value, out var minor);
+                int.TryParse(match.Groups[3].Value, out var patch);
+
+                migrate =
+                    major > 3 ||
+                    minor > 7 ||
+                    patch > 1;
+            }
+
+            if (migrate)
+            {
+                var defaultFolder = CreateNewFolder("My Connections");
+                defaultFolder.IsExpanded = true;
+                defaultFolder.Connections = new ObservableCollection<QueryData>(connections);
+
+                Connections = new ObservableCollection<QueryData>(new[]
+                {
+                    defaultFolder
+                });
+            }
+            else
+            {
+                Connections = new ObservableCollection<QueryData>(connections);
             }
         }
 
@@ -735,6 +768,8 @@ namespace SCQueryConnect
                     DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
+            
+            SaveHelper.RegWrite(SaveHelper.VersionKey, _qcHelper.AppNameOnly);
         }
 
         private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
