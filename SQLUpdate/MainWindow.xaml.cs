@@ -43,6 +43,8 @@ namespace SCQueryConnect
         private static bool DetectIs32Bit => IntPtr.Size == 4;
         private static string GetFileSuffix(bool b32bit) => b32bit ? "x86" : string.Empty;
 
+        private PasswordSecurity _publishPasswordSecurity;
+        private PublishArchitecture _publishArchitecture;
         private Point _startPoint;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
 
@@ -53,6 +55,34 @@ namespace SCQueryConnect
             get
             {
                 return _qcHelper.AppName;
+            }
+        }
+
+        public PasswordSecurity PublishPasswordSecurity
+        {
+            get => _publishPasswordSecurity;
+
+            set
+            {
+                if (_publishPasswordSecurity != value)
+                {
+                    _publishPasswordSecurity = value;
+                    OnPropertyChanged(nameof(PublishPasswordSecurity));
+                }
+            }
+        }
+
+        public PublishArchitecture PublishArchitecture
+        {
+            get => _publishArchitecture;
+            
+            set
+            {
+                if (_publishArchitecture != value)
+                {
+                    _publishArchitecture = value;
+                    OnPropertyChanged(nameof(PublishArchitecture));
+                }
             }
         }
 
@@ -1137,6 +1167,31 @@ namespace SCQueryConnect
                     textBox.Foreground = (SolidColorBrush) Application.Current.Resources["QCBlue"];
                 }
             }
+        }
+
+        private void PublishBatchFolderClick(object sender, RoutedEventArgs e)
+        {
+            bool is32Bit;
+
+            switch (PublishArchitecture)
+            {
+                case PublishArchitecture.Auto:
+                    is32Bit = DetectIs32Bit;
+                    break;
+                
+                case PublishArchitecture.X64:
+                    is32Bit = false;
+                    break;
+                
+                case PublishArchitecture.X32:
+                    is32Bit = true;
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            PublishBatchFolder(SelectedQueryData, is32Bit);
         }
 
         private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)

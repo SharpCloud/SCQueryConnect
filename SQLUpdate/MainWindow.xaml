@@ -81,6 +81,7 @@
 
             <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
 
+            <!-- Left Panel -->
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -198,6 +199,7 @@
                 </Grid>
             </Grid>
 
+            <!-- Right Panel -->
             <Grid Grid.Column="2" DataContext="{Binding SelectedQueryData}">
                 <!-- Tabs for Connection Config -->
                 <TabControl x:Name="BrowserTabs"
@@ -682,106 +684,200 @@
                     </TabItem>
                 </TabControl>
 
-                <!-- Connection Folder Config -->
-                <Grid Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}"
-                      Background="{StaticResource QCBackground}">
-                    <Grid Margin="60,60,60,0">
-                        <Grid.Resources>
-                            <Style TargetType="ListBox">
-                                <Setter Property="Background" Value="{StaticResource QCBackground}" />
-                                <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
-                            </Style>
-                        </Grid.Resources>
+                <!-- Tabs for Folder Config -->
+                <TabControl BorderBrush="Transparent"
+                            MinWidth="750"
+                            Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}">
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                    <!-- Connection Folder Config -->
+                    <TabItem Header="Connections Folder">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid Margin="5">
+                                <Grid.Resources>
+                                    <Style TargetType="ListBox">
+                                        <Setter Property="Background" Value="{StaticResource QCBackground}" />
+                                        <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                    </Style>
+                                </Grid.Resources>
 
-                        <Grid Grid.Row="0" Margin="0,0,0,30">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
 
+                                <!-- Folder Settings -->
+                                <Grid Grid.Row="0" HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="270" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock VerticalAlignment="Center" Margin="0,2" >Folder Name:</TextBlock>
+
+                                    <TextBox Grid.Column="1" Grid.Row="0" Margin="0,2" Height="30" Style="{StaticResource TextBoxWithValidation}">
+                                        <TextBox.Text>
+                                            <Binding Path="Name" FallbackValue="Name">
+                                                <Binding.ValidationRules>
+                                                    <helpers:ConnectionNameValidator />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+
+                                    <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,2" VerticalAlignment="Center">Description:</TextBlock>
+                                    <TextBox Grid.Column="1" Grid.Row="1" Margin="0,2" Height="30" Text="{Binding Description}" />
+
+                                    <Button Grid.Column="1" Grid.Row="2" Height="30" Margin="0,2,0,0" Click="RunQueryDataClick">Run Now</Button>
+                                </Grid>
+
+                                <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" Margin="0,10" />
+
+                                <!-- Log Output -->
+                                <Grid Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" />
+
+                                    <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
+                                        <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="0,0,10,0" />
+                                        <TextBlock Text="{Binding LastRunDate}" TextAlignment="Right" Foreground="White" />
+                                    </StackPanel>
+
+                                    <TextBox x:Name="tbFolderResults"
+                                             AcceptsReturn="True"
+                                             Background="{StaticResource QCBackground}"
+                                             Foreground="{StaticResource QCBlue}"
+                                             Grid.Row="1"
+                                             IsReadOnly="True"
+                                             Margin="0,10,0,0"
+                                             TextChanged="TbResultsTextChanged"
+                                             TextWrapping="Wrap">
+                                    </TextBox>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Folder Publish Config -->
+                    <TabItem Header="Publish">
+                        <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Folder Name:</TextBlock>
+                            <Grid.Resources>
+                                <converters:EnumMatchToBoolConverter x:Key="EnumMatchToBoolConverter" />
+                            </Grid.Resources>
 
-                            <TextBox Grid.Column="1" Grid.Row="0" x:Name="FolderName" Height="30" Style="{StaticResource TextBoxWithValidation}">
-                                <TextBox.Text>
-                                    <Binding Path="Name" FallbackValue="Name">
-                                        <Binding.ValidationRules>
-                                            <helpers:ConnectionNameValidator />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </TextBox.Text>
-                            </TextBox>
+                            <StackPanel DataContext="{Binding Parent, ElementName=Root}" HorizontalAlignment="Center"
+                                        Width="600"
+                                        VerticalAlignment="Center">
 
-                            <Button Grid.Column="2" Grid.Row="0" Margin="5,0,0,0" Padding="20,0" Click="RunQueryDataClick">Run Now</Button>
+                                <StackPanel.Resources>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Margin" Value="0,10,0,0" />
+                                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    </Style>
 
-                            <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,5,10,0" VerticalAlignment="Center">Description:</TextBlock>
-                            <TextBox Grid.Column="1" Grid.Row="1" Margin="0,5,0,0" Height="30" Text="{Binding Description}" />
-                        </Grid>
+                                    <Style x:Key="RadioContent" TargetType="StackPanel">
+                                        <Setter Property="Margin" Value="5,0,0,0" />
+                                    </Style>
+                                </StackPanel.Resources>
 
-                        <!-- Log Output -->
-                        <Grid Grid.Row="1">
-                            <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}"></TextBlock>
+                                <TextBlock Text="Architecture" Foreground="{StaticResource QCBlue}" />
 
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
-                                <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="0,0,10,0"></TextBlock>
-                                <TextBlock x:Name="tbFolderLastRun" Text="Now" TextAlignment="Right" Foreground="White"></TextBlock>
+                                <RadioButton GroupName="Architecture"
+                                             IsChecked="{Binding PublishArchitecture, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=Auto}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Auto" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="Architecture"
+                                             IsChecked="{Binding PublishArchitecture, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=X64}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="64 Bit" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="Architecture"
+                                             IsChecked="{Binding PublishArchitecture, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=X32}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="32 Bit" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <TextBlock Text="Password Security" Foreground="{StaticResource QCBlue}" Margin="0,20,0,0" />
+
+                                <RadioButton GroupName="PublishPasswordSecurity"
+                                             IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=DpapiUser}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Encrypted (User) - Most Secure" FontWeight="Bold" />
+                                        <TextBlock Text="Only you will be able to decrypt your password on this computer." />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="PublishPasswordSecurity"
+                                             IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=DpapiMachine}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Encrypted (Machine)" FontWeight="Bold" />
+                                        <TextBlock Text="Anybody with access to this computer will be able to decrypt your password" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="PublishPasswordSecurity"
+                                             IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=Base64}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Base64 Encoded - Least Secure" FontWeight="Bold" />
+                                        <TextBlock TextWrapping="Wrap" Text="Password is not encrypted, but can be read on a different computer. Use this option if you are generating batch files for use on another computer" />
+                                    </StackPanel>
+                                </RadioButton>
                             </StackPanel>
 
-                            <TextBox x:Name="tbFolderResults"
-                                     Width="Auto"
-                                     Margin="0,35,0,5"
-                                     TextWrapping="Wrap"
-                                     AcceptsReturn="True"
-                                     IsReadOnly="True"
-                                     Foreground="{StaticResource QCBlue}"
-                                     Background="{StaticResource QCBackground}"
-                                     TextChanged="TbResultsTextChanged">
-                            </TextBox>
-                        </Grid>
+                            <!-- Publish Buttons -->
+                            <StackPanel Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,10">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                        <Setter Property="Width" Value="220" />
+                                    </Style>
+                                </StackPanel.Resources>
 
-                        <!-- Publish Buttons -->
-                        <StackPanel Grid.Column="0"
-                                    Grid.Row="2"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,10">
-                            <StackPanel.Resources>
-                                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                                    <Setter Property="FontSize" Value="12" />
-                                    <Setter Property="Height" Value="25" />
-                                    <Setter Property="Margin" Value="5,0" />
-                                    <Setter Property="Width" Value="220" />
-                                </Style>
-                            </StackPanel.Resources>
+                                <Button Click="PublishBatchFolderClick"
+                                        Height="50"
+                                        FontSize="16">
+                                    Publish Now...
+                                </Button>
 
-                            <Button Click="PublishBatchFolderClickAuto"
-                                    Height="50"
-                                    Margin="0,10"
-                                    FontSize="16">
-                                Publish Now...
-                            </Button>
-
-                            <StackPanel Orientation="Horizontal">
-                                <Button Click="PublishBatchFolderClick32">Publish 32bit (x86) Files Now...</Button>
-                                <Button Click="PublishBatchFolderClick64">Publish 64bit (x64) Files Now...</Button>
+                                <Button Click="ViewExisting"
+                                        VerticalAlignment="Bottom"
+                                        Height="25"
+                                        Margin="0,5,0,0"
+                                        Background="Transparent"
+                                        FontSize="12">
+                                    View export folder...
+                                </Button>
                             </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </Grid>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
             </Grid>
         </Grid>
 
-        <Grid x:Name="updatingMessageGrid" Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility, FallbackValue=Collapsed}">
+        <Grid Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility, FallbackValue=Collapsed}">
             <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         </Grid>
     </Grid>

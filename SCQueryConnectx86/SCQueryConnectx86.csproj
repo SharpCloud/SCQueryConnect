@@ -138,6 +138,9 @@
     <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibleConverter.cs">
       <Link>Converters\ConnectionTypeVisibleConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\EnumMatchToBoolConverter.cs">
+      <Link>Converters\EnumMatchToBoolConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
       <Link>Converters\ValidExcelNameConverter.cs</Link>
     </Compile>
@@ -179,6 +182,12 @@
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\PasswordSecurity.cs">
+      <Link>Models\PasswordSecurity.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\PublishArchitecture.cs">
+      <Link>Models\PublishArchitecture.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Models\QueryData.cs">
       <Link>Models\QueryData.cs</Link>
@@ -250,6 +259,9 @@
     <Resource Include="..\SQLUpdate\Images\Up_white.png">
       <Link>Images\Up_white.png</Link>
     </Resource>
+    <Resource Include="..\SQLUpdate\Images\SharpCloud.png">
+      <Link>Images\SharpCloud.png</Link>
+    </Resource>
     <Content Include="..\SQLUpdate\SCSQLBatch.zip">
       <Link>SCSQLBatch.zip</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -302,9 +314,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\SQLUpdate\Images\logo_home.png">
-      <Link>Images\logo_home.png</Link>
-    </Resource>
     <Resource Include="..\SQLUpdate\Images\splash.jpg">
       <Link>Images\splash.jpg</Link>
     </Resource>
