@@ -261,6 +261,7 @@
     <Resource Include="Images\Bin_white.png" />
     <Resource Include="Images\Up_white.png" />
     <Resource Include="Images\Down_white.png" />
+    <Resource Include="Images\SharpCloud.png" />
     <Content Include="SCSQLBatch.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -279,9 +280,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\logo_home.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\splash.jpg" />

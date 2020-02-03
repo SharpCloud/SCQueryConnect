@@ -630,7 +630,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" VerticalAlignment="Center">
-                                <Image Source="Images/logo_home.png" Width="250" Stretch="UniformToFill"></Image>
+                                <Image Source="Images/SharpCloud.png" Width="250" Stretch="UniformToFill"></Image>
                                 <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
