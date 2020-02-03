@@ -4,6 +4,7 @@ using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
+using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
@@ -135,13 +136,14 @@ namespace SCQueryConnect
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
         private ObservableCollection<QueryData> _connections;
+        private readonly int _maxRowCount;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IItemDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IExcelWriter _excelWriter;
-        private readonly ILog _logger;
+        private readonly MultiDestinationLogger _logger;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly IPanelsDataChecker _panelsDataChecker;
@@ -164,6 +166,15 @@ namespace SCQueryConnect
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             DataContext = this;
+
+            try
+            {
+                _maxRowCount = int.Parse(ConfigurationManager.AppSettings["MaxRowCount"]);
+            }
+            catch (Exception)
+            {
+                _maxRowCount = 1000;
+            }
 
             _queryRootNode = CreateNewFolder(QueryData.RootId);
             _queryRootNode.Id = QueryData.RootId;
@@ -188,8 +199,9 @@ namespace SCQueryConnect
             _resourceUrlDataChecker = resourceUrlDataChecker;
             _resourceUrlDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrResourceUrls);
 
-            _logger = logger;
-            ((UILogger) _logger).Initialise(tbResults, tbFolderResults);
+            _logger = (MultiDestinationLogger) logger;
+            _logger.PushLoggingDestination(new TextBoxLoggingDestination(tbResults));
+            _logger.PushLoggingDestination(new TextBoxLoggingDestination(tbFolderResults));
 
             _qcHelper = qcHelper;
         }
@@ -719,7 +731,7 @@ namespace SCQueryConnect
             return newConnections;
         }
 
-        private bool ValidateCreds(QueryData queryData)
+        private bool ValidateCredentials()
         {
             if (string.IsNullOrEmpty(Url.Text))
             {
@@ -739,53 +751,50 @@ namespace SCQueryConnect
                 Password.Focus();
                 return false;
             }
-            if (string.IsNullOrEmpty(queryData.StoryId))
-            {
-                MessageBox.Show("Please enter a story ID");
-                StoryId.Focus();
-                return false;
-            }
-            if ( !Guid.TryParse(queryData.StoryId, out _))
-            {
-                MessageBox.Show("Story ID must be a GUID");
-                StoryId.Focus();
-                return false;
-            }
             return true;
         }
 
-        private async void UpdateSharpCloud(object sender, RoutedEventArgs e)
+        private bool ValidateStoryId(QueryData queryData)
         {
-            await UpdateSharpCloud(SelectedQueryData, true);
+            if (string.IsNullOrEmpty(queryData.StoryId))
+            {
+                MessageBox.Show($"Please enter a story ID for '{queryData.Name}'");
+                StoryId.Focus();
+                return false;
+            }
+            
+            if (!Guid.TryParse(queryData.StoryId, out _))
+            {
+                MessageBox.Show($"Story ID for '{queryData.Name}' must be a GUID");
+                StoryId.Focus();
+                return false;
+            }
+            
+            return true;
         }
 
-        private async Task UpdateSharpCloud(QueryData queryData, bool clearLog)
+        private bool ValidateAllStoryIds(QueryData qd)
         {
-            if (!ValidateCreds(queryData))
+            bool valid;
+
+            if (qd.IsFolder)
             {
-                return;
+                valid = qd.Connections.Aggregate(
+                    true,
+                    (isValid, data) => isValid && ValidateAllStoryIds(data));
+
+                return valid;
+            }
+            else
+            {
+                valid = ValidateStoryId(qd);
             }
 
-            UpdatingMessageVisibility = Visibility.Visible;
-            await Task.Delay(20);
-            SaveSettings();
+            return valid;
+        }
 
-            if (clearLog)
-            {
-                await _logger.Clear();
-            }
-
-            int maxRowCount;
-
-            try
-            {
-                maxRowCount = int.Parse(ConfigurationManager.AppSettings["MaxRowCount"]);
-            }
-            catch (Exception)
-            {
-                maxRowCount = 1000;
-            }
-
+        private async Task UpdateSharpCloud(QueryData queryData)
+        {
             var config = GetApiConfiguration();
 
             var settings = new UpdateSettings
@@ -797,19 +806,12 @@ namespace SCQueryConnect
                 QueryStringResourceUrls = queryData.QueryStringResourceUrls,
                 ConnectionString = queryData.FormattedConnectionString,
                 DBType = queryData.ConnectionType,
-                MaxRowCount = maxRowCount,
+                MaxRowCount = _maxRowCount,
                 UnpublishItems = queryData.UnpublishItems,
                 BuildRelationships = queryData.BuildRelationships
             };
 
             await _qcHelper.UpdateSharpCloud(config, settings);
-
-            queryData.LogData = ((UILogger) _logger).GetLogText();
-            queryData.LastRunDateTime = DateTime.Now;
-            SaveSettings();
-
-            UpdatingMessageVisibility = Visibility.Collapsed;
-            await Task.Delay(20);
         }
 
         private void ViewExisting(object sender, RoutedEventArgs e)
@@ -854,7 +856,7 @@ namespace SCQueryConnect
             
             var outputFolder = GetFolder(Path.Combine(sequenceName, queryData.Name));
 
-            if (!ValidateCreds(queryData))
+            if (!ValidateCredentials())
             {
                 return null;
             }
@@ -1092,7 +1094,7 @@ namespace SCQueryConnect
             }
         }
 
-        private void SelectStoryClick(object sender, RoutedEventArgs e)
+        private async void SelectStoryClick(object sender, RoutedEventArgs e)
         {
             var api = _sharpCloudApiFactory.CreateSharpCloudApi(
                 Username.Text,
@@ -1105,7 +1107,7 @@ namespace SCQueryConnect
 
             if (api == null)
             {
-                _logger.Log(InvalidCredentialsException.LoginFailed);
+                await _logger.Log(InvalidCredentialsException.LoginFailed);
                 return;
             }
 
@@ -1334,38 +1336,58 @@ namespace SCQueryConnect
             }
         }
 
-        private async void RunFolderClick(object sender, RoutedEventArgs e)
+        private async void RunQueryDataClick(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement fe &&
-                fe.DataContext is QueryData connectionFolder)
+                fe.DataContext is QueryData queryData)
             {
-                async Task RunUpdates(QueryData queryData)
-                {
-                    if (queryData.IsFolder)
-                    {
-                        foreach (var data in queryData.Connections)
-                        {
-                            await RunUpdates(data);
-                        }
-                    }
-                    else
-                    {
-                        await _logger.Log($"--- Running '{queryData.Name}'");
-                        await UpdateSharpCloud(queryData, false);
-                    }
-                }
+                await RunQueryData(queryData);
+            }
+        }
 
-                await RecursivelyApply(connectionFolder, true, async qd => await RunUpdates(qd));
+        private async Task RunAllQueryData(QueryData qd)
+        {
+            var destination = new QueryDataLoggingDestination(qd);
+            await destination.Clear();
+            
+            _logger.PushLoggingDestination(destination);
 
-                if (connectionFolder.IsFolder)
+            if (qd.IsFolder)
+            {
+                foreach (var data in qd.Connections)
                 {
-                    await RunUpdates(connectionFolder);
-                }
-                else
-                {
-                    await _logger.Log("Nothing to do: no connections to run");
+                    await RunAllQueryData(data);
                 }
             }
+            else
+            {
+                await _logger.Log($"--- Running '{qd.Name}'");
+                await UpdateSharpCloud(qd);
+            }
+
+            _logger.PopLoggingDestination();
+        }
+
+        private async Task RunQueryData(QueryData queryData)
+        {
+            if (!ValidateCredentials() ||
+                !ValidateAllStoryIds(queryData))
+            {
+                return;
+            }
+
+            UpdatingMessageVisibility = Visibility.Visible;
+            await Task.Delay(20);
+            SaveSettings();
+
+            await _logger.Clear();
+            await RunAllQueryData(queryData);
+
+            queryData.LastRunDateTime = DateTime.Now;
+            SaveSettings();
+
+            UpdatingMessageVisibility = Visibility.Collapsed;
+            await Task.Delay(20);
         }
     }
 }

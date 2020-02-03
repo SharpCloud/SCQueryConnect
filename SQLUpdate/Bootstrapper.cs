@@ -4,7 +4,7 @@ using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
-using SCQueryConnect.ViewModels;
+using SCQueryConnect.Logging;
 using System;
 
 namespace SCQueryConnect
@@ -63,7 +63,7 @@ namespace SCQueryConnect
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>().InstancePerLifetimeScope();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<UILogger>().As<ILog>().InstancePerLifetimeScope();
+            builder.RegisterType<MultiDestinationLogger>().As<ILog>().InstancePerLifetimeScope();
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>().InstancePerLifetimeScope();
             builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>().InstancePerLifetimeScope();

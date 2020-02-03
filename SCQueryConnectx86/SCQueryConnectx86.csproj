@@ -165,6 +165,18 @@
     <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
       <Link>Interfaces\IPostDeserializeAction.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
+      <Link>Logging\LoggingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\MultiDestinationLogger.cs">
+      <Link>Logging\MultiDestinationLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\QueryDataLoggingDestination.cs">
+      <Link>Logging\QueryDataLoggingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\TextboxLoggingDestination.cs">
+      <Link>Logging\TextboxLoggingDestination.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
     </Compile>
@@ -179,9 +191,6 @@
     </Compile>
     <Compile Include="..\SQLUpdate\UIDataCheckerValidityProcessor.cs">
       <Link>UIDataCheckerValidityProcessor.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\UILogger.cs">
-      <Link>UILogger.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
       <Link>ViewModels\ProxyViewModel.cs</Link>
