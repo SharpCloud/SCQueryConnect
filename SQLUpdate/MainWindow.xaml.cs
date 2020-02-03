@@ -299,25 +299,6 @@ namespace SCQueryConnect
             }
         }
 
-        private static async Task RecursivelyApply(
-            QueryData queryData,
-            bool excludeFolders,
-            Action<QueryData> action)
-        {
-            if (!excludeFolders || !queryData.IsFolder)
-            {
-                action(queryData);
-            }
-
-            if (queryData.IsFolder)
-            {
-                foreach (var c in queryData.Connections)
-                {
-                    await RecursivelyApply(c, excludeFolders, action);
-                }
-            }
-        }
-
         private void LoadAllProfiles()
         {
             var file = _localPath + "/connections.json";
