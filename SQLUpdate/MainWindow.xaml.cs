@@ -819,21 +819,6 @@ namespace SCQueryConnect
             Process.Start(GetFolder(SelectedQueryData.Name));
         }
 
-        private void GenerateBatchFile32(object sender, RoutedEventArgs e)
-        {
-            GenerateBatchFile(true);
-        }
-
-        private void GenerateBatchFile64(object sender, RoutedEventArgs e)
-        {
-            GenerateBatchFile(false);
-        }
-
-        private void GenerateBatchFileThis(object sender, RoutedEventArgs e)
-        {
-            GenerateBatchFile(DetectIs32Bit);
-        }
-
         private string GetFolder(string queryName)
         {
             var folder = $"{_localPath}/data";
@@ -843,13 +828,7 @@ namespace SCQueryConnect
             return folder;
         }
 
-        private void GenerateBatchFile(bool b32Bit)
-        {
-            var outputFolder = GenerateBatchFile(b32Bit, SelectedQueryData.ConnectionsString, string.Empty, SelectedQueryData);
-            Process.Start(outputFolder);
-        }
-
-        private string GenerateBatchFile(bool b32Bit, string connectionString, string sequenceName, QueryData queryData)
+        private string GenerateBatchExe(bool b32Bit, string connectionString, string sequenceName, QueryData queryData)
         {
             var suffix = GetFileSuffix(b32Bit);
             var zipfile = $"SCSQLBatch{suffix}.zip";
@@ -1179,29 +1158,73 @@ namespace SCQueryConnect
             }
         }
 
-        private async void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
+        private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
         {
-            await PublishBatchFolder(SelectedQueryData, true);
+            PublishBatchFolder(SelectedQueryData, true);
         }
 
-        private async void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
+        private void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
         {
-            await PublishBatchFolder(SelectedQueryData, false);
+            PublishBatchFolder(SelectedQueryData, false);
         }
 
-        private async void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
+        private void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
         {
-            await PublishBatchFolder(SelectedQueryData, DetectIs32Bit);
+            PublishBatchFolder(SelectedQueryData, DetectIs32Bit);
         }
 
-        private async Task PublishBatchFolder(QueryData queryData, bool is32Bit)
+        private void WriteBatchFile(string path, string filename, string content)
+        {
+            var sequenceFolder = GetFolder(path);
+            var batchPath = Path.Combine(sequenceFolder, $"{filename}.bat");
+            File.WriteAllText(batchPath, content);
+        }
+
+        private void PublishAllBatchFolders(QueryData queryData, bool is32Bit, string parentPath, StringBuilder parentStringBuilder)
+        {
+            if (queryData.IsFolder)
+            {
+                var subPath = Path.Combine(parentPath, queryData.Name);
+                var localStringBuilder = new StringBuilder();
+                localStringBuilder.AppendLine("@echo off");
+
+                parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
+
+                foreach (var c in queryData.Connections)
+                {
+                    PublishAllBatchFolders(c, is32Bit, subPath, localStringBuilder);
+                    
+                    var batchFolderRoot = GetFolder(subPath);
+                    var batchPath = Path.Combine(batchFolderRoot, c.Name, c.Name);
+                    parentStringBuilder.AppendLine($"call \"{batchPath}.bat\"");
+                }
+
+                WriteBatchFile(subPath, queryData.Name, localStringBuilder.ToString());
+            }
+            else
+            {
+                GetFolder(parentPath);
+
+                var fullPath = GenerateBatchExe(
+                    is32Bit,
+                    queryData.ConnectionsString,
+                    parentPath,
+                    queryData);
+
+                var suffix = GetFileSuffix(is32Bit);
+                var filename = $"SCSQLBatch{suffix}.exe";
+                parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
+                parentStringBuilder.AppendLine($"\"{Path.Combine(fullPath, filename)}\"");
+            }
+        }
+
+        private void PublishBatchFolder(QueryData queryData, bool is32Bit)
         {
             try
             {
-                var sb = new StringBuilder();
-                var sequenceFolder = GetFolder(queryData.Name);
+                var outputFolder = GetFolder(queryData.Name);
 
-                var notEmpty = Directory.EnumerateFileSystemEntries(sequenceFolder).Any();
+                var notEmpty = Directory.EnumerateFileSystemEntries(outputFolder).Any();
                 if (notEmpty)
                 {
                     var result = MessageBox.Show(
@@ -1215,31 +1238,14 @@ namespace SCQueryConnect
                     }
                 }
 
-                Directory.Delete(sequenceFolder, true);
+                Directory.Delete(outputFolder, true);
                 GetFolder(queryData.Name);
 
-                var connections = new List<QueryData>();
-                await RecursivelyApply(queryData, true, connections.Add);
-                
+                var sb = new StringBuilder();
                 sb.AppendLine("@echo off");
-                foreach (var connection in connections)
-                {
-                    var path = GenerateBatchFile(
-                        is32Bit,
-                        connection.ConnectionsString,
-                        queryData.Name,
-                        connection);
-
-                    var suffix = GetFileSuffix(is32Bit);
-                    var filename = $"SCSQLBatch{suffix}.exe";
-                    sb.AppendLine($"echo Running: {connection.Name}");
-                    sb.AppendLine($"\"{Path.Combine(path, filename)}\"");
-                }
-
-                var batchPath = Path.Combine(sequenceFolder, $"{queryData.Name}.bat");
-                var content = sb.ToString();
-                File.WriteAllText(batchPath, content);
-                Process.Start(sequenceFolder);
+                PublishAllBatchFolders(queryData, is32Bit, string.Empty, sb);
+                WriteBatchFile(queryData.Name, queryData.Name, sb.ToString());
+                Process.Start(outputFolder);
             }
             catch (Exception ex)
             {

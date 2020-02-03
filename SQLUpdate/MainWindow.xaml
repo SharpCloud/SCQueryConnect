@@ -613,11 +613,11 @@
                         <Grid Background="{StaticResource QCBackground}">
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="10"/>
-                                <Button Click="GenerateBatchFileThis" Height="50" Width="220" Margin="5,0" FontSize="16" >Generate Batch Files Now...</Button>
+                                <Button Click="PublishBatchFolderClickAuto" Height="50" Width="220" Margin="5,0" FontSize="16" >Generate Batch Files Now...</Button>
                             </StackPanel>
                             <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="30">
-                                <Button Click="GenerateBatchFile32" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 32bit (x86) Files Now...</Button>
-                                <Button Click="GenerateBatchFile64" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 64bit (x64) Files Now...</Button>
+                                <Button Click="PublishBatchFolderClick32" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 32bit (x86) Files Now...</Button>
+                                <Button Click="PublishBatchFolderClick64" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 64bit (x64) Files Now...</Button>
                             </StackPanel>
                             <Button Click="ViewExisting" VerticalAlignment="Bottom" Height="25" Width="220" Margin="5" Background="Transparent" FontSize="12" >View export folder...</Button>
                         </Grid>
