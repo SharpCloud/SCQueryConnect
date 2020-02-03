@@ -129,6 +129,18 @@
     <Compile Include="..\SQLUpdate\Converters\BoolToVisibilityConverter.cs">
       <Link>Converters\BoolToVisibilityConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ConnectionTypeCollapsedConverter.cs">
+      <Link>Converters\ConnectionTypeCollapsedConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibilityConverter.cs">
+      <Link>Converters\ConnectionTypeVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibleConverter.cs">
+      <Link>Converters\ConnectionTypeVisibleConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
+      <Link>Converters\ValidExcelNameConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
       <Link>ExtendedPropertyChangedEventArgs.cs</Link>
     </Compile>

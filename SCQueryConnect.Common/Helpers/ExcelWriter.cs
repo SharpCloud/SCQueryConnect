@@ -1,8 +1,5 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using SCQueryConnect.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Reflection;
 
@@ -10,28 +7,6 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class ExcelWriter : IExcelWriter
     {
-        private readonly HashSet<string> _validFileExtensions
-            = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ".xls",
-            ".xlsb",
-            ".xlsm",
-            ".xlsx"
-        };
-
-        public string GetValidFilename(string filename)
-        {
-            var ext = Path.GetExtension(filename);
-            var isValid = _validFileExtensions.Contains(ext);
-
-            var suffix = isValid
-                ? string.Empty
-                : ".xlsx";
-
-            var toReturn = $"{filename}{suffix}";
-            return toReturn;
-        }
-
         public void RewriteExcelFile(string path)
         {
             var excel = (_Application)new Application

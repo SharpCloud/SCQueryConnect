@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace SCQueryConnect.Models
 {
     [DataContract]
-    public class QueryData
+    public class QueryData : INotifyPropertyChanged
     {
         public const string RootId = "RootId";
 
@@ -18,8 +18,8 @@ namespace SCQueryConnect.Models
         private string _id;
         private string _name;
         private string _description;
-        private QueryData _parentFolder;
         private ObservableCollection<QueryData> _connections;
+        private string _fileName;
         private string _sharePointUrl;
         private string _storyId;
         private bool _buildRelationships;
@@ -138,8 +138,21 @@ namespace SCQueryConnect.Models
         public string QueryStringPanels { get; set; }
         [DataMember]
         public string QueryStringResourceUrls { get; set; }
+
         [DataMember]
-        public string FileName { get; set; }
+        public string FileName
+        {
+            get => _fileName;
+
+            set
+            {
+                if (_fileName != value)
+                {
+                    _fileName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [DataMember]
         public string SharePointURL

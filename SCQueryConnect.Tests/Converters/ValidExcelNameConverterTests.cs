@@ -1,10 +1,10 @@
 ﻿using NUnit.Framework;
-using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Converters;
 
-namespace SCQueryConnect.Common.Tests.Helpers
+namespace SCQueryConnect.Tests.Converters
 {
     [TestFixture]
-    public class ExcelWriterTests
+    public class ValidExcelNameConverterTests
     {
         [TestCase(@"C:\Folder\MyFile", @"C:\Folder\MyFile.xlsx")]
         [TestCase(@"C:\Folder\MyFile.xls", @"C:\Folder\MyFile.xls")]
@@ -13,19 +13,21 @@ namespace SCQueryConnect.Common.Tests.Helpers
         [TestCase(@"C:\Folder\MyFile.XLSX", @"C:\Folder\MyFile.XLSX")]
         [TestCase(@"C:\Folder\MyFile.xlsx", @"C:\Folder\MyFile.xlsx")]
         [TestCase(@"C:\Folder\MyFile.xml", @"C:\Folder\MyFile.xml.xlsx")]
-        public void GetValidFilename(string input, string expectedOut)
+        public void ConvertsToValidFilename(string input, string expectedOut)
         {
             // Arrange
 
-            var writer = new ExcelWriter();
+            var writer = new ValidExcelNameConverter();
 
             // Act
 
-            var output = writer.GetValidFilename(input);
+            var convertOutput = writer.Convert(input, null, null, null);
+            var convertBackOutput = writer.ConvertBack(input, null, null, null);
 
             // Assert
 
-            Assert.AreEqual(expectedOut, output);
+            Assert.AreEqual(expectedOut, convertOutput);
+            Assert.AreEqual(expectedOut, convertBackOutput);
         }
     }
 }

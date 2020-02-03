@@ -44,11 +44,6 @@ namespace SCQueryConnect
 
         private Point _startPoint;
         private Visibility _updatingMessageVisibility = Visibility.Collapsed;
-        private Visibility _connectionStringVisibility = Visibility.Visible;
-        private Visibility _filenameVisibility = Visibility.Collapsed;
-        private Visibility _sharepointVisibility = Visibility.Collapsed;
-        private Visibility _sourceStoryIdVisibility = Visibility.Collapsed;
-        private Visibility _rewriteDataSourceVisibility = Visibility.Collapsed;
 
         private readonly QueryData _queryRootNode;
 
@@ -67,76 +62,6 @@ namespace SCQueryConnect
             {
                 _updatingMessageVisibility = value;
                 OnPropertyChanged("UpdatingMessageVisibility");
-            }
-        }
-
-        public Visibility ConnectionStringVisibility
-        {
-            get => _connectionStringVisibility;
-
-            set
-            {
-                if (_connectionStringVisibility != value)
-                {
-                    _connectionStringVisibility = value;
-                    OnPropertyChanged(nameof(ConnectionStringVisibility));
-                }
-            }
-        }
-
-        public Visibility FilenameVisibility
-        {
-            get => _filenameVisibility;
-
-            set
-            {
-                if (_filenameVisibility != value)
-                {
-                    _filenameVisibility = value;
-                    OnPropertyChanged(nameof(FilenameVisibility));
-                }
-            }
-        }
-
-        public Visibility SharepointVisibility
-        {
-            get => _sharepointVisibility;
-
-            set
-            {
-                if (_sharepointVisibility != value)
-                {
-                    _sharepointVisibility = value;
-                    OnPropertyChanged(nameof(SharepointVisibility));
-                }
-            }
-        }
-
-        public Visibility SourceStoryIdVisibility
-        {
-            get => _sourceStoryIdVisibility;
-
-            set
-            {
-                if (_sourceStoryIdVisibility != value)
-                {
-                    _sourceStoryIdVisibility = value;
-                    OnPropertyChanged(nameof(SourceStoryIdVisibility));
-                }
-            }
-        }
-
-        public Visibility RewriteDataSourceVisibility
-        {
-            get => _rewriteDataSourceVisibility;
-
-            set
-            {
-                if (_rewriteDataSourceVisibility != value)
-                {
-                    _rewriteDataSourceVisibility = value;
-                    OnPropertyChanged(nameof(RewriteDataSourceVisibility));
-                }
             }
         }
 
@@ -190,42 +115,6 @@ namespace SCQueryConnect
             queryData != null &&
             qd.Connections != null &&
             qd.Connections.Any(c => c.Id == queryData.Id));
-
-        private void SelectQueryData(QueryData queryData)
-        {
-            if (queryData == null)
-            {
-                return;
-            }
-
-            queryData.IsSelected = true;
-            SelectedQueryData = queryData;
-
-            var hierarchy = new List<QueryData>();
-
-            do
-            {
-                hierarchy.Add(queryData);
-                queryData = FindParent(queryData);
-            }
-            while (queryData != null);
-
-            var startIndex = hierarchy.Count - 2;
-
-            var treeViewItem = QueryItemTree.ItemContainerGenerator
-                .ContainerFromItem(hierarchy[startIndex]) as TreeViewItem;
-
-            for (var i = startIndex - 1; treeViewItem != null && i >= 0; i--)
-            {
-                treeViewItem = treeViewItem.ItemContainerGenerator
-                    .ContainerFromItem(hierarchy[i]) as TreeViewItem;
-            }
-
-            if (treeViewItem != null)
-            {
-                treeViewItem.IsSelected = true;
-            }
-        }
 
         private QueryData _selectedQueryData;
         
@@ -365,7 +254,7 @@ namespace SCQueryConnect
             var queryData = FindQueryData(qd => qd.Id == active)
                             ?? FindQueryData(qd => !qd.IsFolder);
 
-            SelectQueryData(queryData);
+            queryData.IsSelected = true;
 
             BrowserTabs.SelectedIndex = (int.Parse(SaveHelper.RegRead("ActiveTab", "0")));
 
@@ -1147,14 +1036,14 @@ namespace SCQueryConnect
             
             if (toSelect != _queryRootNode)
             {
-                SelectQueryData(toSelect);
+                toSelect.IsSelected = true;
             }
         }
 
         private void AddQueryData(QueryData queryData)
         {
             Connections.Add(queryData);
-            SelectQueryData(queryData);
+            queryData.IsSelected = true;
             BrowserTabs.SelectedIndex = 0; // go back to the first tab
         }
 
@@ -1178,69 +1067,6 @@ namespace SCQueryConnect
                 DataGridRels.ItemsSource = SelectedQueryData.QueryResultsRels;
                 DataGridResourceUrls.ItemsSource = SelectedQueryData.QueryResultsResourceUrls;
                 DataGridPanels.ItemsSource = SelectedQueryData.QueryResultsPanels;
-
-                SetVisibleObjects(SelectedQueryData);
-            }
-        }
-
-        private void FileName_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (SelectedQueryData.ConnectionType == DatabaseType.Excel ||
-                SelectedQueryData.ConnectionType == DatabaseType.SharpCloudExcel)
-            {
-                var filenameBox = sender as TextBox;
-                var validated = _excelWriter.GetValidFilename(filenameBox.Text);
-                filenameBox.Text = validated;
-            }
-            SaveSettings();
-        }
-
-        private void SetVisibleObjects(QueryData qd)
-        {
-            if (qd != null)
-            {
-                switch (qd.ConnectionType)
-                {
-                    case DatabaseType.Access:
-                        ConnectionStringVisibility = Visibility.Collapsed;
-                        FilenameVisibility = Visibility.Visible;
-                        SharepointVisibility = Visibility.Collapsed;
-                        SourceStoryIdVisibility = Visibility.Collapsed;
-                        RewriteDataSourceVisibility = Visibility.Collapsed;
-                        break;
-
-                    case DatabaseType.Excel: 
-                        ConnectionStringVisibility = Visibility.Collapsed;
-                        FilenameVisibility = Visibility.Visible;
-                        SharepointVisibility = Visibility.Collapsed;
-                        SourceStoryIdVisibility = Visibility.Collapsed;
-                        RewriteDataSourceVisibility = Visibility.Visible;
-                        break;
-
-                    case DatabaseType.SharepointList:
-                        ConnectionStringVisibility = Visibility.Collapsed;
-                        FilenameVisibility = Visibility.Collapsed;
-                        SharepointVisibility = Visibility.Visible;
-                        SourceStoryIdVisibility = Visibility.Collapsed;
-                        RewriteDataSourceVisibility = Visibility.Collapsed;
-                        break;
-
-                    case DatabaseType.SharpCloudExcel:
-                        ConnectionStringVisibility = Visibility.Collapsed;
-                        FilenameVisibility = Visibility.Visible;
-                        SharepointVisibility = Visibility.Collapsed;
-                        SourceStoryIdVisibility = Visibility.Visible;
-                        RewriteDataSourceVisibility = Visibility.Collapsed;
-                        break;
-
-                    default:
-                        ConnectionStringVisibility = Visibility.Visible;
-                        FilenameVisibility = Visibility.Collapsed;
-                        SharepointVisibility = Visibility.Collapsed;
-                        SourceStoryIdVisibility = Visibility.Collapsed;
-                        RewriteDataSourceVisibility = Visibility.Collapsed;
-                        break;
-                }
             }
         }
 
