@@ -7,6 +7,7 @@
         xmlns:models="clr-namespace:SCQueryConnect.Models"
         xmlns:helpers="clr-namespace:SCQueryConnect.Helpers"
         xmlns:converters="clr-namespace:SCQueryConnect.Converters"
+        xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
         mc:Ignorable="d"
         Background="{StaticResource QCBackground}"
         Foreground="{StaticResource QCBlue}"
@@ -20,6 +21,11 @@
         UseLayoutRounding="True">
 
     <Grid x:Name="Root">
+        <Grid.Resources>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
+        </Grid.Resources>
+
         <Grid Background="Black">
             <Grid.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
@@ -204,13 +210,13 @@
                 <!-- Tabs for Connection Config -->
                 <TabControl x:Name="BrowserTabs"
                             BorderBrush="Transparent"
-                            MinWidth="750"
-                            Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
+                            MinWidth="750">
                     <TabControl.Resources>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
 
-                    <TabItem Header="1. Database Connection">
+                    <TabItem Header="1. Database Connection"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Grid.RowDefinitions>
@@ -381,7 +387,8 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="2. Query">
+                    <TabItem Header="2. Query"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <TabControl Background="{StaticResource QCBackground}">
                             <TabControl.Resources>
                                 <Style TargetType="GridSplitter">
@@ -430,7 +437,7 @@
                                     <Setter Property="Margin" Value="5" />
                                 </Style>
                             </TabControl.Resources>
-                            
+
                             <TabItem Header="Items">
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -443,7 +450,7 @@
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
                                     <TextBox Grid.Row="1" Text="{Binding QueryString, FallbackValue='SELECT * FROM TABLE'}" />
                                     <GridSplitter Grid.Row="2" />
-                                    
+
                                     <Grid Grid.Row="3">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="30" />
@@ -545,7 +552,8 @@
                         </TabControl>
                     </TabItem>
 
-                    <TabItem Header="3. Update Story" >
+                    <TabItem Header="3. Update Story"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="250"></RowDefinition>
@@ -572,7 +580,7 @@
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>
-                                
+
                                 <StackPanel Margin="100,5,0,0" Width="370">
                                     <CheckBox Foreground="{StaticResource QCBlue}"
                                               IsChecked="{Binding UnpublishItems, Mode=TwoWay}"
@@ -596,7 +604,7 @@
                                     <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="5,0"></TextBlock>
                                     <TextBlock Text="{Binding LastRunDate, FallbackValue='Now'}" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
                                 </StackPanel>
-                                
+
                                 <TextBox x:Name="tbResults"
                                          Width="Auto"
                                          Margin="5,35,5,5"
@@ -611,86 +619,9 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="4. Create batch files">
-                        <Grid Background="{StaticResource QCBackground}">
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="This step will create an executable file that can be scheduled to run automatically, thus allowing your story to be continually updated without manual intervention." TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="10"/>
-                                <Button Click="PublishBatchFolderClickAuto" Height="50" Width="220" Margin="5,0" FontSize="16" >Generate Batch Files Now...</Button>
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal" Margin="30">
-                                <Button Click="PublishBatchFolderClick32" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 32bit (x86) Files Now...</Button>
-                                <Button Click="PublishBatchFolderClick64" Height="25" Width="220" Margin="5,0" FontSize="12" >Generate Batch 64bit (x64) Files Now...</Button>
-                            </StackPanel>
-                            <Button Click="ViewExisting" VerticalAlignment="Bottom" Height="25" Width="220" Margin="5" Background="Transparent" FontSize="12" >View export folder...</Button>
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="About">
-                        <Grid Background="{StaticResource QCBackground}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" VerticalAlignment="Center">
-                                <Image Source="Images/SharpCloud.png" Width="250" Stretch="UniformToFill"></Image>
-                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                            <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0">
-                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://support.sharpcloud.com/en/support/solutions/articles/76000013227-queryconnect-saved-data">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="QueryConnect - Saved Data (Knowledge Base article)"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Click="QC_Data_Folder_Click">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Query Connect Data Folder"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Click="App_Directory_Hyperlink_Click">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Install Folder"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://www.youtube.com/watch?v=cZUyQkVzg2E">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Watch Video Guide"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Click="Database_Engine_Hyperlink_Click">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Download tools for Excel/Access"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://github.com/SharpCloud/SCQueryConnect">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                            </StackPanel>
-                        </Grid>
-                    </TabItem>
-                </TabControl>
-
-                <!-- Tabs for Folder Config -->
-                <TabControl BorderBrush="Transparent"
-                            MinWidth="750"
-                            Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}">
-
                     <!-- Connection Folder Config -->
-                    <TabItem Header="Connections Folder">
+                    <TabItem Header="Connections Folder"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid Margin="5">
                                 <Grid.Resources>
@@ -785,7 +716,8 @@
                                 <converters:EnumMatchToBoolConverter x:Key="EnumMatchToBoolConverter" />
                             </Grid.Resources>
 
-                            <StackPanel DataContext="{Binding Parent, ElementName=Root}" HorizontalAlignment="Center"
+                            <StackPanel DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+                                        HorizontalAlignment="Center"
                                         Width="600"
                                         VerticalAlignment="Center">
 
@@ -878,12 +810,80 @@
                             </StackPanel>
                         </Grid>
                     </TabItem>
+
+                    <TabItem Header="About">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" VerticalAlignment="Center">
+                                <Image Source="Images/SharpCloud.png" Width="250" Stretch="UniformToFill"></Image>
+                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0">
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://support.sharpcloud.com/en/support/solutions/articles/76000013227-queryconnect-saved-data">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="QueryConnect - Saved Data (Knowledge Base article)"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="QC_Data_Folder_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Query Connect Data Folder"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="App_Directory_Hyperlink_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Install Folder"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://www.youtube.com/watch?v=cZUyQkVzg2E">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Watch Video Guide"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="Database_Engine_Hyperlink_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Download tools for Excel/Access"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://github.com/SharpCloud/SCQueryConnect">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
                 </TabControl>
             </Grid>
         </Grid>
 
-        <Grid Background="#cc000000" Visibility="{Binding UpdatingMessageVisibility, FallbackValue=Collapsed}">
-            <TextBlock Foreground="white" MaxWidth="500" FontSize="30" TextWrapping="WrapWithOverflow" Text="Updating..." VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <Grid Background="#cc000000"
+              DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+              Visibility="{Binding UpdateMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+
+            <TextBlock Foreground="white"
+                       FontSize="30"
+                       HorizontalAlignment="Center"
+                       MaxWidth="500"
+                       Text="{Binding UpdateMessage}"
+                       TextWrapping="WrapWithOverflow"
+                       VerticalAlignment="Center">
+            </TextBlock>
         </Grid>
     </Grid>
 </Window>

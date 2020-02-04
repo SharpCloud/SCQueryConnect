@@ -5,6 +5,7 @@ using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
+using SCQueryConnect.ViewModels;
 using System;
 
 namespace SCQueryConnect
@@ -54,6 +55,7 @@ namespace SCQueryConnect
             var builder = new ContainerBuilder();
 
             builder.RegisterType<MainWindow>().InstancePerLifetimeScope();
+            builder.RegisterType<MainViewModel>().As<IMainViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ArchitectureDetector>().As<IArchitectureDetector>().InstancePerLifetimeScope();
             builder.RegisterType<BatchPublishHelper>().As<IBatchPublishHelper>().InstancePerLifetimeScope();
             builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();

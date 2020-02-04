@@ -141,6 +141,9 @@
     <Compile Include="..\SQLUpdate\Converters\EnumMatchToBoolConverter.cs">
       <Link>Converters\EnumMatchToBoolConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\StringToVisibilityConverter.cs">
+      <Link>Converters\StringToVisibilityConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
       <Link>Converters\ValidExcelNameConverter.cs</Link>
     </Compile>
@@ -167,6 +170,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
+      <Link>Interfaces\IMainViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
       <Link>Interfaces\IMessageService.cs</Link>
@@ -210,11 +216,17 @@
     <Compile Include="..\SQLUpdate\UIDataCheckerValidityProcessor.cs">
       <Link>UIDataCheckerValidityProcessor.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
+      <Link>ViewModels\MainViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
       <Link>ViewModels\ProxyViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\SelectedStoryViewModel.cs">
       <Link>ViewModels\SelectedStoryViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
+      <Link>ViewModels\ViewModelLocator.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Views\ConnectionInfo.xaml.cs">
       <Link>Views\ConnectionInfo.xaml.cs</Link>

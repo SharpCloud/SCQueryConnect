@@ -40,10 +40,8 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private PasswordSecurity _publishPasswordSecurity;
-        private PublishArchitecture _publishArchitecture;
+        
         private Point _startPoint;
-        private Visibility _updatingMessageVisibility = Visibility.Collapsed;
 
         private readonly QueryData _queryRootNode;
 
@@ -52,44 +50,6 @@ namespace SCQueryConnect
             get
             {
                 return _qcHelper.AppName;
-            }
-        }
-
-        public PasswordSecurity PublishPasswordSecurity
-        {
-            get => _publishPasswordSecurity;
-
-            set
-            {
-                if (_publishPasswordSecurity != value)
-                {
-                    _publishPasswordSecurity = value;
-                    OnPropertyChanged(nameof(PublishPasswordSecurity));
-                }
-            }
-        }
-
-        public PublishArchitecture PublishArchitecture
-        {
-            get => _publishArchitecture;
-            
-            set
-            {
-                if (_publishArchitecture != value)
-                {
-                    _publishArchitecture = value;
-                    OnPropertyChanged(nameof(PublishArchitecture));
-                }
-            }
-        }
-
-        public Visibility UpdatingMessageVisibility
-        {
-            get => _updatingMessageVisibility;
-            set
-            {
-                _updatingMessageVisibility = value;
-                OnPropertyChanged("UpdatingMessageVisibility");
             }
         }
 
@@ -172,6 +132,7 @@ namespace SCQueryConnect
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IExcelWriter _excelWriter;
         private readonly MultiDestinationLogger _logger;
+        private readonly IMainViewModel _mainViewModel;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly IPanelsDataChecker _panelsDataChecker;
@@ -185,6 +146,7 @@ namespace SCQueryConnect
             IDbConnectionFactory dbConnectionFactory,
             IEncryptionHelper encryptionHelper,
             IExcelWriter excelWriter,
+            IMainViewModel mainViewModel,
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory,
             ILog logger,
@@ -217,6 +179,7 @@ namespace SCQueryConnect
             _dbConnectionFactory = dbConnectionFactory;
             _encryptionHelper = encryptionHelper;
             _excelWriter = excelWriter;
+            _mainViewModel = mainViewModel;
 
             _relationshipsChecker = relationshipsDataChecker;
             _relationshipsChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrRels);
@@ -1069,22 +1032,9 @@ namespace SCQueryConnect
 
         private void PublishBatchFolderClick(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(PublishPasswordSecurity, PublishArchitecture);
-        }
-
-        private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
-        {
-            PublishBatchFolder(PasswordSecurity.DpapiMachine, PublishArchitecture.X32);
-        }
-
-        private void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
-        {
-            PublishBatchFolder(PasswordSecurity.DpapiMachine, PublishArchitecture.X64);
-        }
-
-        private void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
-        {
-            PublishBatchFolder(PasswordSecurity.DpapiMachine, PublishArchitecture.Auto);
+            PublishBatchFolder(
+                _mainViewModel.PublishPasswordSecurity,
+                _mainViewModel.PublishArchitecture);
         }
 
         private void QueryItemTreePreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1201,6 +1151,7 @@ namespace SCQueryConnect
             }
             else
             {
+                _mainViewModel.UpdateMessage = $"Running {qd.Name}...";
                 await _logger.Log($"--- Running '{qd.Name}'");
                 await UpdateSharpCloud(qd);
             }
@@ -1216,7 +1167,6 @@ namespace SCQueryConnect
                 return;
             }
 
-            UpdatingMessageVisibility = Visibility.Visible;
             await Task.Delay(20);
             SaveSettings();
 
@@ -1226,7 +1176,7 @@ namespace SCQueryConnect
             queryData.LastRunDateTime = DateTime.Now;
             SaveSettings();
 
-            UpdatingMessageVisibility = Visibility.Collapsed;
+            _mainViewModel.UpdateMessage = string.Empty;
             await Task.Delay(20);
         }
     }
