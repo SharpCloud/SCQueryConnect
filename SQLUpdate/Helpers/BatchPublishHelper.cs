@@ -194,27 +194,52 @@ namespace SCQueryConnect.Helpers
                     settings.ProxyViewModel,
                     out var proxyEntropy);
 
-                var content = File.ReadAllText(configFilename);
+                var content = File.ReadAllText("BatchConfigTemplate.xml");
 
-                content = ReplaceConfigSetting(content, "USERID", settings.Username);
-                content = ReplaceConfigSetting(content, "PASSWORD_DPAPI", Convert.ToBase64String(passwordBytes));
-                content = ReplaceConfigSetting(content, "PASSWORD_DPAPI_ENTROPY", Convert.ToBase64String(entropy));
-                content = ReplaceConfigSetting(content, "https://my.sharpcloud.com", settings.SharpCloudUrl);
-                content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", queryData.StoryId);
-                content = ReplaceConfigSetting(content, "SQL", queryData.GetBatchDBType);
-                content = ReplaceConfigSetting(content, "CONNECTIONSTRING", formattedConnection.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "QUERYSTRING", queryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "QUERYRELSSTRING", queryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "LOGFILE", $"Logfile.txt");
-                content = ReplaceConfigSetting(content, "BUILDRELATIONSHIPS", queryData.BuildRelationships.ToString());
-                content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", queryData.UnpublishItems.ToString());
-                content = ReplaceConfigSetting(content, "PROXYADDRESS", settings.ProxyViewModel.Proxy);
-                content = ReplaceConfigSetting(content, "PROXYANONYMOUS", settings.ProxyViewModel.ProxyAnnonymous.ToString());
-                content = ReplaceConfigSetting(content, "PROXYUSERNAME", settings.ProxyViewModel.ProxyUserName);
-                content = ReplaceConfigSetting(content, "PROXYPWORD_DPAPI", Convert.ToBase64String(proxyPasswordBytes));
-                content = ReplaceConfigSetting(content, "PROXYPWORD_DPAPI_ENTROPY", Convert.ToBase64String(proxyEntropy));
+                var appSettings = new List<string>
+                {
+                    GetAppSettingText("userid", settings.Username),
+                    GetAppSettingText("url", settings.SharpCloudUrl),
+                    GetAppSettingText("storyid", queryData.StoryId),
+                    GetAppSettingText("dbType", queryData.GetBatchDBType),
+                    GetAppSettingText("connectionString", Sanitize(formattedConnection)),
+                    GetAppSettingText("queryString", Sanitize(queryData.QueryString)),
+                    GetAppSettingText("queryStringRels", Sanitize(queryData.QueryStringRels)),
+                    "    <!-- Add a path to log file if required - leave blank for no logging -->",
+                    GetAppSettingText("LogFile", "Logfile.txt"),
+                    GetAppSettingText("buildRelationships", queryData.BuildRelationships.ToString()),
+                    GetAppSettingText("unpublishItems", queryData.UnpublishItems.ToString()),
+                    GetAppSettingText("proxy", settings.ProxyViewModel.Proxy),
+                    GetAppSettingText("proxyAnonymous", settings.ProxyViewModel.ProxyAnnonymous.ToString()),
+                    GetAppSettingText("proxyUsername", settings.ProxyViewModel.ProxyUserName),
+                    
+                    GetAppSettingText("ClientSettingsProvider.ServiceUri", string.Empty)
+                };
 
-                File.WriteAllText(configFilename, content);
+                string[] passwords;
+                if (settings.PasswordSecurity == PasswordSecurity.Base64)
+                {
+                    passwords = new[]
+                    {
+                        GetAppSettingText("password64", Convert.ToBase64String(passwordBytes)),
+                        GetAppSettingText("proxyPassword64", Convert.ToBase64String(entropy))
+                    };
+                }
+                else
+                {
+                    passwords = new[]
+                    {
+                        GetAppSettingText("passwordDpapi", Convert.ToBase64String(passwordBytes)),
+                        GetAppSettingText("passwordDpapiEntropy", Convert.ToBase64String(entropy)),
+                        GetAppSettingText("proxyPasswordDpapi", Convert.ToBase64String(proxyPasswordBytes)),
+                        GetAppSettingText("proxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy))
+                    };
+                }
+
+                appSettings.AddRange(passwords);
+                var appSettingsString = string.Join(Environment.NewLine, appSettings);
+                var configText = content.Replace("{appSettings}", appSettingsString);
+                File.WriteAllText(configFilename, configText);
 
                 // update the Logfile
                 var logfile = $"{outputFolder}Logfile.txt";
@@ -283,15 +308,6 @@ namespace SCQueryConnect.Helpers
             return passwordBytes;
         }
 
-        private static string ReplaceConfigSetting(
-            string configText,
-            string oldValue,
-            string newValue)
-        {
-            var updated = configText.Replace($"\"{oldValue}\"", $"\"{newValue}\"");
-            return updated;
-        }
-
         private static bool GetIs32Bit(PublishSettings settings)
         {
             switch (settings.PublishArchitecture)
@@ -313,5 +329,11 @@ namespace SCQueryConnect.Helpers
             var suffix = is32Bit ? "x86" : string.Empty;
             return suffix;
         }
+
+        private static string GetAppSettingText(string key, string value)
+            => $"    <add key=\"{key}\" value=\"{value}\" />";
+
+        private static string Sanitize(string input)
+            => input.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'");
     }
 }
