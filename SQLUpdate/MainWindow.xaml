@@ -206,16 +206,17 @@
             </Grid>
 
             <!-- Right Panel -->
-            <Grid Grid.Column="2" DataContext="{Binding SelectedQueryData}">
+            <Grid Grid.Column="2" DataContext="{Binding MainViewModel.SelectedQueryData, Source={StaticResource ViewModelLocator}}">
                 <!-- Tabs for Connection Config -->
                 <TabControl x:Name="BrowserTabs"
                             BorderBrush="Transparent"
-                            MinWidth="750">
+                            MinWidth="750"
+                            SelectedIndex="{Binding MainViewModel.SelectedTabIndex, Source={StaticResource ViewModelLocator}}">
                     <TabControl.Resources>
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
 
-                    <TabItem Header="1. Database Connection"
+                    <TabItem Header="Database Connection"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -387,7 +388,7 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="2. Query"
+                    <TabItem Header="Query"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <TabControl Background="{StaticResource QCBackground}">
                             <TabControl.Resources>
@@ -552,7 +553,7 @@
                         </TabControl>
                     </TabItem>
 
-                    <TabItem Header="3. Update Story"
+                    <TabItem Header="Update Story"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>

@@ -8,5 +8,7 @@ namespace SCQueryConnect.Interfaces
         PasswordSecurity PublishPasswordSecurity { get; set; }
         PublishArchitecture PublishArchitecture { get; set; }
         string UpdateMessage { get; set; }
+        int SelectedTabIndex { get; set; }
+        QueryData SelectedQueryData { get; set; }
     }
 }

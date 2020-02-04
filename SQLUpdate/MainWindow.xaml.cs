@@ -104,21 +104,7 @@ namespace SCQueryConnect
             qd.Connections != null &&
             qd.Connections.Any(c => c.Id == queryData.Id));
 
-        private QueryData _selectedQueryData;
         
-        public QueryData SelectedQueryData
-        {
-            get => _selectedQueryData;
-
-            set
-            {
-                if (_selectedQueryData != value)
-                {
-                    _selectedQueryData = value;
-                    OnPropertyChanged(nameof(SelectedQueryData));
-                }
-            }
-        }
 
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
@@ -357,7 +343,7 @@ namespace SCQueryConnect
 
         private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
         {
-            RewriteDataSource(SelectedQueryData);
+            RewriteDataSource(_mainViewModel.SelectedQueryData);
         }
 
         private void RewriteDataSource(QueryData queryData)
@@ -399,7 +385,7 @@ namespace SCQueryConnect
 
         private async void TestConnectionClick(object sender, RoutedEventArgs e)
         {
-            await TestConnection(SelectedQueryData);
+            await TestConnection(_mainViewModel.SelectedQueryData);
         }
 
         private async Task TestConnection(QueryData queryData)
@@ -438,7 +424,7 @@ namespace SCQueryConnect
 
         private void ReviewConnectionClick(object sender, RoutedEventArgs e)
         {
-            ReviewConnection(SelectedQueryData);
+            ReviewConnection(_mainViewModel.SelectedQueryData);
         }
 
         private void ReviewConnection(QueryData queryData)
@@ -494,8 +480,8 @@ namespace SCQueryConnect
         private async void RunClick(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
-                SelectedQueryData,
-                SelectedQueryData.QueryString,
+                _mainViewModel.SelectedQueryData,
+                _mainViewModel.SelectedQueryData.QueryString,
                 _itemDataChecker,
                 DataGrid,
                 d => d.QueryResults);
@@ -504,8 +490,8 @@ namespace SCQueryConnect
         private async void RunClickRels(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
-                SelectedQueryData,
-                SelectedQueryData.QueryStringRels,
+                _mainViewModel.SelectedQueryData,
+                _mainViewModel.SelectedQueryData.QueryStringRels,
                 _relationshipsChecker,
                 DataGridRels,
                 d => d.QueryResultsRels);
@@ -514,8 +500,8 @@ namespace SCQueryConnect
         private async void PreviewResourceUrlsClick(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
-                SelectedQueryData,
-                SelectedQueryData.QueryStringResourceUrls,
+                _mainViewModel.SelectedQueryData,
+                _mainViewModel.SelectedQueryData.QueryStringResourceUrls,
                 _resourceUrlDataChecker,
                 DataGridResourceUrls,
                 d => d.QueryResultsResourceUrls);
@@ -524,8 +510,8 @@ namespace SCQueryConnect
         private async void PreviewPanelsClick(object sender, RoutedEventArgs e)
         {
             await PreviewSql(
-                SelectedQueryData,
-                SelectedQueryData.QueryStringPanels,
+                _mainViewModel.SelectedQueryData,
+                _mainViewModel.SelectedQueryData.QueryStringPanels,
                 _panelsDataChecker,
                 DataGridPanels,
                 d => d.QueryResultsPanels);
@@ -570,7 +556,7 @@ namespace SCQueryConnect
                             dataGrid.ItemsSource = dt.DefaultView;
 
                             var prop = (PropertyInfo)((MemberExpression)dataViewSelector.Body).Member;
-                            prop.SetValue(SelectedQueryData, dt.DefaultView, null);
+                            prop.SetValue(_mainViewModel.SelectedQueryData, dt.DefaultView, null);
 
                             for (var col = 0; col < dataGrid.Columns.Count; col++)
                             {
@@ -625,9 +611,9 @@ namespace SCQueryConnect
             var connectionsJson = SaveHelper.SerializeJSON(connections);
             File.WriteAllText(_localPath + "/connections.json", connectionsJson);
 
-            if (SelectedQueryData != null)
+            if (_mainViewModel.SelectedQueryData != null)
             {
-                SaveHelper.RegWrite("ActiveConnection", SelectedQueryData.Id);
+                SaveHelper.RegWrite("ActiveConnection", _mainViewModel.SelectedQueryData.Id);
             }
 
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
@@ -790,7 +776,10 @@ namespace SCQueryConnect
 
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
-            var path = _batchPublishHelper.GetFolder(SelectedQueryData.Name, _localPath);
+            var path = _batchPublishHelper.GetFolder(
+                _mainViewModel.SelectedQueryData.Name,
+                _localPath);
+
             Process.Start(path);
         }
 
@@ -826,8 +815,8 @@ namespace SCQueryConnect
 
         private void MoveConnectionDown(object sender, RoutedEventArgs e)
         {
-            var parent = FindParent(SelectedQueryData);
-            var index = parent.Connections.IndexOf(SelectedQueryData);
+            var parent = FindParent(_mainViewModel.SelectedQueryData);
+            var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData);
             
             if (index < parent.Connections.Count - 1)
             {
@@ -837,8 +826,8 @@ namespace SCQueryConnect
 
         private void MoveConnectionUp(object sender, RoutedEventArgs e)
         {
-            var parent = FindParent(SelectedQueryData);
-            var index = parent.Connections.IndexOf(SelectedQueryData);
+            var parent = FindParent(_mainViewModel.SelectedQueryData);
+            var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData);
 
             if (index > 0)
             {
@@ -848,20 +837,20 @@ namespace SCQueryConnect
 
         private void CopyConnectionClick(object sender, RoutedEventArgs e)
         {
-            var queryData = new QueryData(SelectedQueryData);
+            var queryData = new QueryData(_mainViewModel.SelectedQueryData);
             AddQueryData(queryData);
         }
 
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
         {
-            var parent = FindParent(SelectedQueryData);
-            var index = parent.Connections.IndexOf(SelectedQueryData) - 1;
+            var parent = FindParent(_mainViewModel.SelectedQueryData);
+            var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData) - 1;
 
             var toSelect = index > -1
                 ? parent.Connections[index]
                 : parent;
             
-            parent.Connections.Remove(SelectedQueryData);
+            parent.Connections.Remove(_mainViewModel.SelectedQueryData);
             
             if (toSelect != _queryRootNode)
             {
@@ -878,24 +867,24 @@ namespace SCQueryConnect
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            SelectedQueryData = e.NewValue as QueryData;
+            _mainViewModel.SelectedQueryData = e.NewValue as QueryData;
 
-            if (SelectedQueryData == null)
+            if (_mainViewModel.SelectedQueryData == null)
             {
                 return;
             }
 
-            if (SelectedQueryData.IsFolder)
+            if (_mainViewModel.SelectedQueryData.IsFolder)
             {
-                tbFolderResults.Text = SelectedQueryData.LogData;
+                tbFolderResults.Text = _mainViewModel.SelectedQueryData.LogData;
             }
             else
             {
-                tbResults.Text = SelectedQueryData.LogData;
-                DataGrid.ItemsSource = SelectedQueryData.QueryResults;
-                DataGridRels.ItemsSource = SelectedQueryData.QueryResultsRels;
-                DataGridResourceUrls.ItemsSource = SelectedQueryData.QueryResultsResourceUrls;
-                DataGridPanels.ItemsSource = SelectedQueryData.QueryResultsPanels;
+                tbResults.Text = _mainViewModel.SelectedQueryData.LogData;
+                DataGrid.ItemsSource = _mainViewModel.SelectedQueryData.QueryResults;
+                DataGridRels.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsRels;
+                DataGridResourceUrls.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsResourceUrls;
+                DataGridPanels.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsPanels;
             }
         }
 
@@ -903,7 +892,7 @@ namespace SCQueryConnect
         {
             var ord = new OpenFileDialog();
 
-            switch (SelectedQueryData.ConnectionType)
+            switch (_mainViewModel.SelectedQueryData.ConnectionType)
             {
                 case DatabaseType.Access:
                     ord.Filter = "Access Database Files (*.accdb;*.mdb)|*.accdb;*.mdb";
@@ -917,7 +906,7 @@ namespace SCQueryConnect
 
             if (ord.ShowDialog() == true)
             {
-                SelectedQueryData.FileName = ord.FileName;
+                _mainViewModel.SelectedQueryData.FileName = ord.FileName;
             }
         }
 
@@ -944,13 +933,13 @@ namespace SCQueryConnect
             if (dialogResult == true)
             {
                 var story = sel.SelectedStoryLites.First();
-                SelectedQueryData.StoryId = story.Id;
+                _mainViewModel.SelectedQueryData.StoryId = story.Id;
             }
         }
 
         private void ViewStoryClick(object sender, RoutedEventArgs e)
         {
-            Process.Start($"{Url.Text}/html/#/story/{SelectedQueryData.StoryId}");
+            Process.Start($"{Url.Text}/html/#/story/{_mainViewModel.SelectedQueryData.StoryId}");
         }
 
         private void Database_Engine_Hyperlink_Click(object sender, RoutedEventArgs e)
@@ -971,7 +960,7 @@ namespace SCQueryConnect
 
         private void StorySourceSettings_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new SourceStorySettings(SelectedQueryData)
+            var dlg = new SourceStorySettings(_mainViewModel.SelectedQueryData)
             {
                 Owner = this
             };
@@ -1017,7 +1006,7 @@ namespace SCQueryConnect
 
             var settings = new PublishSettings
             {
-                Data = SelectedQueryData,
+                Data = _mainViewModel.SelectedQueryData,
                 Password = Password,
                 ProxyViewModel = _proxyViewModel,
                 BasePath = _localPath,
