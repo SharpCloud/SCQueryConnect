@@ -153,10 +153,12 @@
     <Compile Include="Converters\EnumMatchToBoolConverter.cs" />
     <Compile Include="Converters\ValidExcelNameConverter.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
+    <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\MessageService.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Interfaces\IActionCommand.cs" />
+    <Compile Include="Interfaces\IBatchPublishHelper.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Interfaces\IPostDeserializeAction.cs" />
     <Compile Include="Logging\LoggingDestination.cs" />
@@ -165,6 +167,7 @@
     <Compile Include="Logging\TextBoxLoggingDestination.cs" />
     <Compile Include="Models\PasswordSecurity.cs" />
     <Compile Include="Models\PublishArchitecture.cs" />
+    <Compile Include="Models\PublishSettings.cs" />
     <Compile Include="UIDataCheckerValidityProcessor.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>

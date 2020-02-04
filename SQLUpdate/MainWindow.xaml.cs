@@ -4,6 +4,7 @@ using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
 using SCQueryConnect.Helpers;
+using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
@@ -17,7 +18,6 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -41,7 +41,6 @@ namespace SCQueryConnect
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private static bool DetectIs32Bit => IntPtr.Size == 4;
-        private static string GetFileSuffix(bool b32bit) => b32bit ? "x86" : string.Empty;
 
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
@@ -167,6 +166,7 @@ namespace SCQueryConnect
         private ProxyViewModel _proxyViewModel;
         private ObservableCollection<QueryData> _connections;
         private readonly int _maxRowCount;
+        private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IItemDataChecker _itemDataChecker;
@@ -181,6 +181,7 @@ namespace SCQueryConnect
         private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
 
         public MainWindow(
+            IBatchPublishHelper batchPublishHelper,
             IConnectionStringHelper connectionStringHelper,
             IItemDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
@@ -209,6 +210,7 @@ namespace SCQueryConnect
             _queryRootNode = CreateNewFolder(QueryData.RootId);
             _queryRootNode.Id = QueryData.RootId;
 
+            _batchPublishHelper = batchPublishHelper;
             _connectionStringHelper = connectionStringHelper;
 
             _itemDataChecker = itemDataChecker;
@@ -827,134 +829,8 @@ namespace SCQueryConnect
 
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
-            Process.Start(GetFolder(SelectedQueryData.Name));
-        }
-
-        private string GetFolder(string queryName)
-        {
-            var folder = $"{_localPath}/data";
-            Directory.CreateDirectory(folder);
-            folder += "/" + queryName;
-            Directory.CreateDirectory(folder);
-            return folder;
-        }
-
-        private string GenerateBatchExe(bool b32Bit, string connectionString, string sequenceName, QueryData queryData)
-        {
-            var suffix = GetFileSuffix(b32Bit);
-            var zipfile = $"SCSQLBatch{suffix}.zip";
-            
-            var outputFolder = GetFolder(Path.Combine(sequenceName, queryData.Name));
-
-            if (!ValidateCredentials())
-            {
-                return null;
-            }
-
-            try
-            {
-                var configFilename = outputFolder + $"/SCSQLBatch{suffix}.exe.config";
-
-                if (File.Exists(configFilename))
-                {
-                    if (MessageBox.Show("Config files already exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-                        return null;
-                }
-
-                if (connectionString.Contains("\""))
-                    MessageBox.Show(
-                        "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
-                try
-                {
-                    File.Delete($"{outputFolder}/Autofac.dll");
-                    File.Delete($"{outputFolder}/Newtonsoft.Json.dll");
-                    File.Delete($"{outputFolder}/SC.Framework.dll");
-                    File.Delete($"{outputFolder}/SC.API.ComInterop.dll");
-                    File.Delete($"{outputFolder}/SC.Api.dll");
-                    File.Delete($"{outputFolder}/SC.SharedModels.dll");
-                    File.Delete($"{outputFolder}/SCSQLBatch{suffix}.exe");
-                    File.Delete($"{outputFolder}/SCSQLBatch{suffix}.exe.config");
-                    File.Delete($"{outputFolder}/SCSQLBatch.zip");
-                    File.Delete($"{outputFolder}/SCQueryConnect.Common.dll");
-
-                    ZipFile.ExtractToDirectory(zipfile, outputFolder);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {e.Message}");
-                    return null;
-                }
-
-                // set up the config
-
-                // Remove data source if type is SharpCloud; a temp file will
-                // be used, so an overwrite prompt will not appear
-
-                var formattedConnection = queryData.GetBatchDBType == DatabaseStrings.SharpCloudExcel
-                    ? _connectionStringHelper.SetDataSource(
-                        queryData.FormattedConnectionString,
-                        string.Empty)
-                    : queryData.FormattedConnectionString;
-
-                var passwordBytes = _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(Password.Password),
-                    out var entropy,
-                    DataProtectionScope.LocalMachine);
-
-                var proxyPasswordBytes = _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword),
-                    out var proxyEntropy,
-                    DataProtectionScope.LocalMachine);
-
-                var content = File.ReadAllText(configFilename);
-
-                content = ReplaceConfigSetting(content, "USERID", Username.Text);
-                content = ReplaceConfigSetting(content, "PASSWORD_DPAPI", Convert.ToBase64String(passwordBytes));
-                content = ReplaceConfigSetting(content, "PASSWORD_DPAPI_ENTROPY", Convert.ToBase64String(entropy));
-                content = ReplaceConfigSetting(content, "https://my.sharpcloud.com", Url.Text);
-                content = ReplaceConfigSetting(content, "00000000-0000-0000-0000-000000000000", queryData.StoryId);
-                content = ReplaceConfigSetting(content, "SQL", queryData.GetBatchDBType);
-                content = ReplaceConfigSetting(content, "CONNECTIONSTRING", formattedConnection.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "QUERYSTRING", queryData.QueryString.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "QUERYRELSSTRING", queryData.QueryStringRels.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'"));
-                content = ReplaceConfigSetting(content, "LOGFILE", $"Logfile.txt");
-                content = ReplaceConfigSetting(content, "BUILDRELATIONSHIPS", queryData.BuildRelationships.ToString());
-                content = ReplaceConfigSetting(content, "UNPUBLISHITEMS", queryData.UnpublishItems.ToString());
-                content = ReplaceConfigSetting(content, "PROXYADDRESS", _proxyViewModel.Proxy);
-                content = ReplaceConfigSetting(content, "PROXYANONYMOUS", _proxyViewModel.ProxyAnnonymous.ToString());
-                content = ReplaceConfigSetting(content, "PROXYUSERNAME", _proxyViewModel.ProxyUserName);
-                content = ReplaceConfigSetting(content, "PROXYPWORD_DPAPI", Convert.ToBase64String(proxyPasswordBytes));
-                content = ReplaceConfigSetting(content, "PROXYPWORD_DPAPI_ENTROPY", Convert.ToBase64String(proxyEntropy));
-
-                File.WriteAllText(configFilename, content);
-
-                // update the Logfile
-                var logfile = $"{outputFolder}Logfile.txt";
-                var contentNotes = new List<string>();
-                contentNotes.Add($"----------------------------------------------------------------------");
-                contentNotes.Add(b32Bit
-                    ? $"32 bit (x86) Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}"
-                    : $"64 bit Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}");
-                contentNotes.Add($"----------------------------------------------------------------------");
-
-                File.AppendAllLines(logfile, contentNotes);
-                return outputFolder;
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-
-            return null;
-        }
-
-        private static string ReplaceConfigSetting(
-            string configText,
-            string oldValue,
-            string newValue)
-        {
-            var updated = configText.Replace($"\"{oldValue}\"", $"\"{newValue}\"");
-            return updated;
+            var path = _batchPublishHelper.GetFolder(SelectedQueryData.Name, _localPath);
+            Process.Start(path);
         }
 
         private static QueryData CreateNewFolder(string name)
@@ -1169,6 +1045,27 @@ namespace SCQueryConnect
             }
         }
 
+        private void PublishBatchFolder(bool is32Bit)
+        {
+            if (!ValidateCredentials())
+            {
+                return;
+            }
+
+            var settings = new PublishSettings
+            {
+                Data = SelectedQueryData,
+                Is32Bit = is32Bit,
+                Password = Password,
+                ProxyViewModel = _proxyViewModel,
+                BasePath = _localPath,
+                Username = Username.Text,
+                SharpCloudUrl = Url.Text
+            };
+
+            _batchPublishHelper.PublishBatchFolder(settings);
+        }
+
         private void PublishBatchFolderClick(object sender, RoutedEventArgs e)
         {
             bool is32Bit;
@@ -1191,102 +1088,22 @@ namespace SCQueryConnect
                     throw new ArgumentOutOfRangeException();
             }
 
-            PublishBatchFolder(SelectedQueryData, is32Bit);
+            PublishBatchFolder(is32Bit);
         }
 
         private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(SelectedQueryData, true);
+            PublishBatchFolder(true);
         }
 
         private void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(SelectedQueryData, false);
+            PublishBatchFolder(false);
         }
 
         private void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(SelectedQueryData, DetectIs32Bit);
-        }
-
-        private void WriteBatchFile(string path, string filename, string content)
-        {
-            var sequenceFolder = GetFolder(path);
-            var batchPath = Path.Combine(sequenceFolder, $"{filename}.bat");
-            File.WriteAllText(batchPath, content);
-        }
-
-        private void PublishAllBatchFolders(QueryData queryData, bool is32Bit, string parentPath, StringBuilder parentStringBuilder)
-        {
-            if (queryData.IsFolder)
-            {
-                var subPath = Path.Combine(parentPath, queryData.Name);
-                var localStringBuilder = new StringBuilder();
-                localStringBuilder.AppendLine("@echo off");
-
-                parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
-
-                foreach (var c in queryData.Connections)
-                {
-                    PublishAllBatchFolders(c, is32Bit, subPath, localStringBuilder);
-                    
-                    var batchFolderRoot = GetFolder(subPath);
-                    var batchPath = Path.Combine(batchFolderRoot, c.Name, c.Name);
-                    parentStringBuilder.AppendLine($"call \"{batchPath}.bat\"");
-                }
-
-                WriteBatchFile(subPath, queryData.Name, localStringBuilder.ToString());
-            }
-            else
-            {
-                GetFolder(parentPath);
-
-                var fullPath = GenerateBatchExe(
-                    is32Bit,
-                    queryData.ConnectionsString,
-                    parentPath,
-                    queryData);
-
-                var suffix = GetFileSuffix(is32Bit);
-                var filename = $"SCSQLBatch{suffix}.exe";
-                parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
-                parentStringBuilder.AppendLine($"\"{Path.Combine(fullPath, filename)}\"");
-            }
-        }
-
-        private void PublishBatchFolder(QueryData queryData, bool is32Bit)
-        {
-            try
-            {
-                var outputFolder = GetFolder(queryData.Name);
-
-                var notEmpty = Directory.EnumerateFileSystemEntries(outputFolder).Any();
-                if (notEmpty)
-                {
-                    var result = MessageBox.Show(
-                        $"A folder named '{queryData.Name}' already exist at this location, Do you want to replace?",
-                        "WARNING",
-                        MessageBoxButton.YesNo);
-
-                    if (result != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-                }
-
-                Directory.Delete(outputFolder, true);
-                GetFolder(queryData.Name);
-
-                var sb = new StringBuilder();
-                sb.AppendLine("@echo off");
-                PublishAllBatchFolders(queryData, is32Bit, string.Empty, sb);
-                WriteBatchFile(queryData.Name, queryData.Name, sb.ToString());
-                Process.Start(outputFolder);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {ex.Message}");
-            }
+            PublishBatchFolder(DetectIs32Bit);
         }
 
         private void QueryItemTreePreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

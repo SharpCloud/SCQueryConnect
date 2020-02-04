@@ -147,6 +147,9 @@
     <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
       <Link>ExtendedPropertyChangedEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\BatchPublishHelper.cs">
+      <Link>Helpers\BatchPublishHelper.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\ConnectionNameValidator.cs">
       <Link>Helpers\ConnectionNameValidator.cs</Link>
     </Compile>
@@ -161,6 +164,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IActionCommand.cs">
       <Link>Interfaces\IActionCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
+      <Link>Interfaces\IBatchPublishHelper.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
       <Link>Interfaces\IMessageService.cs</Link>
@@ -188,6 +194,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Models\PublishArchitecture.cs">
       <Link>Models\PublishArchitecture.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\PublishSettings.cs">
+      <Link>Models\PublishSettings.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Models\QueryData.cs">
       <Link>Models\QueryData.cs</Link>
