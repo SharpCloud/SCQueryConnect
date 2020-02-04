@@ -10,8 +10,6 @@ namespace SCQueryConnect.Helpers
 {
     public class SaveHelper
     {
-        public const string VersionKey = "Version";
-
         private const string RegKey = "SOFTWARE\\SharpCloud\\SQLUpdate";
 
         /// <summary>

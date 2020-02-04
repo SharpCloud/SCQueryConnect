@@ -40,7 +40,10 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        
+        private const string ConnectionsFileV3 = "connections.json";
+        private const string ConnectionsFileV3Backup = "connections.json.bak";
+        private const string ConnectionsFileV4 = "connections_v4.json";
+
         private Point _startPoint;
 
         private readonly QueryData _queryRootNode;
@@ -103,8 +106,6 @@ namespace SCQueryConnect
             queryData != null &&
             qd.Connections != null &&
             qd.Connections.Any(c => c.Id == queryData.Id));
-
-        
 
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
@@ -187,6 +188,66 @@ namespace SCQueryConnect
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            var pathV3 = Path.Combine(_localPath, ConnectionsFileV3);
+            var migrate = File.Exists(pathV3);
+            string filePath;
+
+            if (migrate)
+            {
+                var pathV3Backup = Path.Combine(_localPath, ConnectionsFileV3Backup);
+
+                if (File.Exists(pathV3Backup))
+                {
+                    File.Delete(pathV3Backup);
+                }
+
+                File.Move(pathV3, pathV3Backup);
+                filePath = pathV3Backup;
+            }
+            else
+            {
+                filePath = Path.Combine(_localPath, ConnectionsFileV4);
+            }
+
+            LoadAllConnections(migrate, filePath);
+            LoadGlobalSettings(migrate);
+
+            EventManager.RegisterClassHandler(
+                typeof(TextBox),
+                GotKeyboardFocusEvent,
+                new KeyboardFocusChangedEventHandler(SelectAllOnTabFocus));
+
+            EventManager.RegisterClassHandler(
+                typeof(PasswordBox),
+                GotKeyboardFocusEvent,
+                new KeyboardFocusChangedEventHandler(SelectAllOnTabFocus));
+
+            var splashScreen = new SplashScreen("Images/splash.jpg");
+            splashScreen.Show(true);
+        }
+
+        private void SelectAllOnTabFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (e.KeyboardDevice.IsKeyDown(Key.Tab))
+            {
+                if (sender is TextBox textBox && !textBox.IsReadOnly)
+                {
+                    textBox.SelectAll();
+                }
+                else if (sender is PasswordBox passwordBox)
+                {
+                    passwordBox.SelectAll();
+                }
+            }
+        }
+
+        private void LoadGlobalSettings(bool migrate)
+        {
+            if (migrate)
+            {
+                SaveHelper.RegDelete("ActiveConnection");
+            }
+
             Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
             Username.Text = SaveHelper.RegRead("Username", "");
 
@@ -204,7 +265,7 @@ namespace SCQueryConnect
             {
                 // Fallback method for backwards compatibility
                 regPassword = SaveHelper.RegRead("Password", "");
-                
+
                 Password.Password = Encoding.Default.GetString(
                     Convert.FromBase64String(regPassword));
 
@@ -237,64 +298,16 @@ namespace SCQueryConnect
                 SaveHelper.RegDelete("ProxyPassword");
             }
 
-            LoadAllProfiles();
-
-            // choose our last settings
-            var active = SaveHelper.RegRead("ActiveConnection", string.Empty);
-            
-            var queryData = FindQueryData(qd => qd.Id == active)
-                            ?? FindQueryData(qd => !qd.IsFolder);
-
-            queryData.IsSelected = true;
-
             BrowserTabs.SelectedIndex = (int.Parse(SaveHelper.RegRead("ActiveTab", "0")));
-
-            EventManager.RegisterClassHandler(
-                typeof(TextBox),
-                GotKeyboardFocusEvent,
-                new KeyboardFocusChangedEventHandler(SelectAllOnTabFocus));
-
-            EventManager.RegisterClassHandler(
-                typeof(PasswordBox),
-                GotKeyboardFocusEvent,
-                new KeyboardFocusChangedEventHandler(SelectAllOnTabFocus));
-
-            var splashScreen = new SplashScreen("Images/splash.jpg");
-            splashScreen.Show(true);
         }
 
-        private void SelectAllOnTabFocus(object sender, KeyboardFocusChangedEventArgs e)
+        private void LoadAllConnections(bool migrate, string filePath)
         {
-            if (e.KeyboardDevice.IsKeyDown(Key.Tab))
-            {
-                if (sender is TextBox textBox && !textBox.IsReadOnly)
-                {
-                    textBox.SelectAll();
-                }
-                else if (sender is PasswordBox passwordBox)
-                {
-                    passwordBox.SelectAll();
-                }
-            }
-        }
-
-        private void LoadAllProfiles()
-        {
-            var file = _localPath + "/connections.json";
             IList<QueryData> connections;
+            var createExamples = !File.Exists(filePath);
 
-            if (File.Exists(file))
+            if (createExamples)
             {
-                // load our previous settings
-                var encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(file));
-                var filtered = encrypted?.Where(qd => qd != null);
-                var decrypted = CreateDecryptedPasswordConnections(filtered);
-                connections = new List<QueryData>(decrypted);
-            }
-            else
-            {
-                // add some examples
-
                 connections = new List<QueryData>(new[]
                 {
                     new QueryData(DatabaseType.Excel),
@@ -306,34 +319,43 @@ namespace SCQueryConnect
                     new QueryData(DatabaseType.SharpCloudExcel)
                 });
             }
-
-            var version = SaveHelper.RegRead(SaveHelper.VersionKey, string.Empty);
-            var migrate = false;
-
-            if (!string.IsNullOrWhiteSpace(version))
+            else // load previous settings
             {
-                var regex = new Regex(@"^.* v([0-9])+\.([0-9])+\.([0-9])+\.([0-9])+$");
-                var match = regex.Match(version);
-                int.TryParse(match.Groups[1].Value, out var major);
-                int.TryParse(match.Groups[2].Value, out var minor);
-                int.TryParse(match.Groups[3].Value, out var patch);
+                IList<QueryData> encrypted;
 
-                migrate =
-                    major > 3 ||
-                    minor > 7 ||
-                    patch > 1;
+                if (migrate)
+                {
+                    encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(filePath));
+                }
+                else
+                {
+                    var saveData = SaveHelper.DeserializeJSON<SaveData>(File.ReadAllText(filePath));
+                    encrypted = saveData.Connections;
+                }
+
+                var filtered = encrypted?.Where(qd => qd != null);
+                var decrypted = CreateDecryptedPasswordConnections(filtered);
+                connections = new List<QueryData>(decrypted);
             }
 
-            if (migrate)
+            var rootLevelConnections = connections.Where(c => !c.IsFolder).ToArray();
+            var createDefaultFolder = (createExamples || migrate) && rootLevelConnections.Any();
+
+            if (createDefaultFolder)
             {
                 var defaultFolder = CreateNewFolder("My Connections");
                 defaultFolder.IsExpanded = true;
-                defaultFolder.Connections = new ObservableCollection<QueryData>(connections);
+                defaultFolder.IsSelected = true;
+                defaultFolder.Connections = new ObservableCollection<QueryData>(
+                    rootLevelConnections);
 
-                Connections = new ObservableCollection<QueryData>(new[]
+                var otherConnections = connections.Where(c => c.Connections != null);
+                var allConnections = new List<QueryData>
                 {
                     defaultFolder
-                });
+                }.Concat(otherConnections);
+
+                Connections = new ObservableCollection<QueryData>(allConnections);
             }
             else
             {
@@ -605,17 +627,6 @@ namespace SCQueryConnect
                     DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("PasswordDpapiEntropy", Convert.ToBase64String(entropy));
-
-            Directory.CreateDirectory(_localPath);
-            var connections = CreateEncryptedPasswordConnections(_connections);
-            var connectionsJson = SaveHelper.SerializeJSON(connections);
-            File.WriteAllText(_localPath + "/connections.json", connectionsJson);
-
-            if (_mainViewModel.SelectedQueryData != null)
-            {
-                SaveHelper.RegWrite("ActiveConnection", _mainViewModel.SelectedQueryData.Id);
-            }
-
             SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
             SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
@@ -629,13 +640,27 @@ namespace SCQueryConnect
                     DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
-            
-            SaveHelper.RegWrite(SaveHelper.VersionKey, _qcHelper.AppNameOnly);
+            SaveConnections();
         }
 
-        private ObservableCollection<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
+        private void SaveConnections()
         {
-            var newConnections = new ObservableCollection<QueryData>();
+            Directory.CreateDirectory(_localPath);
+            var connections = CreateEncryptedPasswordConnections(_connections);
+
+            var toSave = new SaveData
+            {
+                Connections = connections
+            };
+
+            var json = SaveHelper.SerializeJSON(toSave);
+            var path = Path.Combine(_localPath, ConnectionsFileV4);
+            File.WriteAllText(path, json);
+        }
+
+        private List<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
+        {
+            var newConnections = new List<QueryData>();
 
             foreach (var connection in connections)
             {

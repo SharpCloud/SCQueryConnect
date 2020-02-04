@@ -170,6 +170,7 @@
     <Compile Include="Models\PasswordSecurity.cs" />
     <Compile Include="Models\PublishArchitecture.cs" />
     <Compile Include="Models\PublishSettings.cs" />
+    <Compile Include="Models\SaveData.cs" />
     <Compile Include="UIDataCheckerValidityProcessor.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />

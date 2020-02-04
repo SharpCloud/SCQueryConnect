@@ -43,7 +43,7 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [IgnoreDataMember]
+        [DataMember]
         public bool IsSelected
         {
             get => _isSelected;

@@ -207,6 +207,9 @@
     <Compile Include="..\SQLUpdate\Models\QueryData.cs">
       <Link>Models\QueryData.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Models\SaveData.cs">
+      <Link>Models\SaveData.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
