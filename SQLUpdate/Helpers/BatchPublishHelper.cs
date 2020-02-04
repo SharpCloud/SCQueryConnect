@@ -2,6 +2,7 @@
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
+using SCQueryConnect.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SCQueryConnect.Helpers
 {
@@ -182,15 +184,15 @@ namespace SCQueryConnect.Helpers
                         string.Empty)
                     : queryData.FormattedConnectionString;
 
-                var passwordBytes = _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(settings.Password.Password),
-                    out var entropy,
-                    DataProtectionScope.LocalMachine);
+                var passwordBytes = GetPasswordBytes(
+                    settings.PasswordSecurity,
+                    settings.Password,
+                    out var entropy);
 
-                var proxyPasswordBytes = _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(settings.ProxyViewModel.ProxyPassword),
-                    out var proxyEntropy,
-                    DataProtectionScope.LocalMachine);
+                var proxyPasswordBytes = GetPasswordBytes(
+                    settings.PasswordSecurity,
+                    settings.ProxyViewModel,
+                    out var proxyEntropy);
 
                 var content = File.ReadAllText(configFilename);
 
@@ -232,6 +234,52 @@ namespace SCQueryConnect.Helpers
             }
 
             return null;
+        }
+
+        private byte[] GetPasswordBytes(
+            PasswordSecurity security,
+            PasswordBox password,
+            out byte[] entropy)
+        {
+            byte[] passwordBytes;
+
+            if (security == PasswordSecurity.DpapiUser)
+            {
+                passwordBytes = _encryptionHelper.Encrypt(
+                    _encryptionHelper.TextEncoding.GetBytes(password.Password),
+                    out entropy,
+                    DataProtectionScope.CurrentUser);
+            }
+            else if (security == PasswordSecurity.DpapiMachine)
+            {
+                passwordBytes = _encryptionHelper.Encrypt(
+                    _encryptionHelper.TextEncoding.GetBytes(password.Password),
+                    out entropy,
+                    DataProtectionScope.LocalMachine);
+            }
+            else
+            {
+                passwordBytes = _encryptionHelper.TextEncoding.GetBytes(
+                    password.Password);
+
+                entropy = null;
+            }
+
+            return passwordBytes;
+        }
+
+        private byte[] GetPasswordBytes(
+            PasswordSecurity security,
+            ProxyViewModel proxyViewModel,
+            out byte[] entropy)
+        {
+            var password = new PasswordBox
+            {
+                Password = proxyViewModel.ProxyPassword
+            };
+
+            var passwordBytes = GetPasswordBytes(security, password, out entropy);
+            return passwordBytes;
         }
 
         private static string ReplaceConfigSetting(

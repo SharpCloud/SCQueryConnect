@@ -12,5 +12,6 @@ namespace SCQueryConnect.Models
         public string BasePath { get; set; }
         public string Username { get; set; }
         public string SharpCloudUrl { get; set; }
+        public PasswordSecurity PasswordSecurity { get; set; }
     }
 }
