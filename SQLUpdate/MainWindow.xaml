@@ -819,7 +819,7 @@
                                     </StackPanel>
                                 </RadioButton>
 
-                                <TextBlock Text="Password Security" Foreground="{StaticResource QCBlue}" Margin="0,20,0,0" />
+                                <TextBlock Text="SharpCloud Password Security" Foreground="{StaticResource QCBlue}" Margin="0,20,0,0" />
 
                                 <RadioButton GroupName="PublishPasswordSecurity"
                                              IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=DpapiUser}">
@@ -833,7 +833,7 @@
                                              IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=DpapiMachine}">
                                     <StackPanel Style="{StaticResource RadioContent}">
                                         <TextBlock Text="Encrypted (Machine)" FontWeight="Bold" />
-                                        <TextBlock Text="Anybody with access to this computer will be able to decrypt your password" />
+                                        <TextBlock Text="Anybody with access to this computer will be able to decrypt your password." />
                                     </StackPanel>
                                 </RadioButton>
 
@@ -841,7 +841,7 @@
                                              IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=Base64}">
                                     <StackPanel Style="{StaticResource RadioContent}">
                                         <TextBlock Text="Base64 Encoded - Least Secure" FontWeight="Bold" />
-                                        <TextBlock TextWrapping="Wrap" Text="Password is not encrypted, but can be read on a different computer. Use this option if you are generating batch files for use on another computer" />
+                                        <TextBlock TextWrapping="Wrap" Text="Password is not encrypted, but can be read on a different computer. Use this option if you are generating batch files for use on another computer." />
                                     </StackPanel>
                                 </RadioButton>
                             </StackPanel>
