@@ -109,7 +109,7 @@ namespace SCQueryConnect.Helpers
                     queryData,
                     settings);
 
-                var suffix = GetFileSuffix(settings.Is32Bit);
+                var suffix = GetFileSuffix(settings);
                 var filename = $"SCSQLBatch{suffix}.exe";
                 parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
                 parentStringBuilder.AppendLine($"\"{Path.Combine(fullPath, filename)}\"");
@@ -133,7 +133,7 @@ namespace SCQueryConnect.Helpers
             QueryData queryData,
             PublishSettings settings)
         {
-            var suffix = GetFileSuffix(settings.Is32Bit);
+            var suffix = GetFileSuffix(settings);
             var zipfile = $"SCSQLBatch{suffix}.zip";
 
             var path = Path.Combine(sequenceName, queryData.Name);
@@ -218,13 +218,14 @@ namespace SCQueryConnect.Helpers
 
                 // update the Logfile
                 var logfile = $"{outputFolder}Logfile.txt";
-                var contentNotes = new List<string>();
-                contentNotes.Add($"----------------------------------------------------------------------");
-                contentNotes.Add(settings.Is32Bit
-                    ? $"32 bit (x86) Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}"
-                    : $"64 bit Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}");
-                contentNotes.Add($"----------------------------------------------------------------------");
-
+                var contentNotes = new List<string>
+                {
+                    "----------------------------------------------------------------------",
+                    GetIs32Bit(settings)
+                        ? $"32 bit (x86) Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}"
+                        : $"64 bit Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}",
+                    "----------------------------------------------------------------------"
+                };
                 File.AppendAllLines(logfile, contentNotes);
                 return outputFolder;
             }
@@ -262,7 +263,7 @@ namespace SCQueryConnect.Helpers
                 passwordBytes = _encryptionHelper.TextEncoding.GetBytes(
                     password.Password);
 
-                entropy = null;
+                entropy = new byte[0];
             }
 
             return passwordBytes;
@@ -291,6 +292,26 @@ namespace SCQueryConnect.Helpers
             return updated;
         }
 
-        private static string GetFileSuffix(bool b32bit) => b32bit ? "x86" : string.Empty;
+        private static bool GetIs32Bit(PublishSettings settings)
+        {
+            switch (settings.PublishArchitecture)
+            {
+                case PublishArchitecture.X64:
+                    return false;
+
+                case PublishArchitecture.X32:
+                    return true;
+
+                default:
+                    return IntPtr.Size == 4;
+            }
+        }
+
+        private static string GetFileSuffix(PublishSettings settings)
+        {
+            var is32Bit = GetIs32Bit(settings);
+            var suffix = is32Bit ? "x86" : string.Empty;
+            return suffix;
+        }
     }
 }

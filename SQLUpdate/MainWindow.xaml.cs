@@ -40,8 +40,6 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private static bool DetectIs32Bit => IntPtr.Size == 4;
-
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
         private Point _startPoint;
@@ -1045,7 +1043,9 @@ namespace SCQueryConnect
             }
         }
 
-        private void PublishBatchFolder(bool is32Bit)
+        private void PublishBatchFolder(
+            PasswordSecurity security,
+            PublishArchitecture architecture)
         {
             if (!ValidateCredentials())
             {
@@ -1055,12 +1055,13 @@ namespace SCQueryConnect
             var settings = new PublishSettings
             {
                 Data = SelectedQueryData,
-                Is32Bit = is32Bit,
                 Password = Password,
                 ProxyViewModel = _proxyViewModel,
                 BasePath = _localPath,
                 Username = Username.Text,
-                SharpCloudUrl = Url.Text
+                SharpCloudUrl = Url.Text,
+                PasswordSecurity = security,
+                PublishArchitecture = architecture
             };
 
             _batchPublishHelper.PublishBatchFolder(settings);
@@ -1068,42 +1069,22 @@ namespace SCQueryConnect
 
         private void PublishBatchFolderClick(object sender, RoutedEventArgs e)
         {
-            bool is32Bit;
-
-            switch (PublishArchitecture)
-            {
-                case PublishArchitecture.Auto:
-                    is32Bit = DetectIs32Bit;
-                    break;
-                
-                case PublishArchitecture.X64:
-                    is32Bit = false;
-                    break;
-                
-                case PublishArchitecture.X32:
-                    is32Bit = true;
-                    break;
-                
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            PublishBatchFolder(is32Bit);
+            PublishBatchFolder(PublishPasswordSecurity, PublishArchitecture);
         }
 
         private void PublishBatchFolderClick32(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(true);
+            PublishBatchFolder(PasswordSecurity.DpapiMachine, PublishArchitecture.X32);
         }
 
         private void PublishBatchFolderClick64(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(false);
+            PublishBatchFolder(PasswordSecurity.DpapiMachine, PublishArchitecture.X64);
         }
 
         private void PublishBatchFolderClickAuto(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(DetectIs32Bit);
+            PublishBatchFolder(PasswordSecurity.DpapiMachine, PublishArchitecture.Auto);
         }
 
         private void QueryItemTreePreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
