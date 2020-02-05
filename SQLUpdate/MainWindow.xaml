@@ -128,25 +128,67 @@
                                 <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
 
                                 <HierarchicalDataTemplate DataType="{x:Type models:QueryData}" ItemsSource="{Binding Connections}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <StackPanel.Resources>
-                                            <Style TargetType="Image">
-                                                <Setter Property="Margin" Value="5,0" />
-                                                <Setter Property="VerticalAlignment" Value="Center" />
-                                                <Setter Property="Width" Value="12" />
-                                            </Style>
-                                        </StackPanel.Resources>
+                                    <Grid Background="Transparent">
+                                        <Grid.Triggers>
+                                            <EventTrigger RoutedEvent="StackPanel.MouseEnter">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
+                                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                            
+                                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="1" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                            
+                                            <EventTrigger RoutedEvent="StackPanel.MouseLeave">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
+                                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="0" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                        </Grid.Triggers>
 
-                                        <Image Source="Images/Folder.png"
-                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
-                                        </Image>
+                                        <StackPanel Orientation="Horizontal">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="Image">
+                                                    <Setter Property="Margin" Value="5,0" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="Width" Value="12" />
+                                                </Style>
+                                            </StackPanel.Resources>
 
-                                        <Image Source="Images/Database.png"
-                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false}">
-                                        </Image>
+                                            <Image Source="Images/Folder.png"
+                                                   Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
+                                            </Image>
 
-                                        <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
-                                    </StackPanel>
+                                            <Image Source="Images/Database.png"
+                                                   Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false}">
+                                            </Image>
+
+                                            <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                        </StackPanel>
+
+                                        <Button x:Name="RunButton"
+                                                Background="Transparent"
+                                                Click="RunQueryDataClick"
+                                                FontSize="10"
+                                                HorizontalAlignment="Right"
+                                                Opacity="0"
+                                                Padding="5,0"
+                                                Visibility="Collapsed">
+                                            Run
+                                        </Button>
+                                    </Grid>
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>
                         </TreeView>
