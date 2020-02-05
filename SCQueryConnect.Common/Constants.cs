@@ -17,7 +17,7 @@
         public const string BatchQueryStringRelsKey = "queryStringRels";
         public const string BatchQueryStringPanelsKey = "queryStringPanels";
         public const string BatchQueryStringResourceUrlsKey = "queryStringResourceUrls";
-        public const string BatchLogFileKey = "LogFile";
+        public const string BatchLogFileKey = "logFile";
         public const string BatchBuildRelationshipsKey = "buildRelationships";
         public const string BatchUnpublishItemsKey = "unpublishItems";
         public const string BatchProxyKey = "proxy";
