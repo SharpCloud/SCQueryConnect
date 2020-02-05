@@ -24,3 +24,4 @@ packages/
 **/[Ss]erver/sqlite3/**
 .vs/**
 _build_output/**
+_SCSqlBatchOutput/**
