@@ -251,6 +251,14 @@
     <Compile Include="..\SQLUpdate\Views\SourceStorySettings.xaml.cs">
       <Link>Views\SourceStorySettings.xaml.cs</Link>
     </Compile>
+    <Content Include="..\_SCSqlBatchOutput\SCSQLBatch.zip">
+      <Link>SCSQLBatch.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\_SCSqlBatchOutput\SCSQLBatchx86.zip">
+      <Link>SCSQLBatchx86.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="..\SQLUpdate\app.config">
       <Link>app.config</Link>
@@ -285,14 +293,6 @@
     <Resource Include="..\SQLUpdate\Images\SharpCloud.png">
       <Link>Images\SharpCloud.png</Link>
     </Resource>
-    <Content Include="..\SQLUpdate\SCSQLBatch.zip">
-      <Link>SCSQLBatch.zip</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\SQLUpdate\SCSQLBatchx86.zip">
-      <Link>SCSQLBatchx86.zip</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="..\SQLUpdate\App.xaml">
