@@ -1116,8 +1116,11 @@ namespace SCQueryConnect
                 e.OriginalSource is FrameworkElement fe)
             {
                 var dropTarget = fe.DataContext as QueryData;
-                if (source == dropTarget)
+
+                if (source == dropTarget ||
+                    FindParent(dropTarget) == source)
                 {
+                    ResetDragDropHighlight(dropTarget);
                     return;
                 }
 
@@ -1128,9 +1131,7 @@ namespace SCQueryConnect
 
                 if (dropTarget != null)
                 {
-                    dropTarget.DragAbove = false;
-                    dropTarget.DragBelow = false;
-                    dropTarget.DragInto = false;
+                    ResetDragDropHighlight(dropTarget);
 
                     if (dropTarget.IsFolder)
                     {
@@ -1232,6 +1233,13 @@ namespace SCQueryConnect
                 queryData.DragBelow = false;
                 queryData.DragInto = false;
             }
+        }
+
+        private static void ResetDragDropHighlight(QueryData queryData)
+        {
+            queryData.DragAbove = false;
+            queryData.DragBelow = false;
+            queryData.DragInto = false;
         }
     }
 }

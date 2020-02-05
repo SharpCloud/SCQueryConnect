@@ -54,9 +54,12 @@ namespace SCQueryConnect.ViewModels
                     _selectedQueryData = value;
                     OnPropertyChanged();
 
-                    SelectedTabIndex = _selectedQueryData.IsFolder
-                        ? _lastSelectedFolderIndex
-                        : _lastSelectedConnectionIndex;
+                    if (_selectedQueryData != null)
+                    {
+                        SelectedTabIndex = _selectedQueryData.IsFolder
+                            ? _lastSelectedFolderIndex
+                            : _lastSelectedConnectionIndex;
+                    }
                 }
             }
         }
