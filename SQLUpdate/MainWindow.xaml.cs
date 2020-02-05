@@ -325,11 +325,11 @@ namespace SCQueryConnect
 
                 if (migrate)
                 {
-                    encrypted = SaveHelper.DeserializeJSON<IList<QueryData>>(File.ReadAllText(filePath));
+                    encrypted = JsonConvert.DeserializeObject<IList<QueryData>>(File.ReadAllText(filePath));
                 }
                 else
                 {
-                    var saveData = SaveHelper.DeserializeJSON<SaveData>(File.ReadAllText(filePath));
+                    var saveData = JsonConvert.DeserializeObject<SaveData>(File.ReadAllText(filePath));
                     encrypted = saveData.Connections;
                 }
 
@@ -653,7 +653,7 @@ namespace SCQueryConnect
                 Connections = connections
             };
 
-            var json = SaveHelper.SerializeJSON(toSave);
+            var json = JsonConvert.SerializeObject(toSave);
             var path = Path.Combine(_localPath, ConnectionsFileV4);
             File.WriteAllText(path, json);
         }

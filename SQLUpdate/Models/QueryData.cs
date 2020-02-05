@@ -1,14 +1,13 @@
-﻿using SCQueryConnect.Common;
+﻿using Newtonsoft.Json;
+using SCQueryConnect.Common;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 
 namespace SCQueryConnect.Models
 {
-    [DataContract]
     public class QueryData : INotifyPropertyChanged
     {
         public const string RootId = "RootId";
@@ -25,10 +24,6 @@ namespace SCQueryConnect.Models
         private bool _buildRelationships;
         private bool _unpublishItems;
 
-        [IgnoreDataMember]
-        public bool IsFolder => Connections != null;
-
-        [DataMember]
         public bool IsExpanded
         {
             get => _isExpanded;
@@ -43,7 +38,6 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public bool IsSelected
         {
             get => _isSelected;
@@ -58,7 +52,6 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public string Id
         {
             get
@@ -74,7 +67,6 @@ namespace SCQueryConnect.Models
             set => _id = value;
         }
 
-        [DataMember]
         public string Name
         {
             get => _name;
@@ -89,7 +81,6 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public string Description
         {
             get => _description;
@@ -104,14 +95,10 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public DatabaseType ConnectionType { get; set; }
-        [DataMember]
+        
         public string ConnectionsString { get; set; }
-        [DataMember]
-        public string QueryString { get; set; }
 
-        [DataMember]
         public string StoryId
         {
             get => _storyId;
@@ -132,14 +119,14 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
+        public string QueryString { get; set; }
+
         public string QueryStringRels { get; set; }
-        [DataMember]
+        
         public string QueryStringPanels { get; set; }
-        [DataMember]
+        
         public string QueryStringResourceUrls { get; set; }
 
-        [DataMember]
         public string FileName
         {
             get => _fileName;
@@ -154,7 +141,6 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public string SharePointURL
         {
             get => _sharePointUrl;
@@ -179,24 +165,22 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public DateTime? LastRunDateTime { get; set; }
-        [DataMember]
+        
         public string LogData { get; set; }
-        [DataMember]
+        
         public string SourceStoryId { get; set; }
-        [DataMember]
+        
         public string SourceStoryUserName { get; set; }
-        [DataMember]
+        
         public string SourceStoryPassword { get; set; }
-        [DataMember]
+        
         public string SourceStoryPasswordDpapi { get; set; }
-        [DataMember]
+        
         public string SourceStoryPasswordEntropy { get; set; }
-        [DataMember]
+        
         public string SourceStoryServer { get; set; }
 
-        [DataMember]
         public bool BuildRelationships
         {
             get => _buildRelationships;
@@ -211,7 +195,6 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [DataMember]
         public bool UnpublishItems
         {
             get => _unpublishItems;
@@ -226,15 +209,21 @@ namespace SCQueryConnect.Models
             }
         }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
+        public bool IsFolder => Connections != null;
+
+        [JsonIgnore]
         public DataView QueryResults { get; set; }
-        [IgnoreDataMember]
+
+        [JsonIgnore]
         public DataView QueryResultsRels { get; set; }
-        [IgnoreDataMember]
+        
+        [JsonIgnore]
         public DataView QueryResultsPanels { get; set; }
-        [IgnoreDataMember]
+        
+        [JsonIgnore]
         public DataView QueryResultsResourceUrls { get; set; }
-        [DataMember]
+
         public ObservableCollection<QueryData> Connections
         {
             get => _connections;
@@ -249,6 +238,7 @@ namespace SCQueryConnect.Models
             }
         }
 
+        [JsonIgnore]
         public string FormattedConnectionString => ConnectionsString
             ?.Replace("{0}", FileName)
             .Replace("{1}", SharePointURL)
@@ -257,6 +247,7 @@ namespace SCQueryConnect.Models
             .Replace("{source-story-password}", SourceStoryPassword)
             .Replace("{source-story-server}", SourceStoryServer);
 
+        [JsonIgnore]
         public string GetBatchDBType
         {
             get
@@ -279,6 +270,7 @@ namespace SCQueryConnect.Models
             }
         }
 
+        [JsonIgnore]
         public string LastRunDate
         {
             get
@@ -293,9 +285,23 @@ namespace SCQueryConnect.Models
             }
         }
 
-        public override string ToString()
+        [JsonIgnore]
+        public string ExampleRelQuery
         {
-            return Name;
+            get
+            {
+                if (IsFolder)
+                {
+                    return null;
+                }
+
+                switch (ConnectionType)
+                {
+                    case DatabaseType.Excel:
+                        return "SELECT * from [Sheet2$]";
+                }
+                return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+            }
         }
 
         public QueryData()
@@ -413,22 +419,9 @@ namespace SCQueryConnect.Models
             }
         }
 
-        public string ExampleRelQuery
+        public override string ToString()
         {
-            get
-            {
-                if (IsFolder)
-                {
-                    return null;
-                }
-
-                switch (ConnectionType)
-                {
-                    case DatabaseType.Excel:
-                        return "SELECT * from [Sheet2$]";
-                }
-                return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
-            }
+            return Name;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

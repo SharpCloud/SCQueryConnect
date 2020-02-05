@@ -1,64 +1,10 @@
 ﻿using Microsoft.Win32;
-using SCQueryConnect.Interfaces;
-using System;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Windows;
 
 namespace SCQueryConnect.Helpers
 {
     public class SaveHelper
     {
         private const string RegKey = "SOFTWARE\\SharpCloud\\SQLUpdate";
-
-        /// <summary>
-        /// Serializes the JSON.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj">The obj.</param>
-        /// <returns></returns>
-        public static string SerializeJSON<T>(T obj)
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
-
-                try
-                {
-                    serializer.WriteObject(stream, obj);
-                    stream.Position = 0;
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                }
-            }
-            return "";
-        }
-
-        /// <summary>
-        /// Deserializes the JSON.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="json">The json.</param>
-        /// <returns></returns>
-        public static T DeserializeJSON<T>(string json)
-        {
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
-            using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json)))
-            {
-                ms.Position = 0;
-                T obj = (T)serializer.ReadObject(ms);
-                if (obj is IPostDeserializeAction<T>)
-                    ((IPostDeserializeAction<T>)obj).OnPostDeserialization(obj);
-                return obj;
-            }
-        }
 
         public static string RegRead(string keyName, string defVal)
         {
