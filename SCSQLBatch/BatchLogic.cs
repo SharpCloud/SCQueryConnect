@@ -29,25 +29,27 @@ namespace SCSQLBatch
 
         public async Task Run()
         {
-            var userid = _configurationReader.Get("userid");
-            var password = _configurationReader.Get("password");
-            var password64 = _configurationReader.Get("password64");
-            var passwordDpapi = _configurationReader.Get("passwordDpapi");
-            var passwordDpapiEntropy = _configurationReader.Get("passwordDpapiEntropy");
-            var url = _configurationReader.Get("url");
-            var storyid = _configurationReader.Get("storyid");
-            var connectionString = _configurationReader.Get("connectionString");
-            var queryString = _configurationReader.Get("queryString");
-            var queryStringRels = _configurationReader.Get("queryStringRels");
-            bool.TryParse(_configurationReader.Get("buildRelationships"), out var buildRelationships);
-            bool.TryParse(_configurationReader.Get("unpublishItems"), out var unpubItems);
-            var proxy = _configurationReader.Get("proxy");
-            bool.TryParse(_configurationReader.Get("proxyAnonymous"), out var proxyAnonymous);
-            var proxyUsername = _configurationReader.Get("proxyUsername");
-            var proxyPassword = _configurationReader.Get("proxyPassword");
-            var proxyPassword64 = _configurationReader.Get("proxyPassword64");
-            var proxyPasswordDpapi = _configurationReader.Get("proxyPasswordDpapi");
-            var proxyPasswordDpapiEntropy = _configurationReader.Get("proxyPasswordDpapiEntropy");
+            var userid = _configurationReader.Get(Constants.BatchUserIdKey);
+            var password = _configurationReader.Get(Constants.BatchPasswordKey);
+            var password64 = _configurationReader.Get(Constants.BatchPassword64Key);
+            var passwordDpapi = _configurationReader.Get(Constants.BatchPasswordDpapiKey);
+            var passwordDpapiEntropy = _configurationReader.Get(Constants.BatchPasswordDpapiEntropyKey);
+            var url = _configurationReader.Get(Constants.BatchUrlKey);
+            var storyId = _configurationReader.Get(Constants.BatchStoryIdKey);
+            var connectionString = _configurationReader.Get(Constants.BatchConnectionStringKey);
+            var queryString = _configurationReader.Get(Constants.BatchQueryStringKey);
+            var queryStringRels = _configurationReader.Get(Constants.BatchQueryStringRelsKey);
+            var queryStringPanelsKey = _configurationReader.Get(Constants.BatchQueryStringPanelsKey);
+            var queryStringResourceUrlsKey = _configurationReader.Get(Constants.BatchQueryStringResourceUrlsKey);
+            bool.TryParse(_configurationReader.Get(Constants.BatchBuildRelationshipsKey), out var buildRelationships);
+            bool.TryParse(_configurationReader.Get(Constants.BatchUnpublishItemsKey), out var unpublishItems);
+            var proxy = _configurationReader.Get(Constants.BatchProxyKey);
+            bool.TryParse(_configurationReader.Get(Constants.BatchProxyAnonymousKey), out var proxyAnonymous);
+            var proxyUsername = _configurationReader.Get(Constants.BatchProxyUsernameKey);
+            var proxyPassword = _configurationReader.Get(Constants.BatchProxyPasswordKey);
+            var proxyPassword64 = _configurationReader.Get(Constants.BatchProxyPassword64Key);
+            var proxyPasswordDpapi = _configurationReader.Get(Constants.BatchProxyPasswordDpapiKey);
+            var proxyPasswordDpapiEntropy = _configurationReader.Get(Constants.BatchProxyPasswordDpapiEntropyKey);
 
             // basic checks
             if (string.IsNullOrEmpty(userid) || userid == "USERID")
@@ -89,7 +91,7 @@ namespace SCSQLBatch
                 return;
             }
 
-            if (string.IsNullOrEmpty(storyid) || userid == "00000000-0000-0000-0000-000000000000")
+            if (string.IsNullOrEmpty(storyId) || userid == "00000000-0000-0000-0000-000000000000")
             {
                 await _logger.Log("Error: No storyID provided.");
                 return;
@@ -151,13 +153,15 @@ namespace SCSQLBatch
             var settings = new UpdateSettings
             {
                 BuildRelationships = buildRelationships,
-                TargetStoryId = storyid,
+                TargetStoryId = storyId,
                 QueryString = queryString,
                 QueryStringRels = queryStringRels,
+                QueryStringPanels = queryStringPanelsKey,
+                QueryStringResourceUrls = queryStringResourceUrlsKey,
                 ConnectionString = connectionString,
                 DBType = dbType,
                 MaxRowCount = 1000,
-                UnpublishItems = unpubItems
+                UnpublishItems = unpublishItems
             };
 
             await _qcHelper.UpdateSharpCloud(config, settings);
@@ -165,7 +169,7 @@ namespace SCSQLBatch
 
         private DatabaseType GetDbType()
         {
-            var dbType = _configurationReader.Get("dbType");
+            var dbType = _configurationReader.Get(Constants.BatchDBTypeKey);
 
             switch (dbType)
             {

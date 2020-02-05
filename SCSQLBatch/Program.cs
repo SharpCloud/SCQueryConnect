@@ -35,7 +35,7 @@ namespace SCSQLBatch
             builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>();
             
-            var logFile = ConfigurationManager.AppSettings["LogFile"];
+            var logFile = ConfigurationManager.AppSettings[Constants.BatchLogFileKey];
             builder.RegisterType<ConsoleLogger>().As<ILog>().WithParameter("logFile", logFile);
             
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>();

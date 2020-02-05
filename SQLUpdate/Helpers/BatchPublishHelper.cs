@@ -198,22 +198,22 @@ namespace SCQueryConnect.Helpers
 
                 var appSettings = new List<string>
                 {
-                    GetAppSettingText("userid", settings.Username),
-                    GetAppSettingText("url", settings.SharpCloudUrl),
-                    GetAppSettingText("storyid", queryData.StoryId),
-                    GetAppSettingText("dbType", queryData.GetBatchDBType),
-                    GetAppSettingText("connectionString", Sanitize(formattedConnection)),
-                    GetAppSettingText("queryString", Sanitize(queryData.QueryString)),
-                    GetAppSettingText("queryStringRels", Sanitize(queryData.QueryStringRels)),
-                    "    <!-- Add a path to log file if required - leave blank for no logging -->",
-                    GetAppSettingText("LogFile", "Logfile.txt"),
-                    GetAppSettingText("buildRelationships", queryData.BuildRelationships.ToString()),
-                    GetAppSettingText("unpublishItems", queryData.UnpublishItems.ToString()),
-                    GetAppSettingText("proxy", settings.ProxyViewModel.Proxy),
-                    GetAppSettingText("proxyAnonymous", settings.ProxyViewModel.ProxyAnnonymous.ToString()),
-                    GetAppSettingText("proxyUsername", settings.ProxyViewModel.ProxyUserName),
-                    
-                    GetAppSettingText("ClientSettingsProvider.ServiceUri", string.Empty)
+                    GetAppSettingText(Constants.BatchUserIdKey, settings.Username),
+                    GetAppSettingText(Constants.BatchUrlKey, settings.SharpCloudUrl),
+                    GetAppSettingText(Constants.BatchStoryIdKey, queryData.StoryId),
+                    GetAppSettingText(Constants.BatchDBTypeKey, queryData.GetBatchDBType),
+                    GetAppSettingText(Constants.BatchConnectionStringKey, Sanitize(formattedConnection)),
+                    GetAppSettingText(Constants.BatchQueryStringKey, Sanitize(queryData.QueryString)),
+                    GetAppSettingText(Constants.BatchQueryStringRelsKey, Sanitize(queryData.QueryStringRels)),
+                    GetAppSettingText(Constants.BatchQueryStringPanelsKey, Sanitize(queryData.QueryStringPanels)),
+                    GetAppSettingText(Constants.BatchQueryStringResourceUrlsKey , Sanitize(queryData.QueryStringResourceUrls)),
+                    "<!-- Add a path to log file if required - leave blank for no logging -->",
+                    GetAppSettingText(Constants.BatchLogFileKey, "Logfile.txt"),
+                    GetAppSettingText(Constants.BatchBuildRelationshipsKey, queryData.BuildRelationships.ToString()),
+                    GetAppSettingText(Constants.BatchUnpublishItemsKey, queryData.UnpublishItems.ToString()),
+                    GetAppSettingText(Constants.BatchProxyKey, settings.ProxyViewModel.Proxy),
+                    GetAppSettingText(Constants.BatchProxyAnonymousKey, settings.ProxyViewModel.ProxyAnnonymous.ToString()),
+                    GetAppSettingText(Constants.BatchProxyUsernameKey, settings.ProxyViewModel.ProxyUserName),
                 };
 
                 string[] passwords;
@@ -221,23 +221,24 @@ namespace SCQueryConnect.Helpers
                 {
                     passwords = new[]
                     {
-                        GetAppSettingText("password64", Convert.ToBase64String(passwordBytes)),
-                        GetAppSettingText("proxyPassword64", Convert.ToBase64String(entropy))
+                        GetAppSettingText(Constants.BatchPassword64Key, Convert.ToBase64String(passwordBytes)),
+                        GetAppSettingText(Constants.BatchProxyPassword64Key, Convert.ToBase64String(entropy))
                     };
                 }
                 else
                 {
                     passwords = new[]
                     {
-                        GetAppSettingText("passwordDpapi", Convert.ToBase64String(passwordBytes)),
-                        GetAppSettingText("passwordDpapiEntropy", Convert.ToBase64String(entropy)),
-                        GetAppSettingText("proxyPasswordDpapi", Convert.ToBase64String(proxyPasswordBytes)),
-                        GetAppSettingText("proxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy))
+                        GetAppSettingText(Constants.BatchPasswordDpapiKey, Convert.ToBase64String(passwordBytes)),
+                        GetAppSettingText(Constants.BatchPasswordDpapiEntropyKey, Convert.ToBase64String(entropy)),
+                        GetAppSettingText(Constants.BatchProxyPasswordDpapiKey, Convert.ToBase64String(proxyPasswordBytes)),
+                        GetAppSettingText(Constants.BatchProxyPasswordDpapiEntropyKey, Convert.ToBase64String(proxyEntropy))
                     };
                 }
 
                 appSettings.AddRange(passwords);
-                var appSettingsString = string.Join(Environment.NewLine, appSettings);
+                var indented = appSettings.Select(s => $"    {s}");
+                var appSettingsString = string.Join(Environment.NewLine, indented);
                 var configText = content.Replace("{appSettings}", appSettingsString);
                 File.WriteAllText(configFilename, configText);
 
@@ -331,7 +332,7 @@ namespace SCQueryConnect.Helpers
         }
 
         private static string GetAppSettingText(string key, string value)
-            => $"    <add key=\"{key}\" value=\"{value}\" />";
+            => $"<add key=\"{key}\" value=\"{value}\" />";
 
         private static string Sanitize(string input)
             => input.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'");
