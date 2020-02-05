@@ -476,7 +476,7 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBlock x:Name="txtExampleRels" Grid.Row="0" Text="Example:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right">
+                                    <TextBlock x:Name="txtExampleRels" Grid.Row="0" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right">
                                         <Run Text="Example:" />
                                         <Run Text="{Binding ExampleRelQuery, Mode=OneWay}" />
                                     </TextBlock>
