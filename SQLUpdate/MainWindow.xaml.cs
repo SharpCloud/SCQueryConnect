@@ -1078,6 +1078,31 @@ namespace SCQueryConnect
 
         private void QueryItemTreeDragEnter(object sender, DragEventArgs e)
         {
+            if (e.Data.GetData(typeof(QueryData)) is QueryData source &&
+                e.OriginalSource is FrameworkElement fe &&
+                fe.DataContext is QueryData dropTarget &&
+                source != dropTarget)
+            {
+                if (dropTarget.IsFolder)
+                {
+                    dropTarget.DragInto = true;
+                }
+                else
+                {
+                    var mousePos = e.GetPosition(this);
+                    var diff = _startPoint - mousePos;
+
+                    if (diff.Y > 0)
+                    {
+                        dropTarget.DragAbove = true;
+                    }
+                    else if (diff.Y < 0)
+                    {
+                        dropTarget.DragBelow = true;
+                    }
+                }
+            }
+
             e.Effects = sender is TreeViewItem
                 ? DragDropEffects.Move
                 : DragDropEffects.None;
@@ -1103,6 +1128,10 @@ namespace SCQueryConnect
 
                 if (dropTarget != null)
                 {
+                    dropTarget.DragAbove = false;
+                    dropTarget.DragBelow = false;
+                    dropTarget.DragInto = false;
+
                     if (dropTarget.IsFolder)
                     {
                         updatedSourceParent = dropTarget;
@@ -1192,6 +1221,17 @@ namespace SCQueryConnect
 
             _mainViewModel.UpdateMessage = string.Empty;
             await Task.Delay(20);
+        }
+
+        private void QueryItemTreeDragLeave(object sender, DragEventArgs e)
+        {
+            if (sender is FrameworkElement fe &&
+                fe.DataContext is QueryData queryData)
+            {
+                queryData.DragAbove = false;
+                queryData.DragBelow = false;
+                queryData.DragInto = false;
+            }
         }
     }
 }

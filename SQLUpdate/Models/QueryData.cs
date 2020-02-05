@@ -11,7 +11,10 @@ namespace SCQueryConnect.Models
     public class QueryData : INotifyPropertyChanged
     {
         public const string RootId = "RootId";
-
+        
+        private bool _dragAbove;
+        private bool _dragBelow;
+        private bool _dragInto;
         private bool _isExpanded;
         private bool _isSelected;
         private string _id;
@@ -301,6 +304,51 @@ namespace SCQueryConnect.Models
                         return "SELECT * from [Sheet2$]";
                 }
                 return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
+            }
+        }
+        
+        [JsonIgnore]
+        public bool DragAbove
+        {
+            get => _dragAbove;
+
+            set
+            {
+                if (_dragAbove != value)
+                {
+                    _dragAbove = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+        [JsonIgnore]
+        public bool DragBelow
+        {
+            get => _dragBelow;
+
+            set
+            {
+                if (_dragBelow != value)
+                {
+                    _dragBelow = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+        [JsonIgnore]
+        public bool DragInto
+        {
+            get => _dragInto;
+
+            set
+            {
+                if (_dragInto != value)
+                {
+                    _dragInto = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
