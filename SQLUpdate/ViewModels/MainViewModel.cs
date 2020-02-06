@@ -13,6 +13,7 @@ namespace SCQueryConnect.ViewModels
         private int _lastSelectedConnectionIndex;
         private int _lastSelectedFolderIndex = 3; // index of 'Connections Folder' tab
         private int _selectedTabIndex;
+        private string _publishTabHeader;
         private string _updateMessage;
 
         public PasswordSecurity PublishPasswordSecurity
@@ -56,9 +57,16 @@ namespace SCQueryConnect.ViewModels
 
                     if (_selectedQueryData != null)
                     {
-                        SelectedTabIndex = _selectedQueryData.IsFolder
-                            ? _lastSelectedFolderIndex
-                            : _lastSelectedConnectionIndex;
+                        if (_selectedQueryData.IsFolder)
+                        {
+                            PublishTabHeader = "2. Publish";
+                            SelectedTabIndex = _lastSelectedFolderIndex;
+                        }
+                        else
+                        {
+                            PublishTabHeader = "4. Publish";
+                            SelectedTabIndex = _lastSelectedConnectionIndex;
+                        }
                     }
                 }
             }
@@ -92,14 +100,31 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public string UpdateMessage
+        public string PublishTabHeader
         {
-            get => _updateMessage;
+            get => _publishTabHeader;
             
             set
             {
-                _updateMessage = value;
-                OnPropertyChanged();
+                if (_publishTabHeader != value)
+                {
+                    _publishTabHeader = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string UpdateMessage
+        {
+            get => _updateMessage;
+
+            set
+            {
+                if (_updateMessage != value)
+                {
+                    _updateMessage = value;
+                    OnPropertyChanged();
+                }
             }
         }
 

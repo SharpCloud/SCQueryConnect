@@ -346,7 +346,7 @@
                         <commands:GoToUrl x:Key="GoToUrl"/>
                     </TabControl.Resources>
 
-                    <TabItem Header="Database Connection"
+                    <TabItem Header="1. Database Connection"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -518,7 +518,7 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="Query"
+                    <TabItem Header="2. Queries"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <TabControl Background="{StaticResource QCBackground}">
                             <TabControl.Resources>
@@ -683,7 +683,7 @@
                         </TabControl>
                     </TabItem>
 
-                    <TabItem Header="Update Story"
+                    <TabItem Header="3. Update Story"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
@@ -751,7 +751,7 @@
                     </TabItem>
 
                     <!-- Connection Folder Config -->
-                    <TabItem Header="Connections Folder"
+                    <TabItem Header="1. Connections Folder"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid Margin="5">
@@ -836,7 +836,7 @@
                     </TabItem>
 
                     <!-- Folder Publish Config -->
-                    <TabItem Header="Publish">
+                    <TabItem Header="{Binding MainViewModel.PublishTabHeader, Source={StaticResource ViewModelLocator}}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
                                 <RowDefinition />
