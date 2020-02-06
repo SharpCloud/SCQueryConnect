@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -125,6 +126,8 @@ namespace SCQueryConnect
         private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IResourceUrlDataChecker _resourceUrlDataChecker;
         private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
+        private readonly RichTextBoxLoggingDestination _storyLoggingDestination;
+        private readonly RichTextBoxLoggingDestination _folderLoggingDestination;
 
         public MainWindow(
             IBatchPublishHelper batchPublishHelper,
@@ -180,8 +183,12 @@ namespace SCQueryConnect
             _resourceUrlDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrResourceUrls);
 
             _logger = (MultiDestinationLogger) logger;
-            _logger.PushLoggingDestination(new TextBoxLoggingDestination(tbResults));
-            _logger.PushLoggingDestination(new TextBoxLoggingDestination(tbFolderResults));
+            
+            _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
+            _logger.PushLoggingDestination(_storyLoggingDestination);
+            
+            _folderLoggingDestination  = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
+            _logger.PushLoggingDestination(_folderLoggingDestination);
 
             _qcHelper = qcHelper;
         }
@@ -890,7 +897,7 @@ namespace SCQueryConnect
             BrowserTabs.SelectedIndex = 0; // go back to the first tab
         }
 
-        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private async void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             _mainViewModel.SelectedQueryData = e.NewValue as QueryData;
 
@@ -901,11 +908,14 @@ namespace SCQueryConnect
 
             if (_mainViewModel.SelectedQueryData.IsFolder)
             {
-                tbFolderResults.Text = _mainViewModel.SelectedQueryData.LogData;
+                await _folderLoggingDestination.SetLogText(
+                    _mainViewModel.SelectedQueryData.LogData);
             }
             else
             {
-                tbResults.Text = _mainViewModel.SelectedQueryData.LogData;
+                await _storyLoggingDestination.SetLogText(
+                    _mainViewModel.SelectedQueryData.LogData);
+
                 DataGrid.ItemsSource = _mainViewModel.SelectedQueryData.QueryResults;
                 DataGridRels.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsRels;
                 DataGridResourceUrls.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsResourceUrls;
@@ -996,28 +1006,6 @@ namespace SCQueryConnect
         private void QC_Data_Folder_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", _localPath);
-        }
-
-        private void TbResultsTextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                if (textBox.Text.Contains("ERROR"))
-                {
-                    textBox.Background = Brushes.DarkRed;
-                    textBox.Foreground = Brushes.Pink;
-                }
-                else if (textBox.Text.Contains("WARNING"))
-                {
-                    textBox.Background = Brushes.DarkGoldenrod;
-                    textBox.Foreground = Brushes.LightGoldenrodYellow;
-                }
-                else
-                {
-                    textBox.Background = (SolidColorBrush)Application.Current.Resources["QCBackground"];
-                    textBox.Foreground = (SolidColorBrush) Application.Current.Resources["QCBlue"];
-                }
-            }
         }
 
         private void PublishBatchFolder(
@@ -1196,7 +1184,7 @@ namespace SCQueryConnect
             else
             {
                 _mainViewModel.UpdateMessage = $"Running {qd.Name}...";
-                await _logger.Log($"--- Running '{qd.Name}'");
+                await _logger.Log($"Running '{qd.Name}'...");
                 await UpdateSharpCloud(qd);
             }
 

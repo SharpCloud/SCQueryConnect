@@ -188,8 +188,8 @@
     <Compile Include="..\SQLUpdate\Logging\QueryDataLoggingDestination.cs">
       <Link>Logging\QueryDataLoggingDestination.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Logging\TextboxLoggingDestination.cs">
-      <Link>Logging\TextboxLoggingDestination.cs</Link>
+    <Compile Include="..\SQLUpdate\Logging\RichTextBoxLoggingDestination.cs">
+      <Link>Logging\RichTextBoxLoggingDestination.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>

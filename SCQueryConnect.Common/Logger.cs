@@ -18,7 +18,7 @@ namespace SCQueryConnect.Common
                 ? string.Empty
                 : Environment.NewLine;
             
-            return $"{timestamp} {message}{lineEnd}";
+            return $"[{timestamp}] {message}{lineEnd}";
         }
     }
 }

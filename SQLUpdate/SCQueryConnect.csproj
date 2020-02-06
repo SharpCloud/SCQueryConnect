@@ -165,7 +165,7 @@
     <Compile Include="Logging\LoggingDestination.cs" />
     <Compile Include="Logging\MultiDestinationLogger.cs" />
     <Compile Include="Logging\QueryDataLoggingDestination.cs" />
-    <Compile Include="Logging\TextBoxLoggingDestination.cs" />
+    <Compile Include="Logging\RichTextBoxLoggingDestination.cs" />
     <Compile Include="Models\PasswordSecurity.cs" />
     <Compile Include="Models\PublishArchitecture.cs" />
     <Compile Include="Models\PublishSettings.cs" />
