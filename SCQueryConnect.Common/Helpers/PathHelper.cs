@@ -10,16 +10,22 @@ namespace SCQueryConnect.Common.Helpers
         {
             string output;
 
-            try
-            {
-                var uri = new Uri(path, UriKind.Absolute);
-                output = path;
-            }
-            catch (UriFormatException)
+            var isAbsolute =
+                Path.IsPathRooted(path) &&
+                !string.IsNullOrWhiteSpace(path) &&
+                !Path.GetPathRoot(path).Equals(
+                    Path.DirectorySeparatorChar.ToString(),
+                    StringComparison.Ordinal);
+
+            if (!isAbsolute)
             {
                 var dllPath = Assembly.GetExecutingAssembly().Location;
                 var dir = Path.GetDirectoryName(dllPath);
                 output = Path.Combine(dir, path);
+            }
+            else
+            {
+                output = path;
             }
 
             return output;
