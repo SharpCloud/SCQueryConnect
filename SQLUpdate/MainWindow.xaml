@@ -184,7 +184,7 @@
                                             </EventTrigger>
                                         </Grid.Triggers>
 
-                                        <Border Background="#3DDADADA">
+                                        <Border Background="#3DDADADA" IsHitTestVisible="False">
                                             <Border.Style>
                                                 <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
                                                     <Style.Triggers>
@@ -202,7 +202,7 @@
                                             </Border.Style>
                                         </Border>
 
-                                        <Border>
+                                        <Border IsHitTestVisible="False">
                                             <Border.Background>
                                                 <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource DragDropGradient}" />
                                             </Border.Background>
@@ -224,7 +224,7 @@
                                             </Border.Style>
                                         </Border>
 
-                                        <Border>
+                                        <Border IsHitTestVisible="False">
                                             <Border.Background>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" GradientStops="{StaticResource DragDropGradient}" />
                                             </Border.Background>
@@ -246,7 +246,7 @@
                                             </Border.Style>
                                         </Border>
 
-                                        <StackPanel Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal" IsHitTestVisible="False">
                                             <StackPanel.Resources>
                                                 <Style TargetType="Image">
                                                     <Setter Property="Margin" Value="5,0" />
