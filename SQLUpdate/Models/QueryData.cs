@@ -4,14 +4,21 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace SCQueryConnect.Models
 {
     public class QueryData : INotifyPropertyChanged
     {
         public const string RootId = "RootId";
-        
+
+        private static readonly char[] NewLineSeparators = {'\r', '\n'};
+
+        private readonly Regex _errorRegex = new Regex(Logger.ErrorPrefix);
+        private readonly Regex _warningRegex = new Regex(Logger.WarningPrefix);
+
         private bool _dragAbove;
         private bool _dragBelow;
         private bool _dragInto;
@@ -26,6 +33,8 @@ namespace SCQueryConnect.Models
         private string _storyId;
         private bool _buildRelationships;
         private bool _unpublishItems;
+        private string _issueSummary;
+        private string _logData;
 
         public bool IsExpanded
         {
@@ -169,9 +178,22 @@ namespace SCQueryConnect.Models
         }
 
         public DateTime? LastRunDateTime { get; set; }
-        
-        public string LogData { get; set; }
-        
+
+        public string LogData
+        {
+            get => _logData;
+
+            set
+            {
+                _logData = value;
+
+                var entries = _logData.Split(NewLineSeparators);
+                var errorCount = entries.Count(_errorRegex.IsMatch);
+                var warningCount = entries.Count(_warningRegex.IsMatch);
+                IssueSummary = $"{errorCount} error(s), {warningCount} warning(s)";
+            }
+        }
+
         public string SourceStoryId { get; set; }
         
         public string SourceStoryUserName { get; set; }
@@ -347,6 +369,21 @@ namespace SCQueryConnect.Models
                 if (_dragInto != value)
                 {
                     _dragInto = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public string IssueSummary
+        {
+            get => _issueSummary;
+
+            set
+            {
+                if (_issueSummary != value)
+                {
+                    _issueSummary = value;
                     OnPropertyChanged();
                 }
             }

@@ -730,11 +730,15 @@
                             <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
 
                             <Grid Grid.Row="2">
-                                <TextBlock Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" Margin="5"></TextBlock>
-                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="5">
-                                    <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="5,0"></TextBlock>
-                                    <TextBlock Text="{Binding LastRunDate, FallbackValue='Now'}" TextAlignment="Right" Foreground="White" Margin="5,0"></TextBlock>
-                                </StackPanel>
+                                <TextBlock Foreground="{StaticResource QCBlue}" Margin="5">
+                                    <Run Text="Update Results:" />
+                                    <Run Text="{Binding IssueSummary}" />
+                                </TextBlock>
+
+                                <TextBlock HorizontalAlignment="Right" Margin="5">
+                                    <Run Text="Last Ran:" Foreground="{StaticResource QCBlue}" />
+                                    <Run Text="{Binding LastRunDate, FallbackValue='Now', Mode=OneWay}" Foreground="White" />
+                                </TextBlock>
 
                                 <RichTextBox x:Name="StoryUpdateLogOutput"
                                              AcceptsReturn="True"
@@ -813,12 +817,15 @@
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Row="0" Text="Update Results:" TextAlignment="Left" Foreground="{StaticResource QCBlue}" />
+                                    <TextBlock Grid.Row="0" Foreground="{StaticResource QCBlue}">
+                                        <Run Text="Update Results:" />
+                                        <Run Text="{Binding IssueSummary}" />
+                                    </TextBlock>
 
-                                    <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
-                                        <TextBlock Text="Last Ran:" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="0,0,10,0" />
-                                        <TextBlock Text="{Binding LastRunDate}" TextAlignment="Right" Foreground="White" />
-                                    </StackPanel>
+                                    <TextBlock Grid.Row="0" HorizontalAlignment="Right" Margin="5,0">
+                                        <Run Text="Last Ran:" Foreground="{StaticResource QCBlue}" />
+                                        <Run Text="{Binding LastRunDate, Mode=OneWay}" Foreground="White" />
+                                    </TextBlock>
 
                                     <RichTextBox x:Name="FolderUpdateLogOutput"
                                                  AcceptsReturn="True"
