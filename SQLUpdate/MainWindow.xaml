@@ -309,27 +309,27 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Click="NewQueryFolderClick" Background="{StaticResource QCBlue}">
+                    <Button Grid.Column="0" Click="NewQueryFolderClick" Background="{StaticResource QCBlue}" ToolTip="Add a new folder">
                         <Image Source="Images/Folder_white.png" Width="24" />
                     </Button>
 
-                    <Button Grid.Column="1" Click="NewConnectionClick" Background="{StaticResource QCBlue}">
+                    <Button Grid.Column="1" Click="NewConnectionClick" Background="{StaticResource QCBlue}" ToolTip="Add a new connection">
                         <Image Source="Images/Database_white.png" Width="24" />
                     </Button>
 
-                    <Button Grid.Column="2" Click="MoveConnectionUp">
+                    <Button Grid.Column="2" Click="MoveConnectionUp" ToolTip="Move selected connection/folder up within its folder">
                         <Image Source="Images/Up_white.png" Width="20" />
                     </Button>
 
-                    <Button Grid.Column="3" Click="MoveConnectionDown">
+                    <Button Grid.Column="3" Click="MoveConnectionDown" ToolTip="Move selected connection/folder down within its folder">
                         <Image Source="Images/Down_white.png" Width="20" />
                     </Button>
-                    
-                    <Button Grid.Column="4" Click="CopyConnectionClick">
+
+                    <Button Grid.Column="4" Click="CopyConnectionClick" ToolTip="Copy selected connection/folder">
                         <Image Source="Images/Copy_white.png" Width="22" />
                     </Button>
-                    
-                    <Button Grid.Column="5" Click="DeleteConnectionClick" Background="Red">
+
+                    <Button Grid.Column="5" Click="DeleteConnectionClick" Background="Red" ToolTip="Remove selected connection/folder: all connections and folders within selected folders will also be removed">
                         <Image Source="Images/Bin_white.png" Width="20" />
                     </Button>
                 </Grid>
