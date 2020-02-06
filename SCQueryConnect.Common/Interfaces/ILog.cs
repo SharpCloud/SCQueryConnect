@@ -6,5 +6,7 @@ namespace SCQueryConnect.Common.Interfaces
     {
         Task Clear();
         Task Log(string text);
+        Task LogError(string text);
+        Task LogWarning(string text);
     }
 }

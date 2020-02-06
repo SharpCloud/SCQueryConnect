@@ -111,7 +111,7 @@ namespace SCQueryConnect.Common.Helpers
                 {
                     if (!_relationshipsDataChecker.CheckData(reader))
                     {
-                        await LogError("Invalid SQL");
+                        await _logger.LogError("Invalid SQL");
                         return;
                     }
 
@@ -332,11 +332,11 @@ namespace SCQueryConnect.Common.Helpers
                     $"  * If that doesn't fix the problem, try installing the Microsoft Access Database Engine 2010 Redistributable. " +
                     $"You can find this by clicking on the 'Download tools for Excel/Access' link on the 'About' tab in Query Connect.";
 
-                await LogError($"{message}{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                await _logger.LogError($"{message}{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
             catch (Exception ex)
             {
-                await LogError(ex.Message + Environment.NewLine + ex.StackTrace);
+                await _logger.LogError(ex.Message + Environment.NewLine + ex.StackTrace);
             }
             finally
             {
@@ -368,8 +368,8 @@ namespace SCQueryConnect.Common.Helpers
 
             if (attribsToTest.Count == 0)
             {
-                await LogWarning("No Related attributes detected.");
-                await LogWarning("Make sure you are using a text attribute called 'Related_<CategoryName>' or just 'RelatedItems'");
+                await _logger.LogWarning("No Related attributes detected.");
+                await _logger.LogWarning("Make sure you are using a text attribute called 'Related_<CategoryName>' or just 'RelatedItems'");
                 return;
             }
 
@@ -546,7 +546,7 @@ namespace SCQueryConnect.Common.Helpers
                                     }
                                     catch (FieldAccessException ex)
                                     {
-                                        await LogError(ex.Message);
+                                        await _logger.LogError(ex.Message);
                                     }
                                 }
                             }
@@ -572,16 +572,6 @@ namespace SCQueryConnect.Common.Helpers
                     }
                 }
             }
-        }
-
-        private async Task LogError(string message)
-        {
-            await _logger.Log($"ERROR: {message}");
-        }
-
-        private async Task LogWarning(string message)
-        {
-            await _logger.Log($"WARNING: {message}");
         }
 
         private async Task GetResourceUrlMetadata(
@@ -630,7 +620,7 @@ namespace SCQueryConnect.Common.Helpers
                 }
                 else
                 {
-                    await LogWarning($"Cannot find item with external ID: {m.ItemExternalId}");
+                    await _logger.LogWarning($"Cannot find item with external ID: {m.ItemExternalId}");
                 }
             }
         }
@@ -670,7 +660,7 @@ namespace SCQueryConnect.Common.Helpers
 
                     var valid = string.Join(", ", validValues);
 
-                    await LogWarning(
+                    await _logger.LogWarning(
                         $"Unrecognized panel type '{panelTypeString}' ignored. Valid values are [{valid}]");
                 }
 
@@ -691,7 +681,7 @@ namespace SCQueryConnect.Common.Helpers
 
                 if (item == null)
                 {
-                    await LogWarning($"Cannot find item with external ID: {m.ItemExternalId}");
+                    await _logger.LogWarning($"Cannot find item with external ID: {m.ItemExternalId}");
                     continue;
                 }
 

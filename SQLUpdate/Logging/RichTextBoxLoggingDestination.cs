@@ -12,8 +12,8 @@ namespace SCQueryConnect.Logging
         private readonly char[] _logEntrySeparators = {'\r', '\n'};
         private readonly Regex _hasTimestamp = new Regex("^\\[");
         private readonly Regex _newSection = new Regex("^\\[.+\\] Running '.+'\\.{3}");
-        private readonly Regex _error = new Regex("ERROR:");
-        private readonly Regex _warning = new Regex("WARNING:");
+        private readonly Regex _error = new Regex(ErrorPrefix);
+        private readonly Regex _warning = new Regex(WarningPrefix);
 
         public RichTextBoxLoggingDestination(RichTextBox destination) : base(destination)
         {

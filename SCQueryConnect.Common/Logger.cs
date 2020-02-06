@@ -6,8 +6,21 @@ namespace SCQueryConnect.Common
 {
     public abstract class Logger : ILog
     {
+        protected const string ErrorPrefix = "ERROR:";
+        protected const string WarningPrefix = "WARNING:";
+
         public abstract Task Clear();
         public abstract Task Log(string text);
+
+        public async Task LogError(string text)
+        {
+            await Log($"{ErrorPrefix} {text}");
+        }
+
+        public async Task LogWarning(string text)
+        {
+            await Log($"{WarningPrefix} {text}");
+        }
 
         protected string FormatMessage(string message)
         {
