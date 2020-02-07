@@ -3,10 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SCQueryConnect.Views"
         mc:Ignorable="d"
-        Title="Internal Connection Info" Height="300" Width="300" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
+        Background="{StaticResource QCBackground}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        Title="Internal Connection Info"
+        WindowStartupLocation="CenterOwner">
     <Grid>
-        <TextBox x:Name="txt" IsReadOnly="True" Width="290" Height="260" TextWrapping="Wrap" />
+        <TextBox x:Name="txt"
+                 Background="{StaticResource QCBackground}"
+                 BorderThickness="0"
+                 Foreground="White"
+                 Height="260"
+                 IsReadOnly="True"
+                 Margin="5"
+                 TextWrapping="Wrap"
+                 Width="290">
+        </TextBox>
     </Grid>
 </Window>

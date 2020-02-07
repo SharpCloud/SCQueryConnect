@@ -453,16 +453,10 @@ namespace SCQueryConnect
 
         private void ReviewConnectionClick(object sender, RoutedEventArgs e)
         {
-            ReviewConnection(_mainViewModel.SelectedQueryData);
-        }
-
-        private void ReviewConnection(QueryData queryData)
-        {
-            var info = string.Format("Internal Connection Type:\n{0}\n\nConnection String:\n{1}",
-                queryData.GetBatchDBType,
-                queryData.FormattedConnectionString);
-
-            var dlg = new ConnectionInfo(info);
+            var dlg = new ConnectionInfo(_mainViewModel.SelectedQueryData)
+            {
+                Owner = this
+            };
             dlg.ShowDialog();
         }
 
