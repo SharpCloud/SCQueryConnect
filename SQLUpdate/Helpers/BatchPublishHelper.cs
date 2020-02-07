@@ -61,10 +61,7 @@ namespace SCQueryConnect.Helpers
                 Directory.Delete(outputFolder, true);
                 GetFolder(settings.Data.Name, settings.BasePath);
 
-                var sb = new StringBuilder();
-                sb.AppendLine("@echo off");
-                PublishAllBatchFolders(settings.Data, string.Empty, sb, settings);
-                WriteBatchFile(settings.Data.Name, settings.Data.Name, sb.ToString(), settings);
+                PublishAllBatchFolders(settings.Data, string.Empty, null, settings);
                 Process.Start(outputFolder);
             }
             catch (Exception ex)
@@ -79,21 +76,23 @@ namespace SCQueryConnect.Helpers
             StringBuilder parentStringBuilder,
             PublishSettings settings)
         {
+            var path = GetFolder(parentPath, settings.BasePath);
+
             if (queryData.IsFolder)
             {
                 var subPath = Path.Combine(parentPath, queryData.Name);
+                var filename = $"{queryData.Name}.bat";
+                var batchPath = Path.Combine(path, queryData.Name, filename);
+
+                parentStringBuilder?.AppendLine($"echo Running: {queryData.Name}");
+                parentStringBuilder?.AppendLine($"call \"{batchPath}\"");
+
                 var localStringBuilder = new StringBuilder();
                 localStringBuilder.AppendLine("@echo off");
-
-                parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
 
                 foreach (var c in queryData.Connections)
                 {
                     PublishAllBatchFolders(c, subPath, localStringBuilder, settings);
-
-                    var batchFolderRoot = GetFolder(subPath, settings.BasePath);
-                    var batchPath = Path.Combine(batchFolderRoot, c.Name, c.Name);
-                    parentStringBuilder.AppendLine($"call \"{batchPath}.bat\"");
                 }
 
                 var content = localStringBuilder.ToString();
@@ -101,8 +100,6 @@ namespace SCQueryConnect.Helpers
             }
             else
             {
-                GetFolder(parentPath, settings.BasePath);
-
                 var fullPath = GenerateBatchExe(
                     queryData.ConnectionsString,
                     parentPath,
@@ -111,8 +108,9 @@ namespace SCQueryConnect.Helpers
 
                 var suffix = GetFileSuffix(settings);
                 var filename = $"SCSQLBatch{suffix}.exe";
-                parentStringBuilder.AppendLine($"echo Running: {queryData.Name}");
-                parentStringBuilder.AppendLine($"\"{Path.Combine(fullPath, filename)}\"");
+
+                parentStringBuilder?.AppendLine($"echo Running: {queryData.Name}");
+                parentStringBuilder?.AppendLine($"\"{Path.Combine(fullPath, filename)}\"");
             }
         }
 
@@ -334,7 +332,8 @@ namespace SCQueryConnect.Helpers
         private static string GetAppSettingText(string key, string value)
             => $"<add key=\"{key}\" value=\"{value}\" />";
 
-        private static string Sanitize(string input)
-            => input.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'");
+        private static string Sanitize(string input) => input == null
+            ? string.Empty
+            : input.Replace("\r", " ").Replace("\n", " ").Replace("\"", "'");
     }
 }

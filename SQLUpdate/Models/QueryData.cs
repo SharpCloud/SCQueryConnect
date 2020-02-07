@@ -187,6 +187,11 @@ namespace SCQueryConnect.Models
             {
                 _logData = value;
 
+                if (_logData == null)
+                {
+                    return;
+                }
+
                 var entries = _logData.Split(NewLineSeparators);
                 var errorCount = entries.Count(_errorRegex.IsMatch);
                 var warningCount = entries.Count(_warningRegex.IsMatch);
