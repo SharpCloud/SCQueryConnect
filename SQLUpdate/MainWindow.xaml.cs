@@ -870,6 +870,19 @@ namespace SCQueryConnect
 
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
         {
+            if (_mainViewModel.SelectedQueryData.IsFolder)
+            {
+                var result = MessageBox.Show(
+                    "All folder contents will also be deleted. Do you want to proceed?",
+                    "WARNING",
+                    MessageBoxButton.YesNo);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
+
             var parent = FindParent(_mainViewModel.SelectedQueryData);
             var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData) - 1;
 
