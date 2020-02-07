@@ -78,7 +78,7 @@
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
                 <converters:ValidExcelNameConverter x:Key="ValidExcelNameConverter" />
             </Grid.Resources>
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="320"></ColumnDefinition>
                 <ColumnDefinition Width="3"></ColumnDefinition>
@@ -1012,16 +1012,36 @@
 
         <Grid Background="#cc000000"
               DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
-              Visibility="{Binding UpdateMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+              Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
 
-            <TextBlock Foreground="white"
-                       FontSize="30"
-                       HorizontalAlignment="Center"
-                       MaxWidth="500"
-                       Text="{Binding UpdateMessage}"
-                       TextWrapping="WrapWithOverflow"
-                       VerticalAlignment="Center">
-            </TextBlock>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                <TextBlock Foreground="white"
+                           FontSize="30"
+                           HorizontalAlignment="Center"
+                           MaxWidth="500"
+                           Text="{Binding UpdateText}"
+                           TextWrapping="WrapWithOverflow">
+                </TextBlock>
+
+                <TextBlock Foreground="white"
+                           FontSize="18"
+                           HorizontalAlignment="Center"
+                           MaxWidth="500"
+                           Text="{Binding UpdateSubtext}"
+                           TextWrapping="WrapWithOverflow"
+                           Visibility="{Binding UpdateSubtext, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                </TextBlock>
+
+                <Button Click="CancelStoryUpdate" HorizontalAlignment="Center"
+                        Margin="0,20,0,0"
+                        Padding="30,5"
+                        Style="{StaticResource DefaultButtonStyle}"
+                        VerticalAlignment="Center">
+                    Cancel
+                </Button>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

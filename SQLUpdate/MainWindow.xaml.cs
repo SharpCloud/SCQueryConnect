@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -108,6 +109,7 @@ namespace SCQueryConnect
             qd.Connections != null &&
             qd.Connections.Any(c => c.Id == queryData.Id));
 
+        private CancellationTokenSource _cancellationTokenSource;
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
         private ObservableCollection<QueryData> _connections;
@@ -182,13 +184,12 @@ namespace SCQueryConnect
             _resourceUrlDataChecker = resourceUrlDataChecker;
             _resourceUrlDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrResourceUrls);
 
-            _logger = (MultiDestinationLogger) logger;
-            
-            _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
-            _logger.PushLoggingDestination(_storyLoggingDestination);
             
             _folderLoggingDestination  = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
-            _logger.PushLoggingDestination(_folderLoggingDestination);
+            _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
+            
+            _logger = (MultiDestinationLogger) logger;
+            _logger.SetPersistentDestination(_folderLoggingDestination, _storyLoggingDestination);
 
             _qcHelper = qcHelper;
         }
@@ -779,7 +780,7 @@ namespace SCQueryConnect
             return valid;
         }
 
-        private async Task UpdateSharpCloud(QueryData queryData)
+        private async Task UpdateSharpCloud(QueryData queryData, CancellationToken ct)
         {
             var config = GetApiConfiguration();
 
@@ -797,7 +798,7 @@ namespace SCQueryConnect
                 BuildRelationships = queryData.BuildRelationships
             };
 
-            await _qcHelper.UpdateSharpCloud(config, settings);
+            await _qcHelper.UpdateSharpCloud(config, settings, ct);
         }
 
         private void ViewExisting(object sender, RoutedEventArgs e)
@@ -1157,37 +1158,51 @@ namespace SCQueryConnect
             if (sender is FrameworkElement fe &&
                 fe.DataContext is QueryData queryData)
             {
-                await RunQueryData(queryData);
+                try
+                {
+                    
+                    _cancellationTokenSource = new CancellationTokenSource();
+                    await RunQueryData(queryData, _cancellationTokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    await _logger.LogWarning("Update cancelled by user");
+                    _logger.ClearDestinations();
+                    
+                    _mainViewModel.UpdateText = string.Empty;
+                    _mainViewModel.UpdateSubtext = string.Empty;
+                }
             }
         }
 
-        private async Task RunAllQueryData(QueryData qd)
+        private async Task RunAllQueryData(QueryData queryData, CancellationToken ct)
         {
-            var destination = new QueryDataLoggingDestination(qd);
+            var destination = new QueryDataLoggingDestination(queryData);
             await destination.Clear();
             
-            _logger.PushLoggingDestination(destination);
+            _logger.PushDestination(destination);
 
-            if (qd.IsFolder)
+            if (queryData.IsFolder)
             {
-                foreach (var data in qd.Connections)
+                foreach (var data in queryData.Connections)
                 {
-                    await RunAllQueryData(data);
+                    await RunAllQueryData(data, ct);
+                    ct.ThrowIfCancellationRequested();
                 }
             }
             else
             {
-                var message = $"Running '{qd.Name}'...";
-                _mainViewModel.UpdateMessage = message;
-                await _logger.Log($"> {message}");
+                _mainViewModel.UpdateText = "Updating...";
+                _mainViewModel.UpdateSubtext = $"Running '{queryData.Name}'";
+                await _logger.Log($"> Running '{queryData.Name}'...");
                 
-                await UpdateSharpCloud(qd);
+                await UpdateSharpCloud(queryData, ct);
             }
 
-            _logger.PopLoggingDestination();
+            _logger.PopDestination();
         }
 
-        private async Task RunQueryData(QueryData queryData)
+        private async Task RunQueryData(QueryData queryData, CancellationToken ct)
         {
             if (!ValidateCredentials() ||
                 !ValidateAllStoryIds(queryData))
@@ -1203,12 +1218,13 @@ namespace SCQueryConnect
             await _logger.Clear();
             SaveSettings();
 
-            await RunAllQueryData(queryData);
+            await RunAllQueryData(queryData, ct);
 
             queryData.LastRunDateTime = DateTime.Now;
             SaveSettings();
 
-            _mainViewModel.UpdateMessage = string.Empty;
+            _mainViewModel.UpdateText = string.Empty;
+            _mainViewModel.UpdateSubtext = string.Empty;
         }
 
         private void QueryItemTreeDragLeave(object sender, DragEventArgs e)
@@ -1227,6 +1243,13 @@ namespace SCQueryConnect
             queryData.DragAbove = false;
             queryData.DragBelow = false;
             queryData.DragInto = false;
+        }
+
+        private void CancelStoryUpdate(object sender, RoutedEventArgs e)
+        {
+            _mainViewModel.UpdateText = "Cancelling Update...";
+            _mainViewModel.UpdateSubtext = string.Empty;
+            _cancellationTokenSource.Cancel();
         }
     }
 }

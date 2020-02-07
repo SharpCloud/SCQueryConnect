@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Attribute = SC.API.ComInterop.Models.Attribute;
 
@@ -247,7 +248,8 @@ namespace SCQueryConnect.Common.Helpers
 
         public async Task UpdateSharpCloud(
             SharpCloudConfiguration config,
-            UpdateSettings settings)
+            UpdateSettings settings,
+            CancellationToken ct)
         {
             string newFilename = null;
             var generateTempFile = false;
@@ -272,9 +274,11 @@ namespace SCQueryConnect.Common.Helpers
                 var start = DateTime.Now;
 
                 await _logger.Log($"{AppName}: Starting update process...");
-                await _logger.Log("Connecting to Sharpcloud " + config.Url);
+                await _logger.Log("Connecting to SharpCloud " + config.Url);
 
                 var story = sc.LoadStory(settings.TargetStoryId);
+                ct.ThrowIfCancellationRequested();
+
                 var isValid = Validate(story, out var message);
                 await _logger.Log(message);
 
@@ -294,6 +298,7 @@ namespace SCQueryConnect.Common.Helpers
                         : settings.ConnectionString;
 
                     await InitialiseDatabase(config, connectionString, settings.DBType);
+                    ct.ThrowIfCancellationRequested();
 
                     using (IDbConnection connection = _dbConnectionFactory.GetDb(connectionString, settings.DBType))
                     {
@@ -306,21 +311,32 @@ namespace SCQueryConnect.Common.Helpers
                             settings.MaxRowCount,
                             settings.UnpublishItems);
 
+                        ct.ThrowIfCancellationRequested();
+
                         await UpdateRelationships(connection, story, settings.QueryStringRels);
+                        ct.ThrowIfCancellationRequested();
+
                         await GetResourceUrlMetadata(connection, settings.QueryStringResourceUrls, story);
+                        ct.ThrowIfCancellationRequested();
+
                         await GetPanelMetadata(connection, settings.QueryStringPanels, story);
+                        ct.ThrowIfCancellationRequested();
 
                         if (settings.BuildRelationships)
                         {
                             await _logger.Log("Building relationships...");
+
                             await AddRelationshipsToStory(story);
+                            ct.ThrowIfCancellationRequested();
+
                             await _logger.Log("Relationships built");
                         }
 
                         await _logger.Log("Saving Changes");
                         story.Save();
                         await _logger.Log("Save Complete!");
-                        await _logger.Log($"Update process completed in {(DateTime.Now - start).TotalSeconds:f2} seconds");
+                        await _logger.Log(
+                            $"Update process completed in {(DateTime.Now - start).TotalSeconds:f2} seconds");
                     }
                 }
             }
@@ -334,7 +350,13 @@ namespace SCQueryConnect.Common.Helpers
                     $"  * If that doesn't fix the problem, try installing the Microsoft Access Database Engine 2010 Redistributable. " +
                     $"You can find this by clicking on the 'Download tools for Excel/Access' link on the 'About' tab in Query Connect.";
 
-                await _logger.LogError($"{message}{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                await _logger.LogError(
+                    $"{message}{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
+            catch (OperationCanceledException)
+            {
+                await _logger.LogWarning("Story update aborted");
+                throw;
             }
             catch (Exception ex)
             {

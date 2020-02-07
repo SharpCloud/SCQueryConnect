@@ -17,7 +17,8 @@ namespace SCQueryConnect.ViewModels
         private int _lastSelectedFolderIndex = FolderTabIndex;
         private int _selectedTabIndex;
         private string _publishTabHeader;
-        private string _updateMessage;
+        private string _updateSubtext;
+        private string _updateText;
 
         public PasswordSecurity PublishPasswordSecurity
         {
@@ -117,15 +118,29 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public string UpdateMessage
+        public string UpdateSubtext
         {
-            get => _updateMessage;
+            get => _updateSubtext;
 
             set
             {
-                if (_updateMessage != value)
+                if (_updateSubtext != value)
                 {
-                    _updateMessage = value;
+                    _updateSubtext = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string UpdateText
+        {
+            get => _updateText;
+
+            set
+            {
+                if (_updateText != value)
+                {
+                    _updateText = value;
                     OnPropertyChanged();
                 }
             }

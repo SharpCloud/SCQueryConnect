@@ -4,6 +4,7 @@ using SCQueryConnect.Common.Models;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SCSQLBatch
@@ -164,7 +165,7 @@ namespace SCSQLBatch
                 UnpublishItems = unpublishItems
             };
 
-            await _qcHelper.UpdateSharpCloud(config, settings);
+            await _qcHelper.UpdateSharpCloud(config, settings, CancellationToken.None);
         }
 
         private DatabaseType GetDbType()

@@ -1,27 +1,43 @@
 ﻿using SCQueryConnect.Common;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SCQueryConnect.Logging
 {
     public class MultiDestinationLogger : Logger
     {
-        private readonly Stack<LoggingDestination> _loggingDestinations =
+        private readonly Stack<LoggingDestination> _temporaryDestinations =
             new Stack<LoggingDestination>();
 
-        public void PopLoggingDestination()
+        private IList<LoggingDestination> _persistentLoggingDestinations;
+
+        private IEnumerable<LoggingDestination> AllLoggingDestinations =>
+            _persistentLoggingDestinations.Concat(_temporaryDestinations);
+
+        public void PopDestination()
         {
-            _loggingDestinations.Pop();
+            _temporaryDestinations.Pop();
         }
 
-        public void PushLoggingDestination(LoggingDestination destination)
+        public void SetPersistentDestination(params LoggingDestination[] destinations)
         {
-            _loggingDestinations.Push(destination);
+            _persistentLoggingDestinations = destinations;
+        }
+
+        public void ClearDestinations()
+        {
+            _temporaryDestinations.Clear();
+        }
+
+        public void PushDestination(LoggingDestination destination)
+        {
+            _temporaryDestinations.Push(destination);
         }
 
         public override async Task Clear()
         {
-            foreach (var destination in _loggingDestinations)
+            foreach (var destination in AllLoggingDestinations)
             {
                 await destination.Clear();
             }
@@ -29,7 +45,7 @@ namespace SCQueryConnect.Logging
 
         public override async Task Log(string text)
         {
-            foreach (var destination in _loggingDestinations)
+            foreach (var destination in AllLoggingDestinations)
             {
                 await destination.Log(text);
             }
