@@ -11,5 +11,7 @@ namespace SCQueryConnect.Interfaces
         string UpdateMessage { get; set; }
         int SelectedTabIndex { get; set; }
         QueryData SelectedQueryData { get; set; }
+
+        void SelectUpdateTab();
     }
 }

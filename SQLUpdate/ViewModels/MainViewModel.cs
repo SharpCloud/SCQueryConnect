@@ -7,11 +7,14 @@ namespace SCQueryConnect.ViewModels
 {
     public class MainViewModel : IMainViewModel
     {
+        private const int FolderTabIndex = 3;
+        private const int UpdateStoryTabIndex = 2;
+
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
         private QueryData _selectedQueryData;
         private int _lastSelectedConnectionIndex;
-        private int _lastSelectedFolderIndex = 3; // index of 'Connections Folder' tab
+        private int _lastSelectedFolderIndex = FolderTabIndex;
         private int _selectedTabIndex;
         private string _publishTabHeader;
         private string _updateMessage;
@@ -126,6 +129,13 @@ namespace SCQueryConnect.ViewModels
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public void SelectUpdateTab()
+        {
+            SelectedTabIndex = SelectedQueryData.IsFolder
+                ? FolderTabIndex
+                : UpdateStoryTabIndex;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

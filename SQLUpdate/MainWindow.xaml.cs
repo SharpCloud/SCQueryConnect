@@ -1195,17 +1195,20 @@ namespace SCQueryConnect
                 return;
             }
 
-            await Task.Delay(20);
-            SaveSettings();
+            queryData.IsSelected = true;
+            _mainViewModel.SelectUpdateTab();
+            
+            await Task.Delay(100);
 
             await _logger.Clear();
+            SaveSettings();
+
             await RunAllQueryData(queryData);
 
             queryData.LastRunDateTime = DateTime.Now;
             SaveSettings();
 
             _mainViewModel.UpdateMessage = string.Empty;
-            await Task.Delay(20);
         }
 
         private void QueryItemTreeDragLeave(object sender, DragEventArgs e)
