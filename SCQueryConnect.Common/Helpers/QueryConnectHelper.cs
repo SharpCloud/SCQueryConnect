@@ -312,7 +312,9 @@ namespace SCQueryConnect.Common.Helpers
 
                         if (settings.BuildRelationships)
                         {
+                            await _logger.Log("Building relationships...");
                             await AddRelationshipsToStory(story);
+                            await _logger.Log("Relationships built");
                         }
 
                         await _logger.Log("Saving Changes");
@@ -524,7 +526,9 @@ namespace SCQueryConnect.Common.Helpers
                         row++;
                     }
 
-                    await _logger.Log($"Processing {row.ToString()} rows");
+                    await _logger.Log(
+                        $"Processing {row.ToString()} rows: unmatched items " +
+                        $"will {(unpublishItems ? "" : "NOT ")}be unpublished");
 
                     // pass the array to SharpCloud
                     string errorMessage;
