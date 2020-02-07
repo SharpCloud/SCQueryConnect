@@ -155,29 +155,17 @@
     <Compile Include="..\SQLUpdate\Helpers\ConnectionNameValidator.cs">
       <Link>Helpers\ConnectionNameValidator.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Helpers\MessageService.cs">
-      <Link>Helpers\MessageService.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
       <Link>Helpers\UrlHelper.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IActionCommand.cs">
-      <Link>Interfaces\IActionCommand.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
       <Link>Interfaces\IMainViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
-      <Link>Interfaces\IMessageService.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IPostDeserializeAction.cs">
-      <Link>Interfaces\IPostDeserializeAction.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
       <Link>Logging\LoggingDestination.cs</Link>
