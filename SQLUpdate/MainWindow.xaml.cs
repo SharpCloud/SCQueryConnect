@@ -1177,8 +1177,10 @@ namespace SCQueryConnect
             }
             else
             {
-                _mainViewModel.UpdateMessage = $"Running {qd.Name}...";
-                await _logger.Log($"Running '{qd.Name}'...");
+                var message = $"Running '{qd.Name}'...";
+                _mainViewModel.UpdateMessage = message;
+                await _logger.Log($"> {message}");
+                
                 await UpdateSharpCloud(qd);
             }
 
