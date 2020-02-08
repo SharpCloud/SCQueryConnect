@@ -112,7 +112,7 @@
                               DataContext="{Binding Parent, ElementName=Root}"
                               DragOver="QueryItemTreeDragEnter"
                               Drop="QueryItemTreeDrop"
-                              ItemsSource="{Binding Connections}"
+                              ItemsSource="{Binding MainViewModel.Connections, Source={StaticResource ViewModelLocator}}"
                               PreviewMouseLeftButtonDown="QueryItemTreePreviewMouseLeftButtonDown"
                               PreviewMouseMove="QueryItemTreeMouseMove"
                               SelectedItemChanged="TreeViewSelectedItemChanged">

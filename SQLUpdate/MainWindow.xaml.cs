@@ -12,7 +12,6 @@ using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
@@ -28,10 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace SCQueryConnect
 {
@@ -40,7 +36,7 @@ namespace SCQueryConnect
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
         private const string ConnectionsFileV3 = "connections.json";
         private const string ConnectionsFileV3Backup = "connections.json.bak";
@@ -48,7 +44,7 @@ namespace SCQueryConnect
 
         private Point _startPoint;
 
-        private readonly QueryData _queryRootNode;
+        
 
         public string AppName
         {
@@ -58,61 +54,9 @@ namespace SCQueryConnect
             }
         }
 
-        public ObservableCollection<QueryData> Connections
-        {
-            get => _connections;
-
-            set
-            {
-                if (_connections != value)
-                {
-                    _connections = value;
-                    OnPropertyChanged(nameof(Connections));
-
-                    _queryRootNode.Connections = _connections;
-                }
-            }
-        }
-
-        private QueryData FindQueryData(Func<QueryData, bool> predicate)
-            => FindQueryData(_queryRootNode, predicate);
-
-        private static QueryData FindQueryData(QueryData data, Func<QueryData, bool> predicate)
-        {
-            var result = predicate(data);
-
-            if (result)
-            {
-                return data;
-            }
-
-            QueryData toReturn = null;
-
-            if (data.Connections != null)
-            {
-                foreach (var c in data.Connections)
-                {
-                    toReturn = FindQueryData(c, predicate);
-                    
-                    if (toReturn != null)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return toReturn;
-        }
-
-        private QueryData FindParent(QueryData queryData) => FindQueryData(qd =>
-            queryData != null &&
-            qd.Connections != null &&
-            qd.Connections.Any(c => c.Id == queryData.Id));
-
         private CancellationTokenSource _cancellationTokenSource;
         private string _lastUsedSharpCloudConnection;
         private ProxyViewModel _proxyViewModel;
-        private ObservableCollection<QueryData> _connections;
         private readonly int _maxRowCount;
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
@@ -158,9 +102,6 @@ namespace SCQueryConnect
             {
                 _maxRowCount = 1000;
             }
-
-            _queryRootNode = CreateNewFolder(QueryData.RootId);
-            _queryRootNode.Id = QueryData.RootId;
 
             _batchPublishHelper = batchPublishHelper;
             _connectionStringHelper = connectionStringHelper;
@@ -217,7 +158,7 @@ namespace SCQueryConnect
                 filePath = Path.Combine(_localPath, ConnectionsFileV4);
             }
 
-            LoadAllConnections(migrate, filePath);
+            _mainViewModel.LoadAllConnections(migrate, filePath);
             LoadGlobalSettings(migrate);
 
             EventManager.RegisterClassHandler(
@@ -307,68 +248,6 @@ namespace SCQueryConnect
             }
 
             BrowserTabs.SelectedIndex = (int.Parse(SaveHelper.RegRead("ActiveTab", "0")));
-        }
-
-        private void LoadAllConnections(bool migrate, string filePath)
-        {
-            IList<QueryData> connections;
-            var createExamples = !File.Exists(filePath);
-
-            if (createExamples)
-            {
-                connections = new List<QueryData>(new[]
-                {
-                    new QueryData(DatabaseType.Excel),
-                    new QueryData(DatabaseType.Access),
-                    new QueryData(DatabaseType.SharepointList),
-                    new QueryData(DatabaseType.SQL),
-                    new QueryData(DatabaseType.ODBC),
-                    new QueryData(DatabaseType.ADO),
-                    new QueryData(DatabaseType.SharpCloudExcel)
-                });
-            }
-            else // load previous settings
-            {
-                IList<QueryData> encrypted;
-
-                if (migrate)
-                {
-                    encrypted = JsonConvert.DeserializeObject<IList<QueryData>>(File.ReadAllText(filePath));
-                }
-                else
-                {
-                    var saveData = JsonConvert.DeserializeObject<SaveData>(File.ReadAllText(filePath));
-                    encrypted = saveData.Connections;
-                }
-
-                var filtered = encrypted?.Where(qd => qd != null);
-                var decrypted = CreateDecryptedPasswordConnections(filtered);
-                connections = new List<QueryData>(decrypted);
-            }
-
-            var rootLevelConnections = connections.Where(c => !c.IsFolder).ToArray();
-            var createDefaultFolder = (createExamples || migrate) && rootLevelConnections.Any();
-
-            if (createDefaultFolder)
-            {
-                var defaultFolder = CreateNewFolder("My Connections");
-                defaultFolder.IsExpanded = true;
-                defaultFolder.IsSelected = true;
-                defaultFolder.Connections = new ObservableCollection<QueryData>(
-                    rootLevelConnections);
-
-                var otherConnections = connections.Where(c => c.Connections != null);
-                var allConnections = new List<QueryData>
-                {
-                    defaultFolder
-                }.Concat(otherConnections);
-
-                Connections = new ObservableCollection<QueryData>(allConnections);
-            }
-            else
-            {
-                Connections = new ObservableCollection<QueryData>(connections);
-            }
         }
 
         private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
@@ -598,20 +477,6 @@ namespace SCQueryConnect
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                //check if we are on the UI thread if not switch
-                if (Dispatcher.CurrentDispatcher.CheckAccess())
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-                else
-                    Dispatcher.CurrentDispatcher.BeginInvoke(new Action<string>(OnPropertyChanged), propertyName);
-            }
-        }
-
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             SaveSettings();
@@ -642,80 +507,7 @@ namespace SCQueryConnect
                     DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
-            SaveConnections();
-        }
-
-        private void SaveConnections()
-        {
-            Directory.CreateDirectory(_localPath);
-            var connections = CreateEncryptedPasswordConnections(_connections);
-
-            var toSave = new SaveData
-            {
-                Connections = connections
-            };
-
-            var json = JsonConvert.SerializeObject(toSave);
-            var path = Path.Combine(_localPath, ConnectionsFileV4);
-            File.WriteAllText(path, json);
-        }
-
-        private List<QueryData> CreateEncryptedPasswordConnections(ObservableCollection<QueryData> connections)
-        {
-            var newConnections = new List<QueryData>();
-
-            foreach (var connection in connections)
-            {
-                var json = JsonConvert.SerializeObject(connection);
-                var copy = JsonConvert.DeserializeObject<QueryData>(json);
-                var hasPassword = !string.IsNullOrWhiteSpace(copy.SourceStoryPassword);
-
-                if (hasPassword)
-                {
-                    copy.SourceStoryPasswordDpapi = Convert.ToBase64String(
-                        _encryptionHelper.Encrypt(
-                            _encryptionHelper.TextEncoding.GetBytes(copy.SourceStoryPassword),
-                            out var entropy,
-                            DataProtectionScope.CurrentUser));
-
-                    copy.SourceStoryPasswordEntropy = Convert.ToBase64String(entropy);
-
-                    copy.SourceStoryPassword = null;
-                }
-                else
-                {
-                    copy.SourceStoryPasswordDpapi = null;
-                }
-
-                newConnections.Add(copy);
-            }
-
-            return newConnections;
-        }
-
-        private IList<QueryData> CreateDecryptedPasswordConnections(IEnumerable<QueryData> connections)
-        {
-            var newConnections = new List<QueryData>();
-
-            foreach (var connection in connections)
-            {
-                var json = JsonConvert.SerializeObject(connection);
-                var copy = JsonConvert.DeserializeObject<QueryData>(json);
-
-                var hasPassword = !string.IsNullOrWhiteSpace(copy.SourceStoryPassword);
-                if (!hasPassword && !string.IsNullOrWhiteSpace(copy.SourceStoryPasswordDpapi))
-                {
-                    copy.SourceStoryPassword = _encryptionHelper.TextEncoding.GetString(
-                        _encryptionHelper.Decrypt(
-                            copy.SourceStoryPasswordDpapi,
-                            copy.SourceStoryPasswordEntropy,
-                            DataProtectionScope.CurrentUser));
-                }
-
-                newConnections.Add(copy);
-            }
-
-            return newConnections;
+            _mainViewModel.SaveConnections(_localPath, ConnectionsFileV4);
         }
 
         private bool ValidateCredentials()
@@ -810,16 +602,6 @@ namespace SCQueryConnect
             Process.Start(path);
         }
 
-        private static QueryData CreateNewFolder(string name)
-        {
-            return new QueryData
-            {
-                Name = name,
-                Connections = new ObservableCollection<QueryData>(),
-                ConnectionType = DatabaseType.Folder
-            };
-        }
-
         private void NewConnectionClick(object sender, RoutedEventArgs e)
         {
             var newWnd = new SelectDatabaseType
@@ -827,82 +609,37 @@ namespace SCQueryConnect
                 Owner = this
             };
 
-            if (newWnd.ShowDialog() == true)
+            if (newWnd.ShowDialog() != true)
             {
-                var queryData = new QueryData(newWnd.SelectedButton);
-                AddQueryData(queryData);
+                return;
             }
+            
+            _mainViewModel.CreateNewConnection(newWnd.SelectedButton);
         }
 
         private void NewQueryFolderClick(object sender, RoutedEventArgs e)
         {
-            var queryData = CreateNewFolder("New Folder");
-            AddQueryData(queryData);
+            _mainViewModel.CreateNewFolder();
         }
 
         private void MoveConnectionDown(object sender, RoutedEventArgs e)
         {
-            var parent = FindParent(_mainViewModel.SelectedQueryData);
-            var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData);
-            
-            if (index < parent.Connections.Count - 1)
-            {
-                parent.Connections.Move(index, index + 1);
-            }
+            _mainViewModel.MoveConnectionDown();
         }
 
         private void MoveConnectionUp(object sender, RoutedEventArgs e)
         {
-            var parent = FindParent(_mainViewModel.SelectedQueryData);
-            var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData);
-
-            if (index > 0)
-            {
-                parent.Connections.Move(index, index - 1);
-            }
+            _mainViewModel.MoveConnectionUp();
         }
 
         private void CopyConnectionClick(object sender, RoutedEventArgs e)
         {
-            var queryData = new QueryData(_mainViewModel.SelectedQueryData);
-            AddQueryData(queryData);
+            _mainViewModel.CopyConnection();
         }
 
         private void DeleteConnectionClick(object sender, RoutedEventArgs e)
         {
-            if (_mainViewModel.SelectedQueryData.IsFolder)
-            {
-                var result = MessageBox.Show(
-                    "All folder contents will also be deleted. Do you want to proceed?",
-                    "WARNING",
-                    MessageBoxButton.YesNo);
-
-                if (result != MessageBoxResult.Yes)
-                {
-                    return;
-                }
-            }
-
-            var parent = FindParent(_mainViewModel.SelectedQueryData);
-            var index = parent.Connections.IndexOf(_mainViewModel.SelectedQueryData) - 1;
-
-            var toSelect = index > -1
-                ? parent.Connections[index]
-                : parent;
-            
-            parent.Connections.Remove(_mainViewModel.SelectedQueryData);
-            
-            if (toSelect != _queryRootNode)
-            {
-                toSelect.IsSelected = true;
-            }
-        }
-
-        private void AddQueryData(QueryData queryData)
-        {
-            Connections.Add(queryData);
-            queryData.IsSelected = true;
-            BrowserTabs.SelectedIndex = 0; // go back to the first tab
+            _mainViewModel.DeleteConnection();
         }
 
         private async void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1114,14 +851,14 @@ namespace SCQueryConnect
                 var dropTarget = fe.DataContext as QueryData;
 
                 if (source == dropTarget ||
-                    FindParent(dropTarget) == source)
+                    _mainViewModel.FindParent(dropTarget) == source)
                 {
                     ResetDragDropHighlight(dropTarget);
                     return;
                 }
 
                 var index = 0;
-                var originalSourceParent = FindParent(source);
+                var originalSourceParent = _mainViewModel.FindParent(source);
                 originalSourceParent.Connections.Remove(source);
                 QueryData updatedSourceParent;
 
@@ -1135,15 +872,17 @@ namespace SCQueryConnect
                     }
                     else
                     {
-                        var dropParent = FindParent(dropTarget) ?? _queryRootNode;
+                        var dropParent = _mainViewModel.FindParent(dropTarget) ??
+                                         _mainViewModel.QueryRootNode;
+
                         index = dropParent.Connections.IndexOf(dropTarget);
                         updatedSourceParent = dropParent;
                     }
                 }
                 else
                 {
-                    index = _queryRootNode.Connections.Count;
-                    updatedSourceParent = _queryRootNode;
+                    index = _mainViewModel.QueryRootNode.Connections.Count;
+                    updatedSourceParent = _mainViewModel.QueryRootNode;
                 }
 
                 var mousePos = e.GetPosition(this);
