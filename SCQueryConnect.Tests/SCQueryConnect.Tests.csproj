@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\ValidExcelNameConverterTests.cs" />
+    <Compile Include="Helpers\BatchPublishHelperTests.cs" />
     <Compile Include="Helpers\ConnectionNameValidatorTests.cs" />
     <Compile Include="Models\QueryDataTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,6 +74,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SCQueryConnect.Common\SCQueryConnect.Common.csproj">
+      <Project>{5b57d77f-7ce4-47f2-9f12-a5c532022cd1}</Project>
+      <Name>SCQueryConnect.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SQLUpdate\SCQueryConnect.csproj">
       <Project>{a8532662-2091-4d8e-add8-c1eaaa3679e1}</Project>
       <Name>SCQueryConnect</Name>

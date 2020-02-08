@@ -7,6 +7,7 @@ using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.ViewModels;
 using System;
+using SCQueryConnect.Services;
 
 namespace SCQueryConnect
 {
@@ -63,8 +64,10 @@ namespace SCQueryConnect
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>().InstancePerLifetimeScope();
+            builder.RegisterType<IOService>().As<IIOService>().InstancePerLifetimeScope();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();
             builder.RegisterType<MultiDestinationLogger>().As<ILog>().InstancePerLifetimeScope();
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>().InstancePerLifetimeScope();
             builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>().InstancePerLifetimeScope();

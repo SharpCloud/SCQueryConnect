@@ -803,7 +803,7 @@ namespace SCQueryConnect
 
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
-            var path = _batchPublishHelper.GetFolder(
+            var path = _batchPublishHelper.GetOrCreateOutputFolder(
                 _mainViewModel.SelectedQueryData.Name,
                 _localPath);
 

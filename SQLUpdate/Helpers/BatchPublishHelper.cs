@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,21 +19,27 @@ namespace SCQueryConnect.Helpers
     {
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IEncryptionHelper _encryptionHelper;
+        private readonly IIOService _ioService;
+        private readonly IMessageService _messageService;
 
         public BatchPublishHelper(
             IConnectionStringHelper connectionStringHelper,
-            IEncryptionHelper encryptionHelper)
+            IEncryptionHelper encryptionHelper,
+            IIOService ioService,
+            IMessageService messageService)
         {
             _connectionStringHelper = connectionStringHelper;
             _encryptionHelper = encryptionHelper;
+            _ioService = ioService;
+            _messageService = messageService;
         }
 
-        public string GetFolder(string queryName, string basePath)
+        public string GetOrCreateOutputFolder(string queryName, string basePath)
         {
-            var folder = $"{basePath}/data";
-            Directory.CreateDirectory(folder);
-            folder += "/" + queryName;
-            Directory.CreateDirectory(folder);
+            var folder = Path.Combine(basePath, "data");
+            _ioService.CreateDirectory(folder);
+            folder = Path.Combine(folder, queryName);
+            _ioService.CreateDirectory(folder);
             return folder;
         }
 
@@ -42,12 +47,12 @@ namespace SCQueryConnect.Helpers
         {
             try
             {
-                var outputFolder = GetFolder(settings.Data.Name, settings.BasePath);
+                var outputFolder = GetOrCreateOutputFolder(settings.Data.Name, settings.BasePath);
 
-                var notEmpty = Directory.EnumerateFileSystemEntries(outputFolder).Any();
+                var notEmpty = _ioService.EnumerateFileSystemEntries(outputFolder).Any();
                 if (notEmpty)
                 {
-                    var result = MessageBox.Show(
+                    var result = _messageService.Show(
                         $"A folder named '{settings.Data.Name}' already exist at this location, Do you want to replace?",
                         "WARNING",
                         MessageBoxButton.YesNo);
@@ -58,15 +63,15 @@ namespace SCQueryConnect.Helpers
                     }
                 }
 
-                Directory.Delete(outputFolder, true);
-                GetFolder(settings.Data.Name, settings.BasePath);
+                _ioService.DeleteDirectory(outputFolder, true);
+                GetOrCreateOutputFolder(settings.Data.Name, settings.BasePath);
 
                 PublishAllBatchFolders(settings.Data, string.Empty, null, settings);
                 Process.Start(outputFolder);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {ex.Message}");
+                _messageService.Show($"Sorry, we were unable to complete the process\r\rError: {ex.Message}");
             }
         }
 
@@ -76,16 +81,15 @@ namespace SCQueryConnect.Helpers
             StringBuilder parentStringBuilder,
             PublishSettings settings)
         {
-            var path = GetFolder(parentPath, settings.BasePath);
-
             if (queryData.IsFolder)
             {
                 var subPath = Path.Combine(parentPath, queryData.Name);
                 var filename = $"{queryData.Name}.bat";
-                var batchPath = Path.Combine(path, queryData.Name, filename);
+                var outputFolder = GetOrCreateOutputFolder(subPath, settings.BasePath);
+                var batchFilePath = Path.Combine(outputFolder, filename);
 
                 parentStringBuilder?.AppendLine($"echo Running: {queryData.Name}");
-                parentStringBuilder?.AppendLine($"call \"{batchPath}\"");
+                parentStringBuilder?.AppendLine($"call \"{batchFilePath}\"");
 
                 var localStringBuilder = new StringBuilder();
                 localStringBuilder.AppendLine("@echo off");
@@ -96,10 +100,12 @@ namespace SCQueryConnect.Helpers
                 }
 
                 var content = localStringBuilder.ToString();
-                WriteBatchFile(subPath, queryData.Name, content, settings);
+                _ioService.WriteAllTextToFile(batchFilePath, content);
             }
             else
             {
+                GetOrCreateOutputFolder(parentPath, settings.BasePath);
+
                 var fullPath = GenerateBatchExe(
                     queryData.ConnectionsString,
                     parentPath,
@@ -114,17 +120,6 @@ namespace SCQueryConnect.Helpers
             }
         }
 
-        private void WriteBatchFile(
-            string path,
-            string filename,
-            string content,
-            PublishSettings settings)
-        {
-            var sequenceFolder = GetFolder(path, settings.BasePath);
-            var batchPath = Path.Combine(sequenceFolder, $"{filename}.bat");
-            File.WriteAllText(batchPath, content);
-        }
-
         private string GenerateBatchExe(
             string connectionString,
             string sequenceName,
@@ -135,39 +130,47 @@ namespace SCQueryConnect.Helpers
             var zipfile = $"SCSQLBatch{suffix}.zip";
 
             var path = Path.Combine(sequenceName, queryData.Name);
-            var outputFolder = GetFolder(path, settings.BasePath);
+            var outputFolder = GetOrCreateOutputFolder(path, settings.BasePath);
 
             try
             {
-                var configFilename = outputFolder + $"/SCSQLBatch{suffix}.exe.config";
+                var configFilename = Path.Combine(outputFolder, $"SCSQLBatch{suffix}.exe.config");
 
-                if (File.Exists(configFilename))
+                if (_ioService.FileExists(configFilename))
                 {
-                    if (MessageBox.Show("Config files already exist in this location, Do you want to replace?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    var result = _messageService.Show(
+                        "Config files already exist in this location, Do you want to replace?",
+                        "WARNING",
+                        MessageBoxButton.YesNo);
+
+                    if (result != MessageBoxResult.Yes)
                         return null;
                 }
 
                 if (connectionString.Contains("\""))
-                    MessageBox.Show(
+                {
+                    _messageService.Show(
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
+                }
+
                 try
                 {
-                    File.Delete($"{outputFolder}/Autofac.dll");
-                    File.Delete($"{outputFolder}/Newtonsoft.Json.dll");
-                    File.Delete($"{outputFolder}/SC.Framework.dll");
-                    File.Delete($"{outputFolder}/SC.API.ComInterop.dll");
-                    File.Delete($"{outputFolder}/SC.Api.dll");
-                    File.Delete($"{outputFolder}/SC.SharedModels.dll");
-                    File.Delete($"{outputFolder}/SCSQLBatch{suffix}.exe");
-                    File.Delete($"{outputFolder}/SCSQLBatch{suffix}.exe.config");
-                    File.Delete($"{outputFolder}/SCSQLBatch.zip");
-                    File.Delete($"{outputFolder}/SCQueryConnect.Common.dll");
+                    _ioService.DeleteFile($"{outputFolder}/Autofac.dll");
+                    _ioService.DeleteFile($"{outputFolder}/Newtonsoft.Json.dll");
+                    _ioService.DeleteFile($"{outputFolder}/SC.Framework.dll");
+                    _ioService.DeleteFile($"{outputFolder}/SC.API.ComInterop.dll");
+                    _ioService.DeleteFile($"{outputFolder}/SC.Api.dll");
+                    _ioService.DeleteFile($"{outputFolder}/SC.SharedModels.dll");
+                    _ioService.DeleteFile($"{outputFolder}/SCSQLBatch{suffix}.exe");
+                    _ioService.DeleteFile($"{outputFolder}/SCSQLBatch{suffix}.exe.config");
+                    _ioService.DeleteFile($"{outputFolder}/SCSQLBatch.zip");
+                    _ioService.DeleteFile($"{outputFolder}/SCQueryConnect.Common.dll");
 
-                    ZipFile.ExtractToDirectory(zipfile, outputFolder);
+                    _ioService.ExtractZipFileToDirectory(zipfile, outputFolder);
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show($"Sorry, we were unable to complete the process\r\rError: {e.Message}");
+                    _messageService.Show($"Sorry, we were unable to complete the process\r\rError: {e.Message}");
                     return null;
                 }
 
@@ -192,7 +195,7 @@ namespace SCQueryConnect.Helpers
                     settings.ProxyViewModel,
                     out var proxyEntropy);
 
-                var content = File.ReadAllText("BatchConfigTemplate.xml");
+                var content = _ioService.ReadAllTextFromFile("BatchConfigTemplate.xml");
 
                 var appSettings = new List<string>
                 {
@@ -238,7 +241,7 @@ namespace SCQueryConnect.Helpers
                 var indented = appSettings.Select(s => $"    {s}");
                 var appSettingsString = string.Join(Environment.NewLine, indented);
                 var configText = content.Replace("{appSettings}", appSettingsString);
-                File.WriteAllText(configFilename, configText);
+                _ioService.WriteAllTextToFile(configFilename, configText);
 
                 // update the Logfile
                 var logfile = $"{outputFolder}Logfile.txt";
@@ -250,12 +253,12 @@ namespace SCQueryConnect.Helpers
                         : $"64 bit Batch files created at {DateTime.Now:dd MMM yyyy HH:mm}",
                     "----------------------------------------------------------------------"
                 };
-                File.AppendAllLines(logfile, contentNotes);
+                _ioService.AppendAllLinesToFile(logfile, contentNotes);
                 return outputFolder;
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message);
+                _messageService.Show(exception.Message);
             }
 
             return null;

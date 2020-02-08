@@ -164,8 +164,14 @@
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IIOService.cs">
+      <Link>Interfaces\IIOService.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
       <Link>Interfaces\IMainViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
+      <Link>Interfaces\IMessageService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
       <Link>Logging\LoggingDestination.cs</Link>
@@ -202,6 +208,12 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Properties\Resources.Designer.cs">
       <Link>Properties\Resources.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\IOService.cs">
+      <Link>Services\IOService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\MessageService.cs">
+      <Link>Services\MessageService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\UIDataCheckerValidityProcessor.cs">
       <Link>UIDataCheckerValidityProcessor.cs</Link>

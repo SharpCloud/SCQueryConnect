@@ -157,7 +157,9 @@
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Interfaces\IBatchPublishHelper.cs" />
+    <Compile Include="Interfaces\IIOService.cs" />
     <Compile Include="Interfaces\IMainViewModel.cs" />
+    <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Logging\LoggingDestination.cs" />
     <Compile Include="Logging\MultiDestinationLogger.cs" />
     <Compile Include="Logging\QueryDataLoggingDestination.cs" />
@@ -166,6 +168,8 @@
     <Compile Include="Models\PublishArchitecture.cs" />
     <Compile Include="Models\PublishSettings.cs" />
     <Compile Include="Models\SaveData.cs" />
+    <Compile Include="Services\IOService.cs" />
+    <Compile Include="Services\MessageService.cs" />
     <Compile Include="UIDataCheckerValidityProcessor.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
