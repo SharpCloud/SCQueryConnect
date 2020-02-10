@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
@@ -7,11 +6,11 @@ using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
+using SCQueryConnect.Services;
 using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
@@ -20,8 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,8 +41,6 @@ namespace SCQueryConnect
 
         private Point _startPoint;
 
-        
-
         public string AppName
         {
             get
@@ -67,6 +62,7 @@ namespace SCQueryConnect
         private readonly IExcelWriter _excelWriter;
         private readonly MultiDestinationLogger _logger;
         private readonly IMainViewModel _mainViewModel;
+        private readonly IPasswordStorage _passwordStorage;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly IPanelsDataChecker _panelsDataChecker;
@@ -83,6 +79,7 @@ namespace SCQueryConnect
             IEncryptionHelper encryptionHelper,
             IExcelWriter excelWriter,
             IMainViewModel mainViewModel,
+            IPasswordStorage passwordStorage,
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory,
             ILog logger,
@@ -113,6 +110,7 @@ namespace SCQueryConnect
             _encryptionHelper = encryptionHelper;
             _excelWriter = excelWriter;
             _mainViewModel = mainViewModel;
+            _passwordStorage = passwordStorage;
 
             _relationshipsChecker = relationshipsDataChecker;
             _relationshipsChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrRels);
@@ -200,52 +198,15 @@ namespace SCQueryConnect
             Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
             Username.Text = SaveHelper.RegRead("Username", "");
 
-            var regPassword = SaveHelper.RegRead("PasswordDpapi", "");
-            var regPasswordEntropy = SaveHelper.RegRead("PasswordDpapiEntropy", null);
-            try
-            {
-                Password.Password = _encryptionHelper.TextEncoding.GetString(
-                    _encryptionHelper.Decrypt(
-                        regPassword,
-                        regPasswordEntropy,
-                        DataProtectionScope.CurrentUser));
-            }
-            catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
-            {
-                // Fallback method for backwards compatibility
-                regPassword = SaveHelper.RegRead("Password", "");
-
-                Password.Password = Encoding.Default.GetString(
-                    Convert.FromBase64String(regPassword));
-
-                SaveHelper.RegDelete("Password");
-            }
+            Password.Password = _passwordStorage.LoadPassword(PasswordStorage.Password);
 
             _proxyViewModel = new ProxyViewModel();
             _proxyViewModel.Proxy = SaveHelper.RegRead("Proxy", "");
             _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
             _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
 
-            var regProxyPassword = SaveHelper.RegRead("ProxyPasswordDpapi", "");
-            var regProxyPasswordEntropy = SaveHelper.RegRead("ProxyPasswordDpapiEntropy", null);
-            try
-            {
-                _proxyViewModel.ProxyPassword = _encryptionHelper.TextEncoding.GetString(
-                    _encryptionHelper.Decrypt(
-                        regProxyPassword,
-                        regProxyPasswordEntropy,
-                        DataProtectionScope.CurrentUser));
-            }
-            catch (CryptographicException ex) when (ex.Message.Contains("The parameter is incorrect"))
-            {
-                regProxyPassword = SaveHelper.RegRead("ProxyPassword", "");
-
-                // Fallback method for backwards compatibility
-                _proxyViewModel.ProxyPassword = Encoding.Default.GetString(
-                    Convert.FromBase64String(regProxyPassword));
-
-                SaveHelper.RegDelete("ProxyPassword");
-            }
+            _proxyViewModel.ProxyPassword = _passwordStorage
+                .LoadPassword(PasswordStorage.ProxyPassword);
         }
 
         private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
@@ -485,25 +446,16 @@ namespace SCQueryConnect
             SaveHelper.RegWrite("URL", Url.Text);
             SaveHelper.RegWrite("Username", Username.Text);
 
-            SaveHelper.RegWrite("PasswordDpapi", Convert.ToBase64String(
-                _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(Password.Password),
-                    out var entropy,
-                    DataProtectionScope.CurrentUser)));
-
-            SaveHelper.RegWrite("PasswordDpapiEntropy", Convert.ToBase64String(entropy));
+            _passwordStorage.SavePassword(PasswordStorage.Password, Password.Password);
 
             SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
             SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
             SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
 
-            SaveHelper.RegWrite("ProxyPasswordDpapi", Convert.ToBase64String(
-                _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(_proxyViewModel.ProxyPassword),
-                    out var proxyEntropy,
-                    DataProtectionScope.CurrentUser)));
+            _passwordStorage.SavePassword(
+                PasswordStorage.ProxyPassword,
+                _proxyViewModel.ProxyPassword);
 
-            SaveHelper.RegWrite("ProxyPasswordDpapiEntropy", Convert.ToBase64String(proxyEntropy));
             _mainViewModel.SaveConnections(_localPath, ConnectionsFileV4);
         }
 
@@ -762,7 +714,6 @@ namespace SCQueryConnect
             var settings = new PublishSettings
             {
                 Data = _mainViewModel.SelectedQueryData,
-                Password = Password,
                 ProxyViewModel = _proxyViewModel,
                 BasePath = _localPath,
                 Username = Username.Text,
@@ -1001,6 +952,11 @@ namespace SCQueryConnect
             _mainViewModel.UpdateText = "Cancelling Update...";
             _mainViewModel.UpdateSubtext = string.Empty;
             _cancellationTokenSource.Cancel();
+        }
+
+        private void PasswordOnPasswordChanged(object sender, RoutedEventArgs e)
+        {
+            _passwordStorage.SavePassword(PasswordStorage.Password, Password.Password);
         }
     }
 }

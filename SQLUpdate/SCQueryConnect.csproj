@@ -160,6 +160,7 @@
     <Compile Include="Interfaces\IIOService.cs" />
     <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
+    <Compile Include="Interfaces\IPasswordStorage.cs" />
     <Compile Include="Logging\LoggingDestination.cs" />
     <Compile Include="Logging\MultiDestinationLogger.cs" />
     <Compile Include="Logging\QueryDataLoggingDestination.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Models\SaveData.cs" />
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\MessageService.cs" />
+    <Compile Include="Services\PasswordStorage.cs" />
     <Compile Include="UIDataCheckerValidityProcessor.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />

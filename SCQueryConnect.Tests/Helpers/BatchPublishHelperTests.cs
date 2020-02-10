@@ -4,16 +4,13 @@ using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
+using SCQueryConnect.ViewModels;
 using System.Collections.ObjectModel;
 using System.Text;
-using System.Threading;
-using System.Windows.Controls;
-using SCQueryConnect.ViewModels;
 
 namespace SCQueryConnect.Tests.Helpers
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     public class BatchPublishHelperTests
     {
         private static PublishSettings CreatePublishSettings(params string[] nestedConnectionNames)
@@ -26,7 +23,6 @@ namespace SCQueryConnect.Tests.Helpers
                     ConnectionsString = string.Empty,
                     Name = nestedConnectionNames[0]
                 },
-                Password = new PasswordBox(),
                 PasswordSecurity = PasswordSecurity.Base64,
                 ProxyViewModel = new ProxyViewModel()
             };
@@ -64,11 +60,15 @@ namespace SCQueryConnect.Tests.Helpers
             var ioService = Mock.Of<IIOService>(s =>
                 s.ReadAllTextFromFile(It.IsAny<string>()) == string.Empty);
 
+            var passwordStorage = Mock.Of<IPasswordStorage>(p =>
+                p.LoadPassword(It.IsAny<string>()) == string.Empty);
+
             var helper = new BatchPublishHelper(
                 Mock.Of<IConnectionStringHelper>(),
                 encryptionHelper,
                 ioService,
-                Mock.Of<IMessageService>());
+                Mock.Of<IMessageService>(),
+                passwordStorage);
 
             var settings = CreatePublishSettings("Connection");
 
@@ -101,11 +101,15 @@ namespace SCQueryConnect.Tests.Helpers
             var ioService = Mock.Of<IIOService>(s =>
                 s.ReadAllTextFromFile(It.IsAny<string>()) == string.Empty);
 
+            var passwordStorage = Mock.Of<IPasswordStorage>(p =>
+                p.LoadPassword(It.IsAny<string>()) == string.Empty);
+
             var helper = new BatchPublishHelper(
                 Mock.Of<IConnectionStringHelper>(),
                 encryptionHelper,
                 ioService,
-                Mock.Of<IMessageService>());
+                Mock.Of<IMessageService>(),
+                passwordStorage);
 
             var settings = CreatePublishSettings("Folder1", "Connection");
 
@@ -145,11 +149,15 @@ echo - Running 'Connection'...
             var ioService = Mock.Of<IIOService>(s =>
                 s.ReadAllTextFromFile(It.IsAny<string>()) == string.Empty);
 
+            var passwordStorage = Mock.Of<IPasswordStorage>(p =>
+                p.LoadPassword(It.IsAny<string>()) == string.Empty);
+
             var helper = new BatchPublishHelper(
                 Mock.Of<IConnectionStringHelper>(),
                 encryptionHelper,
                 ioService,
-                Mock.Of<IMessageService>());
+                Mock.Of<IMessageService>(),
+                passwordStorage);
 
             var settings = CreatePublishSettings("Folder1", "Folder2", "Connection");
 

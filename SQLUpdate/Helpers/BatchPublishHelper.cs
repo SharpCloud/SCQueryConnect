@@ -2,7 +2,7 @@
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
-using SCQueryConnect.ViewModels;
+using SCQueryConnect.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace SCQueryConnect.Helpers
 {
@@ -21,17 +20,20 @@ namespace SCQueryConnect.Helpers
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IIOService _ioService;
         private readonly IMessageService _messageService;
+        private readonly IPasswordStorage _passwordStorage;
 
         public BatchPublishHelper(
             IConnectionStringHelper connectionStringHelper,
             IEncryptionHelper encryptionHelper,
             IIOService ioService,
-            IMessageService messageService)
+            IMessageService messageService,
+            IPasswordStorage passwordStorage)
         {
             _connectionStringHelper = connectionStringHelper;
             _encryptionHelper = encryptionHelper;
             _ioService = ioService;
             _messageService = messageService;
+            _passwordStorage = passwordStorage;
         }
 
         public string GetBatchRunStartMessage(string name) => $"- Running '{name}'...";
@@ -91,7 +93,6 @@ namespace SCQueryConnect.Helpers
                 var filename = $"{queryData.Name}.bat";
                 var outputFolder = GetOrCreateOutputFolder(subPath, settings.BasePath);
                 var batchFilePath = Path.Combine(outputFolder, filename);
-
                 
                 parentStringBuilder?.AppendLine($"echo {message}");
                 parentStringBuilder?.AppendLine($"call \"{batchFilePath}\"");
@@ -192,12 +193,12 @@ namespace SCQueryConnect.Helpers
 
                 var passwordBytes = GetPasswordBytes(
                     settings.PasswordSecurity,
-                    settings.Password,
+                    PasswordStorage.Password,
                     out var entropy);
 
                 var proxyPasswordBytes = GetPasswordBytes(
                     settings.PasswordSecurity,
-                    settings.ProxyViewModel,
+                    PasswordStorage.ProxyPassword,
                     out var proxyEntropy);
 
                 var content = _ioService.ReadAllTextFromFile("BatchConfigTemplate.xml");
@@ -271,7 +272,7 @@ namespace SCQueryConnect.Helpers
 
         private byte[] GetPasswordBytes(
             PasswordSecurity security,
-            PasswordBox password,
+            string key,
             out byte[] entropy)
         {
             byte[] passwordBytes;
@@ -279,39 +280,27 @@ namespace SCQueryConnect.Helpers
             if (security == PasswordSecurity.DpapiUser)
             {
                 passwordBytes = _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(password.Password),
+                    _encryptionHelper.TextEncoding.GetBytes(
+                        _passwordStorage.LoadPassword(key)),
                     out entropy,
                     DataProtectionScope.CurrentUser);
             }
             else if (security == PasswordSecurity.DpapiMachine)
             {
                 passwordBytes = _encryptionHelper.Encrypt(
-                    _encryptionHelper.TextEncoding.GetBytes(password.Password),
+                    _encryptionHelper.TextEncoding.GetBytes(
+                        _passwordStorage.LoadPassword(key)),
                     out entropy,
                     DataProtectionScope.LocalMachine);
             }
             else
             {
                 passwordBytes = _encryptionHelper.TextEncoding.GetBytes(
-                    password.Password);
+                    _passwordStorage.LoadPassword(key));
 
                 entropy = new byte[0];
             }
 
-            return passwordBytes;
-        }
-
-        private byte[] GetPasswordBytes(
-            PasswordSecurity security,
-            ProxyViewModel proxyViewModel,
-            out byte[] entropy)
-        {
-            var password = new PasswordBox
-            {
-                Password = proxyViewModel.ProxyPassword
-            };
-
-            var passwordBytes = GetPasswordBytes(security, password, out entropy);
             return passwordBytes;
         }
 

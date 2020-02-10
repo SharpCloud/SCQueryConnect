@@ -173,6 +173,9 @@
     <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
       <Link>Interfaces\IMessageService.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IPasswordStorage.cs">
+      <Link>Interfaces\IPasswordStorage.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
       <Link>Logging\LoggingDestination.cs</Link>
     </Compile>
@@ -214,6 +217,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Services\MessageService.cs">
       <Link>Services\MessageService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\PasswordStorage.cs">
+      <Link>Services\PasswordStorage.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\UIDataCheckerValidityProcessor.cs">
       <Link>UIDataCheckerValidityProcessor.cs</Link>
