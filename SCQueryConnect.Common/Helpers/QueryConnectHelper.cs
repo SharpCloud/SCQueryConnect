@@ -355,7 +355,7 @@ namespace SCQueryConnect.Common.Helpers
             }
             catch (OperationCanceledException)
             {
-                await _logger.LogWarning("Story update aborted");
+                await _logger.LogWarning("Cancelling story update...");
                 throw;
             }
             catch (Exception ex)

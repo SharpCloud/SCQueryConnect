@@ -866,7 +866,7 @@ namespace SCQueryConnect
                 }
                 catch (OperationCanceledException)
                 {
-                    await _logger.LogWarning("Update cancelled by user");
+                    await _logger.LogWarning("Update cancelled");
                     _logger.ClearDestinations();
                     
                     _mainViewModel.UpdateText = string.Empty;
@@ -947,10 +947,13 @@ namespace SCQueryConnect
             queryData.DragInto = false;
         }
 
-        private void CancelStoryUpdate(object sender, RoutedEventArgs e)
+        private async void CancelStoryUpdate(object sender, RoutedEventArgs e)
         {
-            _mainViewModel.UpdateText = "Cancelling Update...";
-            _mainViewModel.UpdateSubtext = string.Empty;
+            await _logger.LogWarning("Update cancellation initiated by user...");
+
+            _mainViewModel.UpdateText = "Update Cancelled...";
+            _mainViewModel.UpdateSubtext = "Finishing current task...";
+            
             _cancellationTokenSource.Cancel();
         }
 
