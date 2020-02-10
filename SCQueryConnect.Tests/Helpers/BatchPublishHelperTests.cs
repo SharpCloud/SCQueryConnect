@@ -129,7 +129,7 @@ namespace SCQueryConnect.Tests.Helpers
             mock.Verify(s => s.WriteAllTextToFile(
                 @"RoamingProfile\data\Folder1\Folder1.bat",
                 @"@echo off
-echo Running: Connection
+echo - Running 'Connection'...
 ""RoamingProfile\data\Folder1\Connection\SCSQLBatch.exe""
 "), Times.Once);
         }
@@ -173,14 +173,14 @@ echo Running: Connection
             mock.Verify(s => s.WriteAllTextToFile(
                 @"RoamingProfile\data\Folder1\Folder2\Folder2.bat",
                 @"@echo off
-echo Running: Connection
+echo - Running 'Connection'...
 ""RoamingProfile\data\Folder1\Folder2\Connection\SCSQLBatch.exe""
 "), Times.Once);
 
             mock.Verify(s => s.WriteAllTextToFile(
                 @"RoamingProfile\data\Folder1\Folder1.bat",
                 @"@echo off
-echo Running: Folder2
+echo - Running 'Folder2'...
 call ""RoamingProfile\data\Folder1\Folder2\Folder2.bat""
 "), Times.Once);
         }

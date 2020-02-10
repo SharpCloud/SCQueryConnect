@@ -34,6 +34,8 @@ namespace SCQueryConnect.Helpers
             _messageService = messageService;
         }
 
+        public string GetBatchRunStartMessage(string name) => $"- Running '{name}'...";
+
         public string GetOrCreateOutputFolder(string queryName, string basePath)
         {
             var folder = Path.Combine(basePath, "data");
@@ -81,6 +83,8 @@ namespace SCQueryConnect.Helpers
             StringBuilder parentStringBuilder,
             PublishSettings settings)
         {
+            var message = GetBatchRunStartMessage(queryData.Name);
+
             if (queryData.IsFolder)
             {
                 var subPath = Path.Combine(parentPath, queryData.Name);
@@ -88,7 +92,8 @@ namespace SCQueryConnect.Helpers
                 var outputFolder = GetOrCreateOutputFolder(subPath, settings.BasePath);
                 var batchFilePath = Path.Combine(outputFolder, filename);
 
-                parentStringBuilder?.AppendLine($"echo Running: {queryData.Name}");
+                
+                parentStringBuilder?.AppendLine($"echo {message}");
                 parentStringBuilder?.AppendLine($"call \"{batchFilePath}\"");
 
                 var localStringBuilder = new StringBuilder();
@@ -115,7 +120,7 @@ namespace SCQueryConnect.Helpers
                 var suffix = GetFileSuffix(settings);
                 var filename = $"SCSQLBatch{suffix}.exe";
 
-                parentStringBuilder?.AppendLine($"echo Running: {queryData.Name}");
+                parentStringBuilder?.AppendLine($"echo {message}");
                 parentStringBuilder?.AppendLine($"\"{Path.Combine(fullPath, filename)}\"");
             }
         }

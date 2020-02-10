@@ -943,7 +943,9 @@ namespace SCQueryConnect
             {
                 _mainViewModel.UpdateText = "Updating...";
                 _mainViewModel.UpdateSubtext = $"Running '{queryData.Name}'";
-                await _logger.Log($"> Running '{queryData.Name}'...");
+
+                var message = _batchPublishHelper.GetBatchRunStartMessage(queryData.Name);
+                await _logger.Log(message);
                 
                 await UpdateSharpCloud(queryData, ct);
             }
