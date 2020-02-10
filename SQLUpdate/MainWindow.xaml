@@ -694,12 +694,23 @@
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Server:" Style="{StaticResource Label}" Width="100" />
-                                    <TextBox x:Name="Url" Text ="https://my.sharpcloud.com" Width="270" />
-                                    <TextBlock Margin="10,0"><Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick"> Proxy</Hyperlink></TextBlock>
+
+                                    <TextBox x:Name="UrlTextBox"
+                                             Text ="{Binding MainViewModel.Url, Source={StaticResource ViewModelLocator}, FallbackValue='https://my.sharpcloud.com'}"
+                                             Width="270">
+                                    </TextBox>
+                                    
+                                    <TextBlock Margin="10,0">
+                                        <Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick"> Proxy</Hyperlink>
+                                    </TextBlock>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Username:" Style="{StaticResource Label}" Width="100" />
-                                    <TextBox x:Name="Username" Width="270"></TextBox>
+
+                                    <TextBox x:Name="UsernameTextBox"
+                                             Width="270"
+                                             Text="{Binding MainViewModel.Username, Source={StaticResource ViewModelLocator}}">
+                                    </TextBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Password:" Style="{StaticResource Label}" Width="100" />

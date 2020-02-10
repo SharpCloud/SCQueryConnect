@@ -195,8 +195,8 @@ namespace SCQueryConnect
                 SaveHelper.RegDelete("ActiveConnection");
             }
 
-            Url.Text = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
-            Username.Text = SaveHelper.RegRead("Username", "");
+            _mainViewModel.Url = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
+            _mainViewModel.Username = SaveHelper.RegRead("Username", "");
 
             Password.Password = _passwordStorage.LoadPassword(PasswordStorage.Password);
 
@@ -241,9 +241,9 @@ namespace SCQueryConnect
         {
             return new SharpCloudConfiguration
             {
-                Username = Username.Text,
+                Username = _mainViewModel.Username,
                 Password = Password.Password,
-                Url = Url.Text,
+                Url = _mainViewModel.Url,
                 ProxyUrl = _proxyViewModel.Proxy,
                 UseDefaultProxyCredentials = _proxyViewModel.ProxyAnnonymous,
                 ProxyUserName = _proxyViewModel.ProxyUserName,
@@ -443,8 +443,8 @@ namespace SCQueryConnect
 
         private void SaveSettings()
         {
-            SaveHelper.RegWrite("URL", Url.Text);
-            SaveHelper.RegWrite("Username", Username.Text);
+            SaveHelper.RegWrite("URL", _mainViewModel.Url);
+            SaveHelper.RegWrite("Username", _mainViewModel.Username);
 
             _passwordStorage.SavePassword(PasswordStorage.Password, Password.Password);
 
@@ -461,16 +461,16 @@ namespace SCQueryConnect
 
         private bool ValidateCredentials()
         {
-            if (string.IsNullOrEmpty(Url.Text))
+            if (string.IsNullOrEmpty(_mainViewModel.Url))
             {
                 MessageBox.Show("Please enter a valid URL");
-                Url.Focus();
+                UrlTextBox.Focus();
                 return false;
             }
-            if (string.IsNullOrEmpty(Username.Text))
+            if (string.IsNullOrEmpty(_mainViewModel.Username))
             {
                 MessageBox.Show("Please enter your SharpCloud username");
-                Username.Focus();
+                UsernameTextBox.Focus();
                 return false;
             }
             if (string.IsNullOrEmpty(Password.Password))
@@ -642,9 +642,9 @@ namespace SCQueryConnect
         private async void SelectStoryClick(object sender, RoutedEventArgs e)
         {
             var api = _sharpCloudApiFactory.CreateSharpCloudApi(
-                Username.Text,
+                _mainViewModel.Username,
                 Password.Password,
-                Url.Text,
+                _mainViewModel.Url,
                 _proxyViewModel.Proxy,
                 _proxyViewModel.ProxyAnnonymous,
                 _proxyViewModel.ProxyUserName,
@@ -656,7 +656,7 @@ namespace SCQueryConnect
                 return;
             }
 
-            var sel = new SelectStory(api, false, Username.Text);
+            var sel = new SelectStory(api, false, _mainViewModel.Username);
 
             bool? dialogResult = sel.ShowDialog();
             if (dialogResult == true)
@@ -668,7 +668,7 @@ namespace SCQueryConnect
 
         private void ViewStoryClick(object sender, RoutedEventArgs e)
         {
-            Process.Start($"{Url.Text}/html/#/story/{_mainViewModel.SelectedQueryData.StoryId}");
+            Process.Start($"{_mainViewModel.Url}/html/#/story/{_mainViewModel.SelectedQueryData.StoryId}");
         }
 
         private void Database_Engine_Hyperlink_Click(object sender, RoutedEventArgs e)
@@ -716,8 +716,8 @@ namespace SCQueryConnect
                 Data = _mainViewModel.SelectedQueryData,
                 ProxyViewModel = _proxyViewModel,
                 BasePath = _localPath,
-                Username = Username.Text,
-                SharpCloudUrl = Url.Text,
+                Username = _mainViewModel.Username,
+                SharpCloudUrl = _mainViewModel.Url,
                 PasswordSecurity = security,
                 PublishArchitecture = architecture
             };

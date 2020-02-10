@@ -34,6 +34,8 @@ namespace SCQueryConnect.ViewModels
         private string _publishTabHeader;
         private string _updateSubtext;
         private string _updateText;
+        private string _url;
+        private string _username;
 
         public PasswordSecurity PublishPasswordSecurity
         {
@@ -174,6 +176,34 @@ namespace SCQueryConnect.ViewModels
                 if (_updateText != value)
                 {
                     _updateText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string Url
+        {
+            get => _url;
+
+            set
+            {
+                if (_url != value)
+                {
+                    _url = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string Username
+        {
+            get => _username;
+
+            set
+            {
+                if (_username != value)
+                {
+                    _username = value;
                     OnPropertyChanged();
                 }
             }
