@@ -68,6 +68,7 @@
     <Compile Include="Helpers\DbConnectionFactory.cs" />
     <Compile Include="Helpers\DpapiHelper.cs" />
     <Compile Include="Helpers\ExcelWriter.cs" />
+    <Compile Include="Helpers\RelationshipsBuilder.cs" />
     <Compile Include="Helpers\ResourceUrlDataChecker.cs" />
     <Compile Include="Helpers\ItemDataChecker.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Interfaces\IDataChecker.cs" />
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IItemDataChecker.cs" />
+    <Compile Include="Interfaces\IRelationshipsBuilder.cs" />
     <Compile Include="Interfaces\IRelationshipsDataChecker.cs" />
     <Compile Include="Interfaces\IPanelsDataChecker.cs" />
     <Compile Include="Interfaces\IResourceUrlDataChecker.cs" />

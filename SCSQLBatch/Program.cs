@@ -32,6 +32,7 @@ namespace SCSQLBatch
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>();
+            builder.RegisterType<RelationshipsBuilder>().As<IRelationshipsBuilder>();
             builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>();
             

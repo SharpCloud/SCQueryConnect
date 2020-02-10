@@ -65,6 +65,7 @@ namespace SCQueryConnect
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>().InstancePerLifetimeScope();
             builder.RegisterType<IOService>().As<IIOService>().InstancePerLifetimeScope();
+            builder.RegisterType<RelationshipsBuilder>().As<IRelationshipsBuilder>().InstancePerLifetimeScope();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>().InstancePerLifetimeScope();
             builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();

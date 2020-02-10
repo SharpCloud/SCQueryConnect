@@ -22,6 +22,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
             ILog log = null,
             IPanelsDataChecker panelsDataChecker = null,
             IRelationshipsDataChecker relationshipsDataChecker = null,
+            IRelationshipsBuilder relationshipsBuilder = null,
             IResourceUrlDataChecker resourceUrlDataChecker = null,
             ISharpCloudApiFactory sharpCloudApiFactory = null)
         {
@@ -33,6 +34,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
                 excelWriter ?? Mock.Of<IExcelWriter>(),
                 log ?? Mock.Of<ILog>(),
                 panelsDataChecker ?? Mock.Of<IPanelsDataChecker>(),
+                relationshipsBuilder ?? Mock.Of<IRelationshipsBuilder>(),
                 relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
                 resourceUrlDataChecker ?? Mock.Of<IResourceUrlDataChecker>(),
                 sharpCloudApiFactory ?? Mock.Of<ISharpCloudApiFactory>());
