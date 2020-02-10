@@ -246,8 +246,6 @@ namespace SCQueryConnect
 
                 SaveHelper.RegDelete("ProxyPassword");
             }
-
-            BrowserTabs.SelectedIndex = (int.Parse(SaveHelper.RegRead("ActiveTab", "0")));
         }
 
         private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
@@ -494,7 +492,6 @@ namespace SCQueryConnect
                     DataProtectionScope.CurrentUser)));
 
             SaveHelper.RegWrite("PasswordDpapiEntropy", Convert.ToBase64String(entropy));
-            SaveHelper.RegWrite("ActiveTab", BrowserTabs.SelectedIndex.ToString());
 
             SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
             SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);

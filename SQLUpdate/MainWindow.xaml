@@ -337,9 +337,9 @@
 
             <!-- Right Panel -->
             <Grid Grid.Column="2" DataContext="{Binding MainViewModel.SelectedQueryData, Source={StaticResource ViewModelLocator}}">
+                
                 <!-- Tabs for Connection Config -->
-                <TabControl x:Name="BrowserTabs"
-                            BorderBrush="Transparent"
+                <TabControl BorderBrush="Transparent"
                             MinWidth="750"
                             SelectedIndex="{Binding MainViewModel.SelectedTabIndex, Source={StaticResource ViewModelLocator}}">
                     <TabControl.Resources>

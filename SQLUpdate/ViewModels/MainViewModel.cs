@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using System;
@@ -326,11 +327,15 @@ namespace SCQueryConnect.ViewModels
                 if (migrate)
                 {
                     encrypted = JsonConvert.DeserializeObject<IList<QueryData>>(File.ReadAllText(filePath));
+                    SaveHelper.RegDelete("ActiveTab");
                 }
                 else
                 {
                     var saveData = JsonConvert.DeserializeObject<SaveData>(File.ReadAllText(filePath));
                     encrypted = saveData.Connections;
+                    _lastSelectedConnectionIndex = saveData.LastSelectedConnectionIndex;
+                    _lastSelectedFolderIndex = saveData.LastSelectedFolderIndex;
+                    SelectedTabIndex = saveData.SelectedTabIndex;
                 }
 
                 var filtered = encrypted?.Where(qd => qd != null);
@@ -370,7 +375,10 @@ namespace SCQueryConnect.ViewModels
 
             var toSave = new SaveData
             {
-                Connections = connections
+                Connections = connections,
+                LastSelectedConnectionIndex = _lastSelectedConnectionIndex,
+                LastSelectedFolderIndex = _lastSelectedFolderIndex,
+                SelectedTabIndex = SelectedTabIndex
             };
 
             var json = JsonConvert.SerializeObject(toSave);
