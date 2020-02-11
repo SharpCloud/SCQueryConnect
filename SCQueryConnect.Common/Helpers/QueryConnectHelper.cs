@@ -328,7 +328,7 @@ namespace SCQueryConnect.Common.Helpers
                         {
                             await _logger.Log("Building relationships...");
 
-                            await _relationshipsBuilder.AddRelationshipsToStory(story, ';', false);
+                            await _relationshipsBuilder.AddRelationshipsToStory(story);
                             ct.ThrowIfCancellationRequested();
 
                             await _logger.Log("Relationships built");

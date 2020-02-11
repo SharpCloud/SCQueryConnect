@@ -5,6 +5,6 @@ namespace SCQueryConnect.Common.Interfaces
 {
     public interface IRelationshipsBuilder
     {
-        Task AddRelationshipsToStory(Story story, char separator, bool hasRelValue);
+        Task AddRelationshipsToStory(Story story);
     }
 }

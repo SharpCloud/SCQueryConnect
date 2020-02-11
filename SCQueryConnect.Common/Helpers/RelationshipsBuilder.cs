@@ -1,6 +1,5 @@
 ﻿using SC.API.ComInterop.Models;
 using SCQueryConnect.Common.Interfaces;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Attribute = SC.API.ComInterop.Models.Attribute;
 
@@ -8,6 +7,7 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class RelationshipsBuilder : IRelationshipsBuilder
     {
+        private readonly char[] _separators = {';', ','};
         private readonly ILog _logger;
 
         public RelationshipsBuilder(ILog logger)
@@ -15,84 +15,70 @@ namespace SCQueryConnect.Common.Helpers
             _logger = logger;
         }
 
-        public async Task AddRelationshipsToStory(Story story, char separator, bool hasRelValue)
+        public async Task AddRelationshipsToStory(Story story)
         {
-            var relAttrib = story.RelationshipAttribute_FindByName("Strength");
-            if (hasRelValue && relAttrib == null)
-                relAttrib = story.RelationshipAttribute_Add("Strength", RelationshipAttribute.RelationshipAttributeType.Numeric);
-
-            var attribsToTest = new List<Attribute>();
+            Attribute relatedItemAttribute = null;
 
             foreach (var a in story.Attributes)
             {
-                if (a.Type == Attribute.AttributeType.Text &&
-                    (a.Name.ToLower().Contains("related_") || a.Name == "RelatedItems"))
+                if (a.Type == Attribute.AttributeType.Text && a.Name == "RelatedItems")
                 {
-                    attribsToTest.Add(a);
+                    relatedItemAttribute = a;
+                    break;
                 }
             }
 
-            if (attribsToTest.Count == 0)
+            if (relatedItemAttribute == null)
             {
-                await _logger.LogWarning("No Related attributes detected.");
-                await _logger.LogWarning("Make sure you are using a text attribute called 'Related_<CategoryName>' or just 'RelatedItems'");
+                await _logger.LogWarning("Warning: Could not find a 'RelatedItems' attribute.");
+                await _logger.Log("Please make sure you have a text attribute called 'RelatedItems' in this story.");
+                await _logger.Log("Exiting process.");
                 return;
             }
 
-            foreach (var at in attribsToTest)
+            int countAny = 0;
+            int countNew = 0;
+
+            foreach (var i in story.Items)
             {
-                bool any = (at.Name == "RelatedItems");
-                var catName = at.Name.Substring(8);
-
-                foreach (var i in story.Items)
+                var text = i.GetAttributeValueAsText(relatedItemAttribute);
+                if (!string.IsNullOrWhiteSpace(text))
                 {
-                    var text = i.GetAttributeValueAsText(at);
-                    if (!string.IsNullOrWhiteSpace(text))
+                    countAny++;
+                    var rels = text.Split(_separators);
+                    foreach (var r in rels)
                     {
-                        var rels = text.Split(separator);
-                        foreach (var r in rels)
+                        var Id = r.Trim();
+                        if (!string.IsNullOrWhiteSpace(Id))
                         {
-                            var Id = r.Trim();
-                            var val = r.Substring(r.Length - 1);
-                            double num = 0;
-                            if (hasRelValue && double.TryParse(val, out num))
-                            {
-                                num = double.Parse(val);
-                                Id = r.Substring(0, Id.Length - 1).Trim();
-                            }
-
-                            var i2 = FindItem(story, Id, catName, any);
+                            var i2 = story.Item_FindByExternalId(Id);
                             if (i2 != null)
                             {
                                 if (story.Relationship_FindByItems(i, i2) == null)
                                 {
-                                    var rel = story.Relationship_AddNew(i, i2, $"Added from {i.Name}.{at.Name}");
-                                    await _logger.Log($"Adding realtionship between '{i.Name}' and '{i2.Name}'");
-                                    if (hasRelValue && num > 0)
-                                        rel.SetAttributeValue(relAttrib, num);
+                                    var rel = story.Relationship_AddNew(i, i2);
+                                    countNew++;
+                                    await _logger.Log($"Adding relationship between '{i.Name}' and '{i2.Name}'");
                                 }
                             }
                             else
                             {
-                                await _logger.Log($"Could not find item '{Id}' for '{i.Name}.{at.Name}' from 'text'");
+                                await _logger.Log(
+                                    $"Could not find related item with '{Id}' for item '{i.Name}' from '{text}'");
                             }
                         }
                     }
                 }
             }
-        }
 
-        private static Item FindItem(Story story, string extId, string catName, bool any)
-        {
-            if (any)
-                return story.Item_FindByExternalId(extId);
-
-            foreach (var i in story.Items)
+            if (countAny == 0)
             {
-                if (i.Category.Name == catName && i.ExternalId == extId)
-                    return i;
+                await _logger.Log($"No items with RelatedItems text fields found.");
             }
-            return null;// none found
+            else
+            {
+                await _logger.Log($"{countAny} records processed, {countNew} new relationships added.");
+            }
         }
     }
 }
