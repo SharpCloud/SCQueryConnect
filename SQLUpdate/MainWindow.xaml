@@ -730,9 +730,18 @@
                                         Unpublish unmatched items
                                     </CheckBox>
 
-                                    <CheckBox Foreground="{StaticResource QCBlue}"
+                                    <CheckBox Content="Build relationships"
+                                              Foreground="{StaticResource QCBlue}"
                                               IsChecked="{Binding BuildRelationships, Mode=TwoWay}">
-                                        Build relationships
+                                        <CheckBox.ToolTip>
+                                            <TextBlock>
+                                                <Run Text="Use this option to automatically create relationships between other items in this story." />
+                                                <LineBreak />
+                                                <Run Text="Your relationships text must be stored in a text attribute called 'RelatedItems' and these MUST refer to the externalID of the item (i.e. not the name)." />
+                                                <LineBreak />
+                                                <Run Text="Note that you can add multiple relationships by separating the values with a semi-colon or a comma (';' or ',')." />
+                                            </TextBlock>
+                                        </CheckBox.ToolTip>
                                     </CheckBox>
                                 </StackPanel>
 
