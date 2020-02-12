@@ -548,6 +548,7 @@
                                     <Setter Property="Foreground" Value="White" />
                                     <Setter Property="FontWeight" Value="Bold" />
                                     <Setter Property="Margin" Value="5,5,5,0" />
+                                    <Setter Property="Padding" Value="5,0,0,0" />
                                 </Style>
 
                                 <Style TargetType="TextBox">
@@ -589,7 +590,13 @@
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Style="{StaticResource DbResultsTextBlock}" />
-                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain a 'Name' or 'External ID' column" x:Name="txterr" Visibility="Collapsed" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsItemQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain a 'Name' or 'External ID' column
+                                        </TextBlock>
+                                        
                                         <Button Click="RunClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid x:Name="DataGrid" Grid.Row="1" />
                                     </Grid>
@@ -620,7 +627,13 @@
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Style="{StaticResource DbResultsTextBlock}" />
-                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain a 'Item1' and 'Item2' column" x:Name="txterrRels" Visibility="Collapsed" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsRelationshipQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain a 'Item1' and 'Item2' column
+                                        </TextBlock>
+                                        
                                         <Button Click="RunClickRels" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid x:Name="DataGridRels" Grid.Row="1" />
                                     </Grid>
@@ -647,7 +660,13 @@
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Style="{StaticResource DbResultsTextBlock}" />
-                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain 'ExternalID', 'ResourceName', 'Description', and 'URL' columns" x:Name="txterrResourceUrls" Visibility="Collapsed" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsResourceUrlsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain 'ExternalID', 'ResourceName', 'Description', and 'URL' columns
+                                        </TextBlock>
+                                        
                                         <Button Click="PreviewResourceUrlsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid x:Name="DataGridResourceUrls" Grid.Row="1" />
                                     </Grid>
@@ -674,7 +693,13 @@
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Style="{StaticResource DbResultsTextBlock}" />
-                                        <TextBlock Style="{StaticResource ErrorTextBlock}" Grid.Row="0" Text=" Error: Data must contain 'ExternalID', 'Title', 'PanelType', and 'Data' columns" x:Name="txterrPanels" Visibility="Collapsed" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsPanelsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain 'ExternalID', 'Title', 'PanelType', and 'Data' columns
+                                        </TextBlock>
+                                        
                                         <Button Click="PreviewPanelsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid x:Name="DataGridPanels" Grid.Row="1" />
                                     </Grid>

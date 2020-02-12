@@ -146,6 +146,9 @@
     <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
       <Link>Converters\ValidExcelNameConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\DataCheckerValidityProcessor.cs">
+      <Link>DataCheckerValidityProcessor.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
       <Link>ExtendedPropertyChangedEventArgs.cs</Link>
     </Compile>
@@ -220,9 +223,6 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Services\PasswordStorage.cs">
       <Link>Services\PasswordStorage.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\UIDataCheckerValidityProcessor.cs">
-      <Link>UIDataCheckerValidityProcessor.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
       <Link>ViewModels\MainViewModel.cs</Link>

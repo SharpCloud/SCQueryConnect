@@ -104,7 +104,9 @@ namespace SCQueryConnect
             _connectionStringHelper = connectionStringHelper;
 
             _itemDataChecker = itemDataChecker;
-            _itemDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterr);
+            _itemDataChecker.ValidityProcessor = new DataCheckerValidityProcessor(
+                mainViewModel,
+                vm => vm.IsItemQueryOk);
 
             _dbConnectionFactory = dbConnectionFactory;
             _encryptionHelper = encryptionHelper;
@@ -113,17 +115,22 @@ namespace SCQueryConnect
             _passwordStorage = passwordStorage;
 
             _relationshipsChecker = relationshipsDataChecker;
-            _relationshipsChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrRels);
+            _relationshipsChecker.ValidityProcessor = new DataCheckerValidityProcessor(
+                mainViewModel,
+                vm => vm.IsRelationshipQueryOk);
 
             _sharpCloudApiFactory = sharpCloudApiFactory;
 
             _panelsDataChecker = panelsDataChecker;
-            _panelsDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrPanels);
+            _panelsDataChecker.ValidityProcessor = new DataCheckerValidityProcessor(
+                mainViewModel,
+                vm => vm.IsPanelsQueryOk);
 
             _resourceUrlDataChecker = resourceUrlDataChecker;
-            _resourceUrlDataChecker.ValidityProcessor = new UIDataCheckerValidityProcessor(txterrResourceUrls);
+            _resourceUrlDataChecker.ValidityProcessor = new DataCheckerValidityProcessor(
+                mainViewModel,
+                vm => vm.IsResourceUrlsQueryOk);
 
-            
             _folderLoggingDestination  = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
             _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
             

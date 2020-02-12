@@ -152,6 +152,7 @@
     <Compile Include="Converters\EnumMatchToBoolConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Converters\ValidExcelNameConverter.cs" />
+    <Compile Include="DataCheckerValidityProcessor.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
@@ -172,7 +173,6 @@
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\MessageService.cs" />
     <Compile Include="Services\PasswordStorage.cs" />
-    <Compile Include="UIDataCheckerValidityProcessor.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\ConnectionInfo.xaml.cs">
