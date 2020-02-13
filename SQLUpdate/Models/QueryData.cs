@@ -12,6 +12,8 @@ namespace SCQueryConnect.Models
 {
     public class QueryData : INotifyPropertyChanged
     {
+        private const string FilenamePlaceHolder = "{filename}";
+
         public const string RootId = "RootId";
 
         private static readonly char[] NewLineSeparators = {'\r', '\n'};
@@ -303,6 +305,7 @@ namespace SCQueryConnect.Models
         [JsonIgnore]
         public string FormattedConnectionString => ConnectionsString
             ?.Replace("{0}", FileName)
+            .Replace(FilenamePlaceHolder, FileName)
             .Replace("{1}", SharePointURL)
             .Replace("{source-story-id}", SourceStoryId)
             .Replace("{source-story-user-name}", SourceStoryUserName)
@@ -360,7 +363,7 @@ namespace SCQueryConnect.Models
                 switch (ConnectionType)
                 {
                     case DatabaseType.Excel:
-                        return "SELECT * from [Sheet2$]";
+                        return "SELECT * from Sheet2";
                 }
                 return "SELECT ITEM1, ITEM2, COMMENT, DIRECTION, TAGS FROM RELTABLE";
             }
@@ -483,9 +486,8 @@ namespace SCQueryConnect.Models
                 case DatabaseType.Excel:
                     Name = "Excel Example";
                     FileName = "C:/MyFolder/MyFile.xlsx";
-                    ConnectionsString =
-                        "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml; HDR = YES'";
-                    QueryString = "SELECT * from [Sheet1$]";
+                    ConnectionsString = $"Excel File={FilenamePlaceHolder}";
+                    QueryString = "SELECT * from Sheet1";
                     break;
                 
                 case DatabaseType.Access:

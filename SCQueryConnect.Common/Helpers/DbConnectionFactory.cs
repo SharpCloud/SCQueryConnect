@@ -1,6 +1,7 @@
 ﻿using SCQueryConnect.Common.Interfaces;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.CData.Excel;
 using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.SqlClient;
@@ -16,6 +17,9 @@ namespace SCQueryConnect.Common.Helpers
         {
             switch (dbType)
             {
+                case DatabaseType.Excel:
+                    return new ExcelConnection(connectionString);
+
                 case DatabaseType.SQL:
                     return new SqlConnection(connectionString);
 

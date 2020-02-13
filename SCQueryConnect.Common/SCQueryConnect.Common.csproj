@@ -49,6 +49,15 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.CData.Excel, Version=19.0.0.40, Culture=neutral, PublicKeyToken=cdc168f89cffe9cf, processorArchitecture=MSIL">
+      <HintPath>..\packages\CData.Excel.19.0.7285\lib\net40\System.Data.CData.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.CData.Excel.Designer, Version=19.0.0.40, Culture=neutral, PublicKeyToken=cdc168f89cffe9cf, processorArchitecture=MSIL">
+      <HintPath>..\packages\CData.Excel.19.0.7285\lib\net40\System.Data.CData.Excel.Designer.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.CData.Excel.Entities.EF6, Version=19.0.0.40, Culture=neutral, PublicKeyToken=cdc168f89cffe9cf, processorArchitecture=MSIL">
+      <HintPath>..\packages\CData.Excel.19.0.7285\lib\net40\System.Data.CData.Excel.Entities.EF6.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
