@@ -18,6 +18,7 @@ namespace SCQueryConnect.Interfaces
         string UpdateText { get; set; }
         string Url { get; set; }
         string Username { get; set; }
+        int SelectedQueryTabIndex { get; set; }
         int SelectedTabIndex { get; set; }
         ObservableCollection<QueryData> Connections { get; set; }
         QueryData QueryRootNode { get; }

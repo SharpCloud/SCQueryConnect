@@ -519,7 +519,8 @@
 
                     <TabItem Header="2. Queries"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
-                        <TabControl Background="{StaticResource QCBackground}">
+                        <TabControl Background="{StaticResource QCBackground}"
+                                    SelectedIndex="{Binding MainViewModel.SelectedQueryTabIndex, Source={StaticResource ViewModelLocator}}">
                             <TabControl.Resources>
                                 <Style TargetType="GridSplitter">
                                     <Setter Property="Height" Value="3" />
@@ -612,7 +613,7 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBlock x:Name="txtExampleRels" Grid.Row="0" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right">
+                                    <TextBlock Grid.Row="0" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right">
                                         <Run Text="Example:" />
                                         <Run Text="{Binding ExampleRelQuery, Mode=OneWay}" />
                                     </TextBlock>

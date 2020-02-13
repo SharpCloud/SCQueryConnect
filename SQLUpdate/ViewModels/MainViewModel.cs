@@ -42,6 +42,7 @@ namespace SCQueryConnect.ViewModels
         private QueryData _selectedQueryData;
         private int _lastSelectedConnectionIndex;
         private int _lastSelectedFolderIndex = FolderTabIndex;
+        private int _selectedQueryTabIndex;
         private int _selectedTabIndex;
         private string _publishTabHeader;
         private string _updateSubtext;
@@ -175,6 +176,20 @@ namespace SCQueryConnect.ViewModels
                             SelectedTabIndex = _lastSelectedConnectionIndex;
                         }
                     }
+                }
+            }
+        }
+
+        public int SelectedQueryTabIndex
+        {
+            get => _selectedQueryTabIndex;
+
+            set
+            {
+                if (_selectedQueryTabIndex != value)
+                {
+                    _selectedQueryTabIndex = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -484,6 +499,7 @@ namespace SCQueryConnect.ViewModels
                     encrypted = saveData.Connections;
                     _lastSelectedConnectionIndex = saveData.LastSelectedConnectionIndex;
                     _lastSelectedFolderIndex = saveData.LastSelectedFolderIndex;
+                    SelectedQueryTabIndex = saveData.SelectedQueryTabIndex;
                     SelectedTabIndex = saveData.SelectedTabIndex;
                 }
 
@@ -555,6 +571,7 @@ namespace SCQueryConnect.ViewModels
                 Connections = encrypted,
                 LastSelectedConnectionIndex = _lastSelectedConnectionIndex,
                 LastSelectedFolderIndex = _lastSelectedFolderIndex,
+                SelectedQueryTabIndex = SelectedQueryTabIndex,
                 SelectedTabIndex = SelectedTabIndex
             };
 
