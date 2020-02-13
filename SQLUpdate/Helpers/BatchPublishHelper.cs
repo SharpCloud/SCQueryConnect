@@ -159,18 +159,28 @@ namespace SCQueryConnect.Helpers
                         "Your connection string and/or query string contains '\"', which will automatically be replaced with '");
                 }
 
+                var fileList = new[]
+                {
+                    "Autofac.dll",
+                    "Newtonsoft.Json.dll",
+                    "SC.Framework.dll",
+                    "SC.API.ComInterop.dll",
+                    "SC.Api.dll",
+                    "SC.SharedModels.dll",
+                    $"SCSQLBatch{suffix}.exe",
+                    $"SCSQLBatch{suffix}.exe.config",
+                    "SCSQLBatch.zip",
+                    "SCQueryConnect.Common.dll",
+                    "System.Data.CData.Excel.dll"
+                };
+
                 try
                 {
-                    _ioService.DeleteFile($"{outputFolder}/Autofac.dll");
-                    _ioService.DeleteFile($"{outputFolder}/Newtonsoft.Json.dll");
-                    _ioService.DeleteFile($"{outputFolder}/SC.Framework.dll");
-                    _ioService.DeleteFile($"{outputFolder}/SC.API.ComInterop.dll");
-                    _ioService.DeleteFile($"{outputFolder}/SC.Api.dll");
-                    _ioService.DeleteFile($"{outputFolder}/SC.SharedModels.dll");
-                    _ioService.DeleteFile($"{outputFolder}/SCSQLBatch{suffix}.exe");
-                    _ioService.DeleteFile($"{outputFolder}/SCSQLBatch{suffix}.exe.config");
-                    _ioService.DeleteFile($"{outputFolder}/SCSQLBatch.zip");
-                    _ioService.DeleteFile($"{outputFolder}/SCQueryConnect.Common.dll");
+                    foreach (var filename in fileList)
+                    {
+                        var toDelete = Path.Combine(outputFolder, filename);
+                        _ioService.DeleteFile(toDelete);
+                    }
 
                     _ioService.ExtractZipFileToDirectory(zipfile, outputFolder);
                 }
