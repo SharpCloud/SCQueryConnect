@@ -28,8 +28,8 @@ namespace SCQueryConnect.Models
         private string _name;
         private string _description;
         private ObservableCollection<QueryData> _connections;
-        private string _fileName;
-        private string _sharePointUrl;
+        private string _fileName = string.Empty;
+        private string _sharePointUrl = string.Empty;
         private bool _buildRelationships;
         private bool _unpublishItems;
         private string _issueSummary;
@@ -116,13 +116,13 @@ namespace SCQueryConnect.Models
 
         public string StoryId { get; set; }
 
-        public string QueryString { get; set; }
+        public string QueryString { get; set; } = "SELECT * FROM TABLE";
 
-        public string QueryStringRels { get; set; }
-        
-        public string QueryStringPanels { get; set; }
-        
-        public string QueryStringResourceUrls { get; set; }
+        public string QueryStringRels { get; set; } = string.Empty;
+
+        public string QueryStringPanels { get; set; } = string.Empty;
+
+        public string QueryStringResourceUrls { get; set; } = string.Empty;
 
         public string FileName
         {
@@ -466,65 +466,41 @@ namespace SCQueryConnect.Models
             {
                 case DatabaseType.SQL:
                     Name = "SQL Server Example";
-                    FileName = "";
-                    SharePointURL = "";
                     ConnectionsString = "Server=.; Integrated Security=true; Database=demo";
-                    QueryString = "SELECT * FROM TABLE";
-                    QueryStringPanels = "";
-                    QueryStringRels = "";
-                    QueryStringResourceUrls = "";
                     break;
+                
                 case DatabaseType.ODBC:
                     Name = "ODBC Example";
-                    FileName = "";
-                    SharePointURL = "";
                     ConnectionsString = "DSN=DatasourceName";
-                    QueryString = "SELECT * FROM TABLE";
-                    QueryStringPanels = "";
-                    QueryStringRels = "";
-                    QueryStringResourceUrls = "";
                     break;
+                
                 case DatabaseType.ADO:
                     Name = "ADO/OLEDB Example";
-                    FileName = "";
-                    SharePointURL = "";
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;";
-                    QueryString = "SELECT * FROM TABLE";
-                    QueryStringPanels = "";
-                    QueryStringRels = "";
-                    QueryStringResourceUrls = "";
                     break;
+                
                 case DatabaseType.Excel:
                     Name = "Excel Example";
                     FileName = "C:/MyFolder/MyFile.xlsx";
-                    SharePointURL = "";
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml; HDR = YES'";
                     QueryString = "SELECT * from [Sheet1$]";
-                    QueryStringPanels = "";
-                    QueryStringRels = "";
-                    QueryStringResourceUrls = "";
                     break;
+                
                 case DatabaseType.Access:
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
-                    SharePointURL = "";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0}";
-                    QueryString = "SELECT * FROM TABLE";
-                    QueryStringPanels = "";
-                    QueryStringRels = "";
-                    QueryStringResourceUrls = "";
                     break;
+                
                 case DatabaseType.SharepointList:
                     Name = "SharePoint List Example";
                     SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
                     ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
                     QueryString = "SELECT * FROM LISTITEM";
-                    QueryStringPanels = "";
-                    QueryStringRels = "";
-                    QueryStringResourceUrls = "";
                     break;
+                
                 case DatabaseType.SharpCloudExcel:
                     Name = "SharpCloud (Excel) Example";
                     FileName = @"C:\MyFolder\MyFile.xlsx";
@@ -540,9 +516,7 @@ namespace SCQueryConnect.Models
                         "HDR = YES'";
 
                     QueryString = "SELECT * from [Items$]";
-                    QueryStringPanels = "";
                     QueryStringRels = "SELECT * from [Relationships$]";
-                    QueryStringResourceUrls = "";
                     break;
             }
         }
