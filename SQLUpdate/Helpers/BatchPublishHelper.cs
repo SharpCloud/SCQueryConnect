@@ -172,7 +172,8 @@ namespace SCQueryConnect.Helpers
                     "SCSQLBatch.zip",
                     "SCQueryConnect.Common.dll",
                     "System.Data.CData.Access.dll",
-                    "System.Data.CData.Excel.dll"
+                    "System.Data.CData.Excel.dll",
+                    "System.Data.CData.SharePoint.dll"
                 };
 
                 try

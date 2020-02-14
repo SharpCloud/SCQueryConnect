@@ -10,6 +10,7 @@ namespace SCQueryConnect.Common
         public const string Sql = "SQL";
         public const string Odbc = "ODBC";
         public const string Oledb = "OLEDB";
+        public const string SharePointList = "SHAREPOINT_LIST";
         public const string SharpCloudExcel = "SHARPCLOUD_EXCEL";
 
         public const string ExcelDataSourceKey = "Excel File";
@@ -21,6 +22,7 @@ namespace SCQueryConnect.Common
                 [DatabaseType.Excel] = Excel,
                 [DatabaseType.SQL] = Sql,
                 [DatabaseType.ODBC] = Odbc,
+                [DatabaseType.SharepointList] = SharePointList,
                 [DatabaseType.SharpCloudExcel] = SharpCloudExcel
             };
 

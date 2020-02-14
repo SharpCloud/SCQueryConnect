@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.CData.Access;
 using System.Data.CData.Excel;
+using System.Data.CData.SharePoint;
 using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.SqlClient;
@@ -23,6 +24,9 @@ namespace SCQueryConnect.Common.Helpers
 
                 case DatabaseType.Access:
                     return new AccessConnection(connectionString);
+
+                case DatabaseType.SharepointList:
+                    return new SharePointConnection(connectionString);
 
                 case DatabaseType.SQL:
                     return new SqlConnection(connectionString);

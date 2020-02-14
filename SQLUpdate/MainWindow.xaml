@@ -448,9 +448,10 @@
 
                                 <TextBlock Grid.Row="3"
                                            Grid.Column="0"
-                                           Text="SharePoint URL:"
+                                           Text="SharePoint Connection String:"
                                            Style="{StaticResource Label}"
-                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharepointList'}">
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharepointList'}"
+                                           TextWrapping="Wrap">
                                 </TextBlock>
 
                                 <TextBox Grid.Row="3"

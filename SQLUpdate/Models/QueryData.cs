@@ -143,6 +143,7 @@ namespace SCQueryConnect.Models
         public string SharePointURL
         {
             get => _sharePointUrl;
+            
             set
             {
                 var newValue = value;
@@ -498,9 +499,9 @@ namespace SCQueryConnect.Models
                 
                 case DatabaseType.SharepointList:
                     Name = "SharePoint List Example";
-                    SharePointURL = "https://mysite.sharepoint.com;LIST={LISTGUID}";
-                    ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;WSS;IMEX=2;RetrieveIds=Yes;DATABASE={1}";
-                    QueryString = "SELECT * FROM LISTITEM";
+                    SharePointURL = "User=USERNAME;Password=PASSWORD;Auth Scheme=NTLM;URL=http://sharepointserver/mysite;";
+                    ConnectionsString = "{1}";
+                    QueryString = "SELECT * FROM LIST";
                     break;
                 
                 case DatabaseType.SharpCloudExcel:
