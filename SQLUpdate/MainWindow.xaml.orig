@@ -1,0 +1,1119 @@
+﻿<Window x:Class="SCQueryConnect.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:commands="clr-namespace:SCQueryConnect.Commands"
+        xmlns:models="clr-namespace:SCQueryConnect.Models"
+        xmlns:helpers="clr-namespace:SCQueryConnect.Helpers"
+        xmlns:converters="clr-namespace:SCQueryConnect.Converters"
+        xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
+        mc:Ignorable="d"
+        Background="{StaticResource QCBackground}"
+        Foreground="{StaticResource QCBlue}"
+        FontSize="{StaticResource DefaultFontSize}"
+        Closing="MainWindow_OnClosing"
+        Title="{Binding AppName}"
+        Height="580"
+        Width="1230"
+        Icon="QC.ico"
+        ResizeMode="CanResizeWithGrip"
+        UseLayoutRounding="True">
+
+    <Grid x:Name="Root">
+        <Grid.Resources>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <converters:UrlToStoryIdConverter x:Key="UrlToStoryIdConverter" />
+            <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
+        </Grid.Resources>
+
+        <Grid Background="Black">
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
+                <Style TargetType="TabControl">
+                    <Setter Property="IsTabStop" Value="False"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="#404040"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
+                </Style>
+                <Style TargetType="TabItem">
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid x:Name="gdBorder" Background="{StaticResource QCBackground}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0" Margin="2,0" Height="30">
+                                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            ContentSource="Header" Margin="10,2"/>
+                                        </Border>
+                                    </StackPanel>
+                                    <Border x:Name="selectedBorder" Height="2" VerticalAlignment="Bottom" Background="{StaticResource QCBlue}"></Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="selectedBorder" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="gdBorder" Property="Background" Value="{StaticResource QCBackground}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="selectedBorder" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="gdBorder" Property="Background" Value="#111111" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <Style x:Key="TextBoxWithValidation" TargetType="{x:Type TextBox}">
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="True">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
+                <converters:ConnectionTypeCollapsedConverter x:Key="ConnectionTypeCollapsedConverter" />
+                <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
+                <converters:ValidNameConverter x:Key="ValidNameConverter" />
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"></ColumnDefinition>
+                <ColumnDefinition Width="3"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <GridSplitter Grid.Column="1" Foreground="Red" HorizontalAlignment="Stretch" Width="3"/>
+
+            <!-- Left Panel -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Connections Tree -->
+                <Grid Background="{StaticResource QCBackground}" >
+                    <TreeView x:Name="QueryItemTree"
+                              AllowDrop="True"
+                              Background="{StaticResource QCBackground}"
+                              BorderThickness="0"
+                              DataContext="{Binding Parent, ElementName=Root}"
+                              DragOver="QueryItemTreeDragEnter"
+                              Drop="QueryItemTreeDrop"
+                              ItemsSource="{Binding MainViewModel.Connections, Source={StaticResource ViewModelLocator}}"
+                              PreviewMouseLeftButtonDown="QueryItemTreePreviewMouseLeftButtonDown"
+                              PreviewMouseMove="QueryItemTreeMouseMove"
+                              SelectedItemChanged="TreeViewSelectedItemChanged">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource StretchedTreeViewItem}">
+                                <EventSetter Event="DragOver" Handler="QueryItemTreeDragEnter" />
+                                <EventSetter Event="DragLeave" Handler="QueryItemTreeDragLeave" />
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+
+                        <TreeView.Resources>
+                            <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
+
+                            <HierarchicalDataTemplate DataType="{x:Type models:QueryData}" ItemsSource="{Binding Connections}">
+                                <Grid Background="Transparent">
+                                    <Grid.Resources>
+                                        <GradientStopCollection x:Key="DragDropGradient">
+                                            <GradientStop Color="Transparent" Offset="0" />
+                                            <GradientStop Color="#3DDADADA" Offset="1" />
+                                        </GradientStopCollection>
+
+                                        <Style x:Key="DragDropHighlight" TargetType="Border" >
+                                            <Setter Property="Opacity" Value="0" />
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Style>
+
+                                        <Storyboard x:Key="FadeIn">
+                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="1" />
+                                        </Storyboard>
+
+                                        <Storyboard x:Key="FadeOut">
+                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="0" />
+                                        </Storyboard>
+                                    </Grid.Resources>
+
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="StackPanel.MouseEnter">
+                                            <EventTrigger.Actions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Visibility">
+                                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Opacity" To="1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.Actions>
+                                        </EventTrigger>
+
+                                        <EventTrigger RoutedEvent="StackPanel.MouseLeave">
+                                            <EventTrigger.Actions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Visibility">
+                                                            <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Opacity" To="0" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.Actions>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+
+                                    <Border Background="#3DDADADA" IsHitTestVisible="False">
+                                        <Border.Style>
+                                            <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DragInto}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                                                        </DataTrigger.EnterActions>
+
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+
+                                    <Border IsHitTestVisible="False">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource DragDropGradient}" />
+                                        </Border.Background>
+
+                                        <Border.Style>
+                                            <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DragAbove}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                                                        </DataTrigger.EnterActions>
+
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+
+                                    <Border IsHitTestVisible="False">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" GradientStops="{StaticResource DragDropGradient}" />
+                                        </Border.Background>
+
+                                        <Border.Style>
+                                            <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DragBelow}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                                                        </DataTrigger.EnterActions>
+
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+
+                                    <StackPanel Orientation="Horizontal" IsHitTestVisible="False">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Margin" Value="5,0" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                                <Setter Property="Width" Value="12" />
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <Image Source="Images/Folder.png"
+                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
+                                        </Image>
+
+                                        <Image Source="Images/Database.png"
+                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false}">
+                                        </Image>
+
+                                        <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                    </StackPanel>
+
+                                    <StackPanel x:Name="ButtonPanel"
+                                                HorizontalAlignment="Right"
+                                                Opacity="0"
+                                                Orientation="Horizontal"
+                                                Visibility="Collapsed">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="FontSize" Value="10" />
+                                                <Setter Property="Padding" Value="5,0" />
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <Button Click="ExportQueryDataClick">Exp</Button>
+                                        <Button Click="RunQueryDataClick">Run</Button>
+                                    </StackPanel>
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </Grid>
+
+                <!-- Button Panel -->
+                <Grid Grid.Row="1" Margin="2">
+                    <Grid.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                            <Setter Property="Background" Value="#666" />
+                            <Setter Property="Height" Value="40" />
+                            <Setter Property="Margin" Value="2" />
+                            <Setter Property="VerticalAlignment" Value="Top" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Click="NewQueryFolderClick" Background="{StaticResource QCBlue}" ToolTip="Add a new folder">
+                        <Image Source="Images/Folder_white.png" Width="24" />
+                    </Button>
+
+                    <Button Grid.Column="1" Click="NewConnectionClick" Background="{StaticResource QCBlue}" ToolTip="Add a new connection">
+                        <Image Source="Images/Database_white.png" Width="24" />
+                    </Button>
+
+                    <Button Grid.Column="2" Click="MoveConnectionUp" ToolTip="Move selected connection/folder up within its folder">
+                        <Image Source="Images/Up_white.png" Width="20" />
+                    </Button>
+
+                    <Button Grid.Column="3" Click="MoveConnectionDown" ToolTip="Move selected connection/folder down within its folder">
+                        <Image Source="Images/Down_white.png" Width="20" />
+                    </Button>
+
+                    <Button Grid.Column="4" Click="CopyConnectionClick" ToolTip="Copy selected connection/folder">
+                        <Image Source="Images/Copy_white.png" Width="22" />
+                    </Button>
+
+                    <Button Grid.Column="5" Click="DeleteConnectionClick" Background="Red" ToolTip="Remove selected connection/folder: all connections and folders within selected folders will also be removed">
+                        <Image Source="Images/Bin_white.png" Width="20" />
+                    </Button>
+                </Grid>
+            </Grid>
+
+            <!-- Right Panel -->
+            <Grid Grid.Column="2" DataContext="{Binding MainViewModel.SelectedQueryData, Source={StaticResource ViewModelLocator}}">
+                
+                <!-- Tabs for Connection Config -->
+                <TabControl BorderBrush="Transparent"
+                            MinWidth="750"
+                            SelectedIndex="{Binding MainViewModel.SelectedTabIndex, Source={StaticResource ViewModelLocator}}">
+                    <TabControl.Resources>
+                        <commands:GoToUrl x:Key="GoToUrl"/>
+                    </TabControl.Resources>
+
+                    <TabItem Header="1. Database Connection"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"></RowDefinition>
+                                    <RowDefinition Height="40"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="80"></RowDefinition>
+                                    <RowDefinition Height="50"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="50"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="140"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                        <Setter Property="Margin" Value="5" />
+                                    </Style>
+                                </Grid.Resources>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Connection Name:" Style="{StaticResource Label}" />
+
+                                <TextBox Grid.Row="0"
+                                         Grid.Column="1"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5,5,250,5"
+                                         Style="{StaticResource TextBoxWithValidation}">
+                                    <TextBox.Text>
+                                        <Binding Path="Name" FallbackValue="Name">
+                                            <Binding.ValidationRules>
+                                                <helpers:ConnectionNameValidator />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+
+                                <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
+                                <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="{Binding ConnectionType, FallbackValue='Connection Type'}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Description, FallbackValue='Description'}" TextWrapping="WrapWithOverflow" Margin="5" />
+
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="0"
+                                           Text="Source Story ID/URL:"
+                                           Style="{StaticResource Label}"
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}">
+                                </TextBlock>
+
+                                <TextBox Grid.Row="2"
+                                         Grid.Column="1"
+                                         Height="30"
+                                         Margin="5,5,250,5"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}"
+                                         Text="{Binding SourceStoryId, Converter={StaticResource UrlToStoryIdConverter}}">
+                                </TextBox>
+
+                                <Button Grid.Row="2"
+                                        Grid.Column="1"
+                                        Height="30"
+                                        HorizontalAlignment="Right"
+                                        Width="150"
+                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}"
+                                        Click="StorySourceSettings_Click">
+                                    More...
+                                </Button>
+
+                                <TextBlock Grid.Row="3"
+                                           Grid.Column="0"
+                                           Text="Filename:"
+                                           Style="{StaticResource Label}"
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access, Excel, SharpCloudExcel'}">
+                                </TextBlock>
+
+                                <TextBox Grid.Column="1"
+                                         Grid.Row="3"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5"
+<<<<<<< HEAD
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Access'}"
+=======
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Access'}"
+>>>>>>> Use CData.Access for reading Access
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access'}">
+                                </TextBox>
+
+                                <TextBox Grid.Column="1"
+                                         Grid.Row="3"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5"
+<<<<<<< HEAD
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Excel'}"
+=======
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Excel'}"
+>>>>>>> Use CData.Access for reading Access
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel, SharpCloudExcel'}">
+                                </TextBox>
+
+                                <Button Grid.Row="3"
+                                        Grid.Column="1"
+                                        Height="40"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Width="150"
+                                        Click="BrowseForDataSourceClick"
+                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access, Excel, SharpCloudExcel'}">
+                                    Choose file...
+                                </Button>
+
+                                <TextBlock Grid.Row="3"
+                                           Grid.Column="0"
+                                           Text="SharePoint URL:"
+                                           Style="{StaticResource Label}"
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharepointList'}">
+                                </TextBlock>
+
+                                <TextBox Grid.Row="3"
+                                         Grid.Column="1"
+                                         Text="{Binding SharePointURL, FallbackValue='https://yoursite.sharepoint.com;LIST={listGuid}'}"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharepointList'}">
+                                </TextBox>
+
+                                <TextBlock Grid.Row="3"
+                                           Grid.Column="0"
+                                           Text="Connection String:"
+                                           Style="{StaticResource Label}"
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeCollapsedConverter}, ConverterParameter='Access, Excel, SharepointList, SharpCloudExcel'}">
+                                </TextBlock>
+
+                                <TextBox Grid.Row="3"
+                                         Grid.Column="1"
+                                         Text="{Binding ConnectionsString, FallbackValue='Server=.; Integrated Security=true; Database=demo'}"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeCollapsedConverter}, ConverterParameter='Access, Excel, SharepointList, SharpCloudExcel'}">
+                                </TextBox>
+
+                                <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
+                                <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Right" Height="40" Click="ReviewConnectionClick">View Connection Info</Button>
+
+                                <TextBlock Grid.Row="5"
+                                           Grid.Column="1"
+                                           Margin="5"
+                                           Foreground="White"
+                                           TextWrapping="WrapWithOverflow"
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel'}">
+                                    <Run>Rewriting the data source may help if data is not being read properly.</Run>
+                                    <Run FontStyle="Italic">Warning:</Run>
+                                    <Run>this may cause your file to become unusable in older versions of Excel.</Run>
+                                </TextBlock>
+
+                                <Button Grid.Row="6"
+                                        Grid.Column="1"
+                                        Width="250"
+                                        HorizontalAlignment="Left"
+                                        Height="40"
+                                        Click="RewriteDataSourceClick"
+                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel'}">
+                                    Rewrite Data Source
+                                </Button>
+
+                                <TextBlock Grid.Row="7" Margin="5" TextWrapping="WrapWithOverflow" Grid.Column="1">
+                                    Connection strings allow you to connect to virtually any database. Connection string may be very simple or quite detailed including username/password and servername, IP address etc.
+                                </TextBlock>
+
+                                <Button Grid.Row="8"
+                                        Grid.Column="1"
+                                        Command="{StaticResource GoToUrl}"
+                                        CommandParameter="https://www.connectionstrings.com/"
+                                        Height="40"
+                                        HorizontalAlignment="Left"
+                                        Width="250">
+                                    Help on Connections Strings
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="2. Queries"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
+                        <TabControl Background="{StaticResource QCBackground}"
+                                    SelectedIndex="{Binding MainViewModel.SelectedQueryTabIndex, Source={StaticResource ViewModelLocator}}">
+                            <TabControl.Resources>
+                                <Style TargetType="GridSplitter">
+                                    <Setter Property="Height" Value="3" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                </Style>
+
+                                <Style x:Key="QueryStringTextBlock" TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                    <Setter Property="Grid.Row" Value="0" />
+                                    <Setter Property="HorizontalAlignment" Value="Left" />
+                                    <Setter Property="Margin" Value="5" />
+                                    <Setter Property="Text" Value="Query String:" />
+                                </Style>
+
+                                <Style x:Key="DbResultsTextBlock" TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                    <Setter Property="Grid.Row" Value="0" />
+                                    <Setter Property="Margin" Value="5" />
+                                    <Setter Property="Text" Value="DB Results:" />
+                                    <Setter Property="TextAlignment" Value="Left" />
+                                </Style>
+
+                                <Style x:Key="ErrorTextBlock" TargetType="TextBlock">
+                                    <Setter Property="Background" Value="Red" />
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Margin" Value="5,5,5,0" />
+                                    <Setter Property="Padding" Value="5,0,0,0" />
+                                </Style>
+
+                                <Style TargetType="TextBox">
+                                    <Setter Property="AcceptsReturn" Value="True" />
+                                    <Setter Property="FontFamily" Value="Courier New" />
+                                    <Setter Property="Margin" Value="5" />
+                                    <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                                </Style>
+
+                                <Style x:Key="PreviewSqlButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                    <Setter Property="Content" Value="Preview SQL Results" />
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Width" Value="180" />
+                                    <Setter Property="Margin" Value="5,5,5,0" />
+                                </Style>
+
+                                <Style TargetType="DataGrid">
+                                    <Setter Property="Margin" Value="5" />
+                                </Style>
+                            </TabControl.Resources>
+
+                            <TabItem Header="Items">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition Height="100"></RowDefinition>
+                                        <RowDefinition Height="3"></RowDefinition>
+                                        <RowDefinition Height="3*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Style="{StaticResource QueryStringTextBlock}" />
+                                    <TextBox Grid.Row="1" Text="{Binding QueryString, FallbackValue='SELECT * FROM TABLE'}" />
+                                    <GridSplitter Grid.Row="2" />
+
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Style="{StaticResource DbResultsTextBlock}" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsItemQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain a 'Name' or 'External ID' column
+                                        </TextBlock>
+                                        
+                                        <Button Click="RunClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <DataGrid x:Name="DataGrid" Grid.Row="1" />
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Relationships">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition Height="100"></RowDefinition>
+                                        <RowDefinition Height="3"></RowDefinition>
+                                        <RowDefinition Height="3*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Style="{StaticResource QueryStringTextBlock}" />
+                                    <TextBlock Grid.Row="0" TextAlignment="Right" Foreground="{StaticResource QCBlue}" Margin="200,5,5,5" HorizontalAlignment="Right">
+                                        <Run Text="Example:" />
+                                        <Run Text="{Binding ExampleRelQuery, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBox Grid.Row="1" Text="{Binding QueryStringRels, FallbackValue='SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE'}" />
+                                    <GridSplitter Grid.Row="2" ></GridSplitter>
+
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Style="{StaticResource DbResultsTextBlock}" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsRelationshipQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain a 'Item1' and 'Item2' column
+                                        </TextBlock>
+                                        
+                                        <Button Click="RunClickRels" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <DataGrid x:Name="DataGridRels" Grid.Row="1" />
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Resource URLs">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="100" />
+                                        <RowDefinition Height="3" />
+                                        <RowDefinition Height="3*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Style="{StaticResource QueryStringTextBlock}" />
+                                    <TextBox Grid.Row="1" Text="{Binding QueryStringResourceUrls, FallbackValue='SELECT * FROM TABLE'}" />
+                                    <GridSplitter Grid.Row="2" />
+
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Style="{StaticResource DbResultsTextBlock}" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsResourceUrlsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain 'ExternalID', 'ResourceName', 'Description', and 'URL' columns
+                                        </TextBlock>
+                                        
+                                        <Button Click="PreviewResourceUrlsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <DataGrid x:Name="DataGridResourceUrls" Grid.Row="1" />
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Panels">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="100" />
+                                        <RowDefinition Height="3" />
+                                        <RowDefinition Height="3*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Style="{StaticResource QueryStringTextBlock}" />
+                                    <TextBox Grid.Row="1" Text="{Binding QueryStringPanels, FallbackValue='SELECT * FROM TABLE'}" />
+                                    <GridSplitter Grid.Row="2" />
+
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Style="{StaticResource DbResultsTextBlock}" />
+
+                                        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                                                   Grid.Row="0"
+                                                   Visibility="{Binding MainViewModel.IsPanelsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
+                                            Error: Data must contain 'ExternalID', 'Title', 'PanelType', and 'Data' columns
+                                        </TextBlock>
+                                        
+                                        <Button Click="PreviewPanelsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <DataGrid x:Name="DataGridPanels" Grid.Row="1" />
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </TabItem>
+
+                    <TabItem Header="3. Update Story"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="250"></RowDefinition>
+                                <RowDefinition Height="3"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Text ="Server:" Style="{StaticResource Label}" Width="100" />
+
+                                    <TextBox x:Name="UrlTextBox"
+                                             Text ="{Binding MainViewModel.Url, Source={StaticResource ViewModelLocator}, FallbackValue='https://my.sharpcloud.com'}"
+                                             Width="270">
+                                    </TextBox>
+                                    
+                                    <TextBlock Margin="10,0">
+                                        <Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick"> Proxy</Hyperlink>
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Text ="Username:" Style="{StaticResource Label}" Width="100" />
+                                    <TextBox x:Name="UsernameTextBox"
+                                             Width="270"
+                                             Text="{Binding MainViewModel.Username, Source={StaticResource ViewModelLocator}}">
+                                    </TextBox>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Text ="Password:" Style="{StaticResource Label}" Width="100" />
+                                    <PasswordBox x:Name="Password" Width="270" PasswordChanged="PasswordOnPasswordChanged" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <TextBlock Text ="Story ID or URL:" Style="{StaticResource Label}" Width="100" />
+
+                                    <TextBox x:Name="StoryId"
+                                             Width="270"
+                                             Text="{Binding StoryId, Converter={StaticResource UrlToStoryIdConverter}}">
+                                    </TextBox>
+                                    
+                                    <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
+                                    <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
+                                </StackPanel>
+
+                                <StackPanel Margin="100,5,0,0" Width="370">
+                                    <StackPanel.Resources>
+                                        <Style x:Key="HelpButton" TargetType="Button">
+                                            <Setter Property="Content" Value="(what's this?)" />
+                                            <Setter Property="Foreground" Value="White" />
+                                            <Setter Property="Margin" Value="5,0,0,0" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Background="Transparent">
+                                                            <ContentPresenter />
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </StackPanel.Resources>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Foreground="{StaticResource QCBlue}"
+                                                  IsChecked="{Binding UnpublishItems, Mode=TwoWay}">
+                                            Unpublish unmatched items
+                                        </CheckBox>
+                                        
+                                        <Button Click="UnpublishUnmatchedItemsHelpClick" Style="{StaticResource HelpButton}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Content="Build relationships"
+                                                  Foreground="{StaticResource QCBlue}"
+                                                  IsChecked="{Binding BuildRelationships, Mode=TwoWay}">
+                                        </CheckBox>
+
+                                        <Button Click="BuildRelationshipsHelpClick" Style="{StaticResource HelpButton}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Button Click="RunQueryDataClick" Width="270" Margin="100,5" Height="40">Update Story Now..</Button>
+                            </StackPanel>
+                            <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+
+                            <Grid Grid.Row="2">
+                                <TextBlock Foreground="{StaticResource QCBlue}" Margin="5">
+                                    <Run Text="Update Results:" />
+                                    <Run Text="{Binding IssueSummary}" />
+                                </TextBlock>
+
+                                <TextBlock HorizontalAlignment="Right" Margin="5">
+                                    <Run Text="Last Ran:" Foreground="{StaticResource QCBlue}" />
+                                    <Run Text="{Binding LastRunDate, FallbackValue='Now', Mode=OneWay}" Foreground="White" />
+                                </TextBlock>
+
+                                <RichTextBox x:Name="StoryUpdateLogOutput"
+                                             AcceptsReturn="True"
+                                             Background="{StaticResource QCBackground}"
+                                             Foreground="{StaticResource QCBlue}"
+                                             HorizontalScrollBarVisibility="Auto"
+                                             IsReadOnly="True"
+                                             Margin="5,35,5,5"
+                                             VerticalScrollBarVisibility="Auto"
+                                             Width="Auto">
+                                </RichTextBox>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Connection Folder Config -->
+                    <TabItem Header="1. Connections Folder"
+                             Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true, FallbackValue=Collapsed}">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid Margin="5">
+                                <Grid.Resources>
+                                    <Style TargetType="ListBox">
+                                        <Setter Property="Background" Value="{StaticResource QCBackground}" />
+                                        <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
+                                    </Style>
+                                </Grid.Resources>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+
+                                <!-- Folder Settings -->
+                                <Grid Grid.Row="0" HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="270" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Style="{StaticResource Label}">Folder Name:</TextBlock>
+
+                                    <TextBox Grid.Column="1" Grid.Row="0" Margin="0,2" Height="30" Style="{StaticResource TextBoxWithValidation}">
+                                        <TextBox.Text>
+                                            <Binding Path="Name" FallbackValue="Name">
+                                                <Binding.ValidationRules>
+                                                    <helpers:ConnectionNameValidator />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
+                                    </TextBox>
+
+                                    <TextBlock Grid.Column="0"
+                                               Grid.Row="1"
+                                               Style="{StaticResource Label}">
+                                        Description:
+                                    </TextBlock>
+
+                                    <TextBox Grid.Column="1" Grid.Row="1" Margin="0,2" Height="30" Text="{Binding Description}" />
+
+                                    <Button Grid.Column="1" Grid.Row="2" Height="30" Margin="0,2,0,0" Click="RunQueryDataClick">Run Now</Button>
+                                </Grid>
+
+                                <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" Margin="0,10" />
+
+                                <!-- Log Output -->
+                                <Grid Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Foreground="{StaticResource QCBlue}">
+                                        <Run Text="Update Results:" />
+                                        <Run Text="{Binding IssueSummary}" />
+                                    </TextBlock>
+
+                                    <TextBlock Grid.Row="0" HorizontalAlignment="Right" Margin="5,0">
+                                        <Run Text="Last Ran:" Foreground="{StaticResource QCBlue}" />
+                                        <Run Text="{Binding LastRunDate, Mode=OneWay}" Foreground="White" />
+                                    </TextBlock>
+
+                                    <RichTextBox x:Name="FolderUpdateLogOutput"
+                                                 AcceptsReturn="True"
+                                                 Background="{StaticResource QCBackground}"
+                                                 Foreground="{StaticResource QCBlue}"
+                                                 Grid.Row="1"
+                                                 HorizontalScrollBarVisibility="Auto"
+                                                 IsReadOnly="True"
+                                                 Margin="0,10,0,0"
+                                                 VerticalScrollBarVisibility="Auto">
+                                    </RichTextBox>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Folder Publish Config -->
+                    <TabItem Header="{Binding MainViewModel.PublishTabHeader, Source={StaticResource ViewModelLocator}}">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid.Resources>
+                                <converters:EnumMatchToBoolConverter x:Key="EnumMatchToBoolConverter" />
+                            </Grid.Resources>
+
+                            <StackPanel DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+                                        HorizontalAlignment="Center"
+                                        Width="600"
+                                        VerticalAlignment="Center">
+
+                                <StackPanel.Resources>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Margin" Value="0,10,0,0" />
+                                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    </Style>
+
+                                    <Style x:Key="RadioContent" TargetType="StackPanel">
+                                        <Setter Property="Margin" Value="5,0,0,0" />
+                                    </Style>
+                                </StackPanel.Resources>
+
+                                <TextBlock Text="Architecture" Foreground="{StaticResource QCBlue}" />
+
+                                <RadioButton GroupName="Architecture"
+                                             IsChecked="{Binding PublishArchitecture, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=Auto}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Auto" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="Architecture"
+                                             IsChecked="{Binding PublishArchitecture, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=X64}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="64 Bit" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="Architecture"
+                                             IsChecked="{Binding PublishArchitecture, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=X32}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="32 Bit" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <TextBlock Text="SharpCloud Password Security" Foreground="{StaticResource QCBlue}" Margin="0,20,0,0" />
+
+                                <RadioButton GroupName="PublishPasswordSecurity"
+                                             IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=DpapiUser}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Encrypted (User) - Most Secure" FontWeight="Bold" />
+                                        <TextBlock Text="Only you will be able to decrypt your password on this computer." />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="PublishPasswordSecurity"
+                                             IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=DpapiMachine}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Encrypted (Machine)" FontWeight="Bold" />
+                                        <TextBlock Text="Anybody with access to this computer will be able to decrypt your password." />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton GroupName="PublishPasswordSecurity"
+                                             IsChecked="{Binding PublishPasswordSecurity, Converter={StaticResource EnumMatchToBoolConverter}, ConverterParameter=Base64}">
+                                    <StackPanel Style="{StaticResource RadioContent}">
+                                        <TextBlock Text="Base64 Encoded - Least Secure" FontWeight="Bold" />
+                                        <TextBlock TextWrapping="Wrap" Text="Password is not encrypted, but can be read on a different computer. Use this option if you are generating batch files for use on another computer." />
+                                    </StackPanel>
+                                </RadioButton>
+                            </StackPanel>
+
+                            <!-- Publish Buttons -->
+                            <StackPanel Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,10">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                        <Setter Property="Width" Value="220" />
+                                    </Style>
+                                </StackPanel.Resources>
+
+                                <Button Click="PublishBatchFolderClick"
+                                        Height="50"
+                                        FontSize="16">
+                                    Publish Now...
+                                </Button>
+
+                                <Button Click="ViewExisting"
+                                        VerticalAlignment="Bottom"
+                                        Height="25"
+                                        Margin="0,5,0,0"
+                                        Background="Transparent"
+                                        FontSize="12">
+                                    View export folder...
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="About">
+                        <Grid Background="{StaticResource QCBackground}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" VerticalAlignment="Center">
+                                <Image Source="Images/SharpCloud.png" Width="250" Stretch="UniformToFill"></Image>
+                                <TextBlock Text="SharpCloud Query Connect" TextWrapping="WrapWithOverflow" Foreground="White" MaxWidth="500" Margin="0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="20">
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" Text="Useful Links:" Margin="5" FontSize="18" MaxWidth="500" />
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0">
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://support.sharpcloud.com/en/support/solutions/articles/76000013227-queryconnect-saved-data">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="QueryConnect - Saved Data (Knowledge Base article)"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="QC_Data_Folder_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Query Connect Data Folder"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="App_Directory_Hyperlink_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Install Folder"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://www.youtube.com/watch?v=cZUyQkVzg2E">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Watch Video Guide"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Click="Database_Engine_Hyperlink_Click">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Download tools for Excel/Access"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
+                                    <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://github.com/SharpCloud/SCQueryConnect">
+                                        <Hyperlink.Inlines>
+                                            <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>
+                                        </Hyperlink.Inlines>
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+
+        <Grid Background="#cc000000"
+              DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+              Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                <TextBlock Foreground="white"
+                           FontSize="30"
+                           HorizontalAlignment="Center"
+                           MaxWidth="500"
+                           Text="{Binding UpdateText}"
+                           TextWrapping="WrapWithOverflow">
+                </TextBlock>
+
+                <TextBlock Foreground="white"
+                           FontSize="18"
+                           HorizontalAlignment="Center"
+                           MaxWidth="500"
+                           Text="{Binding UpdateSubtext}"
+                           TextWrapping="WrapWithOverflow"
+                           Visibility="{Binding UpdateSubtext, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                </TextBlock>
+
+                <Button Click="CancelStoryUpdate" HorizontalAlignment="Center"
+                        Margin="0,20,0,0"
+                        Padding="30,5"
+                        Style="{StaticResource DefaultButtonStyle}"
+                        VerticalAlignment="Center">
+                    Cancel
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
