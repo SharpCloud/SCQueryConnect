@@ -171,6 +171,7 @@ namespace SCQueryConnect.Helpers
                     $"SCSQLBatch{suffix}.exe.config",
                     "SCSQLBatch.zip",
                     "SCQueryConnect.Common.dll",
+                    "System.Data.CData.Access.dll",
                     "System.Data.CData.Excel.dll"
                 };
 

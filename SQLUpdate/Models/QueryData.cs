@@ -322,16 +322,16 @@ namespace SCQueryConnect.Models
                     return null;
                 }
 
-                switch (ConnectionType)
+                var success = DatabaseStrings.TypeStringMapping.TryGetValue(
+                    ConnectionType,
+                    out var dbString);
+
+                if (!success)
                 {
-                    case DatabaseType.SQL:
-                        return DatabaseStrings.Sql;
-                    case DatabaseType.ODBC:
-                        return DatabaseStrings.Odbc;
-                    case DatabaseType.SharpCloudExcel:
-                        return DatabaseStrings.SharpCloudExcel;
+                    dbString = DatabaseStrings.Oledb;
                 }
-                return DatabaseStrings.Oledb; // most types are ADO
+
+                return dbString;
             }
         }
 
@@ -493,7 +493,7 @@ namespace SCQueryConnect.Models
                 case DatabaseType.Access:
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
-                    ConnectionsString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0}";
+                    ConnectionsString = $"Data Source={FilenamePlaceHolder}";
                     break;
                 
                 case DatabaseType.SharepointList:

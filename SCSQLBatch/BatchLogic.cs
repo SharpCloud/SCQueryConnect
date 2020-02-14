@@ -170,20 +170,15 @@ namespace SCSQLBatch
 
         private DatabaseType GetDbType()
         {
-            var dbType = _configurationReader.Get(Constants.BatchDBTypeKey);
-
-            switch (dbType)
+            var configString = _configurationReader.Get(Constants.BatchDBTypeKey);
+            var success = DatabaseStrings.StringTypeMapping.TryGetValue(configString, out var dbType);
+            
+            if (!success)
             {
-                case DatabaseStrings.Sql:
-                    return DatabaseType.SQL;
-                case DatabaseStrings.Odbc:
-                    return DatabaseType.ODBC;
-                default:
-                case DatabaseStrings.Oledb:
-                    return DatabaseType.Excel;
-                case DatabaseStrings.SharpCloudExcel:
-                    return DatabaseType.SharpCloudExcel;
+                dbType = DatabaseType.ADO;
             }
+
+            return dbType;
         }
     }
 }
