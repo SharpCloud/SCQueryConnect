@@ -512,13 +512,9 @@ namespace SCQueryConnect.Models
                         "SourceUserName={source-story-user-name};" +
                         "SourcePassword={source-story-password};" +
                         "SourceServer={source-story-server};" +
-                        "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                        "Data Source={0};" +
-                        "Extended Properties='Excel 12.0 Xml;" +
-                        "HDR = YES'";
-
-                    QueryString = "SELECT * from [Items$]";
-                    QueryStringRels = "SELECT * from [Relationships$]";
+                        $"Excel File={FilenamePlaceHolder}";
+                    QueryString = "SELECT * FROM Items";
+                    QueryStringRels = "SELECT * FROM Relationships";
                     break;
             }
         }

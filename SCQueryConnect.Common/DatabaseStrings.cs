@@ -12,7 +12,7 @@ namespace SCQueryConnect.Common
         public const string Oledb = "OLEDB";
         public const string SharpCloudExcel = "SHARPCLOUD_EXCEL";
 
-        public const string DataSourceKey = "Data Source";
+        public const string ExcelDataSourceKey = "Excel File";
 
         public static Dictionary<DatabaseType, string> TypeStringMapping
             = new Dictionary<DatabaseType, string>

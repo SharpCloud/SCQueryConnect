@@ -45,7 +45,7 @@ namespace SCQueryConnect.Common.Helpers
                             .Split(_delimiter[0])
                             .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
 
-                    return new OleDbConnection(excelConnectionString);
+                    return new ExcelConnection(excelConnectionString);
 
                 default:
                     return new OleDbConnection(connectionString);
