@@ -1,0 +1,427 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{18CAF0CE-D077-4DA4-A248-7084B39C6C59}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>SCQueryConnect</RootNamespace>
+    <AssemblyName>SCQueryConnect</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>publishx86\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <InstallUrl>https://sharpcloudonpremupdate.blob.core.windows.net:443/apidemos/sharpcloudSQLUpdatex86/</InstallUrl>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <ApplicationRevision>10</ApplicationRevision>
+    <ApplicationVersion>4.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\SQLUpdate\QC.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>43AD70F2FDF7089E8265E4D1318C9B5EDD412FE6</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>sharpcloudcodesigning.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=4.9.4.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.9.4\lib\net45\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="SC.Api, Version=1.8.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.8.1\lib\SC.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="SC.API.ComInterop, Version=1.8.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.8.1\lib\SC.API.ComInterop.dll</HintPath>
+    </Reference>
+    <Reference Include="SC.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.8.1\lib\SC.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="SC.SharedModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCloud.ClientAPI.1.8.1\lib\SC.SharedModels.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SCQueryConnect.Common\Properties\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\App.xaml.cs">
+      <Link>App.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Bootstrapper.cs">
+      <Link>Bootstrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Commands\GoToUrl.cs">
+      <Link>Commands\GoToUrl.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\BoolInverse.cs">
+      <Link>Converters\BoolInverse.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\BoolToVisibilityConverter.cs">
+      <Link>Converters\BoolToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ConnectionTypeCollapsedConverter.cs">
+      <Link>Converters\ConnectionTypeCollapsedConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibilityConverter.cs">
+      <Link>Converters\ConnectionTypeVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibleConverter.cs">
+      <Link>Converters\ConnectionTypeVisibleConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\EnumMatchToBoolConverter.cs">
+      <Link>Converters\EnumMatchToBoolConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\StringToVisibilityConverter.cs">
+      <Link>Converters\StringToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Converters\UrlToStoryIdConverter.cs">
+      <Link>Converters\UrlToStoryIdConverter.cs</Link>
+    </Compile>
+<<<<<<< HEAD
+    <Compile Include="..\SQLUpdate\Converters\ValidNameConverter.cs">
+      <Link>Converters\ValidNameConverter.cs</Link>
+=======
+    <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
+      <Link>Converters\ValidExcelNameConverter.cs</Link>
+>>>>>>> Add link to missing file
+    </Compile>
+    <Compile Include="..\SQLUpdate\DataCheckerValidityProcessor.cs">
+      <Link>DataCheckerValidityProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
+      <Link>ExtendedPropertyChangedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\BatchPublishHelper.cs">
+      <Link>Helpers\BatchPublishHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\ConnectionNameValidator.cs">
+      <Link>Helpers\ConnectionNameValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
+      <Link>Helpers\SaveHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
+      <Link>Helpers\UrlHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
+      <Link>Interfaces\IBatchPublishHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IIOService.cs">
+      <Link>Interfaces\IIOService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
+      <Link>Interfaces\IMainViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IMessageService.cs">
+      <Link>Interfaces\IMessageService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IPasswordStorage.cs">
+      <Link>Interfaces\IPasswordStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
+      <Link>Logging\LoggingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\MultiDestinationLogger.cs">
+      <Link>Logging\MultiDestinationLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\QueryDataLoggingDestination.cs">
+      <Link>Logging\QueryDataLoggingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Logging\RichTextBoxLoggingDestination.cs">
+      <Link>Logging\RichTextBoxLoggingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
+      <Link>MainWindow.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\PasswordSecurity.cs">
+      <Link>Models\PasswordSecurity.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\PublishArchitecture.cs">
+      <Link>Models\PublishArchitecture.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\PublishSettings.cs">
+      <Link>Models\PublishSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\QueryData.cs">
+      <Link>Models\QueryData.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\SaveData.cs">
+      <Link>Models\SaveData.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Properties\Resources.Designer.cs">
+      <Link>Properties\Resources.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\IOService.cs">
+      <Link>Services\IOService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\MessageService.cs">
+      <Link>Services\MessageService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\PasswordStorage.cs">
+      <Link>Services\PasswordStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
+      <Link>ViewModels\MainViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\ProxyViewModel.cs">
+      <Link>ViewModels\ProxyViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\SelectedStoryViewModel.cs">
+      <Link>ViewModels\SelectedStoryViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
+      <Link>ViewModels\ViewModelLocator.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\BuildRelationshipsHelp.xaml.cs">
+      <Link>Views\BuildRelationshipsHelp.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\ConnectionInfo.xaml.cs">
+      <Link>Views\ConnectionInfo.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\Database.cs">
+      <Link>Views\Database.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\DatabaseErrorMessage.xaml.cs">
+      <Link>Views\DatabaseErrorMessage.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\ProxySettings.xaml.cs">
+      <Link>Views\ProxySettings.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\SelectDatabaseType.xaml.cs">
+      <Link>Views\SelectDatabaseType.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\SelectStory.xaml.cs">
+      <Link>Views\SelectStory.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\SourceStorySettings.xaml.cs">
+      <Link>Views\SourceStorySettings.xaml.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\UnpublishUnmatchedItemsHelp.xaml.cs">
+      <Link>Views\UnpublishUnmatchedItemsHelp.xaml.cs</Link>
+    </Compile>
+    <Content Include="..\_SCSqlBatchOutput\SCSQLBatch.zip">
+      <Link>SCSQLBatch.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\_SCSqlBatchOutput\SCSQLBatchx86.zip">
+      <Link>SCSQLBatchx86.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="packages.config" />
+    <None Include="..\SQLUpdate\app.config">
+      <Link>app.config</Link>
+    </None>
+    <Resource Include="..\SQLUpdate\QC.ico">
+      <Link>QC.ico</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Database.png">
+      <Link>Images\Database.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Folder.png">
+      <Link>Images\Folder.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Bin_white.png">
+      <Link>Images\Bin_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Copy_white.png">
+      <Link>Images\Copy_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Database_white.png">
+      <Link>Images\Database_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Down_white.png">
+      <Link>Images\Down_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Folder_white.png">
+      <Link>Images\Folder_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\Up_white.png">
+      <Link>Images\Up_white.png</Link>
+    </Resource>
+    <Resource Include="..\SQLUpdate\Images\SharpCloud.png">
+      <Link>Images\SharpCloud.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="..\SQLUpdate\App.xaml">
+      <Link>App.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="..\SQLUpdate\MainWindow.xaml">
+      <Link>MainWindow.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\BuildRelationshipsHelp.xaml">
+      <Link>Views\BuildRelationshipsHelp.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\ConnectionInfo.xaml">
+      <Link>Views\ConnectionInfo.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\DatabaseErrorMessage.xaml">
+      <Link>Views\DatabaseErrorMessage.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\ProxySettings.xaml">
+      <Link>Views\ProxySettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\SelectDatabaseType.xaml">
+      <Link>Views\SelectDatabaseType.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\SelectStory.xaml">
+      <Link>Views\SelectStory.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\SourceStorySettings.xaml">
+      <Link>Views\SourceStorySettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\UnpublishUnmatchedItemsHelp.xaml">
+      <Link>Views\UnpublishUnmatchedItemsHelp.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\SQLUpdate\Images\splash.jpg">
+      <Link>Images\splash.jpg</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\SQLUpdate\Properties\Resources.resx">
+      <Link>Properties\Resources.resx</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SCQueryConnect.Common\SCQueryConnect.Common.csproj">
+      <Project>{5b57d77f-7ce4-47f2-9f12-a5c532022cd1}</Project>
+      <Name>SCQueryConnect.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
