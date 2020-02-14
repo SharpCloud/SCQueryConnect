@@ -143,6 +143,9 @@
     <Compile Include="..\SQLUpdate\Converters\StringToVisibilityConverter.cs">
       <Link>Converters\StringToVisibilityConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\UrlToStoryIdConverter.cs">
+      <Link>Converters\UrlToStoryIdConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
       <Link>Converters\ValidExcelNameConverter.cs</Link>
     </Compile>

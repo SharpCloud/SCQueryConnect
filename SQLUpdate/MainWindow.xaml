@@ -23,6 +23,7 @@
     <Grid x:Name="Root">
         <Grid.Resources>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <converters:UrlToStoryIdConverter x:Key="UrlToStoryIdConverter" />
             <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
         </Grid.Resources>
 
@@ -398,7 +399,7 @@
                                          Height="30"
                                          Margin="5,5,250,5"
                                          Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}"
-                                         Text="{Binding SourceStoryId}">
+                                         Text="{Binding SourceStoryId, Converter={StaticResource UrlToStoryIdConverter}}">
                                 </TextBox>
 
                                 <Button Grid.Row="2"
@@ -729,7 +730,6 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Username:" Style="{StaticResource Label}" Width="100" />
-
                                     <TextBox x:Name="UsernameTextBox"
                                              Width="270"
                                              Text="{Binding MainViewModel.Username, Source={StaticResource ViewModelLocator}}">
@@ -741,7 +741,12 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <TextBlock Text ="Story ID or URL:" Style="{StaticResource Label}" Width="100" />
-                                    <TextBox x:Name="StoryId" Width="270" Text="{Binding StoryId}" />
+
+                                    <TextBox x:Name="StoryId"
+                                             Width="270"
+                                             Text="{Binding StoryId, Converter={StaticResource UrlToStoryIdConverter}}">
+                                    </TextBox>
+                                    
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>

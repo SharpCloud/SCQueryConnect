@@ -30,7 +30,6 @@ namespace SCQueryConnect.Models
         private ObservableCollection<QueryData> _connections;
         private string _fileName;
         private string _sharePointUrl;
-        private string _storyId;
         private bool _buildRelationships;
         private bool _unpublishItems;
         private string _issueSummary;
@@ -111,25 +110,7 @@ namespace SCQueryConnect.Models
         
         public string ConnectionsString { get; set; }
 
-        public string StoryId
-        {
-            get => _storyId;
-
-            set
-            {
-                var newValue = value;
-                if (newValue != null && newValue.Contains("#/story"))
-                {
-                    var mid = newValue.Substring(newValue.IndexOf("#/story", StringComparison.Ordinal) + 8);
-                    if (mid.Length >= 36)
-                    {
-                        newValue = mid.Substring(0, 36);
-                    }
-                }
-
-                _storyId = newValue;
-            }
-        }
+        public string StoryId { get; set; }
 
         public string QueryString { get; set; }
 
