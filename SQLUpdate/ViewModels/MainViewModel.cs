@@ -458,14 +458,21 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public void SaveConnections(string saveFolderPath, string filename)
+        public void SaveConnections(
+            string saveFolderPath,
+            string filename,
+            QueryData root)
         {
+            var connections = root.IsFolder
+                ? new List<QueryData>(root.Connections)
+                : new List<QueryData>(new[] { root });
+
             Directory.CreateDirectory(saveFolderPath);
-            var connections = CreateEncryptedPasswordConnections(Connections);
+            var encrypted = CreateEncryptedPasswordConnections(connections);
 
             var toSave = new SaveData
             {
-                Connections = connections,
+                Connections = encrypted,
                 LastSelectedConnectionIndex = _lastSelectedConnectionIndex,
                 LastSelectedFolderIndex = _lastSelectedFolderIndex,
                 SelectedTabIndex = SelectedTabIndex

@@ -152,10 +152,10 @@
                                             <EventTrigger.Actions>
                                                 <BeginStoryboard>
                                                     <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
+                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Visibility">
                                                             <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
                                                         </ObjectAnimationUsingKeyFrames>
-                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="1" />
+                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Opacity" To="1" />
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </EventTrigger.Actions>
@@ -165,10 +165,10 @@
                                             <EventTrigger.Actions>
                                                 <BeginStoryboard>
                                                     <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
+                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Visibility">
                                                             <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
                                                         </ObjectAnimationUsingKeyFrames>
-                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="0" />
+                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="ButtonPanel" Storyboard.TargetProperty="Opacity" To="0" />
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </EventTrigger.Actions>
@@ -257,16 +257,22 @@
                                         <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
                                     </StackPanel>
 
-                                    <Button x:Name="RunButton"
-                                            Background="Transparent"
-                                            Click="RunQueryDataClick"
-                                            FontSize="10"
-                                            HorizontalAlignment="Right"
-                                            Opacity="0"
-                                            Padding="5,0"
-                                            Visibility="Collapsed">
-                                        Run
-                                    </Button>
+                                    <StackPanel x:Name="ButtonPanel"
+                                                HorizontalAlignment="Right"
+                                                Opacity="0"
+                                                Orientation="Horizontal"
+                                                Visibility="Collapsed">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="FontSize" Value="10" />
+                                                <Setter Property="Padding" Value="5,0" />
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <Button Click="ExportQueryDataClick">Exp</Button>
+                                        <Button Click="RunQueryDataClick">Run</Button>
+                                    </StackPanel>
                                 </Grid>
                             </HierarchicalDataTemplate>
                         </TreeView.Resources>

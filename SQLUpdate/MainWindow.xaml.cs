@@ -463,7 +463,7 @@ namespace SCQueryConnect
                 PasswordStorage.ProxyPassword,
                 _proxyViewModel.ProxyPassword);
 
-            _mainViewModel.SaveConnections(_localPath, ConnectionsFileV4);
+            _mainViewModel.SaveConnections(_localPath, ConnectionsFileV4, _mainViewModel.QueryRootNode);
         }
 
         private bool ValidateCredentials()
@@ -964,6 +964,32 @@ namespace SCQueryConnect
         private void PasswordOnPasswordChanged(object sender, RoutedEventArgs e)
         {
             _passwordStorage.SavePassword(PasswordStorage.Password, Password.Password);
+        }
+
+        private void ExportQueryDataClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe &&
+                fe.DataContext is QueryData queryData)
+            {
+                var dlg = new SaveFileDialog
+                {
+                    Filter = "JSON Files (*.json)|*.json"
+                };
+
+                if (dlg.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var directory = Path.GetDirectoryName(dlg.FileName);
+                var filename = Path.GetFileName(dlg.FileName);
+
+                if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    _mainViewModel.SaveConnections(directory, filename, queryData);
+                    Process.Start(directory);
+                }
+            }
         }
     }
 }
