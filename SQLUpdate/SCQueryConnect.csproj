@@ -173,6 +173,9 @@
     <Compile Include="Services\PasswordStorage.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="Views\BuildRelationshipsHelp.xaml.cs">
+      <DependentUpon>BuildRelationshipsHelp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ConnectionInfo.xaml.cs">
       <DependentUpon>ConnectionInfo.xaml</DependentUpon>
     </Compile>
@@ -197,6 +200,10 @@
     <Compile Include="Views\SelectDatabaseType.xaml.cs">
       <DependentUpon>SelectDatabaseType.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\BuildRelationshipsHelp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ConnectionInfo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

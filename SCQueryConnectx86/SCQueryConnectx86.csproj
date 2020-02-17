@@ -236,6 +236,9 @@
     <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
       <Link>ViewModels\ViewModelLocator.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Views\BuildRelationshipsHelp.xaml.cs">
+      <Link>Views\BuildRelationshipsHelp.xaml.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Views\ConnectionInfo.xaml.cs">
       <Link>Views\ConnectionInfo.xaml.cs</Link>
     </Compile>
@@ -308,6 +311,11 @@
     </ApplicationDefinition>
     <Page Include="..\SQLUpdate\MainWindow.xaml">
       <Link>MainWindow.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\BuildRelationshipsHelp.xaml">
+      <Link>Views\BuildRelationshipsHelp.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -991,5 +991,15 @@ namespace SCQueryConnect
                 }
             }
         }
+
+        private void BuildRelationshipsHelpClick(object sender, RoutedEventArgs e)
+        {
+            var help = new BuildRelationshipsHelp
+            {
+                Owner = this
+            };
+
+            help.Show();
+        }
     }
 }
