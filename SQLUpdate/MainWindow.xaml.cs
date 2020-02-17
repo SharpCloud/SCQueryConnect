@@ -791,10 +791,7 @@ namespace SCQueryConnect
                 }
             }
 
-            e.Effects = sender is TreeViewItem
-                ? DragDropEffects.Move
-                : DragDropEffects.None;
-            
+            e.Effects = DragDropEffects.Move;
             e.Handled = true;
         }
 

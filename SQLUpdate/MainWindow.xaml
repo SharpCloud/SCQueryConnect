@@ -95,17 +95,8 @@
                 </Grid.RowDefinitions>
 
                 <!-- Connections Tree -->
-                <Border Grid.Column="0"
-                        Background="{StaticResource QCBackground}"
-                        BorderThickness="1"
-                        BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-                        <TreeView x:Name="QueryItemTree"
+                <Grid Background="{StaticResource QCBackground}" >
+                    <TreeView x:Name="QueryItemTree"
                               AllowDrop="True"
                               Background="{StaticResource QCBackground}"
                               BorderThickness="0"
@@ -116,178 +107,171 @@
                               PreviewMouseLeftButtonDown="QueryItemTreePreviewMouseLeftButtonDown"
                               PreviewMouseMove="QueryItemTreeMouseMove"
                               SelectedItemChanged="TreeViewSelectedItemChanged">
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource StretchedTreeViewItem}">
-                                    <EventSetter Event="DragOver" Handler="QueryItemTreeDragEnter" />
-                                    <EventSetter Event="DragLeave" Handler="QueryItemTreeDragLeave" />
-                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                                </Style>
-                            </TreeView.ItemContainerStyle>
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource StretchedTreeViewItem}">
+                                <EventSetter Event="DragOver" Handler="QueryItemTreeDragEnter" />
+                                <EventSetter Event="DragLeave" Handler="QueryItemTreeDragLeave" />
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
 
-                            <TreeView.Resources>
-                                <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
+                        <TreeView.Resources>
+                            <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
 
-                                <HierarchicalDataTemplate DataType="{x:Type models:QueryData}" ItemsSource="{Binding Connections}">
-                                    <Grid Background="Transparent">
-                                        <Grid.Resources>
-                                            <GradientStopCollection x:Key="DragDropGradient">
-                                                <GradientStop Color="Transparent" Offset="0" />
-                                                <GradientStop Color="#3DDADADA" Offset="1" />
-                                            </GradientStopCollection>
+                            <HierarchicalDataTemplate DataType="{x:Type models:QueryData}" ItemsSource="{Binding Connections}">
+                                <Grid Background="Transparent">
+                                    <Grid.Resources>
+                                        <GradientStopCollection x:Key="DragDropGradient">
+                                            <GradientStop Color="Transparent" Offset="0" />
+                                            <GradientStop Color="#3DDADADA" Offset="1" />
+                                        </GradientStopCollection>
 
-                                            <Style x:Key="DragDropHighlight" TargetType="Border" >
-                                                <Setter Property="Opacity" Value="0" />
-                                                <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style x:Key="DragDropHighlight" TargetType="Border" >
+                                            <Setter Property="Opacity" Value="0" />
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Style>
+
+                                        <Storyboard x:Key="FadeIn">
+                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="1" />
+                                        </Storyboard>
+
+                                        <Storyboard x:Key="FadeOut">
+                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="0" />
+                                        </Storyboard>
+                                    </Grid.Resources>
+
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="StackPanel.MouseEnter">
+                                            <EventTrigger.Actions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
+                                                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.Actions>
+                                        </EventTrigger>
+
+                                        <EventTrigger RoutedEvent="StackPanel.MouseLeave">
+                                            <EventTrigger.Actions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
+                                                            <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                        <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="0" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.Actions>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+
+                                    <Border Background="#3DDADADA" IsHitTestVisible="False">
+                                        <Border.Style>
+                                            <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DragInto}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                                                        </DataTrigger.EnterActions>
+
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
                                             </Style>
+                                        </Border.Style>
+                                    </Border>
 
-                                            <Storyboard x:Key="FadeIn">
-                                                <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
-                                                    <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="1" />
-                                            </Storyboard>
+                                    <Border IsHitTestVisible="False">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource DragDropGradient}" />
+                                        </Border.Background>
 
-                                            <Storyboard x:Key="FadeOut">
-                                                <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
-                                                    <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="0" />
-                                            </Storyboard>
-                                        </Grid.Resources>
+                                        <Border.Style>
+                                            <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DragAbove}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                                                        </DataTrigger.EnterActions>
 
-                                        <Grid.Triggers>
-                                            <EventTrigger RoutedEvent="StackPanel.MouseEnter">
-                                                <EventTrigger.Actions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
-                                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
-                                                            </ObjectAnimationUsingKeyFrames>
-                                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="1" />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </EventTrigger.Actions>
-                                            </EventTrigger>
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
 
-                                            <EventTrigger RoutedEvent="StackPanel.MouseLeave">
-                                                <EventTrigger.Actions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Visibility">
-                                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
-                                                            </ObjectAnimationUsingKeyFrames>
-                                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetName="RunButton" Storyboard.TargetProperty="Opacity" To="0" />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </EventTrigger.Actions>
-                                            </EventTrigger>
-                                        </Grid.Triggers>
+                                    <Border IsHitTestVisible="False">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" GradientStops="{StaticResource DragDropGradient}" />
+                                        </Border.Background>
 
-                                        <Border Background="#3DDADADA" IsHitTestVisible="False">
-                                            <Border.Style>
-                                                <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding DragInto}" Value="True">
-                                                            <DataTrigger.EnterActions>
-                                                                <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
-                                                            </DataTrigger.EnterActions>
+                                        <Border.Style>
+                                            <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DragBelow}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                                                        </DataTrigger.EnterActions>
 
-                                                            <DataTrigger.ExitActions>
-                                                                <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
-                                                            </DataTrigger.ExitActions>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
 
-                                        <Border IsHitTestVisible="False">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource DragDropGradient}" />
-                                            </Border.Background>
+                                    <StackPanel Orientation="Horizontal" IsHitTestVisible="False">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Margin" Value="5,0" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                                <Setter Property="Width" Value="12" />
+                                            </Style>
+                                        </StackPanel.Resources>
 
-                                            <Border.Style>
-                                                <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding DragAbove}" Value="True">
-                                                            <DataTrigger.EnterActions>
-                                                                <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
-                                                            </DataTrigger.EnterActions>
+                                        <Image Source="Images/Folder.png"
+                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
+                                        </Image>
 
-                                                            <DataTrigger.ExitActions>
-                                                                <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
-                                                            </DataTrigger.ExitActions>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
+                                        <Image Source="Images/Database.png"
+                                               Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false}">
+                                        </Image>
 
-                                        <Border IsHitTestVisible="False">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" GradientStops="{StaticResource DragDropGradient}" />
-                                            </Border.Background>
+                                        <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
+                                    </StackPanel>
 
-                                            <Border.Style>
-                                                <Style TargetType="Border" BasedOn="{StaticResource DragDropHighlight}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding DragBelow}" Value="True">
-                                                            <DataTrigger.EnterActions>
-                                                                <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
-                                                            </DataTrigger.EnterActions>
-
-                                                            <DataTrigger.ExitActions>
-                                                                <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
-                                                            </DataTrigger.ExitActions>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
-
-                                        <StackPanel Orientation="Horizontal" IsHitTestVisible="False">
-                                            <StackPanel.Resources>
-                                                <Style TargetType="Image">
-                                                    <Setter Property="Margin" Value="5,0" />
-                                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                                    <Setter Property="Width" Value="12" />
-                                                </Style>
-                                            </StackPanel.Resources>
-
-                                            <Image Source="Images/Folder.png"
-                                                   Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
-                                            </Image>
-
-                                            <Image Source="Images/Database.png"
-                                                   Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false}">
-                                            </Image>
-
-                                            <TextBlock Foreground="White" Text="{Binding Name}" ToolTip="{Binding Description}" />
-                                        </StackPanel>
-
-                                        <Button x:Name="RunButton"
-                                                Background="Transparent"
-                                                Click="RunQueryDataClick"
-                                                FontSize="10"
-                                                HorizontalAlignment="Right"
-                                                Opacity="0"
-                                                Padding="5,0"
-                                                Visibility="Collapsed">
-                                            Run
-                                        </Button>
-                                    </Grid>
-                                </HierarchicalDataTemplate>
-                            </TreeView.Resources>
-                        </TreeView>
-
-                        <Grid AllowDrop="True"
-                              Background="{StaticResource QCBackground}"
-                              Drop="QueryItemTreeDrop"
-                              Grid.Row="1">
-                        </Grid>
-                    </Grid>
-                </Border>
+                                    <Button x:Name="RunButton"
+                                            Background="Transparent"
+                                            Click="RunQueryDataClick"
+                                            FontSize="10"
+                                            HorizontalAlignment="Right"
+                                            Opacity="0"
+                                            Padding="5,0"
+                                            Visibility="Collapsed">
+                                        Run
+                                    </Button>
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </Grid>
 
                 <!-- Button Panel -->
                 <Grid Grid.Row="1" Margin="2">
