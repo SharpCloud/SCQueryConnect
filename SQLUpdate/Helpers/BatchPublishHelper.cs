@@ -197,7 +197,7 @@ namespace SCQueryConnect.Helpers
                 // Remove data source if type is SharpCloud; a temp file will
                 // be used, so an overwrite prompt will not appear
 
-                var formattedConnection = queryData.GetBatchDBType == DatabaseStrings.SharpCloudExcel
+                var formattedConnection = queryData.GetBatchDBType == DatabaseStrings.MsAdeSharpCloudExcel
                     ? _connectionStringHelper.SetDataSource(
                         queryData.FormattedConnectionString,
                         string.Empty)

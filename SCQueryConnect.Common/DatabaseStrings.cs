@@ -5,25 +5,25 @@ namespace SCQueryConnect.Common
 {
     public static class DatabaseStrings
     {
-        public const string Access = "ACCESS";
-        public const string Excel = "EXCEL";
+        public const string MsAdeAccess = "MS_ADE_ACCESS";
+        public const string MsAdeExcel = "MS_ADE_EXCEL";
         public const string Sql = "SQL";
         public const string Odbc = "ODBC";
-        public const string Oledb = "OLEDB";
-        public const string SharePointList = "SHAREPOINT_LIST";
-        public const string SharpCloudExcel = "SHARPCLOUD_EXCEL";
+        public const string OleDb = "OLEDB";
+        public const string MsAdeSharePointList = "MS_ADE_SHAREPOINT_LIST";
+        public const string MsAdeSharpCloudExcel = "MS_ADE_SHARPCLOUD_EXCEL";
 
         public const string ExcelDataSourceKey = "Excel File";
 
         public static Dictionary<DatabaseType, string> TypeStringMapping
             = new Dictionary<DatabaseType, string>
             {
-                [DatabaseType.Access] = Access,
-                [DatabaseType.Excel] = Excel,
-                [DatabaseType.SQL] = Sql,
-                [DatabaseType.ODBC] = Odbc,
-                [DatabaseType.SharepointList] = SharePointList,
-                [DatabaseType.SharpCloudExcel] = SharpCloudExcel
+                [DatabaseType.MsAdeAccess] = MsAdeAccess,
+                [DatabaseType.MsAdeExcel] = MsAdeExcel,
+                [DatabaseType.Sql] = Sql,
+                [DatabaseType.Odbc] = Odbc,
+                [DatabaseType.MsAdeSharePointList] = MsAdeSharePointList,
+                [DatabaseType.MsAdeSharpCloudExcel] = MsAdeSharpCloudExcel
             };
 
         public static Dictionary<string, DatabaseType> StringTypeMapping

@@ -175,7 +175,7 @@ namespace SCSQLBatch
             
             if (!success)
             {
-                dbType = DatabaseType.ADO;
+                dbType = DatabaseType.Ado;
             }
 
             return dbType;

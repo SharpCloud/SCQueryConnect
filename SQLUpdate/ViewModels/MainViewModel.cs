@@ -477,10 +477,10 @@ namespace SCQueryConnect.ViewModels
                 {
                     new QueryData(DatabaseType.Excel),
                     new QueryData(DatabaseType.Access),
-                    new QueryData(DatabaseType.SharepointList),
-                    new QueryData(DatabaseType.SQL),
-                    new QueryData(DatabaseType.ODBC),
-                    new QueryData(DatabaseType.ADO),
+                    new QueryData(DatabaseType.SharePointList),
+                    new QueryData(DatabaseType.Sql),
+                    new QueryData(DatabaseType.Odbc),
+                    new QueryData(DatabaseType.Ado),
                     new QueryData(DatabaseType.SharpCloudExcel)
                 });
             }

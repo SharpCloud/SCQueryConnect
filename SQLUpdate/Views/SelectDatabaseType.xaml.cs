@@ -21,10 +21,10 @@ namespace SCQueryConnect.Views
             {
                 new Database(DatabaseType.Excel, "Excel Spreadsheet"),
                 new Database(DatabaseType.Access, "Access Database"),
-                new Database(DatabaseType.SharepointList, "SharePoint List"),
-                new Database(DatabaseType.SQL, "SQL Server Connection"),
-                new Database(DatabaseType.ODBC, "ODBC Database Connection"),
-                new Database(DatabaseType.ADO, "Generic ADO/OLDEB Connection"),
+                new Database(DatabaseType.SharePointList, "SharePoint List"),
+                new Database(DatabaseType.Sql, "SQL Server Connection"),
+                new Database(DatabaseType.Odbc, "ODBC Database Connection"),
+                new Database(DatabaseType.Ado, "Generic ADO/OLDEB Connection"),
                 new Database(DatabaseType.SharpCloudExcel, "SharpCloud (Excel)")
             };
 

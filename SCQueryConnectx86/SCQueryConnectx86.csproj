@@ -137,6 +137,9 @@
     <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibleConverter.cs">
       <Link>Converters\ConnectionTypeVisibleConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\DatabaseTypeDisplayTextConverter.cs">
+      <Link>Converters\DatabaseTypeDisplayTextConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\EnumMatchToBoolConverter.cs">
       <Link>Converters\EnumMatchToBoolConverter.cs</Link>
     </Compile>

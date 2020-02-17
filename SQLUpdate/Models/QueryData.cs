@@ -329,7 +329,7 @@ namespace SCQueryConnect.Models
 
                 if (!success)
                 {
-                    dbString = DatabaseStrings.Oledb;
+                    dbString = DatabaseStrings.OleDb;
                 }
 
                 return dbString;
@@ -363,6 +363,8 @@ namespace SCQueryConnect.Models
 
                 switch (ConnectionType)
                 {
+                    case DatabaseType.MsAdeExcel:
+                        return "SELECT * from [Sheet2$]";
                     case DatabaseType.Excel:
                         return "SELECT * from Sheet2";
                 }
@@ -468,42 +470,43 @@ namespace SCQueryConnect.Models
             ConnectionType = type;
             switch (type)
             {
-                case DatabaseType.SQL:
+                case DatabaseType.Sql:
                     Name = "SQL Server Example";
                     ConnectionsString = "Server=.; Integrated Security=true; Database=demo";
                     break;
-                
-                case DatabaseType.ODBC:
+
+                case DatabaseType.Odbc:
                     Name = "ODBC Example";
                     ConnectionsString = "DSN=DatasourceName";
                     break;
-                
-                case DatabaseType.ADO:
+
+                case DatabaseType.Ado:
                     Name = "ADO/OLEDB Example";
                     ConnectionsString =
                         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\myFolder\\myAccessFile.accdb;";
                     break;
-                
+
                 case DatabaseType.Excel:
                     Name = "Excel Example";
                     FileName = "C:/MyFolder/MyFile.xlsx";
                     ConnectionsString = $"Excel File={FilenamePlaceHolder}";
                     QueryString = "SELECT * from Sheet1";
                     break;
-                
+
                 case DatabaseType.Access:
                     Name = "Access Example";
                     FileName = "C:/MyFolder/MyFile.accdb";
                     ConnectionsString = $"Data Source={FilenamePlaceHolder}";
                     break;
-                
-                case DatabaseType.SharepointList:
+
+                case DatabaseType.SharePointList:
                     Name = "SharePoint List Example";
-                    SharePointURL = "User=USERNAME;Password=PASSWORD;Auth Scheme=NTLM;URL=http://sharepointserver/mysite;";
+                    SharePointURL =
+                        "User=USERNAME;Password=PASSWORD;Auth Scheme=NTLM;URL=http://sharepointserver/mysite;";
                     ConnectionsString = "{1}";
                     QueryString = "SELECT * FROM LIST";
                     break;
-                
+
                 case DatabaseType.SharpCloudExcel:
                     Name = "SharpCloud (Excel) Example";
                     FileName = @"C:\MyFolder\MyFile.xlsx";

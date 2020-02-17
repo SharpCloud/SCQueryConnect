@@ -25,13 +25,13 @@ namespace SCQueryConnect.Common.Helpers
                 case DatabaseType.Access:
                     return new AccessConnection(connectionString);
 
-                case DatabaseType.SharepointList:
+                case DatabaseType.SharePointList:
                     return new SharePointConnection(connectionString);
 
-                case DatabaseType.SQL:
+                case DatabaseType.Sql:
                     return new SqlConnection(connectionString);
 
-                case DatabaseType.ODBC:
+                case DatabaseType.Odbc:
                     return new OdbcConnection(connectionString);
 
                 case DatabaseType.SharpCloudExcel:

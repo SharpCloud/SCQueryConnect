@@ -54,7 +54,7 @@ namespace SCSqlBatch.Tests
                 [ProxyPassword] = "BatchProxyPassword",
                 [ProxyPassword64] = "QmF0Y2hQcm94eVBhc3N3b3JkNjQ=", // 'BatchProxyPassword64'
                 [ProxyPasswordDpapi] = "BatchProxyPasswordDpapi",
-                [DbType] = DatabaseStrings.SharpCloudExcel
+                [DbType] = DatabaseStrings.MsAdeSharpCloudExcel
             };
 
             var configReaderMock = new Mock<IConfigurationReader>();

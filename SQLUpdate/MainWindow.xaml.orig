@@ -77,7 +77,12 @@
                 <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
                 <converters:ConnectionTypeCollapsedConverter x:Key="ConnectionTypeCollapsedConverter" />
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
+<<<<<<< HEAD
                 <converters:ValidNameConverter x:Key="ValidNameConverter" />
+=======
+                <converters:DatabaseTypeDisplayTextConverter x:Key="DatabaseTypeDisplayTextConverter" />
+                <converters:ValidExcelNameConverter x:Key="ValidExcelNameConverter" />
+>>>>>>> Add backwards compatibility for MS ADE connections
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -382,7 +387,15 @@
                                 </TextBox>
 
                                 <TextBlock Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Right" Text="Type:" Foreground="{StaticResource QCBlue}" TextAlignment="Right" Margin="5,5,160,5"></TextBlock>
-                                <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Width="150" HorizontalAlignment="Right" Margin="5" Text="{Binding ConnectionType, FallbackValue='Connection Type'}" />
+
+                                <TextBox Grid.Row="0"
+                                         Grid.Column="1"
+                                         IsReadOnly="True"
+                                         Width="150"
+                                         HorizontalAlignment="Right"
+                                         Margin="5"
+                                         Text="{Binding ConnectionType, FallbackValue='Connection Type', Converter={StaticResource DatabaseTypeDisplayTextConverter}}">
+                                </TextBox>
 
                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Description:" Style="{StaticResource Label}" />
                                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Description, FallbackValue='Description'}" TextWrapping="WrapWithOverflow" Margin="5" />
@@ -391,14 +404,14 @@
                                            Grid.Column="0"
                                            Text="Source Story ID/URL:"
                                            Style="{StaticResource Label}"
-                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}">
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeSharpCloudExcel, SharpCloudExcel'}">
                                 </TextBlock>
 
                                 <TextBox Grid.Row="2"
                                          Grid.Column="1"
                                          Height="30"
                                          Margin="5,5,250,5"
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeSharpCloudExcel, SharpCloudExcel'}"
                                          Text="{Binding SourceStoryId, Converter={StaticResource UrlToStoryIdConverter}}">
                                 </TextBox>
 
@@ -407,7 +420,7 @@
                                         Height="30"
                                         HorizontalAlignment="Right"
                                         Width="150"
-                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharpCloudExcel'}"
+                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeSharpCloudExcel, SharpCloudExcel'}"
                                         Click="StorySourceSettings_Click">
                                     More...
                                 </Button>
@@ -416,7 +429,7 @@
                                            Grid.Column="0"
                                            Text="Filename:"
                                            Style="{StaticResource Label}"
-                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access, Excel, SharpCloudExcel'}">
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeAccess, MsAdeExcel, MsAdeSharpCloudExcel, Access, Excel, SharpCloudExcel'}">
                                 </TextBlock>
 
                                 <TextBox Grid.Column="1"
@@ -425,10 +438,11 @@
                                          Margin="5"
 <<<<<<< HEAD
                                          Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Access'}"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access'}">
 =======
                                          Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Access'}"
->>>>>>> Use CData.Access for reading Access
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access'}">
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeAccess, Access'}">
+>>>>>>> Add backwards compatibility for MS ADE connections
                                 </TextBox>
 
                                 <TextBox Grid.Column="1"
@@ -437,10 +451,11 @@
                                          Margin="5"
 <<<<<<< HEAD
                                          Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Excel'}"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel, SharpCloudExcel'}">
 =======
                                          Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Excel'}"
->>>>>>> Use CData.Access for reading Access
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel, SharpCloudExcel'}">
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeExcel, MsAdeSharpCloudExcel, Excel, SharpCloudExcel'}">
+>>>>>>> Add backwards compatibility for MS ADE connections
                                 </TextBox>
 
                                 <Button Grid.Row="3"
@@ -450,15 +465,16 @@
                                         VerticalAlignment="Bottom"
                                         Width="150"
                                         Click="BrowseForDataSourceClick"
-                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access, Excel, SharpCloudExcel'}">
+                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeAccess, MsAdeExcel, MsAdeSharpCloudExcel, Access, Excel, SharpCloudExcel'}">
                                     Choose file...
                                 </Button>
 
                                 <TextBlock Grid.Row="3"
                                            Grid.Column="0"
-                                           Text="SharePoint URL:"
+                                           Text="SharePoint Connection String:"
                                            Style="{StaticResource Label}"
-                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharepointList'}">
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeSharePointList, SharePointList'}"
+                                           TextWrapping="Wrap">
                                 </TextBlock>
 
                                 <TextBox Grid.Row="3"
@@ -466,14 +482,14 @@
                                          Text="{Binding SharePointURL, FallbackValue='https://yoursite.sharepoint.com;LIST={listGuid}'}"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='SharepointList'}">
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeSharePointList, SharePointList'}">
                                 </TextBox>
 
                                 <TextBlock Grid.Row="3"
                                            Grid.Column="0"
                                            Text="Connection String:"
                                            Style="{StaticResource Label}"
-                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeCollapsedConverter}, ConverterParameter='Access, Excel, SharepointList, SharpCloudExcel'}">
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeCollapsedConverter}, ConverterParameter='MsAdeAccess, MsAdeExcel, MsAdeSharePointList, MsAdeSharpCloudExcel, Access, Excel, SharePointList, SharpCloudExcel'}">
                                 </TextBlock>
 
                                 <TextBox Grid.Row="3"
@@ -481,7 +497,7 @@
                                          Text="{Binding ConnectionsString, FallbackValue='Server=.; Integrated Security=true; Database=demo'}"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeCollapsedConverter}, ConverterParameter='Access, Excel, SharepointList, SharpCloudExcel'}">
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeCollapsedConverter}, ConverterParameter='MsAdeAccess, MsAdeExcel, MsAdeSharePointList, MsAdeSharpCloudExcel, Access, Excel, SharePointList, SharpCloudExcel'}">
                                 </TextBox>
 
                                 <Button Grid.Row="4" Grid.Column="1" Width="250" HorizontalAlignment="Left" Height="40" Click="TestConnectionClick">Test Connection</Button>
@@ -492,7 +508,7 @@
                                            Margin="5"
                                            Foreground="White"
                                            TextWrapping="WrapWithOverflow"
-                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel'}">
+                                           Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeExcel, Excel'}">
                                     <Run>Rewriting the data source may help if data is not being read properly.</Run>
                                     <Run FontStyle="Italic">Warning:</Run>
                                     <Run>this may cause your file to become unusable in older versions of Excel.</Run>
@@ -504,7 +520,7 @@
                                         HorizontalAlignment="Left"
                                         Height="40"
                                         Click="RewriteDataSourceClick"
-                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel'}">
+                                        Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeExcel, Excel'}">
                                     Rewrite Data Source
                                 </Button>
 
@@ -606,7 +622,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="RunClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid x:Name="DataGrid" Grid.Row="1" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResults}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
@@ -643,7 +659,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="RunClickRels" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid x:Name="DataGridRels" Grid.Row="1" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsRels}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
@@ -676,7 +692,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="PreviewResourceUrlsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid x:Name="DataGridResourceUrls" Grid.Row="1" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsResourceUrls}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
@@ -709,7 +725,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="PreviewPanelsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid x:Name="DataGridPanels" Grid.Row="1" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsPanels}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
