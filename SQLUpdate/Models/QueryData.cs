@@ -34,6 +34,10 @@ namespace SCQueryConnect.Models
         private bool _unpublishItems;
         private string _issueSummary;
         private string _logData;
+        private DataView _queryResults;
+        private DataView _queryResultsRels;
+        private DataView _queryResultsPanels;
+        private DataView _queryResultsResourceUrls;
 
         public bool IsExpanded
         {
@@ -224,16 +228,63 @@ namespace SCQueryConnect.Models
         public bool IsFolder => Connections != null;
 
         [JsonIgnore]
-        public DataView QueryResults { get; set; }
+        public DataView QueryResults
+        {
+            get => _queryResults;
+
+            set
+            {
+                if (_queryResults != value)
+                {
+                    _queryResults = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [JsonIgnore]
-        public DataView QueryResultsRels { get; set; }
-        
+        public DataView QueryResultsRels
+        {
+            get => _queryResultsRels;
+
+            set
+            {
+                if (_queryResultsRels != value)
+                {
+                    _queryResultsRels = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         [JsonIgnore]
-        public DataView QueryResultsPanels { get; set; }
-        
+        public DataView QueryResultsPanels
+        {
+            get => _queryResultsPanels;
+            set
+            {
+                if (_queryResultsPanels != value)
+                {
+                    _queryResultsPanels = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         [JsonIgnore]
-        public DataView QueryResultsResourceUrls { get; set; }
+        public DataView QueryResultsResourceUrls
+        {
+            get => _queryResultsResourceUrls;
+
+            set
+            {
+                if (_queryResultsResourceUrls != value)
+                {
+                    _queryResultsResourceUrls = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public ObservableCollection<QueryData> Connections
         {

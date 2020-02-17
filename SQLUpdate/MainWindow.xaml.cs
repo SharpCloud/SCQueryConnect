@@ -353,7 +353,6 @@ namespace SCQueryConnect
                 _mainViewModel.SelectedQueryData,
                 _mainViewModel.SelectedQueryData.QueryString,
                 _itemDataChecker,
-                DataGrid,
                 d => d.QueryResults);
         }
 
@@ -363,7 +362,6 @@ namespace SCQueryConnect
                 _mainViewModel.SelectedQueryData,
                 _mainViewModel.SelectedQueryData.QueryStringRels,
                 _relationshipsChecker,
-                DataGridRels,
                 d => d.QueryResultsRels);
         }
 
@@ -373,7 +371,6 @@ namespace SCQueryConnect
                 _mainViewModel.SelectedQueryData,
                 _mainViewModel.SelectedQueryData.QueryStringResourceUrls,
                 _resourceUrlDataChecker,
-                DataGridResourceUrls,
                 d => d.QueryResultsResourceUrls);
         }
 
@@ -383,7 +380,6 @@ namespace SCQueryConnect
                 _mainViewModel.SelectedQueryData,
                 _mainViewModel.SelectedQueryData.QueryStringPanels,
                 _panelsDataChecker,
-                DataGridPanels,
                 d => d.QueryResultsPanels);
         }
 
@@ -391,8 +387,7 @@ namespace SCQueryConnect
             QueryData queryData,
             string query,
             IDataChecker dataChecker,
-            DataGrid dataGrid,
-            Expression<Func<QueryData, DataView>> dataViewSelector)
+            Expression<Func<QueryData, DataView>> resultsSelector)
         {
             try
             {
@@ -423,15 +418,8 @@ namespace SCQueryConnect
                                 }
                             }
 
-                            dataGrid.ItemsSource = dt.DefaultView;
-
-                            var prop = (PropertyInfo)((MemberExpression)dataViewSelector.Body).Member;
-                            prop.SetValue(_mainViewModel.SelectedQueryData, dt.DefaultView, null);
-
-                            for (var col = 0; col < dataGrid.Columns.Count; col++)
-                            {
-                                dataGrid.Columns[col].Header = dt.Columns[col].Caption;
-                            }
+                            var prop = (PropertyInfo)((MemberExpression)resultsSelector.Body).Member;
+                            prop.SetValue(queryData, dt.DefaultView, null);
                         }
                     }
                 }
@@ -621,11 +609,6 @@ namespace SCQueryConnect
             {
                 await _storyLoggingDestination.SetLogText(
                     _mainViewModel.SelectedQueryData.LogData);
-
-                DataGrid.ItemsSource = _mainViewModel.SelectedQueryData.QueryResults;
-                DataGridRels.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsRels;
-                DataGridResourceUrls.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsResourceUrls;
-                DataGridPanels.ItemsSource = _mainViewModel.SelectedQueryData.QueryResultsPanels;
             }
         }
 
