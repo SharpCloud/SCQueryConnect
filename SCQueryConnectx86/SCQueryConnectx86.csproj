@@ -260,6 +260,9 @@
     <Compile Include="..\SQLUpdate\Views\SourceStorySettings.xaml.cs">
       <Link>Views\SourceStorySettings.xaml.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Views\UnpublishUnmatchedItemsHelp.xaml.cs">
+      <Link>Views\UnpublishUnmatchedItemsHelp.xaml.cs</Link>
+    </Compile>
     <Content Include="..\_SCSqlBatchOutput\SCSQLBatch.zip">
       <Link>SCSQLBatch.zip</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -346,6 +349,11 @@
     </Page>
     <Page Include="..\SQLUpdate\Views\SourceStorySettings.xaml">
       <Link>Views\SourceStorySettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\UnpublishUnmatchedItemsHelp.xaml">
+      <Link>Views\UnpublishUnmatchedItemsHelp.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

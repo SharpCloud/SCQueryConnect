@@ -1,0 +1,15 @@
+﻿<Window x:Class="SCQueryConnect.Views.UnpublishUnmatchedItemsHelp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Height="140"
+        Style="{StaticResource MessageBoxWindow}"
+        Title="Unpublish Unmatched Items">
+    <Grid Margin="20">
+        <TextBlock Text="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished"
+                   TextWrapping="Wrap">
+        </TextBlock>
+    </Grid>
+</Window>

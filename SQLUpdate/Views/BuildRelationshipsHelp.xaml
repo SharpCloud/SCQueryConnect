@@ -4,20 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Height="200" Width="500"
-        WindowStartupLocation="CenterOwner"
-        Background="{StaticResource QCBackground}"
-        Foreground="White"
+        Height="240"
         Title="Build Relationships"
-        ResizeMode="NoResize"
-        ShowInTaskbar="False">
+        Style="{StaticResource MessageBoxWindow}">
     <Grid>
         <StackPanel Margin="20">
             <TextBlock TextWrapping="Wrap">
                 <Run Text="Use this option to automatically create relationships between other items in this story." />
             </TextBlock>
 
-            <TextBlock Margin="0,10,0,0" TextWrapping="Wrap">
+            <TextBlock Margin="0,15,0,0" TextWrapping="Wrap">
                 <Run Text="Your relationships text must be stored in a text attribute called 'RelatedItems' and these MUST refer to the externalID of the item (i.e. not the name)." />
                 <Run Text="Note that you can add multiple relationships by separating the values with a semi-colon or a comma (';' or ',')." />
             </TextBlock>

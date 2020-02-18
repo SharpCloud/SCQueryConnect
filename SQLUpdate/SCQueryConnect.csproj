@@ -200,6 +200,9 @@
     <Compile Include="Views\SelectDatabaseType.xaml.cs">
       <DependentUpon>SelectDatabaseType.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UnpublishUnmatchedItemsHelp.xaml.cs">
+      <DependentUpon>UnpublishUnmatchedItemsHelp.xaml</DependentUpon>
+    </Compile>
     <Page Include="Views\BuildRelationshipsHelp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -237,6 +240,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SelectDatabaseType.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UnpublishUnmatchedItemsHelp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

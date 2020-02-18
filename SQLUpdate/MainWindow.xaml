@@ -739,11 +739,31 @@
                                 </StackPanel>
 
                                 <StackPanel Margin="100,5,0,0" Width="370">
-                                    <CheckBox Foreground="{StaticResource QCBlue}"
-                                              IsChecked="{Binding UnpublishItems, Mode=TwoWay}"
-                                              ToolTip="When ticked, Items in the target story that do not match with an incoming record will be marked as unpublished">
-                                        Unpublish unmatched items
-                                    </CheckBox>
+                                    <StackPanel.Resources>
+                                        <Style x:Key="HelpButton" TargetType="Button">
+                                            <Setter Property="Content" Value="(what's this?)" />
+                                            <Setter Property="Foreground" Value="White" />
+                                            <Setter Property="Margin" Value="5,0,0,0" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Background="Transparent">
+                                                            <ContentPresenter />
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </StackPanel.Resources>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Foreground="{StaticResource QCBlue}"
+                                                  IsChecked="{Binding UnpublishItems, Mode=TwoWay}">
+                                            Unpublish unmatched items
+                                        </CheckBox>
+                                        
+                                        <Button Click="UnpublishUnmatchedItemsHelpClick" Style="{StaticResource HelpButton}" />
+                                    </StackPanel>
 
                                     <StackPanel Orientation="Horizontal">
                                         <CheckBox Content="Build relationships"
@@ -751,15 +771,7 @@
                                                   IsChecked="{Binding BuildRelationships, Mode=TwoWay}">
                                         </CheckBox>
 
-                                        <Button Content="(what's this?)" Margin="5,0,0,0" Click="BuildRelationshipsHelpClick">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Grid Background="Transparent">
-                                                        <ContentPresenter />
-                                                    </Grid>
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                        </Button>
+                                        <Button Click="BuildRelationshipsHelpClick" Style="{StaticResource HelpButton}" />
                                     </StackPanel>
                                 </StackPanel>
 

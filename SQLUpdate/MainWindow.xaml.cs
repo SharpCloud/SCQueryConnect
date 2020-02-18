@@ -994,9 +994,20 @@ namespace SCQueryConnect
 
         private void BuildRelationshipsHelpClick(object sender, RoutedEventArgs e)
         {
-            var help = new BuildRelationshipsHelp
+            ShowHelpWindow<BuildRelationshipsHelp>();
+        }
+
+        private void UnpublishUnmatchedItemsHelpClick(object sender, RoutedEventArgs e)
+        {
+            ShowHelpWindow<UnpublishUnmatchedItemsHelp>();
+        }
+
+        private void ShowHelpWindow<T>() where T : Window, new()
+        {
+            var help = new T
             {
-                Owner = this
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
 
             help.Show();
