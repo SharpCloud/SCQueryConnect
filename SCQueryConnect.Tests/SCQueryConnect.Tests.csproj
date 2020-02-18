@@ -63,6 +63,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\UrlToStoryIdConverterTests.cs" />
     <Compile Include="Converters\ValidNameConverterTests.cs" />
     <Compile Include="Helpers\BatchPublishHelperTests.cs" />
     <Compile Include="Helpers\ConnectionNameValidatorTests.cs" />
