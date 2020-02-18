@@ -51,7 +51,8 @@ namespace SCQueryConnect.Common.Helpers
                     return new OdbcConnection(connectionString);
 
                 case DatabaseType.SharpCloudExcel:
-                    var variables = new List<string>()
+                {
+                    var variables = new List<string>
                     {
                         "SourceId",
                         "SourceUserName",
@@ -66,6 +67,26 @@ namespace SCQueryConnect.Common.Helpers
                             .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
 
                     return new ExcelConnection(excelConnectionString);
+                }
+
+                case DatabaseType.MsAdeSharpCloudExcel:
+                {
+                    var variables = new List<string>
+                    {
+                        "SourceId",
+                        "SourceUserName",
+                        "SourcePassword",
+                        "SourceServer"
+                    };
+
+                    var excelConnectionString = string.Join(
+                        Delimiter,
+                        connectionString
+                            .Split(Delimiter[0])
+                            .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
+
+                    return new OleDbConnection(excelConnectionString);
+                }
 
                 default:
                     return new OleDbConnection(connectionString);

@@ -196,7 +196,7 @@ namespace SCQueryConnect
         {
             var filepath = _connectionStringHelper.GetVariable(
                 queryData.FormattedConnectionString,
-                DatabaseStrings.ExcelDataSourceKey);
+                DatabaseStrings.ExcelFileKey);
 
             try
             {

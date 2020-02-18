@@ -13,7 +13,8 @@ namespace SCQueryConnect.Common
         public const string MsAdeSharePointList = "MS_ADE_SHAREPOINT_LIST";
         public const string MsAdeSharpCloudExcel = "MS_ADE_SHARPCLOUD_EXCEL";
 
-        public const string ExcelDataSourceKey = "Excel File";
+        public const string ExcelFileKey = "Excel File";
+        public const string DataSourceKey = "Data Source";
 
         public static Dictionary<DatabaseType, string> TypeStringMapping
             = new Dictionary<DatabaseType, string>

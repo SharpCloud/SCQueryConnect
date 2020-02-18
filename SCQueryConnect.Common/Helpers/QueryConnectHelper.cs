@@ -241,7 +241,7 @@ namespace SCQueryConnect.Common.Helpers
         {
             if (dbType == DatabaseType.SharpCloudExcel)
             {
-                var filename = _connectionStringHelper.GetVariable(connectionString, DatabaseStrings.ExcelDataSourceKey);
+                var filename = _connectionStringHelper.GetVariable(connectionString, DatabaseStrings.ExcelFileKey);
                 var sourceId = _connectionStringHelper.GetVariable(connectionString, "SourceId");
 
                 var csUsername = _connectionStringHelper.GetVariable(connectionString, "SourceUserName");
@@ -326,7 +326,7 @@ namespace SCQueryConnect.Common.Helpers
                 {
                     var filename = _connectionStringHelper.GetVariable(
                         settings.ConnectionString,
-                        DatabaseStrings.ExcelDataSourceKey);
+                        DatabaseStrings.ExcelFileKey);
 
                     var withoutExt = Path.GetFileNameWithoutExtension(filename);
                     generateTempFile = string.IsNullOrWhiteSpace(withoutExt);

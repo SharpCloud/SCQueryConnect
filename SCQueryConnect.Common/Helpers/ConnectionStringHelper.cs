@@ -24,8 +24,8 @@ namespace SCQueryConnect.Common.Helpers
         {
             var updated = Regex.Replace(
                 connectionString,
-                $"{DatabaseStrings.ExcelDataSourceKey}=(.*?)(;|$)",
-                m => $"{DatabaseStrings.ExcelDataSourceKey}={newLocation}{m.Groups[2]}");
+                $"({DatabaseStrings.DataSourceKey}|{DatabaseStrings.ExcelFileKey})=(.*?)(;|$)",
+                m => $"{m.Groups[1]}={newLocation}{m.Groups[3]}");
 
             return updated;
         }
