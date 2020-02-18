@@ -340,7 +340,6 @@ namespace SCSqlBatch.Tests
         {
             // Arrange
 
-
             var overrides = new Dictionary<string, string>
             {
                 [Password64] = null,
@@ -385,7 +384,7 @@ namespace SCSqlBatch.Tests
                 QueryStringRels = "BatchQueryStringRels",
                 ConnectionString = "BatchConnectionString",
                 MaxRowCount = 1000,
-                DBType = DatabaseType.SharpCloudExcel,
+                DBType = DatabaseType.MsAdeSharpCloudExcel,
                 UnpublishItems = true
             };
 
