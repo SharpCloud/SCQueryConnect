@@ -545,7 +545,10 @@ namespace SCQueryConnect.ViewModels
         {
             Connections.Add(queryData);
             queryData.IsSelected = true;
-            SelectedTabIndex = 0; // go back to the first tab
+            
+            SelectedTabIndex = queryData.IsFolder // go back to the first tab
+                ? FolderTabIndex
+                : 0;
         }
 
         private static QueryData CreateNewFolder(string name)
