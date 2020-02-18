@@ -137,6 +137,9 @@
     <Compile Include="..\SQLUpdate\Converters\ConnectionTypeVisibleConverter.cs">
       <Link>Converters\ConnectionTypeVisibleConverter.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Converters\DatabaseTypeDisplayTextConverter.cs">
+      <Link>Converters\DatabaseTypeDisplayTextConverter.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\EnumMatchToBoolConverter.cs">
       <Link>Converters\EnumMatchToBoolConverter.cs</Link>
     </Compile>
@@ -146,13 +149,8 @@
     <Compile Include="..\SQLUpdate\Converters\UrlToStoryIdConverter.cs">
       <Link>Converters\UrlToStoryIdConverter.cs</Link>
     </Compile>
-<<<<<<< HEAD
     <Compile Include="..\SQLUpdate\Converters\ValidNameConverter.cs">
       <Link>Converters\ValidNameConverter.cs</Link>
-=======
-    <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
-      <Link>Converters\ValidExcelNameConverter.cs</Link>
->>>>>>> Add link to missing file
     </Compile>
     <Compile Include="..\SQLUpdate\DataCheckerValidityProcessor.cs">
       <Link>DataCheckerValidityProcessor.cs</Link>
@@ -169,14 +167,8 @@
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
-      <Link>Helpers\UrlHelper.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\SQLUpdate\Interfaces\IIOService.cs">
-      <Link>Interfaces\IIOService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
       <Link>Interfaces\IMainViewModel.cs</Link>
@@ -186,6 +178,12 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IPasswordStorage.cs">
       <Link>Interfaces\IPasswordStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IProxyViewModel.cs">
+      <Link>Interfaces\IProxyViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IZipService.cs">
+      <Link>Interfaces\IZipService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
       <Link>Logging\LoggingDestination.cs</Link>
@@ -223,14 +221,14 @@
     <Compile Include="..\SQLUpdate\Properties\Resources.Designer.cs">
       <Link>Properties\Resources.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Services\IOService.cs">
-      <Link>Services\IOService.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Services\MessageService.cs">
       <Link>Services\MessageService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Services\PasswordStorage.cs">
       <Link>Services\PasswordStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\ZipService.cs">
+      <Link>Services\ZipService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
       <Link>ViewModels\MainViewModel.cs</Link>

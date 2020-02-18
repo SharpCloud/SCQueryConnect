@@ -147,24 +147,24 @@
     <Compile Include="Converters\ConnectionTypeCollapsedConverter.cs" />
     <Compile Include="Converters\ConnectionTypeVisibilityConverter.cs" />
     <Compile Include="Converters\ConnectionTypeVisibleConverter.cs" />
+    <Compile Include="Converters\DatabaseTypeDisplayTextConverter.cs" />
     <Compile Include="Converters\EnumMatchToBoolConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Converters\UrlToStoryIdConverter.cs" />
-<<<<<<< HEAD
     <Compile Include="Converters\ValidNameConverter.cs" />
-=======
-    <Compile Include="Converters\ValidExcelNameConverter.cs" />
->>>>>>> Move URL-to-story-ID conversion into converter
     <Compile Include="DataCheckerValidityProcessor.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
-    <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Interfaces\IBatchPublishHelper.cs" />
-    <Compile Include="Interfaces\IIOService.cs" />
     <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Interfaces\IPasswordStorage.cs" />
+<<<<<<< HEAD
+    <Compile Include="Interfaces\IProxyViewModel.cs" />
+=======
+    <Compile Include="Interfaces\IZipService.cs" />
+>>>>>>> Add CData licence service
     <Compile Include="Logging\LoggingDestination.cs" />
     <Compile Include="Logging\MultiDestinationLogger.cs" />
     <Compile Include="Logging\QueryDataLoggingDestination.cs" />
@@ -173,9 +173,9 @@
     <Compile Include="Models\PublishArchitecture.cs" />
     <Compile Include="Models\PublishSettings.cs" />
     <Compile Include="Models\SaveData.cs" />
-    <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\MessageService.cs" />
     <Compile Include="Services\PasswordStorage.cs" />
+    <Compile Include="Services\ZipService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\BuildRelationshipsHelp.xaml.cs">

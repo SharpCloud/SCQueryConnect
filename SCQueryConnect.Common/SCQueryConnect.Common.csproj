@@ -103,12 +103,14 @@
     <Compile Include="Helpers\PanelsDataChecker.cs" />
     <Compile Include="Helpers\SharpCloudApiFactory.cs" />
     <Compile Include="Interfaces\IArchitectureDetector.cs" />
+    <Compile Include="Interfaces\ICDataLicenceService.cs" />
     <Compile Include="Interfaces\IDataCheckerValidityProcessor.cs" />
     <Compile Include="Interfaces\IEncryptionHelper.cs" />
     <Compile Include="Interfaces\IExcelWriter.cs" />
     <Compile Include="Interfaces\IConnectionStringHelper.cs" />
     <Compile Include="Interfaces\IDbConnectionFactory.cs" />
     <Compile Include="Interfaces\IDataChecker.cs" />
+    <Compile Include="Interfaces\IIOService.cs" />
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IItemDataChecker.cs" />
     <Compile Include="Interfaces\IRelationshipsBuilder.cs" />
@@ -128,6 +130,8 @@
     <Compile Include="Models\UpdateSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersionInfo.cs" />
+    <Compile Include="Services\CDataLicenceService.cs" />
+    <Compile Include="Services\IOService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -161,6 +165,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CDataLicences\CDataLicences.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

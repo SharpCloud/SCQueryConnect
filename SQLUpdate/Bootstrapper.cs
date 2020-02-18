@@ -7,6 +7,7 @@ using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.ViewModels;
 using System;
+using SCQueryConnect.Common.Services;
 using SCQueryConnect.Services;
 
 namespace SCQueryConnect
@@ -59,6 +60,7 @@ namespace SCQueryConnect
             builder.RegisterType<MainViewModel>().As<IMainViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ArchitectureDetector>().As<IArchitectureDetector>().InstancePerLifetimeScope();
             builder.RegisterType<BatchPublishHelper>().As<IBatchPublishHelper>().InstancePerLifetimeScope();
+            builder.RegisterType<CDataLicenceService>().As<ICDataLicenceService>().InstancePerLifetimeScope();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ItemDataChecker>().As<IItemDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();
@@ -75,6 +77,7 @@ namespace SCQueryConnect
             builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<ProxyViewModel>().As<IProxyViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>().InstancePerLifetimeScope();
+            builder.RegisterType<ZipService>().As<IZipService>().InstancePerLifetimeScope();
 
             return builder;
         }

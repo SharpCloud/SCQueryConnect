@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace SCQueryConnect.Interfaces
+namespace SCQueryConnect.Common.Interfaces
 {
     public interface IIOService
     {
@@ -22,7 +22,5 @@ namespace SCQueryConnect.Interfaces
         void MoveFile(string sourceFileName, string destFileName);
         string ReadAllTextFromFile(string path);
         void WriteAllTextToFile(string path, string contents);
-
-        void ExtractZipFileToDirectory(string sourceArchiveFileName, string destinationDirectoryName);
     }
 }

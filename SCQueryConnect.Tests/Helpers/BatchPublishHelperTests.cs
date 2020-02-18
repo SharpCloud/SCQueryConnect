@@ -70,7 +70,8 @@ namespace SCQueryConnect.Tests.Helpers
                 encryptionHelper,
                 ioService,
                 Mock.Of<IMessageService>(),
-                passwordStorage);
+                passwordStorage,
+                Mock.Of<IZipService>());
 
             var settings = CreatePublishSettings("Connection");
 
@@ -112,7 +113,8 @@ namespace SCQueryConnect.Tests.Helpers
                 encryptionHelper,
                 ioService,
                 Mock.Of<IMessageService>(),
-                passwordStorage);
+                passwordStorage,
+                Mock.Of<IZipService>());
 
             var settings = CreatePublishSettings("Folder1", "Connection");
 
@@ -161,7 +163,8 @@ echo - Running 'Connection'...
                 encryptionHelper,
                 ioService,
                 Mock.Of<IMessageService>(),
-                passwordStorage);
+                passwordStorage,
+                Mock.Of<IZipService>());
 
             var settings = CreatePublishSettings("Folder1", "Folder2", "Connection");
 

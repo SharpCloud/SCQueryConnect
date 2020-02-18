@@ -21,19 +21,22 @@ namespace SCQueryConnect.Helpers
         private readonly IIOService _ioService;
         private readonly IMessageService _messageService;
         private readonly IPasswordStorage _passwordStorage;
+        private readonly IZipService _zipService;
 
         public BatchPublishHelper(
             IConnectionStringHelper connectionStringHelper,
             IEncryptionHelper encryptionHelper,
             IIOService ioService,
             IMessageService messageService,
-            IPasswordStorage passwordStorage)
+            IPasswordStorage passwordStorage,
+            IZipService zipService)
         {
             _connectionStringHelper = connectionStringHelper;
             _encryptionHelper = encryptionHelper;
             _ioService = ioService;
             _messageService = messageService;
             _passwordStorage = passwordStorage;
+            _zipService = zipService;
         }
 
         public string GetBatchRunStartMessage(string name) => $"- Running '{name}'...";
@@ -184,7 +187,7 @@ namespace SCQueryConnect.Helpers
                         _ioService.DeleteFile(toDelete);
                     }
 
-                    _ioService.ExtractZipFileToDirectory(zipfile, outputFolder);
+                    _zipService.ExtractZipFileToDirectory(zipfile, outputFolder);
                 }
                 catch (Exception e)
                 {

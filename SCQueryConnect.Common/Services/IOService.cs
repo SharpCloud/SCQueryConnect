@@ -1,11 +1,10 @@
 ﻿using Microsoft.Win32;
-using SCQueryConnect.Interfaces;
+using SCQueryConnect.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 
-namespace SCQueryConnect.Services
+namespace SCQueryConnect.Common.Services
 {
     public class IOService : IIOService
     {
@@ -82,11 +81,6 @@ namespace SCQueryConnect.Services
         public void WriteAllTextToFile(string path, string contents)
         {
             File.WriteAllText(path, contents);
-        }
-
-        public void ExtractZipFileToDirectory(string sourceArchiveFileName, string destinationDirectoryName)
-        {
-            ZipFile.ExtractToDirectory(sourceArchiveFileName, destinationDirectoryName);
         }
     }
 }

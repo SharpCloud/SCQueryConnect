@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Common.Interfaces;
 
 namespace SCQueryConnect.Common.Tests.Helpers
 {
@@ -12,7 +14,8 @@ namespace SCQueryConnect.Common.Tests.Helpers
         {
             // Arrange
 
-            var factory = new DbConnectionFactory();
+            var factory = new DbConnectionFactory(
+                Mock.Of<ICDataLicenceService>());
 
             // Act
 

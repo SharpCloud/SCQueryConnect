@@ -13,20 +13,36 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class DbConnectionFactory : IDbConnectionFactory
     {
-        private const string _delimiter = ";";
+        private const string Delimiter = ";";
+
+        private readonly ICDataLicenceService _cDataLicenceService;
+
+        public DbConnectionFactory(ICDataLicenceService cDataLicenceService)
+        {
+            _cDataLicenceService = cDataLicenceService;
+        }
 
         public IDbConnection GetDb(string connectionString, DatabaseType dbType)
         {
             switch (dbType)
             {
                 case DatabaseType.Excel:
-                    return new ExcelConnection(connectionString);
+                    return new ExcelConnection(connectionString)
+                    {
+                        RuntimeLicense = _cDataLicenceService.GetLicence(dbType)
+                    };
 
                 case DatabaseType.Access:
-                    return new AccessConnection(connectionString);
+                    return new AccessConnection(connectionString)
+                    {
+                        RuntimeLicense = _cDataLicenceService.GetLicence(dbType)
+                    };
 
                 case DatabaseType.SharePointList:
-                    return new SharePointConnection(connectionString);
+                    return new SharePointConnection(connectionString)
+                    {
+                        RuntimeLicense = _cDataLicenceService.GetLicence(dbType)
+                    };
 
                 case DatabaseType.Sql:
                     return new SqlConnection(connectionString);
@@ -44,9 +60,9 @@ namespace SCQueryConnect.Common.Helpers
                     };
 
                     var excelConnectionString = string.Join(
-                        _delimiter,
+                        Delimiter,
                         connectionString
-                            .Split(_delimiter[0])
+                            .Split(Delimiter[0])
                             .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
 
                     return new ExcelConnection(excelConnectionString);
