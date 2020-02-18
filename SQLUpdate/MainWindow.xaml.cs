@@ -194,13 +194,17 @@ namespace SCQueryConnect
 
         private void RewriteDataSource(QueryData queryData)
         {
-            var filepath = _connectionStringHelper.GetVariable(
+            var key = queryData.ConnectionType == DatabaseType.Excel
+                ? DatabaseStrings.ExcelFileKey
+                : DatabaseStrings.DataSourceKey;
+
+            var filePath = _connectionStringHelper.GetVariable(
                 queryData.FormattedConnectionString,
-                DatabaseStrings.ExcelFileKey);
+                key);
 
             try
             {
-                _excelWriter.RewriteExcelFile(filepath);
+                _excelWriter.RewriteExcelFile(filePath);
             }
             catch (Exception ex)
             {

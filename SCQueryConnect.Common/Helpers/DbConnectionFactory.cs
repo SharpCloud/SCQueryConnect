@@ -27,70 +27,79 @@ namespace SCQueryConnect.Common.Helpers
             switch (dbType)
             {
                 case DatabaseType.Excel:
+                {
                     return new ExcelConnection(connectionString)
                     {
                         RuntimeLicense = _cDataLicenceService.GetLicence(dbType)
                     };
+                }
 
                 case DatabaseType.Access:
+                {
                     return new AccessConnection(connectionString)
                     {
                         RuntimeLicense = _cDataLicenceService.GetLicence(dbType)
                     };
+                }
 
                 case DatabaseType.SharePointList:
+                {
                     return new SharePointConnection(connectionString)
                     {
                         RuntimeLicense = _cDataLicenceService.GetLicence(dbType)
                     };
+                }
 
                 case DatabaseType.Sql:
+                {
                     return new SqlConnection(connectionString);
+                }
 
                 case DatabaseType.Odbc:
+                {
                     return new OdbcConnection(connectionString);
+                }
 
                 case DatabaseType.SharpCloudExcel:
                 {
-                    var variables = new List<string>
+                    var excelConnectionString = GetExcelConnectionString(connectionString);
+                    
+                    return new ExcelConnection(excelConnectionString)
                     {
-                        "SourceId",
-                        "SourceUserName",
-                        "SourcePassword",
-                        "SourceServer"
+                        RuntimeLicense = _cDataLicenceService.GetLicence(DatabaseType.Excel)
                     };
-
-                    var excelConnectionString = string.Join(
-                        Delimiter,
-                        connectionString
-                            .Split(Delimiter[0])
-                            .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
-
-                    return new ExcelConnection(excelConnectionString);
                 }
 
                 case DatabaseType.MsAdeSharpCloudExcel:
                 {
-                    var variables = new List<string>
-                    {
-                        "SourceId",
-                        "SourceUserName",
-                        "SourcePassword",
-                        "SourceServer"
-                    };
-
-                    var excelConnectionString = string.Join(
-                        Delimiter,
-                        connectionString
-                            .Split(Delimiter[0])
-                            .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
-
+                    var excelConnectionString = GetExcelConnectionString(connectionString);
                     return new OleDbConnection(excelConnectionString);
                 }
 
                 default:
+                {
                     return new OleDbConnection(connectionString);
+                }
             }
+        }
+
+        private string GetExcelConnectionString(string sharpCloudExcelConnectionString)
+        {
+            var variables = new List<string>
+            {
+                "SourceId",
+                "SourceUserName",
+                "SourcePassword",
+                "SourceServer"
+            };
+
+            var excelConnectionString = string.Join(
+                Delimiter,
+                sharpCloudExcelConnectionString
+                    .Split(Delimiter[0])
+                    .Where(kvp => !variables.Contains(kvp.Split('=')[0])));
+
+            return excelConnectionString;
         }
     }
 }
