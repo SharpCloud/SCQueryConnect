@@ -1064,13 +1064,6 @@
                                     </Hyperlink>
                                 </TextBlock>
                                 <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Click="Database_Engine_Hyperlink_Click">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Download tools for Excel/Access"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
                                     <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://github.com/SharpCloud/SCQueryConnect">
                                         <Hyperlink.Inlines>
                                             <Run Foreground="White" Text="Source code available from https://github.com/SharpCloud/SCQueryConnect"/>

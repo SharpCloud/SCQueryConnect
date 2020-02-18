@@ -17,6 +17,8 @@ namespace SCQueryConnect.Common.Helpers
 {
     public class QueryConnectHelper : IQueryConnectHelper
     {
+        public const string MsAdeUrl = "https://www.microsoft.com/en-gb/download/details.aspx?id=13255";
+
         private readonly IDictionary<PanelType, DefaultPanelValueSet> _defaultPanelValues =
             new Dictionary<PanelType, DefaultPanelValueSet>
             {
@@ -386,7 +388,7 @@ namespace SCQueryConnect.Common.Helpers
                     $"Something went wrong connecting to the data source. Here are some things that might help:{Environment.NewLine}" +
                     $"  * Please download and install the {altArchitecture} bit version of Query Connect.{Environment.NewLine}" +
                     $"  * If that doesn't fix the problem, try installing the Microsoft Access Database Engine 2010 Redistributable. " +
-                    $"You can find this by clicking on the 'Download tools for Excel/Access' link on the 'About' tab in Query Connect.";
+                    $"You can find this at {MsAdeUrl}";
 
                 await _logger.LogError(
                     $"{message}{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");

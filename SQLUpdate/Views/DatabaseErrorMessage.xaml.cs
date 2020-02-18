@@ -1,5 +1,4 @@
 ﻿using SCQueryConnect.Common.Helpers;
-using SCQueryConnect.Helpers;
 using System.Diagnostics;
 using System.Windows;
 
@@ -33,7 +32,7 @@ namespace SCQueryConnect.Views
 
         private void AccessDatabaseEngineHyperlink_Click(object sender, RoutedEventArgs e)
         {
-            UrlHelper.GoToAccessDatabaseEngine();
+            Process.Start(QueryConnectHelper.MsAdeUrl);
         }
 
         private void QueryConnectHyperlink_Click(object sender, RoutedEventArgs e)

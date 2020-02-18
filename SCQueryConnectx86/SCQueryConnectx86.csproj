@@ -167,9 +167,6 @@
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Helpers\UrlHelper.cs">
-      <Link>Helpers\UrlHelper.cs</Link>
-    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
     </Compile>

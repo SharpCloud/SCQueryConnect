@@ -627,11 +627,6 @@ namespace SCQueryConnect
             Process.Start($"{_mainViewModel.Url}/html/#/story/{_mainViewModel.SelectedQueryData.StoryId}");
         }
 
-        private void Database_Engine_Hyperlink_Click(object sender, RoutedEventArgs e)
-        {
-            UrlHelper.GoToAccessDatabaseEngine();
-        }
-
         private void App_Directory_Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
