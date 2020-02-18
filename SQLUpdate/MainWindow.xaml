@@ -79,6 +79,7 @@
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
                 <converters:ValidNameConverter x:Key="ValidNameConverter" />
                 <converters:DatabaseTypeDisplayTextConverter x:Key="DatabaseTypeDisplayTextConverter" />
+                <converters:ValidNameConverter x:Key="ValidNameConverter" />
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>

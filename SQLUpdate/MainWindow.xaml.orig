@@ -77,12 +77,12 @@
                 <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
                 <converters:ConnectionTypeCollapsedConverter x:Key="ConnectionTypeCollapsedConverter" />
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
-<<<<<<< HEAD
                 <converters:ValidNameConverter x:Key="ValidNameConverter" />
-=======
                 <converters:DatabaseTypeDisplayTextConverter x:Key="DatabaseTypeDisplayTextConverter" />
-                <converters:ValidExcelNameConverter x:Key="ValidExcelNameConverter" />
->>>>>>> Add backwards compatibility for MS ADE connections
+<<<<<<< HEAD
+=======
+                <converters:ValidNameConverter x:Key="ValidNameConverter" />
+>>>>>>> Rename ValidExcelNameConverter
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -436,26 +436,16 @@
                                          Grid.Row="3"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-<<<<<<< HEAD
                                          Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Access'}"
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access'}">
-=======
-                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Access'}"
                                          Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeAccess, Access'}">
->>>>>>> Add backwards compatibility for MS ADE connections
                                 </TextBox>
 
                                 <TextBox Grid.Column="1"
                                          Grid.Row="3"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-<<<<<<< HEAD
                                          Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Excel'}"
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel, SharpCloudExcel'}">
-=======
-                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Excel'}"
                                          Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='MsAdeExcel, MsAdeSharpCloudExcel, Excel, SharpCloudExcel'}">
->>>>>>> Add backwards compatibility for MS ADE connections
                                 </TextBox>
 
                                 <Button Grid.Row="3"
@@ -1074,13 +1064,6 @@
                                     <Hyperlink Command="{StaticResource GoToUrl}" CommandParameter="https://www.youtube.com/watch?v=cZUyQkVzg2E">
                                         <Hyperlink.Inlines>
                                             <Run Foreground="White" Text="Watch Video Guide"/>
-                                        </Hyperlink.Inlines>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" MaxWidth="500" Margin="0" >
-                                    <Hyperlink Click="Database_Engine_Hyperlink_Click">
-                                        <Hyperlink.Inlines>
-                                            <Run Foreground="White" Text="Download tools for Excel/Access"/>
                                         </Hyperlink.Inlines>
                                     </Hyperlink>
                                 </TextBlock>
