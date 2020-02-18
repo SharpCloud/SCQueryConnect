@@ -400,8 +400,11 @@ namespace SCQueryConnect.Models
 
         public QueryData(QueryData qd)
         {
+            Description = string.IsNullOrWhiteSpace(qd.Description)
+                ? string.Empty
+                : "Copy of " + qd.Description;
+            
             Name = qd.Name + " Copy";
-            Description = "Copy of " + qd.Description;
             ConnectionType = qd.ConnectionType;
             ConnectionsString = qd.ConnectionsString;
             //StoryId = qd.StoryId; // do not copy this for a copy

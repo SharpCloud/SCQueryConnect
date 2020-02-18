@@ -10,6 +10,41 @@ namespace SCQueryConnect.Tests.Models
         private const string StoryId = "5553cfec-bad2-4b60-96b6-b1e8c0aa7fe2";
 
         [Test]
+        public void DescriptionIsCopiedWithPrefix()
+        {
+            // Arrange
+
+            var toCopy = new QueryData
+            {
+                Description = "Description"
+            };
+
+            // Act
+
+            var copied = new QueryData(toCopy);
+
+            // Assert
+
+            Assert.AreEqual("Copy of Description", copied.Description);
+        }
+
+        [Test]
+        public void CopiedDescriptionIsNotPrefixIfOriginallyEmpty()
+        {
+            // Arrange
+
+            var toCopy = new QueryData();
+
+            // Act
+
+            var copied = new QueryData(toCopy);
+
+            // Assert
+
+            Assert.AreEqual(string.Empty, copied.Description);
+        }
+
+        [Test]
         public void IdIsGeneratedAndPersistent()
         {
             // Arrange
