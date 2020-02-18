@@ -77,7 +77,6 @@
                 <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
                 <converters:ConnectionTypeCollapsedConverter x:Key="ConnectionTypeCollapsedConverter" />
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
-                <converters:ValidNameConverter x:Key="ValidNameConverter" />
                 <converters:DatabaseTypeDisplayTextConverter x:Key="DatabaseTypeDisplayTextConverter" />
                 <converters:ValidNameConverter x:Key="ValidNameConverter" />
             </Grid.Resources>

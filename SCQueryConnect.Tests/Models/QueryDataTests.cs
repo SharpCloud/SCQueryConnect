@@ -8,6 +8,27 @@ namespace SCQueryConnect.Tests.Models
     public class QueryDataTests
     {
         [Test]
+        public void IdIsGeneratedAndPersistent()
+        {
+            // Arrange
+
+            var data = new QueryData();
+
+            // Act
+
+            var id1 = data.Id;
+            var id2 = data.Id;
+
+            // Assert
+
+            Assert.IsNotEmpty(id1);
+            Assert.AreEqual(id1, id2);
+
+            var canParse = Guid.TryParse(id1, out _);
+            Assert.IsTrue(canParse);
+        }
+
+        [Test]
         public void DescriptionIsCopiedWithPrefix()
         {
             // Arrange
@@ -16,20 +37,30 @@ namespace SCQueryConnect.Tests.Models
             {
                 Description = "Description"
             };
-            var copied = new QueryData(toCopy);
-            Assert.AreEqual("Copy of Description", copied.Description);
-        public void CopiedDescriptionIsNotPrefixIfOriginallyEmpty()
-            var toCopy = new QueryData();
-            var copied = new QueryData(toCopy);
-            Assert.AreEqual(string.Empty, copied.Description);
-        public void IdIsGeneratedAndPersistent()
-            var id1 = data.Id;
-            var id2 = data.Id;
-            Assert.IsNotEmpty(id1);
-            Assert.AreEqual(id1, id2);
 
-            var canParse = Guid.TryParse(id1, out _);
-            Assert.IsTrue(canParse);
+            // Act
+
+            var copied = new QueryData(toCopy);
+
+            // Assert
+
+            Assert.AreEqual("Copy of Description", copied.Description);
+        }
+
+        [Test]
+        public void CopiedDescriptionIsNotPrefixIfOriginallyEmpty()
+        {
+            // Arrange
+
+            var toCopy = new QueryData();
+
+            // Act
+
+            var copied = new QueryData(toCopy);
+
+            // Assert
+
+            Assert.AreEqual(string.Empty, copied.Description);
         }
 
         [Test]
