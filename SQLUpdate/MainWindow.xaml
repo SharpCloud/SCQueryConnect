@@ -77,7 +77,7 @@
                 <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
                 <converters:ConnectionTypeCollapsedConverter x:Key="ConnectionTypeCollapsedConverter" />
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
-                <converters:ValidExcelNameConverter x:Key="ValidExcelNameConverter" />
+                <converters:ValidNameConverter x:Key="ValidNameConverter" />
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -423,7 +423,7 @@
                                          Grid.Row="3"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Access'}"
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Access'}"
                                          Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access'}">
                                 </TextBox>
 
@@ -431,7 +431,7 @@
                                          Grid.Row="3"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Excel'}"
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidNameConverter}, ConverterParameter='Excel'}"
                                          Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel, SharpCloudExcel'}">
                                 </TextBox>
 

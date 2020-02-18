@@ -150,7 +150,7 @@
     <Compile Include="Converters\EnumMatchToBoolConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Converters\UrlToStoryIdConverter.cs" />
-    <Compile Include="Converters\ValidExcelNameConverter.cs" />
+    <Compile Include="Converters\ValidNameConverter.cs" />
     <Compile Include="DataCheckerValidityProcessor.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\BatchPublishHelper.cs" />

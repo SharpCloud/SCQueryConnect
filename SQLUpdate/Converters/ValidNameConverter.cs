@@ -6,7 +6,7 @@ using System.Windows.Data;
 
 namespace SCQueryConnect.Converters
 {
-    public class ValidExcelNameConverter : IValueConverter
+    public class ValidNameConverter : IValueConverter
     {
         private const string AccessKey = "Access";
         private const string ExcelKey = "Excel";
@@ -14,14 +14,14 @@ namespace SCQueryConnect.Converters
         private readonly Dictionary<string, HashSet<string>> _validFileExtensions
             = new Dictionary<string, HashSet<string>>
             {
-                [ExcelKey] = new HashSet<string>
+                [ExcelKey] = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     ".xls",
                     ".xlsb",
                     ".xlsm",
                     ".xlsx"
                 },
-                [AccessKey] = new HashSet<string>
+                [AccessKey] = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     ".accdb"
                 }

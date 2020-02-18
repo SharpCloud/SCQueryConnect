@@ -146,8 +146,8 @@
     <Compile Include="..\SQLUpdate\Converters\UrlToStoryIdConverter.cs">
       <Link>Converters\UrlToStoryIdConverter.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\Converters\ValidExcelNameConverter.cs">
-      <Link>Converters\ValidExcelNameConverter.cs</Link>
+    <Compile Include="..\SQLUpdate\Converters\ValidNameConverter.cs">
+      <Link>Converters\ValidNameConverter.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\DataCheckerValidityProcessor.cs">
       <Link>DataCheckerValidityProcessor.cs</Link>
