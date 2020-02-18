@@ -422,8 +422,16 @@
                                          Grid.Row="3"
                                          TextWrapping="WrapWithOverflow"
                                          Margin="5"
-                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}}"
-                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access, Excel, SharpCloudExcel'}">
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Access'}"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Access'}">
+                                </TextBox>
+
+                                <TextBox Grid.Column="1"
+                                         Grid.Row="3"
+                                         TextWrapping="WrapWithOverflow"
+                                         Margin="5"
+                                         Text="{Binding FileName, FallbackValue='C:/Docs/filename.xls', Converter={StaticResource ValidExcelNameConverter}, ConverterParameter='Excel'}"
+                                         Visibility="{Binding ConnectionType, Converter={StaticResource ConnectionTypeVisibleConverter}, ConverterParameter='Excel, SharpCloudExcel'}">
                                 </TextBox>
 
                                 <Button Grid.Row="3"
