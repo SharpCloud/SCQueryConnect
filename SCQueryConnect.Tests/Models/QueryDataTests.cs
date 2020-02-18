@@ -16,46 +16,15 @@ namespace SCQueryConnect.Tests.Models
             {
                 Description = "Description"
             };
-
-            // Act
-
             var copied = new QueryData(toCopy);
-
-            // Assert
-
             Assert.AreEqual("Copy of Description", copied.Description);
-        }
-
-        [Test]
         public void CopiedDescriptionIsNotPrefixIfOriginallyEmpty()
-        {
-            // Arrange
-
             var toCopy = new QueryData();
-
-            // Act
-
             var copied = new QueryData(toCopy);
-
-            // Assert
-
             Assert.AreEqual(string.Empty, copied.Description);
-        }
-
-        [Test]
         public void IdIsGeneratedAndPersistent()
-        {
-            // Arrange
-
-            var data = new QueryData();
-
-            // Act
-
             var id1 = data.Id;
             var id2 = data.Id;
-
-            // Assert
-
             Assert.IsNotEmpty(id1);
             Assert.AreEqual(id1, id2);
 
