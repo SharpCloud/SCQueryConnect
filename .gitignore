@@ -25,4 +25,3 @@ packages/
 .vs/**
 _build_output/**
 _SCSqlBatchOutput/**
-SCQueryConnect.Common/CDataLicences/**

@@ -170,4 +170,8 @@
     <EmbeddedResource Include="CDataLicences\CDataLicences.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>cd $(ProjectDir)\CDataLicences\
+CreateLicenceFile.bat</PreBuildEvent>
+  </PropertyGroup>
 </Project>

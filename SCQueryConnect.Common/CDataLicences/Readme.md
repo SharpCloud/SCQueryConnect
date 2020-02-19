@@ -8,3 +8,7 @@ Access=1234567890123456789012345678901234567890
 Excel=1234567890123456789012345678901234567890
 SharePoint=1234567890123456789012345678901234567890
 ```
+
+A template licence file can be created by running `CreateLicenceFile.bat`. This
+automatically runs as a pre-bulid step of `SCQueryConnect.Common`, and only
+creates the template file if an existing `CDataLicences.txt` is not present.
