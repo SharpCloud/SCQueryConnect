@@ -2,6 +2,7 @@
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Services;
 using System.Configuration;
 
 namespace SCSQLBatch
@@ -24,6 +25,7 @@ namespace SCSQLBatch
 
             builder.RegisterType<ArchitectureDetector>().As<IArchitectureDetector>();
             builder.RegisterType<BatchLogic>();
+            builder.RegisterType<CDataLicenceService>().As<ICDataLicenceService>();
             builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>();
             builder.RegisterType<ItemDataChecker>().As<IItemDataChecker>();
