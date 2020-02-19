@@ -22,6 +22,7 @@ namespace SCQueryConnect.ViewModels
         private const int UpdateStoryTabIndex = 2;
 
         private readonly IEncryptionHelper _encryptionHelper;
+        private readonly IIOService _ioService;
         private readonly IMessageService _messageService;
 
         private PasswordSecurity _publishPasswordSecurity;
@@ -271,9 +272,11 @@ namespace SCQueryConnect.ViewModels
 
         public MainViewModel(
             IEncryptionHelper encryptionHelper,
+            IIOService ioService,
             IMessageService messageService)
         {
             _encryptionHelper = encryptionHelper;
+            _ioService = ioService;
             _messageService = messageService;
 
             QueryRootNode = CreateNewFolder(QueryData.RootId);
@@ -395,7 +398,7 @@ namespace SCQueryConnect.ViewModels
         public void LoadAllConnections(bool migrate, string filePath)
         {
             IList<QueryData> connections;
-            var createExamples = !File.Exists(filePath);
+            var createExamples = !_ioService.FileExists(filePath);
 
             if (createExamples)
             {
@@ -416,12 +419,12 @@ namespace SCQueryConnect.ViewModels
 
                 if (migrate)
                 {
-                    encrypted = JsonConvert.DeserializeObject<IList<QueryData>>(File.ReadAllText(filePath));
+                    encrypted = JsonConvert.DeserializeObject<IList<QueryData>>(_ioService.ReadAllTextFromFile(filePath));
                     SaveHelper.RegDelete("ActiveTab");
                 }
                 else
                 {
-                    var saveData = JsonConvert.DeserializeObject<SaveData>(File.ReadAllText(filePath));
+                    var saveData = JsonConvert.DeserializeObject<SaveData>(_ioService.ReadAllTextFromFile(filePath));
                     encrypted = saveData.Connections;
                     _lastSelectedConnectionIndex = saveData.LastSelectedConnectionIndex;
                     _lastSelectedFolderIndex = saveData.LastSelectedFolderIndex;
@@ -467,7 +470,7 @@ namespace SCQueryConnect.ViewModels
                 ? new List<QueryData>(root.Connections)
                 : new List<QueryData>(new[] { root });
 
-            Directory.CreateDirectory(saveFolderPath);
+            _ioService.CreateDirectory(saveFolderPath);
             var encrypted = CreateEncryptedPasswordConnections(connections);
 
             var toSave = new SaveData
@@ -480,7 +483,7 @@ namespace SCQueryConnect.ViewModels
 
             var json = JsonConvert.SerializeObject(toSave);
             var path = Path.Combine(saveFolderPath, filename);
-            File.WriteAllText(path, json);
+            _ioService.WriteAllTextToFile(path, json);
         }
 
         private IList<QueryData> CreateDecryptedPasswordConnections(IEnumerable<QueryData> connections)
