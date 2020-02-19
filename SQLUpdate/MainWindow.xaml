@@ -267,13 +267,25 @@
                                         <StackPanel.Resources>
                                             <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                                                 <Setter Property="Background" Value="Transparent" />
-                                                <Setter Property="FontSize" Value="10" />
-                                                <Setter Property="Padding" Value="5,0" />
+                                                <Setter Property="Height" Value="18" />
+                                                <Setter Property="Width" Value="18" />
+                                            </Style>
+
+                                            <Style TargetType="Path">
+                                                <Setter Property="Fill" Value="White" />
+                                                <Setter Property="Height" Value="10" />
+                                                <Setter Property="Stretch" Value="Uniform" />
+                                                <Setter Property="Width" Value="10" />
                                             </Style>
                                         </StackPanel.Resources>
 
-                                        <Button Click="ExportQueryDataClick">Exp</Button>
-                                        <Button Click="RunQueryDataClick">Run</Button>
+                                        <Button Click="ExportQueryDataClick" Margin="0,0,2,0" ToolTip="Export">
+                                            <Path Data="M 1,0 L3,0 L3,2 L4,2 L2,4 L0,2 L1,2 Z" />
+                                        </Button>
+                                        
+                                        <Button Click="RunQueryDataClick" ToolTip="Run">
+                                            <Path Data="M 0,0 L2,1 L0,2 Z" />
+                                        </Button>
                                     </StackPanel>
                                 </Grid>
                             </HierarchicalDataTemplate>
