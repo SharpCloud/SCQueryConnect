@@ -32,6 +32,6 @@ namespace SCQueryConnect.Interfaces
         void CopyConnection();
         void DeleteConnection();
         void LoadAllConnections(bool migrate, string filePath);
-        void SaveConnections(string saveFolderPath, string filename, QueryData root);
+        void SaveConnections(string saveFolderPath, string filename, QueryData root, bool connectionsOnly);
     }
 }

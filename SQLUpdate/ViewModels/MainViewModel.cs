@@ -464,9 +464,10 @@ namespace SCQueryConnect.ViewModels
         public void SaveConnections(
             string saveFolderPath,
             string filename,
-            QueryData root)
+            QueryData root,
+            bool connectionsOnly)
         {
-            var connections = root.IsFolder
+            var connections = root.IsFolder && connectionsOnly
                 ? new List<QueryData>(root.Connections)
                 : new List<QueryData>(new[] { root });
 

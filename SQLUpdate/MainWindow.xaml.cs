@@ -463,7 +463,11 @@ namespace SCQueryConnect
                 PasswordStorage.ProxyPassword,
                 _proxyViewModel.ProxyPassword);
 
-            _mainViewModel.SaveConnections(_localPath, ConnectionsFileV4, _mainViewModel.QueryRootNode);
+            _mainViewModel.SaveConnections(
+                _localPath,
+                ConnectionsFileV4,
+                _mainViewModel.QueryRootNode,
+                true);
         }
 
         private bool ValidateCredentials()
@@ -986,7 +990,7 @@ namespace SCQueryConnect
 
                 if (!string.IsNullOrWhiteSpace(directory))
                 {
-                    _mainViewModel.SaveConnections(directory, filename, queryData);
+                    _mainViewModel.SaveConnections(directory, filename, queryData, false);
                     Process.Start(directory);
                 }
             }
