@@ -713,10 +713,15 @@ namespace SCQueryConnect
 
         private void QueryItemTreeDragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData(typeof(QueryData)) is QueryData source &&
-                e.OriginalSource is FrameworkElement fe &&
-                fe.DataContext is QueryData dropTarget &&
-                source != dropTarget)
+            if (GetConfigFileDataPath(e.Data) != null)
+            {
+                e.Effects = DragDropEffects.Copy;
+                e.Handled = true;
+            }
+            else if (e.Data.GetData(typeof(QueryData)) is QueryData source &&
+                     e.OriginalSource is FrameworkElement fe &&
+                     fe.DataContext is QueryData dropTarget &&
+                     source != dropTarget)
             {
                 if (dropTarget.IsFolder)
                 {
@@ -736,10 +741,10 @@ namespace SCQueryConnect
                         dropTarget.DragBelow = true;
                     }
                 }
-            }
 
-            e.Effects = DragDropEffects.Move;
-            e.Handled = true;
+                e.Effects = DragDropEffects.Move;
+                e.Handled = true;
+            }
         }
 
         private void QueryItemTreeDrop(object sender, DragEventArgs e)
@@ -802,6 +807,29 @@ namespace SCQueryConnect
 
                 updatedSourceParent.IsExpanded = true;
             }
+            else if (GetConfigFileDataPath(e.Data) is string path)
+            {
+                _mainViewModel.ImportConnections(path);
+            }
+        }
+
+        private static string GetConfigFileDataPath(IDataObject obj)
+        {
+            string path = null;
+
+            if (obj is DataObject dataObject &&
+                dataObject.ContainsFileDropList())
+            {
+                var dropList = dataObject.GetFileDropList();
+
+                path = dropList.OfType<string>().FirstOrDefault(s =>
+                    string.Equals(
+                        Path.GetExtension(s),
+                        ".json",
+                        StringComparison.OrdinalIgnoreCase));
+            }
+
+            return path;
         }
 
         private async void RunQueryDataClick(object sender, RoutedEventArgs e)

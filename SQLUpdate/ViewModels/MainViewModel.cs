@@ -623,6 +623,54 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
+        public void ImportConnections(string filePath)
+        {
+            if (!_ioService.FileExists(filePath))
+            {
+                return;
+            }
+            
+            var result = _messageService.Show(
+                "Do you want to replace your connections? Select No to merge connection sets, or Cancel to abort",
+                "Import Connections",
+                MessageBoxButton.YesNoCancel);
+            
+            if (result == MessageBoxResult.Cancel)
+            {
+                return;
+            }
+
+            try
+            {
+                var saveData = JsonConvert.DeserializeObject<SaveData>(
+                    _ioService.ReadAllTextFromFile(filePath));
+
+                var encrypted = saveData.Connections;
+                var filtered = encrypted?.Where(qd => qd != null);
+                var decrypted = CreateDecryptedPasswordConnections(filtered);
+
+                switch (result)
+                {
+                    case MessageBoxResult.Yes:
+                        Connections = new ObservableCollection<QueryData>(decrypted);
+                        break;
+                    case MessageBoxResult.No:
+                        Connections = new ObservableCollection<QueryData>(
+                            Connections.Concat(decrypted));
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                var msg = $"Could not import {filePath}" +
+                          $" {Environment.NewLine}" +
+                          $" {Environment.NewLine}" +
+                          e.Message;
+
+                _messageService.Show(msg);
+            }
+        }
+
         private IList<QueryData> CreateDecryptedPasswordConnections(IEnumerable<QueryData> connections)
         {
             var newConnections = new List<QueryData>();

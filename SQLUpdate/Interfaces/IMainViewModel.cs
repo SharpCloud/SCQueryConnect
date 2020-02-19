@@ -35,6 +35,7 @@ namespace SCQueryConnect.Interfaces
         void LoadApplicationState();
         void SaveApplicationState();
         void ExportQueryDataClick(QueryData queryData);
+        void ImportConnections(string filePath);
         void ValidatePanelData(QueryData queryData);
     }
 }
