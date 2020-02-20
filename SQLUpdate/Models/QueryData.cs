@@ -381,6 +381,8 @@ namespace SCQueryConnect.Models
 
         public QueryData(QueryData qd)
         {
+            // Do not copy this for a copy
+
             Description = string.IsNullOrWhiteSpace(qd.Description)
                 ? string.Empty
                 : "Copy of " + qd.Description;
@@ -388,9 +390,10 @@ namespace SCQueryConnect.Models
             Name = qd.Name + " Copy";
             ConnectionType = qd.ConnectionType;
             ConnectionsString = qd.ConnectionsString;
-            //StoryId = qd.StoryId; // do not copy this for a copy
             QueryString = qd.QueryString;
             QueryStringRels = qd.QueryStringRels;
+            QueryStringResourceUrls = qd.QueryStringResourceUrls;
+            QueryStringPanels = qd.QueryStringPanels;
             FileName = qd.FileName;
             SharePointURL = qd.SharePointURL;
 

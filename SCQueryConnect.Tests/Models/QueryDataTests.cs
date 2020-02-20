@@ -62,5 +62,51 @@ namespace SCQueryConnect.Tests.Models
             var canParse = Guid.TryParse(id1, out _);
             Assert.IsTrue(canParse);
         }
+
+        [Test]
+        public void AllQueriesAreCopiedWhenCopyingConnection()
+        {
+            // Arrange
+
+            const string itemQuery = "ItemQuery";
+            const string relationshipQuery = "RelationshipQuery";
+            const string resourceUrlQuery = "ResourceUrlQuery";
+            const string panelQuery = "PanelQuery";
+
+            var original = new QueryData
+            {
+                QueryString = itemQuery,
+                QueryStringRels = relationshipQuery,
+                QueryStringResourceUrls = resourceUrlQuery,
+                QueryStringPanels = panelQuery
+            };
+
+            // Act
+
+            var copy = new QueryData(original);
+
+            // Assert
+
+            Assert.AreEqual(itemQuery, copy.QueryString);
+            Assert.AreEqual(relationshipQuery, copy.QueryStringRels);
+            Assert.AreEqual(resourceUrlQuery, copy.QueryStringResourceUrls);
+            Assert.AreEqual(panelQuery, copy.QueryStringPanels);
+        }
+
+        [Test]
+        public void CopiedConnectionsDoNotShareIds()
+        {
+            // Arrange
+
+            var original = new QueryData();
+
+            // Act
+
+            var copy = new QueryData(original);
+
+            // Assert
+
+            Assert.AreNotEqual(original.Id, copy.Id);
+        }
     }
 }
