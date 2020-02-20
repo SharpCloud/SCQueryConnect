@@ -35,9 +35,10 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string saveDataExtension = ".scqc";
         private const string ConnectionsFileV3 = "connections.json";
         private const string ConnectionsFileV3Backup = "connections.json.bak";
-        private const string ConnectionsFileV4 = "connections_v4.json";
+        private const string ConnectionsFileV4 = "connections_v4" + saveDataExtension;
 
         private Point _startPoint;
 
@@ -977,7 +978,8 @@ namespace SCQueryConnect
             {
                 var dlg = new SaveFileDialog
                 {
-                    Filter = "JSON Files (*.json)|*.json"
+                    FileName = queryData.Name,
+                    Filter = $"SharpCloud QueryConnect Files (*{saveDataExtension})|*{saveDataExtension}"
                 };
 
                 if (dlg.ShowDialog() != true)
