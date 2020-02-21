@@ -597,7 +597,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="RunClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResults}" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResults.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
@@ -634,7 +634,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="RunClickRels" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsRels}" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsRels.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
@@ -667,7 +667,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="PreviewResourceUrlsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsResourceUrls}" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsResourceUrls.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
@@ -700,7 +700,7 @@
                                         </TextBlock>
                                         
                                         <Button Click="PreviewPanelsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsPanels}" />
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsPanels.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>

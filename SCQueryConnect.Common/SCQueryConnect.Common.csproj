@@ -68,6 +68,7 @@
     <Compile Include="Helpers\DbConnectionFactory.cs" />
     <Compile Include="Helpers\DpapiHelper.cs" />
     <Compile Include="Helpers\ExcelWriter.cs" />
+    <Compile Include="Helpers\PanelTypeHelper.cs" />
     <Compile Include="Helpers\RelationshipsBuilder.cs" />
     <Compile Include="Helpers\ResourceUrlDataChecker.cs" />
     <Compile Include="Helpers\ItemDataChecker.cs" />

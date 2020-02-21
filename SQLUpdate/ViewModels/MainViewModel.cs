@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SCQueryConnect.Common;
+using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
@@ -8,11 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Windows;
+using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.ViewModels
 {
@@ -485,6 +488,30 @@ namespace SCQueryConnect.ViewModels
             var json = JsonConvert.SerializeObject(toSave);
             var path = Path.Combine(saveFolderPath, filename);
             _ioService.WriteAllTextToFile(path, json);
+        }
+
+        public void ValidatePanelData(QueryData queryData)
+        {
+            var index = queryData.QueryResultsPanels.Columns.IndexOf("PanelType");
+            var invalid = new List<string>();
+
+            foreach (DataRow row in queryData.QueryResultsPanels.Rows)
+            {
+                var data = (string) row[index];
+                var success = Enum.TryParse(data, true, out PanelType _);
+
+                if (!success)
+                {
+                    invalid.Add(data);
+                }
+            }
+
+            if (invalid.Count > 0)
+            {
+                var invalidStr = string.Join(", ", invalid);
+                var msg = $"Unrecognized panel types: '{invalidStr}'. Valid values are [{PanelTypeHelper.ValidTypes}]";
+                _messageService.Show(msg);
+            }
         }
 
         private IList<QueryData> CreateDecryptedPasswordConnections(IEnumerable<QueryData> connections)

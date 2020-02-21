@@ -11,6 +11,7 @@ using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
@@ -381,13 +382,15 @@ namespace SCQueryConnect
                 _mainViewModel.SelectedQueryData.QueryStringPanels,
                 _panelsDataChecker,
                 d => d.QueryResultsPanels);
+
+            _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
         }
 
         private async Task PreviewSql(
             QueryData queryData,
             string query,
             IDataChecker dataChecker,
-            Expression<Func<QueryData, DataView>> resultsSelector)
+            Expression<Func<QueryData, DataTable>> resultsSelector)
         {
             try
             {
@@ -419,7 +422,7 @@ namespace SCQueryConnect
                             }
 
                             var prop = (PropertyInfo)((MemberExpression)resultsSelector.Body).Member;
-                            prop.SetValue(queryData, dt.DefaultView, null);
+                            prop.SetValue(queryData, dt, null);
                         }
                     }
                 }

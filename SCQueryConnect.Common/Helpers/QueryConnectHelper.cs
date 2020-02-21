@@ -600,16 +600,8 @@ namespace SCQueryConnect.Common.Helpers
                 }
                 else
                 {
-
-                    var validValues = Enum.GetValues(typeof(Panel.PanelType))
-                        .Cast<Panel.PanelType>()
-                        .Select(t => t.ToString())
-                        .Where(t => string.Compare(t, "Undefined", StringComparison.OrdinalIgnoreCase) != 0);
-
-                    var valid = string.Join(", ", validValues);
-
                     await _logger.LogWarning(
-                        $"Unrecognized panel type '{panelTypeString}' ignored. Valid values are [{valid}]");
+                        $"Unrecognized panel type '{panelTypeString}' ignored. Valid values are [{PanelTypeHelper.ValidTypes}]");
                 }
 
                 return metadata;

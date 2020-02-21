@@ -34,10 +34,10 @@ namespace SCQueryConnect.Models
         private bool _unpublishItems;
         private string _issueSummary;
         private string _logData;
-        private DataView _queryResults;
-        private DataView _queryResultsRels;
-        private DataView _queryResultsPanels;
-        private DataView _queryResultsResourceUrls;
+        private DataTable _queryResults;
+        private DataTable _queryResultsRels;
+        private DataTable _queryResultsPanels;
+        private DataTable _queryResultsResourceUrls;
 
         public bool IsExpanded
         {
@@ -228,7 +228,7 @@ namespace SCQueryConnect.Models
         public bool IsFolder => Connections != null;
 
         [JsonIgnore]
-        public DataView QueryResults
+        public DataTable QueryResults
         {
             get => _queryResults;
 
@@ -243,7 +243,7 @@ namespace SCQueryConnect.Models
         }
 
         [JsonIgnore]
-        public DataView QueryResultsRels
+        public DataTable QueryResultsRels
         {
             get => _queryResultsRels;
 
@@ -258,7 +258,7 @@ namespace SCQueryConnect.Models
         }
 
         [JsonIgnore]
-        public DataView QueryResultsPanels
+        public DataTable QueryResultsPanels
         {
             get => _queryResultsPanels;
             set
@@ -272,7 +272,7 @@ namespace SCQueryConnect.Models
         }
 
         [JsonIgnore]
-        public DataView QueryResultsResourceUrls
+        public DataTable QueryResultsResourceUrls
         {
             get => _queryResultsResourceUrls;
 
