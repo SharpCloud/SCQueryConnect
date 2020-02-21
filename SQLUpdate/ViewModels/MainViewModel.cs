@@ -408,7 +408,10 @@ namespace SCQueryConnect.ViewModels
 
         public void LoadApplicationState()
         {
-            var migrate = _ioService.FileExists(_ioService.V3ConnectionsPath);
+            var migrate =
+                _ioService.FileExists(_ioService.V3ConnectionsPath) &&
+                !_ioService.FileExists(_ioService.V4ConnectionsPath);
+
             string filePath;
 
             if (migrate)
