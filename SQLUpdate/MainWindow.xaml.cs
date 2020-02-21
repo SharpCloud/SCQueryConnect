@@ -203,7 +203,7 @@ namespace SCQueryConnect
                 Password = Password.Password,
                 Url = _mainViewModel.Url,
                 ProxyUrl = _proxyViewModel.Proxy,
-                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnnonymous,
+                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnonymous,
                 ProxyUserName = _proxyViewModel.ProxyUserName,
                 ProxyPassword = _proxyViewModel.ProxyPassword
             };
@@ -582,7 +582,7 @@ namespace SCQueryConnect
                 Password.Password,
                 _mainViewModel.Url,
                 _proxyViewModel.Proxy,
-                _proxyViewModel.ProxyAnnonymous,
+                _proxyViewModel.ProxyAnonymous,
                 _proxyViewModel.ProxyUserName,
                 _proxyViewModel.ProxyPassword);
 

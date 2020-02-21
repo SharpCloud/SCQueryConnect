@@ -17,7 +17,7 @@ namespace SCQueryConnect.Views
             InitializeComponent();
 
             tbProxy.Text = _viewModel.Proxy;
-            chkAnnonymous.IsChecked = _viewModel.ProxyAnnonymous;
+            chkAnnonymous.IsChecked = _viewModel.ProxyAnonymous;
             tbUsername.Text = _viewModel.ProxyUserName;
             tbPassword.Password = _viewModel.ProxyPassword;
         }
@@ -36,7 +36,7 @@ namespace SCQueryConnect.Views
             }
 
             _viewModel.Proxy = tbProxy.Text;
-            _viewModel.ProxyAnnonymous = (bool)chkAnnonymous.IsChecked;
+            _viewModel.ProxyAnonymous = (bool)chkAnnonymous.IsChecked;
             _viewModel.ProxyUserName = tbUsername.Text;
             _viewModel.ProxyPassword = tbPassword.Password;
             Close();

@@ -441,7 +441,7 @@ namespace SCQueryConnect.ViewModels
             Username = SaveHelper.RegRead("Username", "");
 
             _proxyViewModel.Proxy = SaveHelper.RegRead("Proxy", "");
-            _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
+            _proxyViewModel.ProxyAnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
             _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
 
             _proxyViewModel.ProxyPassword = _passwordStorage
@@ -520,7 +520,7 @@ namespace SCQueryConnect.ViewModels
             SaveHelper.RegWrite("Username", Username);
 
             SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
-            SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
+            SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnonymous);
             SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
 
             _passwordStorage.SavePassword(

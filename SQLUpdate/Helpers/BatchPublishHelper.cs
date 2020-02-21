@@ -219,7 +219,7 @@ namespace SCQueryConnect.Helpers
                     GetAppSettingText(Constants.BatchBuildRelationshipsKey, queryData.BuildRelationships.ToString()),
                     GetAppSettingText(Constants.BatchUnpublishItemsKey, queryData.UnpublishItems.ToString()),
                     GetAppSettingText(Constants.BatchProxyKey, settings.ProxyViewModel.Proxy),
-                    GetAppSettingText(Constants.BatchProxyAnonymousKey, settings.ProxyViewModel.ProxyAnnonymous.ToString()),
+                    GetAppSettingText(Constants.BatchProxyAnonymousKey, settings.ProxyViewModel.ProxyAnonymous.ToString()),
                     GetAppSettingText(Constants.BatchProxyUsernameKey, settings.ProxyViewModel.ProxyUserName),
                 };
 
