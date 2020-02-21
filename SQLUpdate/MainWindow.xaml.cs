@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
 using SCQueryConnect.Common.Models;
@@ -7,7 +8,6 @@ using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
 using SCQueryConnect.Services;
-using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
@@ -53,6 +53,7 @@ namespace SCQueryConnect
         private readonly MultiDestinationLogger _logger;
         private readonly IIOService _ioService;
         private readonly IMainViewModel _mainViewModel;
+        private readonly IMessageService _messageService;
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
@@ -70,6 +71,7 @@ namespace SCQueryConnect
             IExcelWriter excelWriter,
             IIOService ioService,
             IMainViewModel mainViewModel,
+            IMessageService messageService,
             IPasswordStorage passwordStorage,
             IProxyViewModel proxyViewModel,
             IRelationshipsDataChecker relationshipsDataChecker,
@@ -104,6 +106,7 @@ namespace SCQueryConnect
             _excelWriter = excelWriter;
             _ioService = ioService;
             _mainViewModel = mainViewModel;
+            _messageService = messageService;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
 
@@ -135,7 +138,24 @@ namespace SCQueryConnect
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            _mainViewModel.LoadApplicationState();
+            try
+            {
+                _mainViewModel.LoadApplicationState();
+            }
+            catch (JsonReaderException ex)
+            {
+                var msg = $"Error occurred reading saved connections at {_ioService.V4ConnectionsPath}" +
+                          Environment.NewLine +
+                          Environment.NewLine +
+                          "Click OK to exit QueryConnect" +
+                          Environment.NewLine +
+                          Environment.NewLine +
+                          ex.Message;
+                
+                _messageService.Show(msg);
+                throw;
+            }
+
             Password.Password = _passwordStorage.LoadPassword(PasswordStorage.Password);
 
             EventManager.RegisterClassHandler(
