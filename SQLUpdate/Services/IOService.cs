@@ -69,6 +69,11 @@ namespace SCQueryConnect.Services
             return File.Exists(path);
         }
 
+        public void MoveFile(string sourceFileName, string destFileName)
+        {
+            File.Move(sourceFileName, destFileName);
+        }
+
         public string ReadAllTextFromFile(string path)
         {
             return File.ReadAllText(path);

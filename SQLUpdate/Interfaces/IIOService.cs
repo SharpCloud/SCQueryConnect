@@ -19,6 +19,7 @@ namespace SCQueryConnect.Interfaces
         void AppendAllLinesToFile(string path, IEnumerable<string> contents);
         void DeleteFile(string path);
         bool FileExists(string path);
+        void MoveFile(string sourceFileName, string destFileName);
         string ReadAllTextFromFile(string path);
         void WriteAllTextToFile(string path, string contents);
 

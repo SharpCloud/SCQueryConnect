@@ -408,17 +408,17 @@ namespace SCQueryConnect.ViewModels
 
         public void LoadApplicationState()
         {
-            var migrate = File.Exists(_ioService.V3ConnectionsPath);
+            var migrate = _ioService.FileExists(_ioService.V3ConnectionsPath);
             string filePath;
 
             if (migrate)
             {
-                if (File.Exists(_ioService.V3ConnectionsBackupPath))
+                if (_ioService.FileExists(_ioService.V3ConnectionsBackupPath))
                 {
-                    File.Delete(_ioService.V3ConnectionsBackupPath);
+                    _ioService.DeleteFile(_ioService.V3ConnectionsBackupPath);
                 }
 
-                File.Move(_ioService.V3ConnectionsPath, _ioService.V3ConnectionsBackupPath);
+                _ioService.MoveFile(_ioService.V3ConnectionsPath, _ioService.V3ConnectionsBackupPath);
                 filePath = _ioService.V3ConnectionsBackupPath;
             }
             else
