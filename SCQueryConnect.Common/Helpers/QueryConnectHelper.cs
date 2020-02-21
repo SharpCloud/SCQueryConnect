@@ -11,11 +11,47 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.Common.Helpers
 {
     public class QueryConnectHelper : IQueryConnectHelper
     {
+        private readonly IDictionary<PanelType, DefaultPanelValueSet> _defaultPanelValues =
+            new Dictionary<PanelType, DefaultPanelValueSet>
+            {
+                [PanelType.RichText] = new DefaultPanelValueSet
+                {
+                    Title = "Rich Text Panel",
+                    Data = "<html><head><style type=\"text/css\">.c0 { margin: 0px 0px 10px } .c1 { font-family: \"Arial\" } </style></head><body><p class=\"c0\"><span class=\"c1\">​</span></p></body></html>"
+                },
+                [PanelType.CustomResource] = new DefaultPanelValueSet
+                {
+                    Title = "Custom Resources",
+                    Data = "{\"Text\":\"\",\"ResLinks\":[]}"
+                },
+                [PanelType.Image] = new DefaultPanelValueSet
+                {
+                    Title = "Image Panel",
+                    Data = "[]"
+                },
+                [PanelType.Video] = new DefaultPanelValueSet
+                {
+                    Title = "Video Panel",
+                    Data = "novideoset"
+                },
+                [PanelType.Attribute] = new DefaultPanelValueSet
+                {
+                    Title = "Attributes",
+                    Data = "[]"
+                },
+                [PanelType.HTML] = new DefaultPanelValueSet
+                {
+                    Title = "HTML Panel",
+                    Data = ""
+                }
+            };
+
         private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IItemDataChecker _itemDataChecker;
@@ -586,16 +622,29 @@ namespace SCQueryConnect.Common.Helpers
                 var success = Enum.TryParse(
                     panelTypeString,
                     true,
-                    out Panel.PanelType panelType);
+                    out PanelType panelType);
 
                 if (success)
                 {
+                    var title = fieldExtractor(PanelsDataChecker.TitleHeader);
+                    var data = fieldExtractor(PanelsDataChecker.DataHeader);
+
+                    if (string.IsNullOrWhiteSpace(title))
+                    {
+                        title = _defaultPanelValues[panelType].Title;
+                    }
+                    
+                    if (string.IsNullOrWhiteSpace(data))
+                    {
+                        data = _defaultPanelValues[panelType].Data;
+                    }
+
                     metadata = new PanelMetadata
                     {
-                        Title = fieldExtractor(PanelsDataChecker.TitleHeader),
+                        Title = title,
                         ItemExternalId = fieldExtractor(PanelsDataChecker.ExternalIdHeader),
                         PanelType = panelType,
-                        Data = fieldExtractor(PanelsDataChecker.DataHeader)
+                        Data = data
                     };
                 }
                 else

@@ -93,6 +93,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Helpers\RelationshipsDataChecker.cs" />
     <Compile Include="Helpers\QueryConnectHelper.cs" />
+    <Compile Include="Models\DefaultPanelValueSet.cs" />
     <Compile Include="Models\InvalidCredentialsException.cs" />
     <Compile Include="Models\PanelMetadata.cs" />
     <Compile Include="Models\ResourceUrlMetadata.cs" />
