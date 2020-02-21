@@ -21,7 +21,9 @@ namespace SCQueryConnect.Common.Helpers
 
             foreach (var a in story.Attributes)
             {
-                if (a.Type == Attribute.AttributeType.Text && a.Name == "RelatedItems")
+                if ((a.Type == Attribute.AttributeType.Text ||
+                     a.Type == Attribute.AttributeType.List) &&
+                    a.Name == "RelatedItems")
                 {
                     relatedItemAttribute = a;
                     break;
@@ -31,7 +33,7 @@ namespace SCQueryConnect.Common.Helpers
             if (relatedItemAttribute == null)
             {
                 await _logger.LogWarning("Warning: Could not find a 'RelatedItems' attribute.");
-                await _logger.Log("Please make sure you have a text attribute called 'RelatedItems' in this story.");
+                await _logger.Log("Please make sure you have a Text or List attribute called 'RelatedItems' in this story.");
                 await _logger.Log("Exiting process.");
                 return;
             }

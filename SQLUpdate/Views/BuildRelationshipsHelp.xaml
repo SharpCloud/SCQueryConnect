@@ -14,7 +14,7 @@
             </TextBlock>
 
             <TextBlock Margin="0,15,0,0" TextWrapping="Wrap">
-                <Run Text="Your relationships text must be stored in a text attribute called 'RelatedItems' and these MUST refer to the externalID of the item (i.e. not the name)." />
+                <Run Text="Your relationships text must be stored in a Text or List attribute called 'RelatedItems' and these MUST refer to the externalID of the item (i.e. not the name)." />
                 <Run Text="Note that you can add multiple relationships by separating the values with a semi-colon or a comma (';' or ',')." />
             </TextBlock>
         </StackPanel>
