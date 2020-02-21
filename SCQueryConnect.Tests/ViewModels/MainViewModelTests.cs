@@ -29,7 +29,9 @@ namespace SCQueryConnect.Tests.ViewModels
             var vm = new MainViewModel(
                 Mock.Of<IEncryptionHelper>(),
                 Mock.Of<IIOService>(),
-                messageService);
+                messageService,
+                Mock.Of<IPasswordStorage>(),
+                Mock.Of<IProxyViewModel>());
 
             var table = new DataTable();
             table.Columns.Add(PanelTypeHeader);
@@ -66,7 +68,9 @@ namespace SCQueryConnect.Tests.ViewModels
             var vm = new MainViewModel(
                 Mock.Of<IEncryptionHelper>(),
                 Mock.Of<IIOService>(),
-                messageService);
+                messageService,
+                Mock.Of<IPasswordStorage>(),
+                Mock.Of<IProxyViewModel>());
 
             var table = new DataTable();
             table.Columns.Add(panelTypeHeader);

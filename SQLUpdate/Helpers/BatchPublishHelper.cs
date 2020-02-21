@@ -38,9 +38,9 @@ namespace SCQueryConnect.Helpers
 
         public string GetBatchRunStartMessage(string name) => $"- Running '{name}'...";
 
-        public string GetOrCreateOutputFolder(string queryName, string basePath)
+        public string GetOrCreateOutputFolder(string queryName)
         {
-            var folder = Path.Combine(basePath, "data");
+            var folder = Path.Combine(_ioService.OutputRoot, "data");
             _ioService.CreateDirectory(folder);
             folder = Path.Combine(folder, queryName);
             _ioService.CreateDirectory(folder);
@@ -51,7 +51,7 @@ namespace SCQueryConnect.Helpers
         {
             try
             {
-                var outputFolder = GetOrCreateOutputFolder(settings.Data.Name, settings.BasePath);
+                var outputFolder = GetOrCreateOutputFolder(settings.Data.Name);
 
                 var notEmpty = _ioService.EnumerateFileSystemEntries(outputFolder).Any();
                 if (notEmpty)
@@ -68,7 +68,7 @@ namespace SCQueryConnect.Helpers
                 }
 
                 _ioService.DeleteDirectory(outputFolder, true);
-                GetOrCreateOutputFolder(settings.Data.Name, settings.BasePath);
+                GetOrCreateOutputFolder(settings.Data.Name);
 
                 PublishAllBatchFolders(settings.Data, string.Empty, null, settings);
                 Process.Start(outputFolder);
@@ -91,7 +91,7 @@ namespace SCQueryConnect.Helpers
             {
                 var subPath = Path.Combine(parentPath, queryData.Name);
                 var filename = $"{queryData.Name}.bat";
-                var outputFolder = GetOrCreateOutputFolder(subPath, settings.BasePath);
+                var outputFolder = GetOrCreateOutputFolder(subPath);
                 var batchFilePath = Path.Combine(outputFolder, filename);
                 
                 parentStringBuilder?.AppendLine($"echo {message}");
@@ -110,7 +110,7 @@ namespace SCQueryConnect.Helpers
             }
             else
             {
-                GetOrCreateOutputFolder(parentPath, settings.BasePath);
+                GetOrCreateOutputFolder(parentPath);
 
                 var fullPath = GenerateBatchExe(
                     queryData.ConnectionsString,
@@ -136,7 +136,7 @@ namespace SCQueryConnect.Helpers
             var zipfile = $"SCSQLBatch{suffix}.zip";
 
             var path = Path.Combine(sequenceName, queryData.Name);
-            var outputFolder = GetOrCreateOutputFolder(path, settings.BasePath);
+            var outputFolder = GetOrCreateOutputFolder(path);
 
             try
             {

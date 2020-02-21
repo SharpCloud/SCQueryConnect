@@ -11,12 +11,10 @@ using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -36,40 +34,31 @@ namespace SCQueryConnect
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string saveDataExtension = ".scqc";
-        private const string ConnectionsFileV3 = "connections.json";
-        private const string ConnectionsFileV3Backup = "connections.json.bak";
-        private const string ConnectionsFileV4 = "connections_v4" + saveDataExtension;
-
         private Point _startPoint;
 
         public string AppName
         {
-            get
-            {
-                return _qcHelper.AppName;
-            }
+            get { return _qcHelper.AppName; }
         }
 
         private CancellationTokenSource _cancellationTokenSource;
         private string _lastUsedSharpCloudConnection;
-        private ProxyViewModel _proxyViewModel;
         private readonly int _maxRowCount;
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
         private readonly IItemDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
-        private readonly IEncryptionHelper _encryptionHelper;
         private readonly IExcelWriter _excelWriter;
         private readonly MultiDestinationLogger _logger;
+        private readonly IIOService _ioService;
         private readonly IMainViewModel _mainViewModel;
         private readonly IPasswordStorage _passwordStorage;
+        private readonly IProxyViewModel _proxyViewModel;
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IResourceUrlDataChecker _resourceUrlDataChecker;
-        private readonly string _localPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SharpCloudQueryConnect");
         private readonly RichTextBoxLoggingDestination _storyLoggingDestination;
         private readonly RichTextBoxLoggingDestination _folderLoggingDestination;
 
@@ -78,10 +67,11 @@ namespace SCQueryConnect
             IConnectionStringHelper connectionStringHelper,
             IItemDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
-            IEncryptionHelper encryptionHelper,
             IExcelWriter excelWriter,
+            IIOService ioService,
             IMainViewModel mainViewModel,
             IPasswordStorage passwordStorage,
+            IProxyViewModel proxyViewModel,
             IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory,
             ILog logger,
@@ -111,10 +101,11 @@ namespace SCQueryConnect
                 vm => vm.IsItemQueryOk);
 
             _dbConnectionFactory = dbConnectionFactory;
-            _encryptionHelper = encryptionHelper;
             _excelWriter = excelWriter;
+            _ioService = ioService;
             _mainViewModel = mainViewModel;
             _passwordStorage = passwordStorage;
+            _proxyViewModel = proxyViewModel;
 
             _relationshipsChecker = relationshipsDataChecker;
             _relationshipsChecker.ValidityProcessor = new DataCheckerValidityProcessor(
@@ -133,9 +124,9 @@ namespace SCQueryConnect
                 mainViewModel,
                 vm => vm.IsResourceUrlsQueryOk);
 
-            _folderLoggingDestination  = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
+            _folderLoggingDestination = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
             _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
-            
+
             _logger = (MultiDestinationLogger) logger;
             _logger.SetPersistentDestination(_folderLoggingDestination, _storyLoggingDestination);
 
@@ -144,29 +135,8 @@ namespace SCQueryConnect
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var pathV3 = Path.Combine(_localPath, ConnectionsFileV3);
-            var migrate = File.Exists(pathV3);
-            string filePath;
-
-            if (migrate)
-            {
-                var pathV3Backup = Path.Combine(_localPath, ConnectionsFileV3Backup);
-
-                if (File.Exists(pathV3Backup))
-                {
-                    File.Delete(pathV3Backup);
-                }
-
-                File.Move(pathV3, pathV3Backup);
-                filePath = pathV3Backup;
-            }
-            else
-            {
-                filePath = Path.Combine(_localPath, ConnectionsFileV4);
-            }
-
-            _mainViewModel.LoadAllConnections(migrate, filePath);
-            LoadGlobalSettings(migrate);
+            _mainViewModel.LoadApplicationState();
+            Password.Password = _passwordStorage.LoadPassword(PasswordStorage.Password);
 
             EventManager.RegisterClassHandler(
                 typeof(TextBox),
@@ -195,27 +165,6 @@ namespace SCQueryConnect
                     passwordBox.SelectAll();
                 }
             }
-        }
-
-        private void LoadGlobalSettings(bool migrate)
-        {
-            if (migrate)
-            {
-                SaveHelper.RegDelete("ActiveConnection");
-            }
-
-            _mainViewModel.Url = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
-            _mainViewModel.Username = SaveHelper.RegRead("Username", "");
-
-            Password.Password = _passwordStorage.LoadPassword(PasswordStorage.Password);
-
-            _proxyViewModel = new ProxyViewModel();
-            _proxyViewModel.Proxy = SaveHelper.RegRead("Proxy", "");
-            _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
-            _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
-
-            _proxyViewModel.ProxyPassword = _passwordStorage
-                .LoadPassword(PasswordStorage.ProxyPassword);
         }
 
         private void RewriteDataSourceClick(object sender, RoutedEventArgs e)
@@ -290,7 +239,6 @@ namespace SCQueryConnect
                     connection.Open();
                     MessageBox.Show("Hooray! It looks like it's worked!");
                     SaveSettings();
-                    return;
                 }
             }
             catch (Exception ex)
@@ -338,7 +286,7 @@ namespace SCQueryConnect
             switch (e)
             {
                 case InvalidOperationException ex when ex.Message.Contains(Constants.AccessDBEngineErrorMessage):
-                    var msgbox = new DatabaseErrorMessage { Owner = this };
+                    var msgbox = new DatabaseErrorMessage {Owner = this};
                     msgbox.ShowDialog();
                     break;
 
@@ -421,7 +369,7 @@ namespace SCQueryConnect
                                 }
                             }
 
-                            var prop = (PropertyInfo)((MemberExpression)resultsSelector.Body).Member;
+                            var prop = (PropertyInfo) ((MemberExpression) resultsSelector.Body).Member;
                             prop.SetValue(queryData, dt, null);
                         }
                     }
@@ -442,24 +390,8 @@ namespace SCQueryConnect
 
         private void SaveSettings()
         {
-            SaveHelper.RegWrite("URL", _mainViewModel.Url);
-            SaveHelper.RegWrite("Username", _mainViewModel.Username);
-
             _passwordStorage.SavePassword(PasswordStorage.Password, Password.Password);
-
-            SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
-            SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
-            SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
-
-            _passwordStorage.SavePassword(
-                PasswordStorage.ProxyPassword,
-                _proxyViewModel.ProxyPassword);
-
-            _mainViewModel.SaveConnections(
-                _localPath,
-                ConnectionsFileV4,
-                _mainViewModel.QueryRootNode,
-                true);
+            _mainViewModel.SaveApplicationState();
         }
 
         private bool ValidateCredentials()
@@ -470,18 +402,21 @@ namespace SCQueryConnect
                 UrlTextBox.Focus();
                 return false;
             }
+
             if (string.IsNullOrEmpty(_mainViewModel.Username))
             {
                 MessageBox.Show("Please enter your SharpCloud username");
                 UsernameTextBox.Focus();
                 return false;
             }
+
             if (string.IsNullOrEmpty(Password.Password))
             {
                 MessageBox.Show("Please enter your password");
                 Password.Focus();
                 return false;
             }
+
             return true;
         }
 
@@ -493,14 +428,14 @@ namespace SCQueryConnect
                 StoryId.Focus();
                 return false;
             }
-            
+
             if (!Guid.TryParse(queryData.StoryId, out _))
             {
                 MessageBox.Show($"Story ID for '{queryData.Name}' must be a GUID");
                 StoryId.Focus();
                 return false;
             }
-            
+
             return true;
         }
 
@@ -547,11 +482,14 @@ namespace SCQueryConnect
 
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
-            var path = _batchPublishHelper.GetOrCreateOutputFolder(
-                _mainViewModel.SelectedQueryData.Name,
-                _localPath);
+            if (sender is FrameworkElement fe &&
+                fe.DataContext is QueryData queryData)
+            {
+                var path = _batchPublishHelper.GetOrCreateOutputFolder(
+                    queryData.Name);
 
-            Process.Start(path);
+                Process.Start(path);
+            }
         }
 
         private void NewConnectionClick(object sender, RoutedEventArgs e)
@@ -697,7 +635,7 @@ namespace SCQueryConnect
 
         private void QC_Data_Folder_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("explorer.exe", _localPath);
+            Process.Start("explorer.exe", _ioService.OutputRoot);
         }
 
         private void PublishBatchFolder(
@@ -713,7 +651,6 @@ namespace SCQueryConnect
             {
                 Data = _mainViewModel.SelectedQueryData,
                 ProxyViewModel = _proxyViewModel,
-                BasePath = _localPath,
                 Username = _mainViewModel.Username,
                 SharpCloudUrl = _mainViewModel.Url,
                 PasswordSecurity = security,
@@ -855,7 +792,6 @@ namespace SCQueryConnect
             {
                 try
                 {
-                    
                     _cancellationTokenSource = new CancellationTokenSource();
                     await RunQueryData(queryData, _cancellationTokenSource.Token);
                 }
@@ -962,25 +898,7 @@ namespace SCQueryConnect
             if (sender is FrameworkElement fe &&
                 fe.DataContext is QueryData queryData)
             {
-                var dlg = new SaveFileDialog
-                {
-                    FileName = queryData.Name,
-                    Filter = $"SharpCloud QueryConnect Files (*{saveDataExtension})|*{saveDataExtension}"
-                };
-
-                if (dlg.ShowDialog() != true)
-                {
-                    return;
-                }
-
-                var directory = Path.GetDirectoryName(dlg.FileName);
-                var filename = Path.GetFileName(dlg.FileName);
-
-                if (!string.IsNullOrWhiteSpace(directory))
-                {
-                    _mainViewModel.SaveConnections(directory, filename, queryData, false);
-                    Process.Start(directory);
-                }
+                _mainViewModel.ExportQueryDataClick(queryData);
             }
         }
 

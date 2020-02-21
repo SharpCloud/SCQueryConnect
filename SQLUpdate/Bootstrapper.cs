@@ -73,6 +73,7 @@ namespace SCQueryConnect
             builder.RegisterType<PasswordStorage>().As<IPasswordStorage>().InstancePerLifetimeScope();
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>().InstancePerLifetimeScope();
             builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>().InstancePerLifetimeScope();
+            builder.RegisterType<ProxyViewModel>().As<IProxyViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>().InstancePerLifetimeScope();
 
             return builder;

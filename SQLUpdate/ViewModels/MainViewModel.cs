@@ -10,11 +10,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Windows;
+using SCQueryConnect.Services;
 using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.ViewModels
@@ -27,6 +29,8 @@ namespace SCQueryConnect.ViewModels
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IIOService _ioService;
         private readonly IMessageService _messageService;
+        private readonly IPasswordStorage _passwordStorage;
+        private readonly IProxyViewModel _proxyViewModel;
 
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
@@ -276,11 +280,15 @@ namespace SCQueryConnect.ViewModels
         public MainViewModel(
             IEncryptionHelper encryptionHelper,
             IIOService ioService,
-            IMessageService messageService)
+            IMessageService messageService,
+            IPasswordStorage passwordStorage,
+            IProxyViewModel proxyViewModel)
         {
             _encryptionHelper = encryptionHelper;
             _ioService = ioService;
             _messageService = messageService;
+            _passwordStorage = passwordStorage;
+            _proxyViewModel = proxyViewModel;
 
             QueryRootNode = CreateNewFolder(QueryData.RootId);
             QueryRootNode.Id = QueryData.RootId;
@@ -398,7 +406,49 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public void LoadAllConnections(bool migrate, string filePath)
+        public void LoadApplicationState()
+        {
+            var migrate = File.Exists(_ioService.V3ConnectionsPath);
+            string filePath;
+
+            if (migrate)
+            {
+                if (File.Exists(_ioService.V3ConnectionsBackupPath))
+                {
+                    File.Delete(_ioService.V3ConnectionsBackupPath);
+                }
+
+                File.Move(_ioService.V3ConnectionsPath, _ioService.V3ConnectionsBackupPath);
+                filePath = _ioService.V3ConnectionsBackupPath;
+            }
+            else
+            {
+                filePath = _ioService.V4ConnectionsPath;
+            }
+
+            LoadAllConnections(migrate, filePath);
+            LoadGlobalSettings(migrate);
+        }
+
+        private void LoadGlobalSettings(bool migrate)
+        {
+            if (migrate)
+            {
+                SaveHelper.RegDelete("ActiveConnection");
+            }
+
+            Url = SaveHelper.RegRead("URL", "https://my.sharpcloud.com");
+            Username = SaveHelper.RegRead("Username", "");
+
+            _proxyViewModel.Proxy = SaveHelper.RegRead("Proxy", "");
+            _proxyViewModel.ProxyAnnonymous = bool.Parse(SaveHelper.RegRead("ProxyAnonymous", "true"));
+            _proxyViewModel.ProxyUserName = SaveHelper.RegRead("ProxyUserName", "");
+
+            _proxyViewModel.ProxyPassword = _passwordStorage
+                .LoadPassword(PasswordStorage.ProxyPassword);
+        }
+
+        private void LoadAllConnections(bool migrate, string filePath)
         {
             IList<QueryData> connections;
             var createExamples = !_ioService.FileExists(filePath);
@@ -464,7 +514,27 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public void SaveConnections(
+        public void SaveApplicationState()
+        {
+            SaveHelper.RegWrite("URL", Url);
+            SaveHelper.RegWrite("Username", Username);
+
+            SaveHelper.RegWrite("Proxy", _proxyViewModel.Proxy);
+            SaveHelper.RegWrite("ProxyAnonymous", _proxyViewModel.ProxyAnnonymous);
+            SaveHelper.RegWrite("ProxyUserName", _proxyViewModel.ProxyUserName);
+
+            _passwordStorage.SavePassword(
+                PasswordStorage.ProxyPassword,
+                _proxyViewModel.ProxyPassword);
+
+            SaveConnections(
+                _ioService.OutputRoot,
+                IOService.ConnectionsFileV4,
+                QueryRootNode,
+                true);
+        }
+
+        private void SaveConnections(
             string saveFolderPath,
             string filename,
             QueryData root,
@@ -488,6 +558,25 @@ namespace SCQueryConnect.ViewModels
             var json = JsonConvert.SerializeObject(toSave);
             var path = Path.Combine(saveFolderPath, filename);
             _ioService.WriteAllTextToFile(path, json);
+        }
+
+        public void ExportQueryDataClick(QueryData queryData)
+        {
+            var fileName = _ioService.PromptForExportPath(queryData?.Name);
+            
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return;
+            }
+
+            var directory = Path.GetDirectoryName(fileName);
+            var file = Path.GetFileName(fileName);
+
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                SaveConnections(directory, file, queryData, false);
+                Process.Start(directory);
+            }
         }
 
         public void ValidatePanelData(QueryData queryData)

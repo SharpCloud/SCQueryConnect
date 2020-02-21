@@ -13,11 +13,12 @@ namespace SCQueryConnect.Tests.Helpers
     [TestFixture]
     public class BatchPublishHelperTests
     {
+        private const string outputRoot = "RoamingProfile";
+
         private static PublishSettings CreatePublishSettings(params string[] nestedConnectionNames)
         {
             var settings = new PublishSettings
             {
-                BasePath = "RoamingProfile",
                 Data = new QueryData
                 {
                     ConnectionsString = string.Empty,
@@ -58,6 +59,7 @@ namespace SCQueryConnect.Tests.Helpers
                 e.TextEncoding == Encoding.UTF8);
 
             var ioService = Mock.Of<IIOService>(s =>
+                s.OutputRoot == outputRoot &&
                 s.ReadAllTextFromFile(It.IsAny<string>()) == string.Empty);
 
             var passwordStorage = Mock.Of<IPasswordStorage>(p =>
@@ -99,6 +101,7 @@ namespace SCQueryConnect.Tests.Helpers
                 e.TextEncoding == Encoding.UTF8);
 
             var ioService = Mock.Of<IIOService>(s =>
+                s.OutputRoot == outputRoot &&
                 s.ReadAllTextFromFile(It.IsAny<string>()) == string.Empty);
 
             var passwordStorage = Mock.Of<IPasswordStorage>(p =>
@@ -147,6 +150,7 @@ echo - Running 'Connection'...
                 e.TextEncoding == Encoding.UTF8);
 
             var ioService = Mock.Of<IIOService>(s =>
+                s.OutputRoot == outputRoot &&
                 s.ReadAllTextFromFile(It.IsAny<string>()) == string.Empty);
 
             var passwordStorage = Mock.Of<IPasswordStorage>(p =>

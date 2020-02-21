@@ -161,6 +161,7 @@
     <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Interfaces\IPasswordStorage.cs" />
+    <Compile Include="Interfaces\IProxyViewModel.cs" />
     <Compile Include="Logging\LoggingDestination.cs" />
     <Compile Include="Logging\MultiDestinationLogger.cs" />
     <Compile Include="Logging\QueryDataLoggingDestination.cs" />

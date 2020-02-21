@@ -182,6 +182,9 @@
     <Compile Include="..\SQLUpdate\Interfaces\IPasswordStorage.cs">
       <Link>Interfaces\IPasswordStorage.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IProxyViewModel.cs">
+      <Link>Interfaces\IProxyViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Logging\LoggingDestination.cs">
       <Link>Logging\LoggingDestination.cs</Link>
     </Compile>

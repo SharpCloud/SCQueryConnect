@@ -1,17 +1,5 @@
-﻿using SCQueryConnect.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SCQueryConnect.Interfaces;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SCQueryConnect.Views
 {
@@ -20,9 +8,9 @@ namespace SCQueryConnect.Views
     /// </summary>
     public partial class ProxySettings : Window
     {
-        private ProxyViewModel _viewModel;
+        private IProxyViewModel _viewModel;
 
-        public ProxySettings(ProxyViewModel viewModel)
+        public ProxySettings(IProxyViewModel viewModel)
         {
             _viewModel = viewModel;
 

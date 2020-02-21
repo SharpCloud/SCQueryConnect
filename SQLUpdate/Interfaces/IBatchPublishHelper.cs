@@ -5,7 +5,7 @@ namespace SCQueryConnect.Interfaces
     public interface IBatchPublishHelper
     {
         string GetBatchRunStartMessage(string name);
-        string GetOrCreateOutputFolder(string queryName, string basePath);
+        string GetOrCreateOutputFolder(string queryName);
         void PublishBatchFolder(PublishSettings settings);
     }
 }
