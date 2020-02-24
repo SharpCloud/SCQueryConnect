@@ -2,9 +2,11 @@
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Services;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
+using SCQueryConnect.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +18,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Windows;
-using SCQueryConnect.Services;
 using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.ViewModels
@@ -31,6 +32,7 @@ namespace SCQueryConnect.ViewModels
         private readonly IMessageService _messageService;
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
+        private readonly ISaveFileDialogService _saveFileDialogService;
 
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
@@ -297,13 +299,15 @@ namespace SCQueryConnect.ViewModels
             IIOService ioService,
             IMessageService messageService,
             IPasswordStorage passwordStorage,
-            IProxyViewModel proxyViewModel)
+            IProxyViewModel proxyViewModel,
+            ISaveFileDialogService saveFileDialogService)
         {
             _encryptionHelper = encryptionHelper;
             _ioService = ioService;
             _messageService = messageService;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
+            _saveFileDialogService = saveFileDialogService;
 
             QueryRootNode = CreateNewFolder(QueryData.RootId);
             QueryRootNode.Id = QueryData.RootId;
@@ -582,7 +586,7 @@ namespace SCQueryConnect.ViewModels
 
         public void ExportQueryDataClick(QueryData queryData)
         {
-            var fileName = _ioService.PromptForExportPath(queryData?.Name);
+            var fileName = _saveFileDialogService.PromptForExportPath(queryData?.Name);
             
             if (string.IsNullOrWhiteSpace(fileName))
             {

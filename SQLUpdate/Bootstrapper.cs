@@ -77,6 +77,7 @@ namespace SCQueryConnect
             builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>().InstancePerLifetimeScope();
             builder.RegisterType<ProxyViewModel>().As<IProxyViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>().InstancePerLifetimeScope();
+            builder.RegisterType<SaveFileDialogService>().As<ISaveFileDialogService>().InstancePerLifetimeScope();
             builder.RegisterType<ZipService>().As<IZipService>().InstancePerLifetimeScope();
 
             return builder;

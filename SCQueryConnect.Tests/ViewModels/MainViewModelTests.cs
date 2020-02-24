@@ -34,7 +34,8 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IIOService>(),
                 messageService,
                 Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>());
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
 
             var table = new DataTable();
             table.Columns.Add(PanelTypeHeader);
@@ -73,7 +74,8 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<IIOService>(),
                 messageService,
                 Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>());
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
 
             var table = new DataTable();
             table.Columns.Add(panelTypeHeader);
@@ -114,7 +116,8 @@ namespace SCQueryConnect.Tests.ViewModels
                 ioService,
                 Mock.Of<IMessageService>(),
                 Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>());
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
 
             // Act
 
@@ -156,7 +159,8 @@ namespace SCQueryConnect.Tests.ViewModels
                 ioService,
                 Mock.Of<IMessageService>(),
                 Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>());
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
 
             // Act
 
@@ -191,7 +195,8 @@ namespace SCQueryConnect.Tests.ViewModels
                 ioService,
                 Mock.Of<IMessageService>(),
                 Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>());
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
 
             // Act
 

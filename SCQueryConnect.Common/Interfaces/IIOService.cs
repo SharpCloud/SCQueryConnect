@@ -10,8 +10,6 @@ namespace SCQueryConnect.Common.Interfaces
         string V3ConnectionsBackupPath { get; }
         string V4ConnectionsPath { get; }
 
-        string PromptForExportPath(string defaultFileName);
-
         DirectoryInfo CreateDirectory(string path);
         void DeleteDirectory(string path, bool recursive);
         IEnumerable<string> EnumerateFileSystemEntries(string path);

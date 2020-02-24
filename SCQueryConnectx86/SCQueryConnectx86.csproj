@@ -182,6 +182,9 @@
     <Compile Include="..\SQLUpdate\Interfaces\IProxyViewModel.cs">
       <Link>Interfaces\IProxyViewModel.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\ISaveFileDialogService.cs">
+      <Link>Interfaces\ISaveFileDialogService.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IZipService.cs">
       <Link>Interfaces\IZipService.cs</Link>
     </Compile>
@@ -226,6 +229,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Services\PasswordStorage.cs">
       <Link>Services\PasswordStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Services\SaveFileDialogService.cs">
+      <Link>Services\SaveFileDialogService.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Services\ZipService.cs">
       <Link>Services\ZipService.cs</Link>

@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using SCQueryConnect.Common.Interfaces;
+﻿using SCQueryConnect.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,11 +7,11 @@ namespace SCQueryConnect.Common.Services
 {
     public class IOService : IIOService
     {
-        private const string SaveDataExtension = ".scqc";
         private const string ConnectionsFileV3 = "connections.json";
         private const string ConnectionsFileV3Backup = "connections.json.bak";
         
         public const string ConnectionsFileV4 = "connections_v4" + SaveDataExtension;
+        public const string SaveDataExtension = ".scqc";
 
         public string OutputRoot { get; } = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -21,22 +20,6 @@ namespace SCQueryConnect.Common.Services
         public string V3ConnectionsPath => Path.Combine(OutputRoot, ConnectionsFileV3);
         public string V3ConnectionsBackupPath => Path.Combine(OutputRoot, ConnectionsFileV3Backup);
         public string V4ConnectionsPath => Path.Combine(OutputRoot, ConnectionsFileV4);
-
-        public string PromptForExportPath(string defaultFileName)
-        {
-            if (string.IsNullOrWhiteSpace(defaultFileName))
-            {
-                return string.Empty;
-            }
-
-            var dlg = new SaveFileDialog
-            {
-                FileName = defaultFileName,
-                Filter = $"SharpCloud QueryConnect Files (*{SaveDataExtension})|*{SaveDataExtension}"
-            };
-
-            return dlg.FileName;
-        }
 
         public DirectoryInfo CreateDirectory(string path)
         {
