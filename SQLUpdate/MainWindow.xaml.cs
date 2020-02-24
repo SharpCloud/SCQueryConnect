@@ -323,58 +323,64 @@ namespace SCQueryConnect
 
         private async void PreviewSqlClick(object sender, RoutedEventArgs e)
         {
+            await PreviewSql();
+        }
+
+        private async Task PreviewSql()
+        {
             if (_mainViewModel.SelectedTabIndex == 1 &&
                 _mainViewModel.SelectedQueryTabItem.Tag is TextBox tb &&
                 tb.Tag is string queryEntityType)
             {
+                IDataChecker dataChecker;
+                Expression<Func<QueryData, DataTable>> resultsSelector;
+
                 switch (queryEntityType)
                 {
                     case QueryEntityType.Items:
-                    {
-                        await PreviewSql(
-                            _mainViewModel.SelectedQueryData,
-                            _mainViewModel.SelectedQueryData.QueryString,
-                            _itemDataChecker,
-                            d => d.QueryResults);
-
+                        dataChecker = _itemDataChecker;
+                        resultsSelector = d => d.QueryResults;
                         break;
-                    }
 
                     case QueryEntityType.Relationships:
-                    {
-                        await PreviewSql(
-                            _mainViewModel.SelectedQueryData,
-                            _mainViewModel.SelectedQueryData.QueryStringRels,
-                            _relationshipsChecker,
-                            d => d.QueryResultsRels);
-
+                        dataChecker = _relationshipsChecker;
+                        resultsSelector = d => d.QueryResultsRels;
                         break;
-                    }
 
                     case QueryEntityType.ResourceUrls:
-                    {
-                        await PreviewSql(
-                            _mainViewModel.SelectedQueryData,
-                            _mainViewModel.SelectedQueryData.QueryStringResourceUrls,
-                            _resourceUrlDataChecker,
-                            d => d.QueryResultsResourceUrls);
-
+                        dataChecker = _resourceUrlDataChecker;
+                        resultsSelector = d => d.QueryResultsResourceUrls;
                         break;
-                    }
 
                     case QueryEntityType.Panels:
-                    {
-                        await PreviewSql(
-                            _mainViewModel.SelectedQueryData,
-                            _mainViewModel.SelectedQueryData.QueryStringPanels,
-                            _panelsDataChecker,
-                            d => d.QueryResultsPanels);
-
-                        _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
+                        dataChecker = _panelsDataChecker;
+                        resultsSelector = d => d.QueryResultsPanels;
                         break;
-                    }
+
+                    default:
+                        _messageService.Show($"Unknown query type: {queryEntityType}");
+                        return;
                 }
+
+                var query = GetQueryText(tb);
+
+                await PreviewSql(
+                    _mainViewModel.SelectedQueryData,
+                    query,
+                    dataChecker,
+                    resultsSelector);
+
+                _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
             }
+        }
+
+        private string GetQueryText(TextBox queryTextBox)
+        {
+            var text = string.IsNullOrWhiteSpace(queryTextBox.SelectedText)
+                ? queryTextBox.Text
+                : queryTextBox.SelectedText;
+
+            return text;
         }
 
         private async Task PreviewSql(
@@ -987,6 +993,14 @@ namespace SCQueryConnect
             };
 
             help.Show();
+        }
+
+        private async void MainWindowOnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F5)
+            {
+                await PreviewSql();
+            }
         }
     }
 }

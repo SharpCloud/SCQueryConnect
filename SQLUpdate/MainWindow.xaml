@@ -18,7 +18,8 @@
         Width="1230"
         Icon="QC.ico"
         ResizeMode="CanResizeWithGrip"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        KeyUp="MainWindowOnKeyUp">
 
     <Grid x:Name="Root">
         <Grid.Resources>
