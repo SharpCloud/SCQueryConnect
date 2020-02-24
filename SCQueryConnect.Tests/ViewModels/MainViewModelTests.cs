@@ -96,7 +96,91 @@ namespace SCQueryConnect.Tests.ViewModels
             // Assert
 
             Mock.Get(messageService).Verify(ms =>
-                ms.Show(It.Is<string>(s => s.Contains(invalidPanelType))));
+                ms.Show(It.Is<string>(s => s.Contains(invalidPanelType) &&
+                                           !s.Contains("unspecified panel"))));
+        }
+
+        [Test]
+        public void ValidatePanelDataShowsMessageForUnspecifiedTypes()
+        {
+            // Arrange
+
+            var messageService = Mock.Of<IMessageService>();
+
+            var vm = new MainViewModel(
+                Mock.Of<IEncryptionHelper>(),
+                Mock.Of<IIOService>(),
+                messageService,
+                Mock.Of<IPasswordStorage>(),
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
+
+            var table = new DataTable();
+            table.Columns.Add(PanelTypeHeader);
+
+            var nullTypeRow = table.NewRow();
+            table.Rows.Add(nullTypeRow);
+
+            var emptyTypeRow = table.NewRow();
+            emptyTypeRow[PanelTypeHeader] = string.Empty;
+            table.Rows.Add(emptyTypeRow);
+
+            var data = new QueryData
+            {
+                QueryResultsPanels = table
+            };
+
+            // Act
+
+            vm.ValidatePanelData(data);
+
+            // Assert
+
+            Mock.Get(messageService).Verify(ms =>
+                ms.Show(It.Is<string>(s => s == "Data contains 2 unspecified panel type(s)")));
+        }
+
+        [Test]
+        public void ValidatePanelDataShowsMessageForInvalidAndUnspecifiedTypes()
+        {
+            // Arrange
+
+            const string invalidPanelType = "Invalid Type";
+
+            var messageService = Mock.Of<IMessageService>();
+
+            var vm = new MainViewModel(
+                Mock.Of<IEncryptionHelper>(),
+                Mock.Of<IIOService>(),
+                messageService,
+                Mock.Of<IPasswordStorage>(),
+                Mock.Of<IProxyViewModel>(),
+                Mock.Of<ISaveFileDialogService>());
+
+            var table = new DataTable();
+            table.Columns.Add(PanelTypeHeader);
+
+            var unspecifiedRow = table.NewRow();
+            table.Rows.Add(unspecifiedRow);
+
+            var invalidRow = table.NewRow();
+            invalidRow[PanelTypeHeader] = invalidPanelType;
+            table.Rows.Add(invalidRow);
+
+            var data = new QueryData
+            {
+                QueryResultsPanels = table
+            };
+
+            // Act
+
+            vm.ValidatePanelData(data);
+
+            // Assert
+
+            Mock.Get(messageService).Verify(ms =>
+                ms.Show(It.Is<string>(s => s.Contains(invalidPanelType) &&
+                                           s.Contains("Data contains 1 unspecified panel type(s)"))));
         }
 
         [Test]

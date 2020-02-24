@@ -631,7 +631,7 @@ namespace SCQueryConnect.ViewModels
 
             foreach (DataRow row in queryData.QueryResultsPanels.Rows)
             {
-                var data = (string) row[index];
+                var data = row[index] as string;
                 var success = Enum.TryParse(data, true, out PanelType _);
 
                 if (!success)
@@ -642,8 +642,23 @@ namespace SCQueryConnect.ViewModels
 
             if (invalid.Count > 0)
             {
-                var invalidStr = string.Join(", ", invalid);
-                var msg = $"Unrecognized panel types: '{invalidStr}'. Valid values are [{PanelTypeHelper.ValidTypes}]";
+                var unrecognised = invalid.Where(s => !string.IsNullOrWhiteSpace(s));
+                var unrecognisedStr = string.Join(", ", unrecognised);
+
+                var unrecognisedMsg = string.IsNullOrWhiteSpace(unrecognisedStr)
+                    ? string.Empty
+                    : $"Unrecognised panel types: '{unrecognisedStr}'. Valid values are [{PanelTypeHelper.ValidTypes}]";
+
+                var unspecified = invalid.Count(string.IsNullOrWhiteSpace);
+
+                var unspecifiedMsg = unspecified == 0
+                    ? string.Empty
+                    : $"Data contains {unspecified} unspecified panel type(s)";
+
+                var messages = new[] {unrecognisedMsg, unspecifiedMsg}
+                    .Where(s => !string.IsNullOrWhiteSpace(s));
+
+                var msg = string.Join(". ", messages);
                 _messageService.Show(msg);
             }
         }
