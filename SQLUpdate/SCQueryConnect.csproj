@@ -156,6 +156,7 @@
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
+    <Compile Include="Helpers\QueryEntityType.cs" />
     <Compile Include="Interfaces\IBatchPublishHelper.cs" />
     <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />

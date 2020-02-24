@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SCQueryConnect.Helpers;
 
 namespace SCQueryConnect
 {
@@ -320,42 +321,60 @@ namespace SCQueryConnect
             }
         }
 
-        private async void RunClick(object sender, RoutedEventArgs e)
+        private async void PreviewSqlClick(object sender, RoutedEventArgs e)
         {
-            await PreviewSql(
-                _mainViewModel.SelectedQueryData,
-                _mainViewModel.SelectedQueryData.QueryString,
-                _itemDataChecker,
-                d => d.QueryResults);
-        }
+            if (_mainViewModel.SelectedTabIndex == 1 &&
+                _mainViewModel.SelectedQueryTabItem.Tag is TextBox tb &&
+                tb.Tag is string queryEntityType)
+            {
+                switch (queryEntityType)
+                {
+                    case QueryEntityType.Items:
+                    {
+                        await PreviewSql(
+                            _mainViewModel.SelectedQueryData,
+                            _mainViewModel.SelectedQueryData.QueryString,
+                            _itemDataChecker,
+                            d => d.QueryResults);
 
-        private async void RunClickRels(object sender, RoutedEventArgs e)
-        {
-            await PreviewSql(
-                _mainViewModel.SelectedQueryData,
-                _mainViewModel.SelectedQueryData.QueryStringRels,
-                _relationshipsChecker,
-                d => d.QueryResultsRels);
-        }
+                        break;
+                    }
 
-        private async void PreviewResourceUrlsClick(object sender, RoutedEventArgs e)
-        {
-            await PreviewSql(
-                _mainViewModel.SelectedQueryData,
-                _mainViewModel.SelectedQueryData.QueryStringResourceUrls,
-                _resourceUrlDataChecker,
-                d => d.QueryResultsResourceUrls);
-        }
+                    case QueryEntityType.Relationships:
+                    {
+                        await PreviewSql(
+                            _mainViewModel.SelectedQueryData,
+                            _mainViewModel.SelectedQueryData.QueryStringRels,
+                            _relationshipsChecker,
+                            d => d.QueryResultsRels);
 
-        private async void PreviewPanelsClick(object sender, RoutedEventArgs e)
-        {
-            await PreviewSql(
-                _mainViewModel.SelectedQueryData,
-                _mainViewModel.SelectedQueryData.QueryStringPanels,
-                _panelsDataChecker,
-                d => d.QueryResultsPanels);
+                        break;
+                    }
 
-            _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
+                    case QueryEntityType.ResourceUrls:
+                    {
+                        await PreviewSql(
+                            _mainViewModel.SelectedQueryData,
+                            _mainViewModel.SelectedQueryData.QueryStringResourceUrls,
+                            _resourceUrlDataChecker,
+                            d => d.QueryResultsResourceUrls);
+
+                        break;
+                    }
+
+                    case QueryEntityType.Panels:
+                    {
+                        await PreviewSql(
+                            _mainViewModel.SelectedQueryData,
+                            _mainViewModel.SelectedQueryData.QueryStringPanels,
+                            _panelsDataChecker,
+                            d => d.QueryResultsPanels);
+
+                        _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
+                        break;
+                    }
+                }
+            }
         }
 
         private async Task PreviewSql(

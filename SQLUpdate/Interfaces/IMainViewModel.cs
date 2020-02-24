@@ -2,6 +2,7 @@
 using SCQueryConnect.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Controls;
 
 namespace SCQueryConnect.Interfaces
 {
@@ -19,6 +20,7 @@ namespace SCQueryConnect.Interfaces
         string Url { get; set; }
         string Username { get; set; }
         int SelectedQueryTabIndex { get; set; }
+        TabItem SelectedQueryTabItem { get; set; }
         int SelectedTabIndex { get; set; }
         ObservableCollection<QueryData> Connections { get; set; }
         QueryData QueryRootNode { get; }

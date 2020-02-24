@@ -542,7 +542,8 @@
                     <TabItem Header="2. Queries"
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <TabControl Background="{StaticResource QCBackground}"
-                                    SelectedIndex="{Binding MainViewModel.SelectedQueryTabIndex, Source={StaticResource ViewModelLocator}}">
+                                    SelectedIndex="{Binding MainViewModel.SelectedQueryTabIndex, Source={StaticResource ViewModelLocator}}"
+                                    SelectedItem="{Binding MainViewModel.SelectedQueryTabItem, Source={StaticResource ViewModelLocator}}">
                             <TabControl.Resources>
                                 <Style TargetType="GridSplitter">
                                     <Setter Property="Height" Value="3" />
@@ -590,9 +591,11 @@
                                 <Style TargetType="DataGrid">
                                     <Setter Property="Margin" Value="5" />
                                 </Style>
+
+                                <helpers:QueryEntityType x:Key="QueryEntityType" />
                             </TabControl.Resources>
 
-                            <TabItem Header="Items">
+                            <TabItem Header="Items" Tag="{Binding ElementName=ItemsQueryText}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="30"></RowDefinition>
@@ -602,7 +605,14 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBox Grid.Row="1" Text="{Binding QueryString, FallbackValue='SELECT * FROM TABLE'}" />
+
+                                    <TextBox x:Name="ItemsQueryText"
+                                             x:FieldModifier="private"
+                                             Grid.Row="1"
+                                             Tag="{Binding ItemsType, Source={StaticResource QueryEntityType}}" 
+                                             Text="{Binding QueryString, FallbackValue='SELECT * FROM TABLE'}">
+                                    </TextBox>
+                                    
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -619,13 +629,13 @@
                                             Error: Data must contain a 'Name' or 'External ID' column
                                         </TextBlock>
                                         
-                                        <Button Click="RunClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+                                        <Button Click="PreviewSqlClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResults.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
 
-                            <TabItem Header="Relationships">
+                            <TabItem Header="Relationships" Tag="{Binding ElementName=RelationshipsQueryText}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="30"></RowDefinition>
@@ -639,8 +649,15 @@
                                         <Run Text="Example:" />
                                         <Run Text="{Binding ExampleRelQuery, Mode=OneWay}" />
                                     </TextBlock>
-                                    <TextBox Grid.Row="1" Text="{Binding QueryStringRels, FallbackValue='SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE'}" />
-                                    <GridSplitter Grid.Row="2" ></GridSplitter>
+
+                                    <TextBox x:Name="RelationshipsQueryText"
+                                             x:FieldModifier="private"
+                                             Grid.Row="1"
+                                             Tag="{Binding RelationshipsType, Source={StaticResource QueryEntityType}}"
+                                             Text="{Binding QueryStringRels, FallbackValue='SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE'}">
+                                    </TextBox>
+                                    
+                                    <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
                                         <Grid.RowDefinitions>
@@ -655,14 +672,14 @@
                                                    Visibility="{Binding MainViewModel.IsRelationshipQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
                                             Error: Data must contain a 'Item1' and 'Item2' column
                                         </TextBlock>
-                                        
-                                        <Button Click="RunClickRels" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+
+                                        <Button Click="PreviewSqlClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsRels.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
 
-                            <TabItem Header="Resource URLs">
+                            <TabItem Header="Resource URLs" Tag="{Binding ElementName=ResourceUrlsQueryText}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="30" />
@@ -672,7 +689,14 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBox Grid.Row="1" Text="{Binding QueryStringResourceUrls, FallbackValue='SELECT * FROM TABLE'}" />
+                                    
+                                    <TextBox x:Name="ResourceUrlsQueryText"
+                                             x:FieldModifier="private"
+                                             Grid.Row="1"
+                                             Tag="{Binding ResourceUrlsType, Source={StaticResource QueryEntityType}}"
+                                             Text="{Binding QueryStringResourceUrls, FallbackValue='SELECT * FROM TABLE'}">
+                                    </TextBox>
+                                    
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -688,14 +712,14 @@
                                                    Visibility="{Binding MainViewModel.IsResourceUrlsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
                                             Error: Data must contain 'ExternalID', 'ResourceName', 'Description', and 'URL' columns
                                         </TextBlock>
-                                        
-                                        <Button Click="PreviewResourceUrlsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+
+                                        <Button Click="PreviewSqlClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsResourceUrls.DefaultView}" />
                                     </Grid>
                                 </Grid>
                             </TabItem>
 
-                            <TabItem Header="Panels">
+                            <TabItem Header="Panels" Tag="{Binding ElementName=PanelsQueryText}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="30" />
@@ -705,7 +729,14 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    <TextBox Grid.Row="1" Text="{Binding QueryStringPanels, FallbackValue='SELECT * FROM TABLE'}" />
+
+                                    <TextBox x:Name="PanelsQueryText"
+                                             x:FieldModifier="private"
+                                             Grid.Row="1"
+                                             Tag="{Binding PanelsType, Source={StaticResource QueryEntityType}}"
+                                             Text="{Binding QueryStringPanels, FallbackValue='SELECT * FROM TABLE'}">
+                                    </TextBox>
+
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -721,8 +752,8 @@
                                                    Visibility="{Binding MainViewModel.IsPanelsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
                                             Error: Data must contain 'ExternalID', 'Title', 'PanelType', and 'Data' columns
                                         </TextBlock>
-                                        
-                                        <Button Click="PreviewPanelsClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
+
+                                        <Button Click="PreviewSqlClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResultsPanels.DefaultView}" />
                                     </Grid>
                                 </Grid>

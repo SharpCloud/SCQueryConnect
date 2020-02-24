@@ -164,6 +164,9 @@
     <Compile Include="..\SQLUpdate\Helpers\ConnectionNameValidator.cs">
       <Link>Helpers\ConnectionNameValidator.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\QueryEntityType.cs">
+      <Link>Helpers\QueryEntityType.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>

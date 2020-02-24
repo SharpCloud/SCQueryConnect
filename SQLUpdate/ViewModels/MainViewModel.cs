@@ -18,6 +18,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Windows;
+using System.Windows.Controls;
 using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.ViewModels
@@ -45,6 +46,7 @@ namespace SCQueryConnect.ViewModels
         private int _lastSelectedConnectionIndex;
         private int _lastSelectedFolderIndex = FolderTabIndex;
         private int _selectedQueryTabIndex;
+        private TabItem _selectedQueryTabItem;
         private int _selectedTabIndex;
         private string _publishTabHeader;
         private string _updateSubtext;
@@ -191,6 +193,20 @@ namespace SCQueryConnect.ViewModels
                 if (_selectedQueryTabIndex != value)
                 {
                     _selectedQueryTabIndex = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public TabItem SelectedQueryTabItem
+        {
+            get => _selectedQueryTabItem;
+
+            set
+            {
+                if (_selectedQueryTabItem != value)
+                {
+                    _selectedQueryTabItem = value;
                     OnPropertyChanged();
                 }
             }
@@ -605,6 +621,11 @@ namespace SCQueryConnect.ViewModels
 
         public void ValidatePanelData(QueryData queryData)
         {
+            if (queryData.QueryResultsPanels == null)
+            {
+                return;
+            }
+
             var index = queryData.QueryResultsPanels.Columns.IndexOf("PanelType");
             var invalid = new List<string>();
 
