@@ -25,8 +25,9 @@ namespace SCQueryConnect.ViewModels
 {
     public class MainViewModel : IMainViewModel
     {
-        private const int FolderTabIndex = 3;
-        private const int UpdateStoryTabIndex = 2;
+        public const int FolderTabIndex = 3;
+        public const int QueriesTabIndex = 1;
+        public const int UpdateStoryTabIndex = 2;
 
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IIOService _ioService;

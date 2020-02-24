@@ -25,6 +25,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SCQueryConnect.Helpers;
+using SCQueryConnect.ViewModels;
 
 namespace SCQueryConnect
 {
@@ -328,7 +329,7 @@ namespace SCQueryConnect
 
         private async Task PreviewSql()
         {
-            if (_mainViewModel.SelectedTabIndex == 1 &&
+            if (_mainViewModel.SelectedTabIndex == MainViewModel.QueriesTabIndex &&
                 _mainViewModel.SelectedQueryTabItem.Tag is TextBox tb &&
                 tb.Tag is string queryEntityType)
             {
@@ -862,19 +863,24 @@ namespace SCQueryConnect
             if (sender is FrameworkElement fe &&
                 fe.DataContext is QueryData queryData)
             {
-                try
-                {
-                    _cancellationTokenSource = new CancellationTokenSource();
-                    await RunQueryData(queryData, _cancellationTokenSource.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    await _logger.LogWarning("Update cancelled");
-                    _logger.ClearDestinations();
-                    
-                    _mainViewModel.UpdateText = string.Empty;
-                    _mainViewModel.UpdateSubtext = string.Empty;
-                }
+                await RunQueryData(queryData);
+            }
+        }
+
+        private async Task RunQueryData(QueryData queryData)
+        {
+            try
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+                await RunQueryData(queryData, _cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                await _logger.LogWarning("Update cancelled");
+                _logger.ClearDestinations();
+
+                _mainViewModel.UpdateText = string.Empty;
+                _mainViewModel.UpdateSubtext = string.Empty;
             }
         }
 
@@ -999,7 +1005,17 @@ namespace SCQueryConnect
         {
             if (e.Key == Key.F5)
             {
-                await PreviewSql();
+                switch (_mainViewModel.SelectedTabIndex)
+                {
+                    case MainViewModel.QueriesTabIndex:
+                        await PreviewSql();
+                        break;
+
+                    case MainViewModel.FolderTabIndex:
+                    case MainViewModel.UpdateStoryTabIndex:
+                        await RunQueryData(_mainViewModel.SelectedQueryData);
+                        break;
+                }
             }
         }
     }
