@@ -64,7 +64,6 @@ namespace SCQueryConnect.Tests.ViewModels
         {
             // Arrange
 
-            const string panelTypeHeader = "PanelType";
             const string invalidPanelType = "Invalid Type";
 
             var messageService = Mock.Of<IMessageService>();
@@ -78,10 +77,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 Mock.Of<ISaveFileDialogService>());
 
             var table = new DataTable();
-            table.Columns.Add(panelTypeHeader);
+            table.Columns.Add(PanelTypeHeader);
 
             var row = table.NewRow();
-            row[panelTypeHeader] = invalidPanelType;
+            row[PanelTypeHeader] = invalidPanelType;
             table.Rows.Add(row);
 
             var data = new QueryData
