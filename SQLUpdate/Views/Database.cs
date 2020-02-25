@@ -6,11 +6,13 @@ namespace SCQueryConnect.Views
     {
         public DatabaseType DBType { get; set; }
         public string Name { get; set; }
+        public string ImageSource { get; set; }
 
-        public Database(DatabaseType dbType, string name)
+        public Database(DatabaseType dbType, string name, string imageSource)
         {
             DBType = dbType;
             Name = name;
+            ImageSource = imageSource;
         }
     }
 }

@@ -19,13 +19,13 @@ namespace SCQueryConnect.Views
 
             DatabaseTypes = new[]
             {
-                new Database(DatabaseType.Excel, "Excel Spreadsheet"),
-                new Database(DatabaseType.Access, "Access Database"),
-                new Database(DatabaseType.SharePointList, "SharePoint List"),
-                new Database(DatabaseType.Sql, "SQL Server Connection"),
-                new Database(DatabaseType.Odbc, "ODBC Database Connection"),
-                new Database(DatabaseType.Ado, "Generic ADO/OLDEB Connection"),
-                new Database(DatabaseType.SharpCloudExcel, "SharpCloud (Excel)")
+                new Database(DatabaseType.Excel, "Excel Spreadsheet", "../Images/Connections/Excel.png"),
+                new Database(DatabaseType.Access, "Access Database", "../Images/Connections/Access.png"),
+                new Database(DatabaseType.SharePointList, "SharePoint List", "../Images/Connections/SharePoint.png"),
+                new Database(DatabaseType.Sql, "SQL Server Connection", "../Images/Connections/SqlServer.png"),
+                new Database(DatabaseType.Odbc, "ODBC Database Connection", "../Images/Connections/ODBC.png"),
+                new Database(DatabaseType.Ado, "Generic ADO/OLEDB Connection", "../Images/Connections/ADO.png"),
+                new Database(DatabaseType.SharpCloudExcel, "SharpCloud (Excel)", "../Images/Connections/SharpCloud.png")
             };
 
             DataContext = this;

@@ -267,6 +267,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Images\Connections\ADO.png" />
+    <Resource Include="Images\Connections\ODBC.png" />
+    <Resource Include="Images\Connections\SqlServer.png" />
+    <Resource Include="Images\Connections\SharpCloud.png" />
+    <Resource Include="Images\Connections\SharePoint.png" />
+    <Resource Include="Images\Connections\Access.png" />
+    <Resource Include="Images\Connections\Excel.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

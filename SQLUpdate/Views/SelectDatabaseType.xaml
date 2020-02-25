@@ -10,12 +10,33 @@
         ResizeMode="NoResize"
         Background="{StaticResource QCBackground}"
         WindowStartupLocation="CenterOwner"
-        FontSize="{StaticResource DefaultFontSize}">
+        FontSize="{StaticResource DefaultFontSize}"
+        UseLayoutRounding="True">
+
     <Grid>
         <ItemsControl ItemsSource="{Binding DatabaseTypes}" VerticalAlignment="Center">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Click="Button_Click" Height="40" Background="{StaticResource QCBlue}" Foreground="White" Margin="5" Content="{Binding Name}" />
+                    <Button Click="Button_Click" Height="40" Background="{StaticResource QCBlue}" Foreground="White" Margin="5" HorizontalContentAlignment="Stretch">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Image Grid.Column="0"
+                                   Height="36"
+                                   Source="{Binding ImageSource}"
+                                   Width="36">
+                            </Image>
+
+                            <TextBlock Grid.Column="1"
+                                       HorizontalAlignment="Center"
+                                       Text="{Binding Name}"
+                                       VerticalAlignment="Center">
+                            </TextBlock>
+                        </Grid>
+                    </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
