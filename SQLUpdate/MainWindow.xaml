@@ -23,9 +23,24 @@
 
     <Grid x:Name="Root">
         <Grid.Resources>
+            <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
             <converters:UrlToStoryIdConverter x:Key="UrlToStoryIdConverter" />
             <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
+
+            <Storyboard x:Key="FadeIn">
+                <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
+                </ObjectAnimationUsingKeyFrames>
+                <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="1" />
+            </Storyboard>
+
+            <Storyboard x:Key="FadeOut">
+                <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
+                </ObjectAnimationUsingKeyFrames>
+                <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="0" />
+            </Storyboard>
         </Grid.Resources>
 
         <Grid Background="Black">
@@ -75,7 +90,6 @@
                         </Trigger>
                     </Style.Triggers>
                 </Style>
-                <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
                 <converters:ConnectionTypeCollapsedConverter x:Key="ConnectionTypeCollapsedConverter" />
                 <converters:ConnectionTypeVisibleConverter x:Key="ConnectionTypeVisibleConverter" />
                 <converters:DatabaseTypeDisplayTextConverter x:Key="DatabaseTypeDisplayTextConverter" />
@@ -134,20 +148,6 @@
                                             <Setter Property="Opacity" Value="0" />
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </Style>
-
-                                        <Storyboard x:Key="FadeIn">
-                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="1" />
-                                        </Storyboard>
-
-                                        <Storyboard x:Key="FadeOut">
-                                            <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="0" />
-                                        </Storyboard>
                                     </Grid.Resources>
 
                                     <Grid.Triggers>
@@ -283,7 +283,7 @@
                                         <Button Click="ExportQueryDataClick" Margin="0,0,2,0" ToolTip="Export">
                                             <Path Data="M 1,0 L3,0 L3,2 L4,2 L2,4 L0,2 L1,2 Z" />
                                         </Button>
-                                        
+
                                         <Button Click="RunQueryDataClick" ToolTip="Run">
                                             <Path Data="M 0,0 L2,1 L0,2 Z" />
                                         </Button>
@@ -342,7 +342,7 @@
 
             <!-- Right Panel -->
             <Grid Grid.Column="2" DataContext="{Binding MainViewModel.SelectedQueryData, Source={StaticResource ViewModelLocator}}">
-                
+
                 <!-- Tabs for Connection Config -->
                 <TabControl BorderBrush="Transparent"
                             MinWidth="750"
@@ -613,7 +613,7 @@
                                              Tag="{Binding ItemsType, Source={StaticResource QueryEntityType}}" 
                                              Text="{Binding QueryString, FallbackValue='SELECT * FROM TABLE'}">
                                     </TextBox>
-                                    
+
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -629,7 +629,7 @@
                                                    Visibility="{Binding MainViewModel.IsItemQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
                                             Error: Data must contain a 'Name' or 'External ID' column
                                         </TextBlock>
-                                        
+
                                         <Button Click="PreviewSqlClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding QueryResults.DefaultView}" />
                                     </Grid>
@@ -657,7 +657,7 @@
                                              Tag="{Binding RelationshipsType, Source={StaticResource QueryEntityType}}"
                                              Text="{Binding QueryStringRels, FallbackValue='SELECT ITEM1, ITEM2, COMMENT, TAGS FROM RELTABLE'}">
                                     </TextBox>
-                                    
+
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -690,14 +690,14 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Style="{StaticResource QueryStringTextBlock}" />
-                                    
+
                                     <TextBox x:Name="ResourceUrlsQueryText"
                                              x:FieldModifier="private"
                                              Grid.Row="1"
                                              Tag="{Binding ResourceUrlsType, Source={StaticResource QueryEntityType}}"
                                              Text="{Binding QueryStringResourceUrls, FallbackValue='SELECT * FROM TABLE'}">
                                     </TextBox>
-                                    
+
                                     <GridSplitter Grid.Row="2" />
 
                                     <Grid Grid.Row="3">
@@ -778,7 +778,7 @@
                                              Text ="{Binding MainViewModel.Url, Source={StaticResource ViewModelLocator}, FallbackValue='https://my.sharpcloud.com'}"
                                              Width="270">
                                     </TextBox>
-                                    
+
                                     <TextBlock Margin="10,0">
                                         <Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick"> Proxy</Hyperlink>
                                     </TextBlock>
@@ -801,7 +801,7 @@
                                              Width="270"
                                              Text="{Binding StoryId, Converter={StaticResource UrlToStoryIdConverter}}">
                                     </TextBox>
-                                    
+
                                     <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
                                     <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
                                 </StackPanel>
@@ -829,7 +829,7 @@
                                                   IsChecked="{Binding UnpublishItems, Mode=TwoWay}">
                                             Unpublish unmatched items
                                         </CheckBox>
-                                        
+
                                         <Button Click="UnpublishUnmatchedItemsHelpClick" Style="{StaticResource HelpButton}" />
                                     </StackPanel>
 
@@ -1125,6 +1125,22 @@
               DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
               Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
 
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding UpdateText}" Value="">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
+                            </DataTrigger.EnterActions>
+
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
@@ -1149,7 +1165,8 @@
                         Margin="0,20,0,0"
                         Padding="30,5"
                         Style="{StaticResource DefaultButtonStyle}"
-                        VerticalAlignment="Center">
+                        VerticalAlignment="Center"
+                        Visibility="{Binding CanCancelUpdate, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
                     Cancel
                 </Button>
             </StackPanel>

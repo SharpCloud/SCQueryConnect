@@ -375,7 +375,7 @@ namespace SCQueryConnect
             }
         }
 
-        private string GetQueryText(TextBox queryTextBox)
+        private static string GetQueryText(TextBox queryTextBox)
         {
             var text = string.IsNullOrWhiteSpace(queryTextBox.SelectedText)
                 ? queryTextBox.Text
@@ -390,6 +390,10 @@ namespace SCQueryConnect
             IDataChecker dataChecker,
             Expression<Func<QueryData, DataTable>> resultsSelector)
         {
+            _mainViewModel.CanCancelUpdate = false;
+            _mainViewModel.UpdateText = "Running SQL Preview...";
+            _mainViewModel.UpdateSubtext = string.Empty;
+
             try
             {
                 await InitialiseSharpCloudDataIfNeeded(queryData);
@@ -430,6 +434,11 @@ namespace SCQueryConnect
             catch (Exception ex)
             {
                 ProcessRunException(ex);
+            }
+            finally
+            {
+                _mainViewModel.UpdateText = string.Empty;
+                _mainViewModel.UpdateSubtext = string.Empty;
             }
         }
 
@@ -871,6 +880,7 @@ namespace SCQueryConnect
         {
             try
             {
+                _mainViewModel.CanCancelUpdate = true;
                 _cancellationTokenSource = new CancellationTokenSource();
                 await RunQueryData(queryData, _cancellationTokenSource.Token);
             }

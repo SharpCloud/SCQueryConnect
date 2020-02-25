@@ -38,6 +38,7 @@ namespace SCQueryConnect.ViewModels
 
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
+        private bool _canCancelUpdate = true;
         private bool _isItemQueryOk = true;
         private bool _isRelationshipQueryOk = true;
         private bool _isPanelsQueryOk = true;
@@ -78,6 +79,20 @@ namespace SCQueryConnect.ViewModels
                 if (_publishArchitecture != value)
                 {
                     _publishArchitecture = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool CanCancelUpdate
+        {
+            get => _canCancelUpdate;
+
+            set
+            {
+                if (_canCancelUpdate != value)
+                {
+                    _canCancelUpdate = value;
                     OnPropertyChanged();
                 }
             }

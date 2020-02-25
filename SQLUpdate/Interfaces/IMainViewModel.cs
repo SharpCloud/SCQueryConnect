@@ -10,6 +10,7 @@ namespace SCQueryConnect.Interfaces
     {
         PasswordSecurity PublishPasswordSecurity { get; set; }
         PublishArchitecture PublishArchitecture { get; set; }
+        bool CanCancelUpdate { get; set; }
         bool IsItemQueryOk { get; set; }
         bool IsRelationshipQueryOk { get; set; }
         bool IsPanelsQueryOk { get; set; }
