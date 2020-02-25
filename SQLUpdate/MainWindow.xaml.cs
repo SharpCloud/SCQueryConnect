@@ -341,21 +341,25 @@ namespace SCQueryConnect
                     case QueryEntityType.Items:
                         dataChecker = _itemDataChecker;
                         resultsSelector = d => d.QueryResults;
+                        _mainViewModel.UpdateSubtext = "Running Items Query";
                         break;
 
                     case QueryEntityType.Relationships:
                         dataChecker = _relationshipsChecker;
                         resultsSelector = d => d.QueryResultsRels;
+                        _mainViewModel.UpdateSubtext = "Running Relationships Query";
                         break;
 
                     case QueryEntityType.ResourceUrls:
                         dataChecker = _resourceUrlDataChecker;
                         resultsSelector = d => d.QueryResultsResourceUrls;
+                        _mainViewModel.UpdateSubtext = "Running Resource URLs Query";
                         break;
 
                     case QueryEntityType.Panels:
                         dataChecker = _panelsDataChecker;
                         resultsSelector = d => d.QueryResultsPanels;
+                        _mainViewModel.UpdateSubtext = "Running Panels Query";
                         break;
 
                     default:
@@ -391,8 +395,7 @@ namespace SCQueryConnect
             Expression<Func<QueryData, DataTable>> resultsSelector)
         {
             _mainViewModel.CanCancelUpdate = false;
-            _mainViewModel.UpdateText = "Running SQL Preview...";
-            _mainViewModel.UpdateSubtext = string.Empty;
+            _mainViewModel.UpdateText = "Generating SQL Preview...";
 
             try
             {

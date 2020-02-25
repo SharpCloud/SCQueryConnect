@@ -1144,24 +1144,59 @@
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
-                <TextBlock Foreground="white"
-                           FontSize="30"
-                           HorizontalAlignment="Center"
-                           MaxWidth="500"
-                           Text="{Binding UpdateText}"
-                           TextWrapping="WrapWithOverflow">
-                </TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderBrush="White"
+                            BorderThickness="1"
+                            Margin="0,0,20,0"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
 
-                <TextBlock Foreground="white"
-                           FontSize="18"
-                           HorizontalAlignment="Center"
-                           MaxWidth="500"
-                           Text="{Binding UpdateSubtext}"
-                           TextWrapping="WrapWithOverflow"
-                           Visibility="{Binding UpdateSubtext, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
-                </TextBlock>
+                        <Border.Triggers>
+                            <EventTrigger RoutedEvent="Border.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation AutoReverse="True"
+                                                         Duration="00:00:01.500" 
+                                                         From="5"
+                                                         RepeatBehavior="Forever"
+                                                         Storyboard.TargetName="DropShadow" 
+                                                         Storyboard.TargetProperty="BlurRadius"
+                                                         To="20">
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Border.Triggers>
 
-                <Button Click="CancelStoryUpdate" HorizontalAlignment="Center"
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="0" Color="White" x:Name="DropShadow" />
+                        </Border.Effect>
+
+                        <Image Height="36" Source="Images/Connections/SharpCloud.png" Width="36" />
+                    </Border>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Foreground="white"
+                               FontSize="30"
+                               HorizontalAlignment="Center"
+                               MaxWidth="500"
+                               Text="{Binding UpdateText}"
+                               TextWrapping="WrapWithOverflow">
+                        </TextBlock>
+
+                        <TextBlock Foreground="white"
+                               FontSize="18"
+                               HorizontalAlignment="Center"
+                               MaxWidth="500"
+                               Text="{Binding UpdateSubtext}"
+                               TextWrapping="WrapWithOverflow"
+                               Visibility="{Binding UpdateSubtext, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Click="CancelStoryUpdate"
+                        HorizontalAlignment="Center"
                         Margin="0,20,0,0"
                         Padding="30,5"
                         Style="{StaticResource DefaultButtonStyle}"
