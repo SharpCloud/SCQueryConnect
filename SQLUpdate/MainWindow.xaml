@@ -671,7 +671,7 @@
                                         <TextBlock Style="{StaticResource ErrorTextBlock}"
                                                    Grid.Row="0"
                                                    Visibility="{Binding MainViewModel.IsRelationshipQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}">
-                                            Error: Data must contain a 'Item1' and 'Item2' column
+                                            Error: Data must have columns ['Item1'/'ExternalID1']; ['Item2'/'ExternalID2']; 'Comment'; 'Direction'
                                         </TextBlock>
 
                                         <Button Click="PreviewSqlClick" Grid.Row="0" Style="{StaticResource PreviewSqlButton}" />

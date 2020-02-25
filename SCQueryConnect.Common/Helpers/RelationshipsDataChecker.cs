@@ -1,49 +1,73 @@
-﻿using SCQueryConnect.Common.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using SCQueryConnect.Common.Interfaces;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers
 {
     public class RelationshipsDataChecker : DataChecker, IRelationshipsDataChecker
     {
-        private readonly string[] _validItem1Headings =
-        {
-            "ITEM1",
-            "ITEM 1",
-            "EXTERNALID1",
-            "EXTERNALID 1",
-            "EXTERNAL ID 1",
-            "INTERNAL ID 1"
-        };
+        private static readonly HashSet<string> ValidItem1Headings =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Item1",
+                "Item 1",
+                "ExternalID1",
+                "ExternalID 1",
+                "External ID 1",
+                "Internal ID 1"
+            };
 
-        private readonly string[] _validItem2Headings =
-        {
-            "ITEM2",
-            "ITEM 2",
-            "EXTERNALID2",
-            "EXTERNALID 2",
-            "EXTERNAL ID 2",
-            "INTERNAL ID 2"
-        };
+        private static readonly HashSet<string> ValidItem2Headings =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Item2",
+                "Item 2",
+                "ExternalID2",
+                "ExternalID 2",
+                "External ID 2",
+                "Internal ID 2"
+            };
 
-        protected override bool CheckDataIsValid(IDataReader reader)
-        {
-            bool bOK1 = false;
-            bool bOK2 = false;
+        private readonly ILog _logger;
 
-            for (int i = 0; i < reader.FieldCount; i++)
+        public RelationshipsDataChecker(ILog logger)
+        {
+            _logger = logger;
+        }
+
+        protected override async Task<bool> CheckDataIsValid(IDataReader reader)
+        {
+            var item1Ok = false;
+            var item2Ok = false;
+            var commentOk = false;
+            var directionOk = false;
+
+            var allOk = false;
+
+            for (int i = 0; i < reader.FieldCount && !allOk; i++)
             {
                 var heading = reader.GetName(i).ToUpper();
 
-                if (_validItem1Headings.Contains(heading))
-                    bOK1 = true;
+                item1Ok = item1Ok || ValidItem1Headings.Contains(heading);
+                item2Ok = item2Ok || ValidItem2Headings.Contains(heading);
+                commentOk = commentOk || string.Equals(heading, "Comment", StringComparison.OrdinalIgnoreCase);
+                directionOk = directionOk || string.Equals(heading, "Direction", StringComparison.OrdinalIgnoreCase);
 
-                if (_validItem2Headings.Contains(heading))
-                    bOK2 = true;
+                allOk = item1Ok && item2Ok && commentOk && directionOk;
             }
 
-            var isOk = bOK1 && bOK2;
-            return isOk;
+            if (!allOk)
+            {
+                var valid1 = string.Join(", ", ValidItem1Headings.Select(h => $"'{h}'"));
+                var valid2 = string.Join(", ", ValidItem2Headings.Select(h => $"'{h}'"));
+
+                await _logger.LogWarning($"Relationships data invalid - headings must contain one of [{valid1}]; one of [{valid2}]; 'Comment'; 'Direction'");
+            }
+
+            return allOk;
         }
     }
 }

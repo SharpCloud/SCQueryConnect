@@ -79,6 +79,10 @@
   <ItemGroup>
     <Compile Include="Helpers\ConnectionStringHelperTests.cs" />
     <Compile Include="Helpers\DbConnectionFactoryTests.cs" />
+    <Compile Include="Helpers\ResourceUrlDataCheckerTests.cs" />
+    <Compile Include="Helpers\RelationshipsDataCheckerTests.cs" />
+    <Compile Include="Helpers\PanelsDataCheckerTests.cs" />
+    <Compile Include="Helpers\ItemDataCheckerTests.cs" />
     <Compile Include="Helpers\PathHelperTests.cs" />
     <Compile Include="Helpers\QueryConnectHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

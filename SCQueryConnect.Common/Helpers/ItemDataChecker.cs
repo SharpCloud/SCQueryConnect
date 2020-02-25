@@ -1,24 +1,42 @@
 ﻿using SCQueryConnect.Common.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers
 {
     public class ItemDataChecker : DataChecker, IItemDataChecker
     {
-        protected override bool CheckDataIsValid(IDataReader reader)
+        private static readonly HashSet<string> ValidHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Name",
+            "External ID",
+            "ExternalID"
+        };
+
+        private readonly ILog _logger;
+
+        public ItemDataChecker(ILog logger)
+        {
+            _logger = logger;
+        }
+
+        protected override async Task<bool> CheckDataIsValid(IDataReader reader)
         {
             var isOk = false;
 
-            for (int i = 0; i < reader.FieldCount; i++)
+            for (int i = 0; i < reader.FieldCount && !isOk; i++)
             {
-                var heading = reader.GetName(i).ToUpper();
-                
-                if (heading == "NAME")
-                    isOk = true;
-                else if (heading == "EXTERNAL ID")
-                    isOk = true;
-                else if (heading == "EXTERNALID")
-                    isOk = true;
+                var heading = reader.GetName(i);
+                isOk = ValidHeadings.Contains(heading);
+            }
+
+            if (!isOk)
+            {
+                var valid = string.Join(", ", ValidHeadings.Select(h => $"'{h}'"));
+                await _logger.LogWarning($"Item data invalid - headings must contain one of {valid}");
             }
 
             return isOk;

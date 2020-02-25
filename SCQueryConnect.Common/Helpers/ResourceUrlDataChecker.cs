@@ -3,17 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers
 {
     public class ResourceUrlDataChecker : DataChecker, IResourceUrlDataChecker
     {
-        public const string ExternalIdHeader = "ExternalId";
+        public const string ExternalIdHeader = "ExternalID";
         public const string ResourceNameHeader = "ResourceName";
         public const string DescriptionHeader = "Description";
         public const string UrlHeader = "URL";
 
-        public static HashSet<string> RequiredHeadings = new HashSet<string>
+        public static readonly HashSet<string> RequiredHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ExternalIdHeader,
             ResourceNameHeader,
@@ -21,7 +22,14 @@ namespace SCQueryConnect.Common.Helpers
             UrlHeader
         };
 
-        protected override bool CheckDataIsValid(IDataReader reader)
+        private readonly ILog _logger;
+
+        public ResourceUrlDataChecker(ILog logger)
+        {
+            _logger = logger;
+        }
+
+        protected override async Task<bool> CheckDataIsValid(IDataReader reader)
         {
             var isOk = false;
 
@@ -40,6 +48,12 @@ namespace SCQueryConnect.Common.Helpers
                 }
 
                 isOk = required.Values.All(v => v == true);
+            }
+
+            if (!isOk)
+            {
+                var valid = string.Join(", ", RequiredHeadings.Select(h => $"'{h}'"));
+                await _logger.LogWarning($"Resource URL data invalid - headings must contain all of {valid}");
             }
 
             return isOk;

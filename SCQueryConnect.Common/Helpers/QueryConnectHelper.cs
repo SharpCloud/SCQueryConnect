@@ -150,7 +150,8 @@ namespace SCQueryConnect.Common.Helpers
                 
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    if (!_relationshipsDataChecker.CheckData(reader))
+                    var relationshipsValid = await _relationshipsDataChecker.CheckData(reader);
+                    if (!relationshipsValid)
                     {
                         await _logger.LogError("Invalid SQL");
                         return;
@@ -452,8 +453,8 @@ namespace SCQueryConnect.Common.Helpers
                 await _logger.Log("Reading database");
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    var isOk = _itemDataChecker.CheckData(reader);
-                    if (!isOk)
+                    var itemsValid = await _itemDataChecker.CheckData(reader);
+                    if (!itemsValid)
                     {
                         return;
                     }
@@ -747,8 +748,8 @@ namespace SCQueryConnect.Common.Helpers
                 await _logger.Log("Reading database");
                 using (var reader = command.ExecuteReader())
                 {
-                    var isOk = dataChecker.CheckData(reader);
-                    if (!isOk)
+                    var isValid = await dataChecker.CheckData(reader);
+                    if (!isValid)
                     {
                         return metadataList;
                     }

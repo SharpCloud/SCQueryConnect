@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Interfaces
 {
@@ -6,6 +7,6 @@ namespace SCQueryConnect.Common.Interfaces
     {
         IDataCheckerValidityProcessor ValidityProcessor { get; set; }
 
-        bool CheckData(IDataReader reader);
+        Task<bool> CheckData(IDataReader reader);
     }
 }

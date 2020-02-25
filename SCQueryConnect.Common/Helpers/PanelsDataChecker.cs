@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers
 {
@@ -21,7 +22,14 @@ namespace SCQueryConnect.Common.Helpers
             DataHeader
         };
 
-        protected override bool CheckDataIsValid(IDataReader reader)
+        private readonly ILog _logger;
+
+        public PanelsDataChecker(ILog logger)
+        {
+            _logger = logger;
+        }
+
+        protected override async Task<bool> CheckDataIsValid(IDataReader reader)
         {
             var isOk = false;
 
@@ -40,6 +48,12 @@ namespace SCQueryConnect.Common.Helpers
                 }
 
                 isOk = required.Values.All(v => v == true);
+            }
+
+            if (!isOk)
+            {
+                var valid = string.Join(", ", RequiredHeadings.Select(h => $"'{h}'"));
+                await _logger.LogWarning($"Panels data invalid - headings must contain all of {valid}");
             }
 
             return isOk;
