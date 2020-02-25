@@ -1,15 +1,7 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("SCSqlBatch.Tests")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("SharpCloud Software Limited")]
-[assembly: AssemblyProduct("SCSqlBatch.Tests")]
-[assembly: AssemblyCopyright("Copyright © 2019 SharpCloud Software Limited")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 

@@ -128,6 +128,7 @@
     <Compile Include="Models\ResourceUrlMetadata.cs" />
     <Compile Include="Models\SharpCloudConfiguration.cs" />
     <Compile Include="Models\UpdateSettings.cs" />
+    <Compile Include="Properties\AssemblyCommonInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersionInfo.cs" />
     <Compile Include="Services\CDataLicenceService.cs" />
