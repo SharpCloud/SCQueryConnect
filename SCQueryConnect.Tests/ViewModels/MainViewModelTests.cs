@@ -1,7 +1,9 @@
 ﻿using Moq;
 using NUnit.Framework;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using SCQueryConnect.Interfaces;
+using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
 using SCQueryConnect.ViewModels;
 using System.Data;
@@ -16,6 +18,41 @@ namespace SCQueryConnect.Tests.ViewModels
         private const string V3ConnectionsBackupPath = "V3ConnectionsBackupPath";
         private const string V4ConnectionsPath = "V4ConnectionsPath";
 
+        private MainViewModel CreateViewModel(
+            IBatchPublishHelper batchPublishHelper = null,
+            IDbConnectionFactory dbConnectionFactory = null,
+            IEncryptionHelper encryptionHelper = null,
+            IIOService ioService = null,
+            IItemsDataChecker itemsDataChecker = null,
+            ILog log = null,
+            IMessageService messageService = null,
+            IPanelsDataChecker panelsDataChecker = null,
+            IPasswordStorage passwordStorage = null,
+            IProxyViewModel proxyViewModel = null,
+            IQueryConnectHelper queryConnectHelper = null,
+            IRelationshipsDataChecker relationshipsDataChecker = null,
+            IResourceUrlsDataChecker resourceUrlsDataChecker = null,
+            ISaveFileDialogService saveFileDialogService = null)
+        {
+            var vm = new MainViewModel(
+                batchPublishHelper ?? Mock.Of<IBatchPublishHelper>(),
+                dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
+                encryptionHelper ?? Mock.Of<IEncryptionHelper>(),
+                ioService ?? Mock.Of<IIOService>(),
+                itemsDataChecker ?? Mock.Of<IItemsDataChecker>(),
+                log ?? new MultiDestinationLogger(),
+                messageService ?? Mock.Of<IMessageService>(),
+                panelsDataChecker ?? Mock.Of<IPanelsDataChecker>(),
+                passwordStorage ?? Mock.Of<IPasswordStorage>(),
+                proxyViewModel ?? Mock.Of<IProxyViewModel>(),
+                queryConnectHelper ?? Mock.Of<IQueryConnectHelper>(),
+                relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
+                resourceUrlsDataChecker ?? Mock.Of<IResourceUrlsDataChecker>(),
+                saveFileDialogService ?? Mock.Of<ISaveFileDialogService>());
+
+            return vm;
+        }
+
         [TestCase("Attribute")]
         [TestCase("CustomResource")]
         [TestCase("HTML")]
@@ -28,14 +65,7 @@ namespace SCQueryConnect.Tests.ViewModels
             // Arrange
 
             var messageService = Mock.Of<IMessageService>();
-
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                Mock.Of<IIOService>(),
-                messageService,
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(messageService: messageService);
 
             var table = new DataTable();
             table.Columns.Add(PanelTypeHeader);
@@ -67,14 +97,7 @@ namespace SCQueryConnect.Tests.ViewModels
             const string invalidPanelType = "Invalid Type";
 
             var messageService = Mock.Of<IMessageService>();
-
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                Mock.Of<IIOService>(),
-                messageService,
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(messageService: messageService);
 
             var table = new DataTable();
             table.Columns.Add(PanelTypeHeader);
@@ -105,14 +128,7 @@ namespace SCQueryConnect.Tests.ViewModels
             // Arrange
 
             var messageService = Mock.Of<IMessageService>();
-
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                Mock.Of<IIOService>(),
-                messageService,
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(messageService: messageService);
 
             var table = new DataTable();
             table.Columns.Add(PanelTypeHeader);
@@ -147,14 +163,7 @@ namespace SCQueryConnect.Tests.ViewModels
             const string invalidPanelType = "Invalid Type";
 
             var messageService = Mock.Of<IMessageService>();
-
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                Mock.Of<IIOService>(),
-                messageService,
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(messageService: messageService);
 
             var table = new DataTable();
             table.Columns.Add(PanelTypeHeader);
@@ -194,13 +203,7 @@ namespace SCQueryConnect.Tests.ViewModels
                 s.FileExists(V3ConnectionsBackupPath) == true &&
                 s.ReadAllTextFromFile(V3ConnectionsBackupPath) == "[]");
 
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                ioService,
-                Mock.Of<IMessageService>(),
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(ioService: ioService);
 
             // Act
 
@@ -237,13 +240,7 @@ namespace SCQueryConnect.Tests.ViewModels
                 s.FileExists(V4ConnectionsPath) == true &&
                 s.ReadAllTextFromFile(V4ConnectionsPath) == "{ Connections: [] }");
 
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                ioService,
-                Mock.Of<IMessageService>(),
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(ioService: ioService);
 
             // Act
 
@@ -272,14 +269,7 @@ namespace SCQueryConnect.Tests.ViewModels
             // Arrange
 
             var ioService = Mock.Of<IIOService>();
-
-            var vm = new MainViewModel(
-                Mock.Of<IEncryptionHelper>(),
-                ioService,
-                Mock.Of<IMessageService>(),
-                Mock.Of<IPasswordStorage>(),
-                Mock.Of<IProxyViewModel>(),
-                Mock.Of<ISaveFileDialogService>());
+            var vm = CreateViewModel(ioService: ioService);
 
             // Act
 

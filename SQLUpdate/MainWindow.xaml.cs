@@ -44,10 +44,8 @@ namespace SCQueryConnect
         {
             get { return _qcHelper.AppName; }
         }
-
-        private CancellationTokenSource _cancellationTokenSource;
         
-        private readonly int _maxRowCount;
+        
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
@@ -78,15 +76,6 @@ namespace SCQueryConnect
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             DataContext = this;
-
-            try
-            {
-                _maxRowCount = int.Parse(ConfigurationManager.AppSettings["MaxRowCount"]);
-            }
-            catch (Exception)
-            {
-                _maxRowCount = 1000;
-            }
 
             _batchPublishHelper = batchPublishHelper;
             _connectionStringHelper = connectionStringHelper;
@@ -273,92 +262,6 @@ namespace SCQueryConnect
             _mainViewModel.SaveApplicationState();
         }
 
-        private bool ValidateCredentials()
-        {
-            if (string.IsNullOrEmpty(_mainViewModel.Url))
-            {
-                MessageBox.Show("Please enter a valid URL");
-                UrlTextBox.Focus();
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(_mainViewModel.Username))
-            {
-                MessageBox.Show("Please enter your SharpCloud username");
-                UsernameTextBox.Focus();
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(Password.Password))
-            {
-                MessageBox.Show("Please enter your password");
-                Password.Focus();
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool ValidateStoryId(QueryData queryData)
-        {
-            if (string.IsNullOrEmpty(queryData.StoryId))
-            {
-                MessageBox.Show($"Please enter a story ID for '{queryData.Name}'");
-                StoryId.Focus();
-                return false;
-            }
-
-            if (!Guid.TryParse(queryData.StoryId, out _))
-            {
-                MessageBox.Show($"Story ID for '{queryData.Name}' must be a GUID");
-                StoryId.Focus();
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool ValidateAllStoryIds(QueryData qd)
-        {
-            bool valid;
-
-            if (qd.IsFolder)
-            {
-                valid = qd.Connections.Aggregate(
-                    true,
-                    (isValid, data) => isValid && ValidateAllStoryIds(data));
-
-                return valid;
-            }
-            else
-            {
-                valid = ValidateStoryId(qd);
-            }
-
-            return valid;
-        }
-
-        private async Task UpdateSharpCloud(QueryData queryData, CancellationToken ct)
-        {
-            var config = _mainViewModel.GetApiConfiguration();
-
-            var settings = new UpdateSettings
-            {
-                TargetStoryId = queryData.StoryId,
-                QueryString = queryData.QueryString,
-                QueryStringPanels = queryData.QueryStringPanels,
-                QueryStringRels = queryData.QueryStringRels,
-                QueryStringResourceUrls = queryData.QueryStringResourceUrls,
-                ConnectionString = queryData.FormattedConnectionString,
-                DBType = queryData.ConnectionType,
-                MaxRowCount = _maxRowCount,
-                UnpublishItems = queryData.UnpublishItems,
-                BuildRelationships = queryData.BuildRelationships
-            };
-
-            await _qcHelper.UpdateSharpCloud(config, settings, ct);
-        }
-
         private void ViewExisting(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement fe &&
@@ -512,33 +415,9 @@ namespace SCQueryConnect
             Process.Start("explorer.exe", _ioService.OutputRoot);
         }
 
-        private void PublishBatchFolder(
-            PasswordSecurity security,
-            PublishArchitecture architecture)
-        {
-            if (!ValidateCredentials())
-            {
-                return;
-            }
-
-            var settings = new PublishSettings
-            {
-                Data = _mainViewModel.SelectedQueryData,
-                ProxyViewModel = _proxyViewModel,
-                Username = _mainViewModel.Username,
-                SharpCloudUrl = _mainViewModel.Url,
-                PasswordSecurity = security,
-                PublishArchitecture = architecture
-            };
-
-            _batchPublishHelper.PublishBatchFolder(settings);
-        }
-
         private void PublishBatchFolderClick(object sender, RoutedEventArgs e)
         {
-            PublishBatchFolder(
-                _mainViewModel.PublishPasswordSecurity,
-                _mainViewModel.PublishArchitecture);
+            _mainViewModel.PublishBatchFolder();
         }
 
         private void QueryItemTreePreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -692,80 +571,8 @@ namespace SCQueryConnect
             if (sender is FrameworkElement fe &&
                 fe.DataContext is QueryData queryData)
             {
-                await RunQueryData(queryData);
+                await _mainViewModel.RunQueryData(queryData);
             }
-        }
-
-        private async Task RunQueryData(QueryData queryData)
-        {
-            try
-            {
-                _mainViewModel.CanCancelUpdate = true;
-                _cancellationTokenSource = new CancellationTokenSource();
-                await RunQueryData(queryData, _cancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                await _logger.LogWarning("Update cancelled");
-                _logger.ClearDestinations();
-
-                _mainViewModel.UpdateText = string.Empty;
-                _mainViewModel.UpdateSubtext = string.Empty;
-            }
-        }
-
-        private async Task RunAllQueryData(QueryData queryData, CancellationToken ct)
-        {
-            var destination = new QueryDataLoggingDestination(queryData);
-            await destination.Clear();
-
-            _logger.PushDestination(destination);
-
-            if (queryData.IsFolder)
-            {
-                foreach (var data in queryData.Connections)
-                {
-                    await RunAllQueryData(data, ct);
-                    ct.ThrowIfCancellationRequested();
-                }
-            }
-            else
-            {
-                _mainViewModel.UpdateText = "Updating...";
-                _mainViewModel.UpdateSubtext = $"Running '{queryData.Name}'";
-
-                var message = _batchPublishHelper.GetBatchRunStartMessage(queryData.Name);
-                await _logger.Log(message);
-
-                await UpdateSharpCloud(queryData, ct);
-            }
-
-            _logger.PopDestination();
-        }
-
-        private async Task RunQueryData(QueryData queryData, CancellationToken ct)
-        {
-            if (!ValidateCredentials() ||
-                !ValidateAllStoryIds(queryData))
-            {
-                return;
-            }
-
-            queryData.IsSelected = true;
-            _mainViewModel.SelectUpdateTab();
-
-            await Task.Delay(100);
-
-            await _logger.Clear();
-            SaveSettings();
-
-            await RunAllQueryData(queryData, ct);
-
-            queryData.LastRunDateTime = DateTime.Now;
-            SaveSettings();
-
-            _mainViewModel.UpdateText = string.Empty;
-            _mainViewModel.UpdateSubtext = string.Empty;
         }
 
         private void QueryItemTreeDragLeave(object sender, DragEventArgs e)
@@ -788,12 +595,7 @@ namespace SCQueryConnect
 
         private async void CancelStoryUpdate(object sender, RoutedEventArgs e)
         {
-            await _logger.LogWarning("Update cancellation initiated by user...");
-
-            _mainViewModel.UpdateText = "Update Cancelled...";
-            _mainViewModel.UpdateSubtext = "Finishing current task...";
-
-            _cancellationTokenSource.Cancel();
+            await _mainViewModel.CancelStoryUpdate();
         }
 
         private void PasswordOnPasswordChanged(object sender, RoutedEventArgs e)
@@ -843,7 +645,7 @@ namespace SCQueryConnect
 
                     case MainViewModel.FolderTabIndex:
                     case MainViewModel.UpdateStoryTabIndex:
-                        await RunQueryData(_mainViewModel.SelectedQueryData);
+                        await _mainViewModel.RunQueryData(_mainViewModel.SelectedQueryData);
                         break;
                 }
             }

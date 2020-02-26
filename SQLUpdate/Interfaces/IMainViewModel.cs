@@ -27,7 +27,6 @@ namespace SCQueryConnect.Interfaces
         QueryData SelectedQueryData { get; set; }
 
         QueryData FindParent(QueryData queryData);
-        void SelectUpdateTab();
         void CreateNewConnection(DatabaseType dbType);
         void CreateNewFolder();
         void MoveConnectionDown();
@@ -41,5 +40,8 @@ namespace SCQueryConnect.Interfaces
         SharpCloudConfiguration GetApiConfiguration();
         IDbConnection GetDb(QueryData queryData);
         Task PreviewSql();
+        Task RunQueryData(QueryData queryData);
+        Task CancelStoryUpdate();
+        void PublishBatchFolder();
     }
 }
