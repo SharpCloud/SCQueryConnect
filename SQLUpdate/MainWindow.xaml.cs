@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SCQueryConnect.Controls;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.ViewModels;
 
@@ -153,7 +154,7 @@ namespace SCQueryConnect
                           Environment.NewLine +
                           Environment.NewLine +
                           ex.Message;
-                
+
                 _messageService.Show(msg);
                 throw;
             }
@@ -322,21 +323,20 @@ namespace SCQueryConnect
             }
         }
 
-        private async void PreviewSqlClick(object sender, RoutedEventArgs e)
+        private async void QueryEditorSqlPreviewClick(object sender, EventArgs e)
         {
             await PreviewSql();
         }
-
+        
         private async Task PreviewSql()
         {
             if (_mainViewModel.SelectedTabIndex == MainViewModel.QueriesTabIndex &&
-                _mainViewModel.SelectedQueryTabItem.Tag is TextBox tb &&
-                tb.Tag is string queryEntityType)
+                _mainViewModel.SelectedQueryTabItem.Content is QueryEditor editor)
             {
                 IDataChecker dataChecker;
                 Expression<Func<QueryData, DataTable>> resultsSelector;
 
-                switch (queryEntityType)
+                switch (editor.TargetEntity)
                 {
                     case QueryEntityType.Items:
                         dataChecker = _itemDataChecker;
@@ -363,29 +363,19 @@ namespace SCQueryConnect
                         break;
 
                     default:
-                        _messageService.Show($"Unknown query type: {queryEntityType}");
+                        _messageService.Show($"Unknown query type: {editor.TargetEntity}");
+                        _mainViewModel.UpdateSubtext = string.Empty;
                         return;
                 }
 
-                var query = GetQueryText(tb);
-
                 await PreviewSql(
                     _mainViewModel.SelectedQueryData,
-                    query,
+                    editor.SelectedQueryString,
                     dataChecker,
                     resultsSelector);
 
                 _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
             }
-        }
-
-        private static string GetQueryText(TextBox queryTextBox)
-        {
-            var text = string.IsNullOrWhiteSpace(queryTextBox.SelectedText)
-                ? queryTextBox.Text
-                : queryTextBox.SelectedText;
-
-            return text;
         }
 
         private async Task PreviewSql(
@@ -565,7 +555,7 @@ namespace SCQueryConnect
             {
                 return;
             }
-            
+
             _mainViewModel.CreateNewConnection(newWnd.SelectedButton);
         }
 
@@ -901,7 +891,7 @@ namespace SCQueryConnect
         {
             var destination = new QueryDataLoggingDestination(queryData);
             await destination.Clear();
-            
+
             _logger.PushDestination(destination);
 
             if (queryData.IsFolder)
@@ -919,7 +909,7 @@ namespace SCQueryConnect
 
                 var message = _batchPublishHelper.GetBatchRunStartMessage(queryData.Name);
                 await _logger.Log(message);
-                
+
                 await UpdateSharpCloud(queryData, ct);
             }
 
@@ -936,7 +926,7 @@ namespace SCQueryConnect
 
             queryData.IsSelected = true;
             _mainViewModel.SelectUpdateTab();
-            
+
             await Task.Delay(100);
 
             await _logger.Clear();
@@ -975,7 +965,7 @@ namespace SCQueryConnect
 
             _mainViewModel.UpdateText = "Update Cancelled...";
             _mainViewModel.UpdateSubtext = "Finishing current task...";
-            
+
             _cancellationTokenSource.Cancel();
         }
 

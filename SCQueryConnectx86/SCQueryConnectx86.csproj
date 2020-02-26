@@ -125,6 +125,9 @@
     <Compile Include="..\SQLUpdate\Commands\GoToUrl.cs">
       <Link>Commands\GoToUrl.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Controls\QueryEditor.cs">
+      <Link>Controls\QueryEditor.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Converters\BoolInverse.cs">
       <Link>Converters\BoolInverse.cs</Link>
     </Compile>
@@ -330,6 +333,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="..\SQLUpdate\Controls\QueryEditor.xaml">
+      <Link>Controls\QueryEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="..\SQLUpdate\MainWindow.xaml">
       <Link>MainWindow.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
