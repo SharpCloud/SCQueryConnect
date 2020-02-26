@@ -1,6 +1,8 @@
 ﻿using SC.API.ComInterop.ArrayProcessing;
 using SC.API.ComInterop.Models;
+using SCQueryConnect.Common.Helpers.DataValidation;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using SCQueryConnect.Common.Models;
 using System;
 using System.Collections.Generic;
@@ -56,14 +58,14 @@ namespace SCQueryConnect.Common.Helpers
 
         private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
-        private readonly IItemDataChecker _itemDataChecker;
+        private readonly IItemsDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
         private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IRelationshipsBuilder _relationshipsBuilder;
         private readonly IRelationshipsDataChecker _relationshipsDataChecker;
-        private readonly IResourceUrlDataChecker _resourceUrlDataChecker;
+        private readonly IResourceUrlsDataChecker _resourceUrlsDataChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
@@ -82,14 +84,14 @@ namespace SCQueryConnect.Common.Helpers
         public QueryConnectHelper(
             IArchitectureDetector architectureDetector,
             IConnectionStringHelper connectionStringHelper,
-            IItemDataChecker itemDataChecker,
+            IItemsDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
             IExcelWriter excelWriter,
             ILog log,
             IPanelsDataChecker panelsDataChecker,
             IRelationshipsBuilder relationshipsBuilder,
             IRelationshipsDataChecker relationshipsDataChecker,
-            IResourceUrlDataChecker resourceUrlDataChecker,
+            IResourceUrlsDataChecker resourceUrlsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory)
         {
             _architectureDetector = architectureDetector;
@@ -101,7 +103,7 @@ namespace SCQueryConnect.Common.Helpers
             _panelsDataChecker = panelsDataChecker;
             _relationshipsBuilder = relationshipsBuilder;
             _relationshipsDataChecker = relationshipsDataChecker;
-            _resourceUrlDataChecker = resourceUrlDataChecker;
+            _resourceUrlsDataChecker = resourceUrlsDataChecker;
             _sharpCloudApiFactory = sharpCloudApiFactory;
         }
 
@@ -588,10 +590,10 @@ namespace SCQueryConnect.Common.Helpers
             {
                 var metadata = new ResourceUrlMetadata
                 {
-                    Description = fieldExtractor(ResourceUrlDataChecker.DescriptionHeader),
-                    ItemExternalId = fieldExtractor(ResourceUrlDataChecker.ExternalIdHeader),
-                    Name = fieldExtractor(ResourceUrlDataChecker.ResourceNameHeader),
-                    Url = fieldExtractor(ResourceUrlDataChecker.UrlHeader)
+                    Description = fieldExtractor(ResourceUrlsDataChecker.DescriptionHeader),
+                    ItemExternalId = fieldExtractor(ResourceUrlsDataChecker.ExternalIdHeader),
+                    Name = fieldExtractor(ResourceUrlsDataChecker.ResourceNameHeader),
+                    Url = fieldExtractor(ResourceUrlsDataChecker.UrlHeader)
                 };
 
                 return Task.FromResult(metadata);
@@ -600,9 +602,9 @@ namespace SCQueryConnect.Common.Helpers
             var resourceUrlMetadata = await GetMetadata(
                 connection,
                 sqlString,
-                ResourceUrlDataChecker.RequiredHeadings,
+                ResourceUrlsDataChecker.RequiredHeadings,
                 "Resource URL",
-                _resourceUrlDataChecker,
+                _resourceUrlsDataChecker,
                 Mapper);
 
             foreach (var m in resourceUrlMetadata)

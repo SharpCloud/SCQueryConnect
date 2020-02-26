@@ -549,7 +549,7 @@
 
                             <TabItem Header="Items">
                                 <controls:QueryEditor ErrorText="Error: Data must contain a 'Name' or 'External ID' column"
-                                                      ErrorVisibility="{Binding MainViewModel.IsItemQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
+                                                      ErrorVisibility="{Binding IsItemsQueryOk, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
                                                       QueryResults="{Binding QueryResults.DefaultView}"
                                                       QueryString="{Binding QueryString}"
                                                       SqlPreviewClick="QueryEditorSqlPreviewClick"
@@ -559,7 +559,7 @@
 
                             <TabItem Header="Relationships">
                                 <controls:QueryEditor ErrorText="Error: Data must have columns ['Item1'/'ExternalID1']; ['Item2'/'ExternalID2']; 'Comment'; 'Direction'"
-                                                      ErrorVisibility="{Binding MainViewModel.IsRelationshipQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
+                                                      ErrorVisibility="{Binding IsRelationshipsQueryOk, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
                                                       QueryResults="{Binding QueryResultsRels.DefaultView}"
                                                       QueryString="{Binding QueryStringRels}"
                                                       SqlPreviewClick="QueryEditorSqlPreviewClick"
@@ -569,7 +569,7 @@
 
                             <TabItem Header="Resource URLs">
                                 <controls:QueryEditor ErrorText="Error: Data must contain 'ExternalID', 'ResourceName', 'Description', and 'URL' columns"
-                                                      ErrorVisibility="{Binding MainViewModel.IsResourceUrlsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
+                                                      ErrorVisibility="{Binding IsResourceUrlsQueryOk, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
                                                       QueryResults="{Binding QueryResultsResourceUrls.DefaultView}"
                                                       QueryString="{Binding QueryStringResourceUrls}"
                                                       SqlPreviewClick="QueryEditorSqlPreviewClick"
@@ -579,7 +579,7 @@
 
                             <TabItem Header="Panels">
                                 <controls:QueryEditor ErrorText="Error: Data must contain 'ExternalID', 'Title', 'PanelType', and 'Data' columns"
-                                                      ErrorVisibility="{Binding MainViewModel.IsPanelsQueryOk, Source={StaticResource ViewModelLocator}, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
+                                                      ErrorVisibility="{Binding IsPanelsQueryOk, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=False}"
                                                       QueryResults="{Binding QueryResultsPanels.DefaultView}"
                                                       QueryString="{Binding QueryStringPanels}"
                                                       SqlPreviewClick="QueryEditorSqlPreviewClick"

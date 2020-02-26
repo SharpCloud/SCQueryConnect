@@ -1,13 +1,14 @@
 ﻿using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SCQueryConnect.Common.Helpers
+namespace SCQueryConnect.Common.Helpers.DataValidation
 {
-    public class ItemDataChecker : DataChecker, IItemDataChecker
+    public class ItemsDataChecker : DataChecker, IItemsDataChecker
     {
         private static readonly HashSet<string> ValidHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -18,7 +19,7 @@ namespace SCQueryConnect.Common.Helpers
 
         private readonly ILog _logger;
 
-        public ItemDataChecker(ILog logger)
+        public ItemsDataChecker(ILog logger)
         {
             _logger = logger;
         }

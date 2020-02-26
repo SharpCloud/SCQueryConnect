@@ -156,7 +156,10 @@
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Converters\UrlToStoryIdConverter.cs" />
     <Compile Include="Converters\ValidNameConverter.cs" />
-    <Compile Include="DataCheckerValidityProcessor.cs" />
+    <Compile Include="DataValidation\RelationshipsValidityProcessor.cs" />
+    <Compile Include="DataValidation\ResourceUrlsValidityProcessor.cs" />
+    <Compile Include="DataValidation\PanelsValidityProcessor.cs" />
+    <Compile Include="DataValidation\ItemsValidityProcessor.cs" />
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />

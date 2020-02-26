@@ -1,7 +1,9 @@
 ﻿using Autofac;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Common.Helpers.DataValidation;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using SCQueryConnect.Common.Services;
 using System.Configuration;
 
@@ -28,14 +30,14 @@ namespace SCSQLBatch
             builder.RegisterType<CDataLicenceService>().As<ICDataLicenceService>();
             builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>();
-            builder.RegisterType<ItemDataChecker>().As<IItemDataChecker>();
+            builder.RegisterType<ItemsDataChecker>().As<IItemsDataChecker>();
             builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();
             builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>();
             builder.RegisterType<RelationshipsBuilder>().As<IRelationshipsBuilder>();
-            builder.RegisterType<ResourceUrlDataChecker>().As<IResourceUrlDataChecker>();
+            builder.RegisterType<ResourceUrlsDataChecker>().As<IResourceUrlsDataChecker>();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>();
             
             var logFile = ConfigurationManager.AppSettings[Constants.BatchLogFileKey];

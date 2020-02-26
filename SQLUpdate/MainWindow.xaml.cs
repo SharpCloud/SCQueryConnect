@@ -2,11 +2,15 @@
 using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using SCQueryConnect.Common.Models;
+using SCQueryConnect.Controls;
+using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
 using SCQueryConnect.Services;
+using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
@@ -24,9 +28,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using SCQueryConnect.Controls;
-using SCQueryConnect.Helpers;
-using SCQueryConnect.ViewModels;
 
 namespace SCQueryConnect
 {
@@ -50,7 +51,7 @@ namespace SCQueryConnect
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
-        private readonly IItemDataChecker _itemDataChecker;
+        private readonly IItemsDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IExcelWriter _excelWriter;
         private readonly MultiDestinationLogger _logger;
@@ -62,14 +63,14 @@ namespace SCQueryConnect
         private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly IPanelsDataChecker _panelsDataChecker;
-        private readonly IResourceUrlDataChecker _resourceUrlDataChecker;
+        private readonly IResourceUrlsDataChecker _resourceUrlsDataChecker;
         private readonly RichTextBoxLoggingDestination _storyLoggingDestination;
         private readonly RichTextBoxLoggingDestination _folderLoggingDestination;
 
         public MainWindow(
             IBatchPublishHelper batchPublishHelper,
             IConnectionStringHelper connectionStringHelper,
-            IItemDataChecker itemDataChecker,
+            IItemsDataChecker itemDataChecker,
             IDbConnectionFactory dbConnectionFactory,
             IExcelWriter excelWriter,
             IIOService ioService,
@@ -82,7 +83,7 @@ namespace SCQueryConnect
             ILog logger,
             IQueryConnectHelper qcHelper,
             IPanelsDataChecker panelsDataChecker,
-            IResourceUrlDataChecker resourceUrlDataChecker)
+            IResourceUrlsDataChecker resourceUrlsDataChecker)
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
@@ -99,12 +100,7 @@ namespace SCQueryConnect
 
             _batchPublishHelper = batchPublishHelper;
             _connectionStringHelper = connectionStringHelper;
-
             _itemDataChecker = itemDataChecker;
-            _itemDataChecker.ValidityProcessor = new DataCheckerValidityProcessor(
-                mainViewModel,
-                vm => vm.IsItemQueryOk);
-
             _dbConnectionFactory = dbConnectionFactory;
             _excelWriter = excelWriter;
             _ioService = ioService;
@@ -112,23 +108,10 @@ namespace SCQueryConnect
             _messageService = messageService;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
-
             _relationshipsChecker = relationshipsDataChecker;
-            _relationshipsChecker.ValidityProcessor = new DataCheckerValidityProcessor(
-                mainViewModel,
-                vm => vm.IsRelationshipQueryOk);
-
             _sharpCloudApiFactory = sharpCloudApiFactory;
-
             _panelsDataChecker = panelsDataChecker;
-            _panelsDataChecker.ValidityProcessor = new DataCheckerValidityProcessor(
-                mainViewModel,
-                vm => vm.IsPanelsQueryOk);
-
-            _resourceUrlDataChecker = resourceUrlDataChecker;
-            _resourceUrlDataChecker.ValidityProcessor = new DataCheckerValidityProcessor(
-                mainViewModel,
-                vm => vm.IsResourceUrlsQueryOk);
+            _resourceUrlsDataChecker = resourceUrlsDataChecker;
 
             _folderLoggingDestination = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
             _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
@@ -351,7 +334,7 @@ namespace SCQueryConnect
                         break;
 
                     case QueryEntityType.ResourceUrls:
-                        dataChecker = _resourceUrlDataChecker;
+                        dataChecker = _resourceUrlsDataChecker;
                         resultsSelector = d => d.QueryResultsResourceUrls;
                         _mainViewModel.UpdateSubtext = "Running Resource URLs Query";
                         break;
@@ -401,7 +384,7 @@ namespace SCQueryConnect
 
                         using (var reader = command.ExecuteReader())
                         {
-                            dataChecker.CheckData(reader);
+                            await dataChecker.CheckData(reader, queryData);
 
                             var dt = new DataTable();
                             dt.Load(reader);

@@ -1,4 +1,4 @@
-﻿namespace SCQueryConnect.Common.Interfaces
+﻿namespace SCQueryConnect.Common.Interfaces.DataValidation
 {
     public interface IRelationshipsDataChecker : IDataChecker
     {

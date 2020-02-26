@@ -39,10 +39,6 @@ namespace SCQueryConnect.ViewModels
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
         private bool _canCancelUpdate = true;
-        private bool _isItemQueryOk = true;
-        private bool _isRelationshipQueryOk = true;
-        private bool _isPanelsQueryOk = true;
-        private bool _isResourceUrlsQueryOk = true;
         private ObservableCollection<QueryData> _connections;
         private QueryData _selectedQueryData;
         private int _lastSelectedConnectionIndex;
@@ -93,62 +89,6 @@ namespace SCQueryConnect.ViewModels
                 if (_canCancelUpdate != value)
                 {
                     _canCancelUpdate = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool IsItemQueryOk
-        {
-            get => _isItemQueryOk;
-
-            set
-            {
-                if (_isItemQueryOk != value)
-                {
-                    _isItemQueryOk = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool IsRelationshipQueryOk
-        {
-            get => _isRelationshipQueryOk;
-
-            set
-            {
-                if (_isRelationshipQueryOk != value)
-                {
-                    _isRelationshipQueryOk = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool IsPanelsQueryOk
-        {
-            get => _isPanelsQueryOk;
-
-            set
-            {
-                if (_isPanelsQueryOk != value)
-                {
-                    _isPanelsQueryOk = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool IsResourceUrlsQueryOk
-        {
-            get => _isResourceUrlsQueryOk;
-
-            set
-            {
-                if (_isResourceUrlsQueryOk != value)
-                {
-                    _isResourceUrlsQueryOk = value;
                     OnPropertyChanged();
                 }
             }

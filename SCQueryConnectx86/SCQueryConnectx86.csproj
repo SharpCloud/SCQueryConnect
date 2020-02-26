@@ -158,8 +158,17 @@
     <Compile Include="..\SQLUpdate\Converters\ValidNameConverter.cs">
       <Link>Converters\ValidNameConverter.cs</Link>
     </Compile>
-    <Compile Include="..\SQLUpdate\DataCheckerValidityProcessor.cs">
-      <Link>DataCheckerValidityProcessor.cs</Link>
+    <Compile Include="..\SQLUpdate\DataValidation\ItemsValidityProcessor.cs">
+      <Link>DataValidation\ItemsValidityProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\DataValidation\PanelsValidityProcessor.cs">
+      <Link>DataValidation\PanelsValidityProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\DataValidation\RelationshipsValidityProcessor.cs">
+      <Link>DataValidation\RelationshipsValidityProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\DataValidation\ResourceUrlsValidityProcessor.cs">
+      <Link>DataValidation\ResourceUrlsValidityProcessor.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ExtendedPropertyChangedEventArgs.cs">
       <Link>ExtendedPropertyChangedEventArgs.cs</Link>

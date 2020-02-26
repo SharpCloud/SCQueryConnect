@@ -1,9 +1,10 @@
 ﻿using Moq;
 using NUnit.Framework;
-using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Common.Helpers.DataValidation;
 using SCQueryConnect.Common.Interfaces;
 using System.Data;
 using System.Threading.Tasks;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 
 namespace SCQueryConnect.Common.Tests.Helpers
 {

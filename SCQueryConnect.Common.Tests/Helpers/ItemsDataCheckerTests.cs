@@ -1,14 +1,15 @@
 ﻿using Moq;
 using NUnit.Framework;
-using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Common.Helpers.DataValidation;
 using SCQueryConnect.Common.Interfaces;
 using System.Data;
 using System.Threading.Tasks;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 
 namespace SCQueryConnect.Common.Tests.Helpers
 {
     [TestFixture]
-    public class ItemDataCheckerTests
+    public class ItemsDataCheckerTests
     {
         [TestCase(new object[] {"NAME", "Hello"})]
         [TestCase(new object[] {"Name", "World"})]
@@ -25,7 +26,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
                 .Returns<int>(i => (string) values[i]);
 
             var log = Mock.Of<ILog>();
-            var checker = new ItemDataChecker(log);
+            var checker = new ItemsDataChecker(log);
 
             // Act
 
@@ -53,7 +54,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
                 .Returns<int>(i => values[i]);
 
             var log = Mock.Of<ILog>();
-            var checker = new ItemDataChecker(log);
+            var checker = new ItemsDataChecker(log);
 
             // Act
 

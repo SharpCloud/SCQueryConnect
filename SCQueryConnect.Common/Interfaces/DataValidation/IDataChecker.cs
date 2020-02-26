@@ -1,12 +1,11 @@
 ﻿using System.Data;
 using System.Threading.Tasks;
 
-namespace SCQueryConnect.Common.Interfaces
+namespace SCQueryConnect.Common.Interfaces.DataValidation
 {
     public interface IDataChecker
     {
-        IDataCheckerValidityProcessor ValidityProcessor { get; set; }
-
         Task<bool> CheckData(IDataReader reader);
+        Task<bool> CheckData(IDataReader reader, object state);
     }
 }

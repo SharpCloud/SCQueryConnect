@@ -5,6 +5,7 @@ using SC.API.ComInterop.Models;
 using SC.Entities.Models;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using SCQueryConnect.Common.Models;
 using Category = SC.Entities.Models.Category;
 
@@ -16,27 +17,27 @@ namespace SCQueryConnect.Common.Tests.Helpers
         private QueryConnectHelper CreateQueryConnectHelper(
             IArchitectureDetector architectureDetector = null,
             IConnectionStringHelper connectionStringHelper = null,
-            IItemDataChecker itemDataChecker = null,
+            IItemsDataChecker itemDataChecker = null,
             IDbConnectionFactory dbConnectionFactory = null,
             IExcelWriter excelWriter = null,
             ILog log = null,
             IPanelsDataChecker panelsDataChecker = null,
             IRelationshipsDataChecker relationshipsDataChecker = null,
             IRelationshipsBuilder relationshipsBuilder = null,
-            IResourceUrlDataChecker resourceUrlDataChecker = null,
+            IResourceUrlsDataChecker resourceUrlsDataChecker = null,
             ISharpCloudApiFactory sharpCloudApiFactory = null)
         {
             return new QueryConnectHelper(
                 architectureDetector ?? Mock.Of<IArchitectureDetector>(),
                 connectionStringHelper ?? Mock.Of<IConnectionStringHelper>(),
-                itemDataChecker ?? Mock.Of<IItemDataChecker>(),
+                itemDataChecker ?? Mock.Of<IItemsDataChecker>(),
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
                 excelWriter ?? Mock.Of<IExcelWriter>(),
                 log ?? Mock.Of<ILog>(),
                 panelsDataChecker ?? Mock.Of<IPanelsDataChecker>(),
                 relationshipsBuilder ?? Mock.Of<IRelationshipsBuilder>(),
                 relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
-                resourceUrlDataChecker ?? Mock.Of<IResourceUrlDataChecker>(),
+                resourceUrlsDataChecker ?? Mock.Of<IResourceUrlsDataChecker>(),
                 sharpCloudApiFactory ?? Mock.Of<ISharpCloudApiFactory>());
         }
 

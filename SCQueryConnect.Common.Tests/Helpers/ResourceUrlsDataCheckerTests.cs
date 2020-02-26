@@ -1,14 +1,15 @@
 ﻿using Moq;
 using NUnit.Framework;
-using SCQueryConnect.Common.Helpers;
+using SCQueryConnect.Common.Helpers.DataValidation;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using System.Data;
 using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Tests.Helpers
 {
     [TestFixture]
-    public class ResourceUrlDataCheckerTests
+    public class ResourceUrlsDataCheckerTests
     {
         private static IDataReader CreateDataReader(params string[] values)
         {
@@ -28,7 +29,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
 
             var reader = CreateDataReader("ExternalId", "ResourceName", "Description", "URL");
             var log = Mock.Of<ILog>();
-            var checker = new ResourceUrlDataChecker(log);
+            var checker = new ResourceUrlsDataChecker(log);
 
             // Act
 
@@ -50,7 +51,7 @@ namespace SCQueryConnect.Common.Tests.Helpers
 
             var reader = CreateDataReader("ExternalID", "ResourceName", "URL");
             var log = Mock.Of<ILog>();
-            var checker = new ResourceUrlDataChecker(log);
+            var checker = new ResourceUrlsDataChecker(log);
 
             // Act
 

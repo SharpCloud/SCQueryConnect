@@ -1,11 +1,12 @@
 ﻿using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SCQueryConnect.Common.Helpers
+namespace SCQueryConnect.Common.Helpers.DataValidation
 {
     public class PanelsDataChecker : DataChecker, IPanelsDataChecker
     {
