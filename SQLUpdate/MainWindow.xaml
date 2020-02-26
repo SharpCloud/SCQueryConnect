@@ -22,7 +22,7 @@
         UseLayoutRounding="True"
         KeyUp="MainWindowOnKeyUp">
 
-    <Grid x:Name="Root">
+    <Grid>
         <Grid.Resources>
             <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
@@ -114,8 +114,7 @@
 
                 <!-- Connections Tree -->
                 <Grid Background="{StaticResource QCBackground}" >
-                    <TreeView x:Name="QueryItemTree"
-                              AllowDrop="True"
+                    <TreeView AllowDrop="True"
                               Background="{StaticResource QCBackground}"
                               BorderThickness="0"
                               DataContext="{Binding Parent, ElementName=Root}"
