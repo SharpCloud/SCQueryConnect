@@ -15,10 +15,18 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using SCQueryConnect.Common.Interfaces.DataValidation;
+using SCQueryConnect.Common.Models;
+using SCQueryConnect.Controls;
+using SCQueryConnect.Views;
 using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.ViewModels
@@ -29,13 +37,20 @@ namespace SCQueryConnect.ViewModels
         public const int QueriesTabIndex = 1;
         public const int UpdateStoryTabIndex = 2;
 
+        private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IIOService _ioService;
+        private readonly IItemsDataChecker _itemDataChecker;
         private readonly IMessageService _messageService;
+        private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
+        private readonly IQueryConnectHelper _qcHelper;
+        private readonly IRelationshipsDataChecker _relationshipsChecker;
+        private readonly IResourceUrlsDataChecker _resourceUrlsDataChecker;
         private readonly ISaveFileDialogService _saveFileDialogService;
 
+        private string _lastUsedSharpCloudConnection;
         private PasswordSecurity _publishPasswordSecurity;
         private PublishArchitecture _publishArchitecture;
         private bool _canCancelUpdate = true;
@@ -51,6 +66,10 @@ namespace SCQueryConnect.ViewModels
         private string _updateText;
         private string _url;
         private string _username;
+
+        public bool IsUpdateRunning =>
+            !string.IsNullOrWhiteSpace(UpdateText) ||
+            !string.IsNullOrWhiteSpace(UpdateSubtext);
 
         public PasswordSecurity PublishPasswordSecurity
         {
@@ -267,19 +286,31 @@ namespace SCQueryConnect.ViewModels
         }
 
         public MainViewModel(
+            IDbConnectionFactory dbConnectionFactory,
             IEncryptionHelper encryptionHelper,
             IIOService ioService,
+            IItemsDataChecker itemDataChecker,
             IMessageService messageService,
+            IPanelsDataChecker panelsDataChecker,
             IPasswordStorage passwordStorage,
             IProxyViewModel proxyViewModel,
+            IQueryConnectHelper qcHelper,
+            IRelationshipsDataChecker relationshipsDataChecker,
+            IResourceUrlsDataChecker resourceUrlsDataChecker,
             ISaveFileDialogService saveFileDialogService)
         {
+            _dbConnectionFactory = dbConnectionFactory;
             _encryptionHelper = encryptionHelper;
             _ioService = ioService;
+            _itemDataChecker = itemDataChecker;
             _messageService = messageService;
+            _panelsDataChecker = panelsDataChecker;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
+            _qcHelper = qcHelper;
+            _relationshipsChecker = relationshipsDataChecker;
             _saveFileDialogService = saveFileDialogService;
+            _resourceUrlsDataChecker = resourceUrlsDataChecker;
 
             QueryRootNode = CreateNewFolder(QueryData.RootId);
             QueryRootNode.Id = QueryData.RootId;
@@ -664,6 +695,156 @@ namespace SCQueryConnect.ViewModels
                           e.Message;
 
                 _messageService.Show(msg);
+            }
+        }
+
+        public SharpCloudConfiguration GetApiConfiguration()
+        {
+            return new SharpCloudConfiguration
+            {
+                Username = Username,
+                Password = _passwordStorage.LoadPassword(PasswordStorage.Password),
+                Url = Url,
+                ProxyUrl = _proxyViewModel.Proxy,
+                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnonymous,
+                ProxyUserName = _proxyViewModel.ProxyUserName,
+                ProxyPassword = _proxyViewModel.ProxyPassword
+            };
+        }
+
+        public IDbConnection GetDb(QueryData queryData)
+        {
+            return _dbConnectionFactory.GetDb(
+                queryData.FormattedConnectionString,
+                queryData.ConnectionType);
+        }
+
+        public async Task PreviewSql()
+        {
+            if (!IsUpdateRunning &&
+                SelectedTabIndex == QueriesTabIndex &&
+                SelectedQueryTabItem.Content is QueryEditor editor)
+            {
+                IDataChecker dataChecker;
+                Expression<Func<QueryData, DataTable>> resultsSelector;
+
+                switch (editor.TargetEntity)
+                {
+                    case QueryEntityType.Items:
+                        dataChecker = _itemDataChecker;
+                        resultsSelector = d => d.QueryResults;
+                        UpdateSubtext = "Running Items Query";
+                        break;
+
+                    case QueryEntityType.Relationships:
+                        dataChecker = _relationshipsChecker;
+                        resultsSelector = d => d.QueryResultsRels;
+                        UpdateSubtext = "Running Relationships Query";
+                        break;
+
+                    case QueryEntityType.ResourceUrls:
+                        dataChecker = _resourceUrlsDataChecker;
+                        resultsSelector = d => d.QueryResultsResourceUrls;
+                        UpdateSubtext = "Running Resource URLs Query";
+                        break;
+
+                    case QueryEntityType.Panels:
+                        dataChecker = _panelsDataChecker;
+                        resultsSelector = d => d.QueryResultsPanels;
+                        UpdateSubtext = "Running Panels Query";
+                        break;
+
+                    default:
+                        _messageService.Show($"Unknown query type: {editor.TargetEntity}");
+                        UpdateSubtext = string.Empty;
+                        return;
+                }
+
+                await PreviewSql(
+                    SelectedQueryData,
+                    editor.SelectedQueryString,
+                    dataChecker,
+                    resultsSelector);
+
+                ValidatePanelData(SelectedQueryData);
+            }
+        }
+
+        private async Task PreviewSql(
+            QueryData queryData,
+            string query,
+            IDataChecker dataChecker,
+            Expression<Func<QueryData, DataTable>> resultsSelector)
+        {
+            CanCancelUpdate = false;
+            UpdateText = "Generating SQL Preview...";
+
+            try
+            {
+                await InitialiseSharpCloudDataIfNeeded(queryData);
+
+                using (var connection = GetDb(queryData))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = query;
+                        command.CommandType = CommandType.Text;
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            await dataChecker.CheckData(reader, queryData);
+
+                            var dt = new DataTable();
+                            dt.Load(reader);
+
+                            var regex = new Regex(Regex.Escape("#"));
+                            for (var c = 0; c < dt.Columns.Count; c++)
+                            {
+                                var col = dt.Columns[c];
+                                if (col.Caption.ToLower().StartsWith("tags#"))
+                                {
+                                    col.Caption = regex.Replace(col.Caption, ".", 1);
+                                }
+                            }
+
+                            var prop = (PropertyInfo)((MemberExpression)resultsSelector.Body).Member;
+                            prop.SetValue(queryData, dt, null);
+                        }
+                    }
+                }
+
+                SetLastUsedSharpCloudConnection(queryData);
+            }
+            finally
+            {
+                UpdateText = string.Empty;
+                UpdateSubtext = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Check if updating the database is necessary, e.g. an update is only necessary
+        /// when running queries against data when the query is run for the first time;
+        /// subsequent runs should be able to use local data to speed up the process.
+        /// </summary>
+        private async Task InitialiseSharpCloudDataIfNeeded(QueryData queryData)
+        {
+            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel &&
+                queryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
+            {
+                await _qcHelper.InitialiseDatabase(
+                    GetApiConfiguration(),
+                    queryData.FormattedConnectionString,
+                    queryData.ConnectionType);
+            }
+        }
+
+        private void SetLastUsedSharpCloudConnection(QueryData queryData)
+        {
+            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel)
+            {
+                _lastUsedSharpCloudConnection = queryData.FormattedConnectionString;
             }
         }
 

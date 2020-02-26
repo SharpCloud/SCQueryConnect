@@ -1,7 +1,10 @@
 ﻿using SCQueryConnect.Common;
+using SCQueryConnect.Common.Models;
 using SCQueryConnect.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace SCQueryConnect.Interfaces
@@ -35,6 +38,8 @@ namespace SCQueryConnect.Interfaces
         void SaveApplicationState();
         void ExportQueryDataClick(QueryData queryData);
         void ImportConnections(string filePath);
-        void ValidatePanelData(QueryData queryData);
+        SharpCloudConfiguration GetApiConfiguration();
+        IDbConnection GetDb(QueryData queryData);
+        Task PreviewSql();
     }
 }

@@ -46,13 +46,11 @@ namespace SCQueryConnect
         }
 
         private CancellationTokenSource _cancellationTokenSource;
-        private string _lastUsedSharpCloudConnection;
+        
         private readonly int _maxRowCount;
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
-        private readonly IItemsDataChecker _itemDataChecker;
-        private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly IExcelWriter _excelWriter;
         private readonly MultiDestinationLogger _logger;
         private readonly IIOService _ioService;
@@ -60,30 +58,22 @@ namespace SCQueryConnect
         private readonly IMessageService _messageService;
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
-        private readonly IRelationshipsDataChecker _relationshipsChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
-        private readonly IPanelsDataChecker _panelsDataChecker;
-        private readonly IResourceUrlsDataChecker _resourceUrlsDataChecker;
         private readonly RichTextBoxLoggingDestination _storyLoggingDestination;
         private readonly RichTextBoxLoggingDestination _folderLoggingDestination;
 
         public MainWindow(
             IBatchPublishHelper batchPublishHelper,
             IConnectionStringHelper connectionStringHelper,
-            IItemsDataChecker itemDataChecker,
-            IDbConnectionFactory dbConnectionFactory,
             IExcelWriter excelWriter,
             IIOService ioService,
             IMainViewModel mainViewModel,
             IMessageService messageService,
             IPasswordStorage passwordStorage,
             IProxyViewModel proxyViewModel,
-            IRelationshipsDataChecker relationshipsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory,
             ILog logger,
-            IQueryConnectHelper qcHelper,
-            IPanelsDataChecker panelsDataChecker,
-            IResourceUrlsDataChecker resourceUrlsDataChecker)
+            IQueryConnectHelper qcHelper)
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
@@ -100,18 +90,13 @@ namespace SCQueryConnect
 
             _batchPublishHelper = batchPublishHelper;
             _connectionStringHelper = connectionStringHelper;
-            _itemDataChecker = itemDataChecker;
-            _dbConnectionFactory = dbConnectionFactory;
             _excelWriter = excelWriter;
             _ioService = ioService;
             _mainViewModel = mainViewModel;
             _messageService = messageService;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
-            _relationshipsChecker = relationshipsDataChecker;
             _sharpCloudApiFactory = sharpCloudApiFactory;
-            _panelsDataChecker = panelsDataChecker;
-            _resourceUrlsDataChecker = resourceUrlsDataChecker;
 
             _folderLoggingDestination = new RichTextBoxLoggingDestination(FolderUpdateLogOutput);
             _storyLoggingDestination = new RichTextBoxLoggingDestination(StoryUpdateLogOutput);
@@ -198,27 +183,6 @@ namespace SCQueryConnect
             }
         }
 
-        private IDbConnection GetDb(QueryData queryData)
-        {
-            return _dbConnectionFactory.GetDb(
-                queryData.FormattedConnectionString,
-                queryData.ConnectionType);
-        }
-
-        private SharpCloudConfiguration GetApiConfiguration()
-        {
-            return new SharpCloudConfiguration
-            {
-                Username = _mainViewModel.Username,
-                Password = Password.Password,
-                Url = _mainViewModel.Url,
-                ProxyUrl = _proxyViewModel.Proxy,
-                UseDefaultProxyCredentials = _proxyViewModel.ProxyAnonymous,
-                ProxyUserName = _proxyViewModel.ProxyUserName,
-                ProxyPassword = _proxyViewModel.ProxyPassword
-            };
-        }
-
         private async void TestConnectionClick(object sender, RoutedEventArgs e)
         {
             await TestConnection(_mainViewModel.SelectedQueryData);
@@ -231,7 +195,7 @@ namespace SCQueryConnect
                 try
                 {
                     await _qcHelper.InitialiseDatabase(
-                        GetApiConfiguration(),
+                        _mainViewModel.GetApiConfiguration(),
                         queryData.FormattedConnectionString,
                         queryData.ConnectionType);
                 }
@@ -244,7 +208,7 @@ namespace SCQueryConnect
 
             try
             {
-                using (IDbConnection connection = GetDb(queryData))
+                using (IDbConnection connection = _mainViewModel.GetDb(queryData))
                 {
                     connection.Open();
                     MessageBox.Show("Hooray! It looks like it's worked!");
@@ -266,37 +230,12 @@ namespace SCQueryConnect
             dlg.ShowDialog();
         }
 
-        private void SetLastUsedSharpCloudConnection(QueryData queryData)
-        {
-            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel)
-            {
-                _lastUsedSharpCloudConnection = queryData.FormattedConnectionString;
-            }
-        }
-
-        /// <summary>
-        /// Check if updating the database is necessary, e.g. an update is only necessary
-        /// when running queries against data when the query is run for the first time;
-        /// subsequent runs should be able to use local data to speed up the process.
-        /// </summary>
-        private async Task InitialiseSharpCloudDataIfNeeded(QueryData queryData)
-        {
-            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel &&
-                queryData.FormattedConnectionString != _lastUsedSharpCloudConnection)
-            {
-                await _qcHelper.InitialiseDatabase(
-                    GetApiConfiguration(),
-                    queryData.FormattedConnectionString,
-                    queryData.ConnectionType);
-            }
-        }
-
         private void ProcessRunException(Exception e)
         {
             switch (e)
             {
                 case InvalidOperationException ex when ex.Message.Contains(Constants.AccessDBEngineErrorMessage):
-                    var msgbox = new DatabaseErrorMessage {Owner = this};
+                    var msgbox = new DatabaseErrorMessage { Owner = this };
                     msgbox.ShowDialog();
                     break;
 
@@ -310,111 +249,16 @@ namespace SCQueryConnect
         {
             await PreviewSql();
         }
-        
+
         private async Task PreviewSql()
         {
-            if (_mainViewModel.SelectedTabIndex == MainViewModel.QueriesTabIndex &&
-                _mainViewModel.SelectedQueryTabItem.Content is QueryEditor editor)
-            {
-                IDataChecker dataChecker;
-                Expression<Func<QueryData, DataTable>> resultsSelector;
-
-                switch (editor.TargetEntity)
-                {
-                    case QueryEntityType.Items:
-                        dataChecker = _itemDataChecker;
-                        resultsSelector = d => d.QueryResults;
-                        _mainViewModel.UpdateSubtext = "Running Items Query";
-                        break;
-
-                    case QueryEntityType.Relationships:
-                        dataChecker = _relationshipsChecker;
-                        resultsSelector = d => d.QueryResultsRels;
-                        _mainViewModel.UpdateSubtext = "Running Relationships Query";
-                        break;
-
-                    case QueryEntityType.ResourceUrls:
-                        dataChecker = _resourceUrlsDataChecker;
-                        resultsSelector = d => d.QueryResultsResourceUrls;
-                        _mainViewModel.UpdateSubtext = "Running Resource URLs Query";
-                        break;
-
-                    case QueryEntityType.Panels:
-                        dataChecker = _panelsDataChecker;
-                        resultsSelector = d => d.QueryResultsPanels;
-                        _mainViewModel.UpdateSubtext = "Running Panels Query";
-                        break;
-
-                    default:
-                        _messageService.Show($"Unknown query type: {editor.TargetEntity}");
-                        _mainViewModel.UpdateSubtext = string.Empty;
-                        return;
-                }
-
-                await PreviewSql(
-                    _mainViewModel.SelectedQueryData,
-                    editor.SelectedQueryString,
-                    dataChecker,
-                    resultsSelector);
-
-                _mainViewModel.ValidatePanelData(_mainViewModel.SelectedQueryData);
-            }
-        }
-
-        private async Task PreviewSql(
-            QueryData queryData,
-            string query,
-            IDataChecker dataChecker,
-            Expression<Func<QueryData, DataTable>> resultsSelector)
-        {
-            _mainViewModel.CanCancelUpdate = false;
-            _mainViewModel.UpdateText = "Generating SQL Preview...";
-
             try
             {
-                await InitialiseSharpCloudDataIfNeeded(queryData);
-
-                using (var connection = GetDb(queryData))
-                {
-                    connection.Open();
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.CommandText = query;
-                        command.CommandType = CommandType.Text;
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            await dataChecker.CheckData(reader, queryData);
-
-                            var dt = new DataTable();
-                            dt.Load(reader);
-
-                            var regex = new Regex(Regex.Escape("#"));
-                            for (var c = 0; c < dt.Columns.Count; c++)
-                            {
-                                var col = dt.Columns[c];
-                                if (col.Caption.ToLower().StartsWith("tags#"))
-                                {
-                                    col.Caption = regex.Replace(col.Caption, ".", 1);
-                                }
-                            }
-
-                            var prop = (PropertyInfo) ((MemberExpression) resultsSelector.Body).Member;
-                            prop.SetValue(queryData, dt, null);
-                        }
-                    }
-                }
-
-                SetLastUsedSharpCloudConnection(queryData);
+                await _mainViewModel.PreviewSql();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                ProcessRunException(ex);
-            }
-            finally
-            {
-                _mainViewModel.UpdateText = string.Empty;
-                _mainViewModel.UpdateSubtext = string.Empty;
+                ProcessRunException(e);
             }
         }
 
@@ -496,7 +340,7 @@ namespace SCQueryConnect
 
         private async Task UpdateSharpCloud(QueryData queryData, CancellationToken ct)
         {
-            var config = GetApiConfiguration();
+            var config = _mainViewModel.GetApiConfiguration();
 
             var settings = new UpdateSettings
             {
