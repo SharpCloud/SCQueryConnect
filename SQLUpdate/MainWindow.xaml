@@ -592,87 +592,150 @@
                              Visibility="{Binding IsFolder, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=false, FallbackValue=Collapsed}">
                         <Grid Background="{StaticResource QCBackground}">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="250"></RowDefinition>
-                                <RowDefinition Height="3"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
+                                <RowDefinition Height="230" />
+                                <RowDefinition Height="3" />
+                                <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Server:" Style="{StaticResource Label}" Width="100" />
 
-                                    <TextBox x:Name="UrlTextBox"
-                                             Text ="{Binding MainViewModel.Url, Source={StaticResource ViewModelLocator}, FallbackValue='https://my.sharpcloud.com'}"
-                                             Width="270">
-                                    </TextBox>
+                            <!-- Update Configuration Settings -->
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="270" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
 
-                                    <TextBlock Margin="10,0">
-                                        <Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick"> Proxy</Hyperlink>
-                                    </TextBlock>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Username:" Style="{StaticResource Label}" Width="100" />
-                                    <TextBox x:Name="UsernameTextBox"
-                                             Width="270"
-                                             Text="{Binding MainViewModel.Username, Source={StaticResource ViewModelLocator}}">
-                                    </TextBox>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Password:" Style="{StaticResource Label}" Width="100" />
-                                    <PasswordBox x:Name="Password" Width="270" PasswordChanged="PasswordOnPasswordChanged" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2">
-                                    <TextBlock Text ="Story ID or URL:" Style="{StaticResource Label}" Width="100" />
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition Height="2" />
+                                            <RowDefinition />
+                                            <RowDefinition Height="2" />
+                                            <RowDefinition />
+                                            <RowDefinition Height="2" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
 
-                                    <TextBox x:Name="StoryId"
-                                             Width="270"
-                                             Text="{Binding StoryId, Converter={StaticResource UrlToStoryIdConverter}}">
-                                    </TextBox>
+                                        <!-- Server -->
+                                        <TextBlock Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Text ="Server:"
+                                                   Style="{StaticResource Label}">
+                                        </TextBlock>
 
-                                    <Button Click="SelectStoryClick" Margin="0" Width="40">...</Button>
-                                    <Button Click="ViewStoryClick" Margin="10,0" Width="50">Open</Button>
-                                </StackPanel>
+                                        <TextBox Grid.Row="0"
+                                                 Grid.Column="1"
+                                                 Text ="{Binding MainViewModel.Url, Source={StaticResource ViewModelLocator}, FallbackValue='https://my.sharpcloud.com'}">
+                                        </TextBox>
 
-                                <StackPanel Margin="100,5,0,0" Width="370">
-                                    <StackPanel.Resources>
-                                        <Style x:Key="HelpButton" TargetType="Button">
-                                            <Setter Property="Content" Value="(what's this?)" />
-                                            <Setter Property="Foreground" Value="White" />
-                                            <Setter Property="Margin" Value="5,0,0,0" />
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Grid Background="Transparent">
-                                                            <ContentPresenter />
-                                                        </Grid>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </StackPanel.Resources>
+                                        <TextBlock Grid.Row="0"
+                                                   Grid.Column="2"
+                                                   HorizontalAlignment="Left"
+                                                   Style="{StaticResource Label}">
+                                            <Hyperlink Foreground="{StaticResource QCBlue}" Click="Proxy_OnClick">
+                                                Proxy
+                                            </Hyperlink>
+                                        </TextBlock>
 
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Foreground="{StaticResource QCBlue}"
-                                                  IsChecked="{Binding UnpublishItems, Mode=TwoWay}">
-                                            Unpublish unmatched items
-                                        </CheckBox>
+                                        <!-- Username -->
+                                        <TextBlock Grid.Row="2"
+                                                   Grid.Column="0"
+                                                   Text ="Username:" Style="{StaticResource Label}">
+                                        </TextBlock>
 
-                                        <Button Click="UnpublishUnmatchedItemsHelpClick" Style="{StaticResource HelpButton}" />
+                                        <TextBox Grid.Row="2"
+                                                 Grid.Column="1"
+                                                 Text="{Binding MainViewModel.Username, Source={StaticResource ViewModelLocator}}">
+                                        </TextBox>
+
+                                        <!-- Password -->
+                                        <TextBlock Grid.Row="4"
+                                                   Grid.Column="0"
+                                                   Text ="Password:"
+                                                   Style="{StaticResource Label}">
+                                        </TextBlock>
+
+                                        <PasswordBox x:Name="Password"
+                                                     Grid.Row="4"
+                                                     Grid.Column="1"
+                                                     Width="270"
+                                                     PasswordChanged="PasswordOnPasswordChanged">
+                                        </PasswordBox>
+
+                                        <!-- Story ID -->
+                                        <TextBlock Grid.Row="6"
+                                                   Grid.Column="0"
+                                                   Text ="Story ID/URL:"
+                                                   Style="{StaticResource Label}">
+                                        </TextBlock>
+
+                                        <TextBox Grid.Row="6"
+                                                 Grid.Column="1"
+                                                 Text="{Binding StoryId, Converter={StaticResource UrlToStoryIdConverter}}">
+                                        </TextBox>
+
+                                        <StackPanel Grid.Row="6"
+                                                    Grid.Column="2"
+                                                    Orientation="Horizontal">
+                                            <Button Click="SelectStoryClick" Margin="5,0" Width="40">...</Button>
+                                            <Button Click="ViewStoryClick" Width="50">Open</Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <StackPanel Margin="30,5,0,0">
+                                        <StackPanel.Resources>
+                                            <Style x:Key="HelpButton" TargetType="Button">
+                                                <Setter Property="Content" Value="(what's this?)" />
+                                                <Setter Property="Foreground" Value="White" />
+                                                <Setter Property="Margin" Value="5,0,0,0" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid Background="Transparent">
+                                                                <ContentPresenter />
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Foreground="{StaticResource QCBlue}"
+                                                      IsChecked="{Binding UnpublishItems, Mode=TwoWay}">
+                                                Unpublish unmatched items
+                                            </CheckBox>
+
+                                            <Button Click="UnpublishUnmatchedItemsHelpClick" Style="{StaticResource HelpButton}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Content="Build relationships"
+                                                      Foreground="{StaticResource QCBlue}"
+                                                      IsChecked="{Binding BuildRelationships, Mode=TwoWay}">
+                                            </CheckBox>
+
+                                            <Button Click="BuildRelationshipsHelpClick" Style="{StaticResource HelpButton}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Content="Custom attribute mapping"
+                                                      Foreground="{StaticResource QCBlue}"
+                                                      IsChecked="{Binding UseAttributeMapping, Mode=TwoWay}">
+                                            </CheckBox>
+
+                                            <Button Click="EditCustomAttributeMappingClick" Content="(edit mapping...)" Style="{StaticResource HelpButton}" />
+                                        </StackPanel>
                                     </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Content="Build relationships"
-                                                  Foreground="{StaticResource QCBlue}"
-                                                  IsChecked="{Binding BuildRelationships, Mode=TwoWay}">
-                                        </CheckBox>
-
-                                        <Button Click="BuildRelationshipsHelpClick" Style="{StaticResource HelpButton}" />
-                                    </StackPanel>
                                 </StackPanel>
 
-                                <Button Click="RunQueryDataClick" Width="270" Margin="100,5" Height="40">Update Story Now..</Button>
+                                <Button Click="RunQueryDataClick" Width="270" Margin="0,30,0,0" Height="40">Update Story Now..</Button>
                             </StackPanel>
-                            <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3"></GridSplitter>
 
+                            <GridSplitter Grid.Row="1"  HorizontalAlignment="Stretch" Height="3" />
+
+                            <!-- Logging Section -->
                             <Grid Grid.Row="2">
                                 <TextBlock Foreground="{StaticResource QCBlue}" Margin="5">
                                     <Run Text="Update Results:" />

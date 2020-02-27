@@ -34,6 +34,7 @@ namespace SCQueryConnect.Models
         private string _sharePointUrl = string.Empty;
         private bool _buildRelationships;
         private bool _unpublishItems;
+        private bool _useAttributeMapping;
         private string _issueSummary;
         private bool _isItemsQueryOk = true;
         private bool _isRelationshipsQueryOk = true;
@@ -226,6 +227,20 @@ namespace SCQueryConnect.Models
                 if (_unpublishItems != value)
                 {
                     _unpublishItems = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool UseAttributeMapping
+        {
+            get => _useAttributeMapping;
+
+            set
+            {
+                if (_useAttributeMapping != value)
+                {
+                    _useAttributeMapping = value;
                     OnPropertyChanged();
                 }
             }

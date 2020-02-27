@@ -622,6 +622,16 @@ namespace SCQueryConnect
             ShowHelpWindow<UnpublishUnmatchedItemsHelp>();
         }
 
+        private void EditCustomAttributeMappingClick(object sender, RoutedEventArgs e)
+        {
+            var editor = new AttributeMappingEditor
+            {
+                Owner = this
+            };
+
+            editor.ShowDialog();
+        }
+
         private void ShowHelpWindow<T>() where T : Window, new()
         {
             var help = new T

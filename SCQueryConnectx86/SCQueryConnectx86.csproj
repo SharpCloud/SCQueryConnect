@@ -182,6 +182,9 @@
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IAttributeMappingEditorViewModel.cs">
+      <Link>Interfaces\IAttributeMappingEditorViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
     </Compile>
@@ -218,6 +221,12 @@
     <Compile Include="..\SQLUpdate\MainWindow.xaml.cs">
       <Link>MainWindow.xaml.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Models\AttributeDesignations.cs">
+      <Link>Models\AttributeDesignations.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Models\AttributeMapping.cs">
+      <Link>Models\AttributeMapping.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Models\PasswordSecurity.cs">
       <Link>Models\PasswordSecurity.cs</Link>
     </Compile>
@@ -251,6 +260,9 @@
     <Compile Include="..\SQLUpdate\Services\ZipService.cs">
       <Link>Services\ZipService.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\AttributeMappingEditorViewModel.cs">
+      <Link>ViewModels\AttributeMappingEditorViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
       <Link>ViewModels\MainViewModel.cs</Link>
     </Compile>
@@ -262,6 +274,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\ViewModelLocator.cs">
       <Link>ViewModels\ViewModelLocator.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Views\AttributeMappingEditor.xaml.cs">
+      <Link>Views\AttributeMappingEditor.xaml.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Views\BuildRelationshipsHelp.xaml.cs">
       <Link>Views\BuildRelationshipsHelp.xaml.cs</Link>
@@ -346,6 +361,11 @@
     </Page>
     <Page Include="..\SQLUpdate\MainWindow.xaml">
       <Link>MainWindow.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Views\AttributeMappingEditor.xaml">
+      <Link>Views\AttributeMappingEditor.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
