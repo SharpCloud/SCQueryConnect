@@ -6,7 +6,7 @@ namespace SCQueryConnect.Interfaces
 {
     public interface IStoryAttributesHelper
     {
-        Task<List<AttributeDesignations>> GetStoryAttributes();
-        Task<List<AttributeMapping>> GetAttributeMappings();
+        Task<List<AttributeDesignations>> GetStoryAttributes(AttributeDesignations unassigned);
+        Task<List<AttributeMapping>> GetAttributeMappings(AttributeDesignations unassigned);
     }
 }

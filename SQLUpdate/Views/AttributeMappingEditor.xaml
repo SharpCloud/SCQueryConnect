@@ -23,7 +23,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer Margin="10">
+        <ScrollViewer Margin="10" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding AttributeMappings}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

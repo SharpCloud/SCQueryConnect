@@ -10,6 +10,6 @@ namespace SCQueryConnect.Interfaces
         List<AttributeDesignations> StoryAttributes { get; }
         List<AttributeMapping> AttributeMappings { get; }
 
-        Task InitialiseEditor();
+        Task InitialiseEditor(IDictionary<string, string> existingMapping);
     }
 }

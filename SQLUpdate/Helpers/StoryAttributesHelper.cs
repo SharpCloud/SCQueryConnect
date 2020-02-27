@@ -18,12 +18,6 @@ namespace SCQueryConnect.Helpers
         private readonly IProxyViewModel _proxyViewModel;
         private readonly ISharpCloudApiFactory _scApiFactory;
 
-        private readonly AttributeDesignations _unassignedDesignation = new AttributeDesignations
-        {
-            Id = string.Empty,
-            Name = "- Unassigned -"
-        };
-
         public StoryAttributesHelper(
             IMainViewModel mainViewModel,
             IMessageService messageService,
@@ -38,7 +32,7 @@ namespace SCQueryConnect.Helpers
             _scApiFactory = scApiFactory;
         }
 
-        public Task<List<AttributeDesignations>> GetStoryAttributes()
+        public Task<List<AttributeDesignations>> GetStoryAttributes(AttributeDesignations unassigned)
         {
             var sc = _scApiFactory.CreateSharpCloudApi(
                 _mainViewModel.Username,
@@ -68,14 +62,14 @@ namespace SCQueryConnect.Helpers
                         })
                     .ToList();
 
-                var allAttributes = attributes.Prepend(_unassignedDesignation).ToList();
+                var allAttributes = attributes.Prepend(unassigned).ToList();
                 return allAttributes;
             });
 
             return storyTask;
         }
 
-        public async Task<List<AttributeMapping>> GetAttributeMappings()
+        public async Task<List<AttributeMapping>> GetAttributeMappings(AttributeDesignations unassigned)
         {
             var sqlResultsTask = await _mainViewModel.PreviewSql(
                 _mainViewModel.SelectedQueryData,
@@ -86,7 +80,7 @@ namespace SCQueryConnect.Helpers
                 new AttributeMapping
                 {
                     SourceName = c.Caption,
-                    Target = _unassignedDesignation
+                    Target = unassigned
                 });
 
             return mappingList.OrderBy(a => a.SourceName).ToList();

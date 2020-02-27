@@ -19,7 +19,8 @@ namespace SCQueryConnect.Views
             if (Content is FrameworkElement fe &&
                 fe.DataContext is IAttributeMappingEditorViewModel vm)
             {
-                Task.Run(() => vm.InitialiseEditor());
+                // Do not run on UI thread to maintain responsive UI
+                Task.Run(() => vm.InitialiseEditor(null));
             }
         }
     }

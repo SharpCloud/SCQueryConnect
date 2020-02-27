@@ -2,6 +2,7 @@
 using SCQueryConnect.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -11,7 +12,11 @@ namespace SCQueryConnect.ViewModels
     {
         private readonly IStoryAttributesHelper _storyAttributesHelper;
 
-        
+        private readonly AttributeDesignations _unassigned = new AttributeDesignations
+        {
+            Id = string.Empty,
+            Name = "- Unassigned -"
+        };
 
         private List<AttributeDesignations> _storyAttributes;
         private List<AttributeMapping> _attributeMappings;
@@ -50,14 +55,33 @@ namespace SCQueryConnect.ViewModels
             _storyAttributesHelper = storyAttributesHelper;
         }
 
-        public async Task InitialiseEditor()
+        public async Task InitialiseEditor(IDictionary<string, string> existingMapping)
         {
-            var attributesTask = _storyAttributesHelper.GetStoryAttributes();
-            var mappingsTask = _storyAttributesHelper.GetAttributeMappings();
+            var attributesTask = _storyAttributesHelper.GetStoryAttributes(_unassigned);
+            var mappingsTask = _storyAttributesHelper.GetAttributeMappings(_unassigned);
             await Task.WhenAll(attributesTask, mappingsTask);
 
-            StoryAttributes = attributesTask.Result;
-            AttributeMappings = mappingsTask.Result;
+            var storyAttributes = attributesTask.Result;
+            var generatedMappings = mappingsTask.Result;
+
+            if (existingMapping != null)
+            {
+                foreach (var mapping in generatedMappings)
+                {
+                    var attribute = storyAttributes.SingleOrDefault(a =>
+                        existingMapping.ContainsKey(mapping.SourceName) &&
+                        a.Id == existingMapping[mapping.SourceName]);
+
+                    mapping.Target = attribute ?? _unassigned;
+
+                    mapping.IsBrokenMapping =
+                        mapping.Target == _unassigned ||
+                        !existingMapping.ContainsKey(mapping.SourceName);
+                }
+            }
+
+            StoryAttributes = storyAttributes;
+            AttributeMappings = generatedMappings;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
