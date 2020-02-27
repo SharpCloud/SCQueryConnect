@@ -78,6 +78,7 @@ namespace SCQueryConnect
             builder.RegisterType<QueryConnectHelper>().As<IQueryConnectHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ProxyViewModel>().As<IProxyViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<SaveFileDialogService>().As<ISaveFileDialogService>().InstancePerLifetimeScope();
+            builder.RegisterType<StoryAttributesHelper>().As<IStoryAttributesHelper>().InstancePerLifetimeScope();
             builder.RegisterType<ZipService>().As<IZipService>().InstancePerLifetimeScope();
 
             builder.RegisterType<ItemsDataChecker>().As<IDataChecker>()

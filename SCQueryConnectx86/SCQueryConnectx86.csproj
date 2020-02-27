@@ -182,6 +182,9 @@
     <Compile Include="..\SQLUpdate\Helpers\SaveHelper.cs">
       <Link>Helpers\SaveHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Helpers\StoryAttributesHelper.cs">
+      <Link>Helpers\StoryAttributesHelper.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IAttributeMappingEditorViewModel.cs">
       <Link>Interfaces\IAttributeMappingEditorViewModel.cs</Link>
     </Compile>
@@ -202,6 +205,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\ISaveFileDialogService.cs">
       <Link>Interfaces\ISaveFileDialogService.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IStoryAttributesHelper.cs">
+      <Link>Interfaces\IStoryAttributesHelper.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IZipService.cs">
       <Link>Interfaces\IZipService.cs</Link>

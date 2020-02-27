@@ -163,6 +163,7 @@
     <Compile Include="ExtendedPropertyChangedEventArgs.cs" />
     <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
+    <Compile Include="Helpers\StoryAttributesHelper.cs" />
     <Compile Include="Interfaces\IAttributeMappingEditorViewModel.cs" />
     <Compile Include="Interfaces\IBatchPublishHelper.cs" />
     <Compile Include="Interfaces\IMainViewModel.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Interfaces\IPasswordStorage.cs" />
     <Compile Include="Interfaces\IProxyViewModel.cs" />
     <Compile Include="Interfaces\ISaveFileDialogService.cs" />
+    <Compile Include="Interfaces\IStoryAttributesHelper.cs" />
     <Compile Include="Interfaces\IZipService.cs" />
     <Compile Include="Logging\LoggingDestination.cs" />
     <Compile Include="Logging\MultiDestinationLogger.cs" />
