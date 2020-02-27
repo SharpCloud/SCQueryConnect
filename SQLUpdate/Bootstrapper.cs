@@ -79,19 +79,19 @@ namespace SCQueryConnect
             builder.RegisterType<SaveFileDialogService>().As<ISaveFileDialogService>().InstancePerLifetimeScope();
             builder.RegisterType<ZipService>().As<IZipService>().InstancePerLifetimeScope();
 
-            builder.RegisterType<ItemsDataChecker>().As<IItemsDataChecker>()
+            builder.RegisterType<ItemsDataChecker>().As<IDataChecker>()
                 .WithProperty(nameof(DataChecker.ValidityProcessor), new ItemsValidityProcessor())
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>()
+            builder.RegisterType<RelationshipsDataChecker>().As<IDataChecker>()
                 .WithProperty(nameof(DataChecker.ValidityProcessor), new RelationshipsValidityProcessor())
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>()
+            builder.RegisterType<PanelsDataChecker>().As<IDataChecker>()
                 .WithProperty(nameof(DataChecker.ValidityProcessor), new PanelsValidityProcessor())
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<ResourceUrlsDataChecker>().As<IResourceUrlsDataChecker>()
+            builder.RegisterType<ResourceUrlsDataChecker>().As<IDataChecker>()
                 .WithProperty(nameof(DataChecker.ValidityProcessor), new ResourceUrlsValidityProcessor())
                 .InstancePerLifetimeScope();
 

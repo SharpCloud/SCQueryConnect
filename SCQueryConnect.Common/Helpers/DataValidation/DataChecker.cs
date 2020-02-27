@@ -1,4 +1,5 @@
 ﻿using SCQueryConnect.Common.Interfaces.DataValidation;
+using SCQueryConnect.Common.Models;
 using System.Data;
 using System.Threading.Tasks;
 
@@ -6,6 +7,7 @@ namespace SCQueryConnect.Common.Helpers.DataValidation
 {
     public abstract class DataChecker : IDataChecker
     {
+        public abstract QueryEntityType TargetEntity { get; }
         public IDataValidityProcessor ValidityProcessor { get; set; }
 
         public async Task<bool> CheckData(IDataReader reader)

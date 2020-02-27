@@ -17,27 +17,21 @@ namespace SCQueryConnect.Common.Tests.Helpers
         private QueryConnectHelper CreateQueryConnectHelper(
             IArchitectureDetector architectureDetector = null,
             IConnectionStringHelper connectionStringHelper = null,
-            IItemsDataChecker itemDataChecker = null,
             IDbConnectionFactory dbConnectionFactory = null,
             IExcelWriter excelWriter = null,
             ILog log = null,
-            IPanelsDataChecker panelsDataChecker = null,
-            IRelationshipsDataChecker relationshipsDataChecker = null,
             IRelationshipsBuilder relationshipsBuilder = null,
-            IResourceUrlsDataChecker resourceUrlsDataChecker = null,
-            ISharpCloudApiFactory sharpCloudApiFactory = null)
+            ISharpCloudApiFactory sharpCloudApiFactory = null,
+            params IDataChecker[] dataCheckers)
         {
             return new QueryConnectHelper(
                 architectureDetector ?? Mock.Of<IArchitectureDetector>(),
                 connectionStringHelper ?? Mock.Of<IConnectionStringHelper>(),
-                itemDataChecker ?? Mock.Of<IItemsDataChecker>(),
+                dataCheckers,
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
                 excelWriter ?? Mock.Of<IExcelWriter>(),
                 log ?? Mock.Of<ILog>(),
-                panelsDataChecker ?? Mock.Of<IPanelsDataChecker>(),
                 relationshipsBuilder ?? Mock.Of<IRelationshipsBuilder>(),
-                relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
-                resourceUrlsDataChecker ?? Mock.Of<IResourceUrlsDataChecker>(),
                 sharpCloudApiFactory ?? Mock.Of<ISharpCloudApiFactory>());
         }
 

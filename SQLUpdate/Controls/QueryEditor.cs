@@ -1,4 +1,4 @@
-﻿using SCQueryConnect.Helpers;
+﻿using SCQueryConnect.Common.Models;
 using System;
 using System.Data;
 using System.Windows;

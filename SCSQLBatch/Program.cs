@@ -30,14 +30,14 @@ namespace SCSQLBatch
             builder.RegisterType<CDataLicenceService>().As<ICDataLicenceService>();
             builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>();
-            builder.RegisterType<ItemsDataChecker>().As<IItemsDataChecker>();
-            builder.RegisterType<PanelsDataChecker>().As<IPanelsDataChecker>();
+            builder.RegisterType<ItemsDataChecker>().As<IDataChecker>();
+            builder.RegisterType<PanelsDataChecker>().As<IDataChecker>();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>();
             builder.RegisterType<ExcelWriter>().As<IExcelWriter>();
-            builder.RegisterType<RelationshipsDataChecker>().As<IRelationshipsDataChecker>();
+            builder.RegisterType<RelationshipsDataChecker>().As<IDataChecker>();
             builder.RegisterType<RelationshipsBuilder>().As<IRelationshipsBuilder>();
-            builder.RegisterType<ResourceUrlsDataChecker>().As<IResourceUrlsDataChecker>();
+            builder.RegisterType<ResourceUrlsDataChecker>().As<IDataChecker>();
             builder.RegisterType<SharpCloudApiFactory>().As<ISharpCloudApiFactory>();
             
             var logFile = ConfigurationManager.AppSettings[Constants.BatchLogFileKey];

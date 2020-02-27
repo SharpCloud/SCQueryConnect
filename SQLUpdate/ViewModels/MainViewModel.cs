@@ -43,17 +43,14 @@ namespace SCQueryConnect.ViewModels
         private readonly int _maxRowCount;
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IDictionary<QueryEntityType, IDataChecker> _dataCheckers;
         private readonly IEncryptionHelper _encryptionHelper;
         private readonly IIOService _ioService;
-        private readonly IItemsDataChecker _itemDataChecker;
         private readonly MultiDestinationLogger _logger;
         private readonly IMessageService _messageService;
-        private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
         private readonly IQueryConnectHelper _qcHelper;
-        private readonly IRelationshipsDataChecker _relationshipsChecker;
-        private readonly IResourceUrlsDataChecker _resourceUrlsDataChecker;
         private readonly ISaveFileDialogService _saveFileDialogService;
 
         private CancellationTokenSource _cancellationTokenSource;
@@ -295,18 +292,15 @@ namespace SCQueryConnect.ViewModels
 
         public MainViewModel(
             IBatchPublishHelper batchPublishHelper,
+            IEnumerable<IDataChecker> dataCheckers,
             IDbConnectionFactory dbConnectionFactory,
             IEncryptionHelper encryptionHelper,
             IIOService ioService,
-            IItemsDataChecker itemDataChecker,
             ILog logger,
             IMessageService messageService,
-            IPanelsDataChecker panelsDataChecker,
             IPasswordStorage passwordStorage,
             IProxyViewModel proxyViewModel,
             IQueryConnectHelper qcHelper,
-            IRelationshipsDataChecker relationshipsDataChecker,
-            IResourceUrlsDataChecker resourceUrlsDataChecker,
             ISaveFileDialogService saveFileDialogService)
         {
             try
@@ -322,16 +316,14 @@ namespace SCQueryConnect.ViewModels
             _dbConnectionFactory = dbConnectionFactory;
             _encryptionHelper = encryptionHelper;
             _ioService = ioService;
-            _itemDataChecker = itemDataChecker;
             _logger = (MultiDestinationLogger) logger;
             _messageService = messageService;
-            _panelsDataChecker = panelsDataChecker;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
             _qcHelper = qcHelper;
-            _relationshipsChecker = relationshipsDataChecker;
             _saveFileDialogService = saveFileDialogService;
-            _resourceUrlsDataChecker = resourceUrlsDataChecker;
+
+            _dataCheckers = dataCheckers.ToDictionary(c => c.TargetEntity, c => c);
 
             QueryRootNode = CreateNewFolder(QueryData.RootId);
             QueryRootNode.Id = QueryData.RootId;
@@ -746,31 +738,26 @@ namespace SCQueryConnect.ViewModels
                 SelectedTabIndex == QueriesTabIndex &&
                 SelectedQueryTabItem.Content is QueryEditor editor)
             {
-                IDataChecker dataChecker;
                 Expression<Func<QueryData, DataTable>> resultsSelector;
 
                 switch (editor.TargetEntity)
                 {
                     case QueryEntityType.Items:
-                        dataChecker = _itemDataChecker;
                         resultsSelector = d => d.QueryResults;
                         UpdateSubtext = "Running Items Query";
                         break;
 
                     case QueryEntityType.Relationships:
-                        dataChecker = _relationshipsChecker;
                         resultsSelector = d => d.QueryResultsRels;
                         UpdateSubtext = "Running Relationships Query";
                         break;
 
                     case QueryEntityType.ResourceUrls:
-                        dataChecker = _resourceUrlsDataChecker;
                         resultsSelector = d => d.QueryResultsResourceUrls;
                         UpdateSubtext = "Running Resource URLs Query";
                         break;
 
                     case QueryEntityType.Panels:
-                        dataChecker = _panelsDataChecker;
                         resultsSelector = d => d.QueryResultsPanels;
                         UpdateSubtext = "Running Panels Query";
                         break;
@@ -784,7 +771,7 @@ namespace SCQueryConnect.ViewModels
                 await PreviewSql(
                     SelectedQueryData,
                     editor.SelectedQueryString,
-                    dataChecker,
+                    _dataCheckers[editor.TargetEntity],
                     resultsSelector);
 
                 ValidatePanelData(SelectedQueryData);

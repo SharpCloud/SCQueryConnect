@@ -58,14 +58,11 @@ namespace SCQueryConnect.Common.Helpers
 
         private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
-        private readonly IItemsDataChecker _itemDataChecker;
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IDictionary<QueryEntityType, IDataChecker> _dataCheckers;
         private readonly IExcelWriter _excelWriter;
         private readonly ILog _logger;
-        private readonly IPanelsDataChecker _panelsDataChecker;
         private readonly IRelationshipsBuilder _relationshipsBuilder;
-        private readonly IRelationshipsDataChecker _relationshipsDataChecker;
-        private readonly IResourceUrlsDataChecker _resourceUrlsDataChecker;
         private readonly ISharpCloudApiFactory _sharpCloudApiFactory;
         private readonly Regex _tagHeaderRegex = new Regex(Regex.Escape("#"));
 
@@ -84,27 +81,22 @@ namespace SCQueryConnect.Common.Helpers
         public QueryConnectHelper(
             IArchitectureDetector architectureDetector,
             IConnectionStringHelper connectionStringHelper,
-            IItemsDataChecker itemDataChecker,
+            IEnumerable<IDataChecker> dataCheckers,
             IDbConnectionFactory dbConnectionFactory,
             IExcelWriter excelWriter,
             ILog log,
-            IPanelsDataChecker panelsDataChecker,
             IRelationshipsBuilder relationshipsBuilder,
-            IRelationshipsDataChecker relationshipsDataChecker,
-            IResourceUrlsDataChecker resourceUrlsDataChecker,
             ISharpCloudApiFactory sharpCloudApiFactory)
         {
             _architectureDetector = architectureDetector;
             _connectionStringHelper = connectionStringHelper;
-            _itemDataChecker = itemDataChecker;
             _dbConnectionFactory = dbConnectionFactory;
             _excelWriter = excelWriter;
             _logger = log;
-            _panelsDataChecker = panelsDataChecker;
             _relationshipsBuilder = relationshipsBuilder;
-            _relationshipsDataChecker = relationshipsDataChecker;
-            _resourceUrlsDataChecker = resourceUrlsDataChecker;
             _sharpCloudApiFactory = sharpCloudApiFactory;
+
+            _dataCheckers = dataCheckers.ToDictionary(c => c.TargetEntity, c => c);
         }
 
         public bool Validate(Story story, out string message)
@@ -152,7 +144,9 @@ namespace SCQueryConnect.Common.Helpers
                 
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    var relationshipsValid = await _relationshipsDataChecker.CheckData(reader);
+                    var relationshipsValid = await _dataCheckers[QueryEntityType.Relationships]
+                        .CheckData(reader);
+                    
                     if (!relationshipsValid)
                     {
                         await _logger.LogError("Invalid SQL");
@@ -455,7 +449,9 @@ namespace SCQueryConnect.Common.Helpers
                 await _logger.Log("Reading database");
                 using (IDataReader reader = command.ExecuteReader())
                 {
-                    var itemsValid = await _itemDataChecker.CheckData(reader);
+                    var itemsValid = await _dataCheckers[QueryEntityType.Items]
+                        .CheckData(reader);
+
                     if (!itemsValid)
                     {
                         return;
@@ -604,7 +600,7 @@ namespace SCQueryConnect.Common.Helpers
                 sqlString,
                 ResourceUrlsDataChecker.RequiredHeadings,
                 "Resource URL",
-                _resourceUrlsDataChecker,
+                _dataCheckers[QueryEntityType.ResourceUrls],
                 Mapper);
 
             foreach (var m in resourceUrlMetadata)
@@ -684,7 +680,7 @@ namespace SCQueryConnect.Common.Helpers
                 sqlString,
                 PanelsDataChecker.RequiredHeadings,
                 "Panel",
-                _panelsDataChecker,
+                _dataCheckers[QueryEntityType.Panels],
                 Mapper);
 
             foreach (var m in panelMetadata)

@@ -1,4 +1,4 @@
-﻿namespace SCQueryConnect.Helpers
+﻿namespace SCQueryConnect.Common.Models
 {
     public enum QueryEntityType
     {

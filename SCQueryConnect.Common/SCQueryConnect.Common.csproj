@@ -112,11 +112,7 @@
     <Compile Include="Interfaces\DataValidation\IDataChecker.cs" />
     <Compile Include="Interfaces\IIOService.cs" />
     <Compile Include="Interfaces\ILog.cs" />
-    <Compile Include="Interfaces\DataValidation\IItemsDataChecker.cs" />
     <Compile Include="Interfaces\IRelationshipsBuilder.cs" />
-    <Compile Include="Interfaces\DataValidation\IRelationshipsDataChecker.cs" />
-    <Compile Include="Interfaces\DataValidation\IPanelsDataChecker.cs" />
-    <Compile Include="Interfaces\DataValidation\IResourceUrlsDataChecker.cs" />
     <Compile Include="Interfaces\ISharpCloudApiFactory.cs" />
     <Compile Include="Interfaces\IQueryConnectHelper.cs" />
     <Compile Include="Logger.cs" />
@@ -125,6 +121,7 @@
     <Compile Include="Models\DefaultPanelValueSet.cs" />
     <Compile Include="Models\InvalidCredentialsException.cs" />
     <Compile Include="Models\PanelMetadata.cs" />
+    <Compile Include="Models\QueryEntityType.cs" />
     <Compile Include="Models\ResourceUrlMetadata.cs" />
     <Compile Include="Models\SharpCloudConfiguration.cs" />
     <Compile Include="Models\UpdateSettings.cs" />

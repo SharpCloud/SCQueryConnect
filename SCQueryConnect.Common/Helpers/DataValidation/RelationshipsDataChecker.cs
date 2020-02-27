@@ -1,5 +1,5 @@
 ﻿using SCQueryConnect.Common.Interfaces;
-using SCQueryConnect.Common.Interfaces.DataValidation;
+using SCQueryConnect.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers.DataValidation
 {
-    public class RelationshipsDataChecker : DataChecker, IRelationshipsDataChecker
+    public class RelationshipsDataChecker : DataChecker
     {
         private static readonly HashSet<string> ValidItem1Headings =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -33,6 +33,8 @@ namespace SCQueryConnect.Common.Helpers.DataValidation
             };
 
         private readonly ILog _logger;
+
+        public override QueryEntityType TargetEntity { get; } = QueryEntityType.Relationships;
 
         public RelationshipsDataChecker(ILog logger)
         {

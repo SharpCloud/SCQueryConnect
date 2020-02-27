@@ -1,5 +1,5 @@
 ﻿using SCQueryConnect.Common.Interfaces;
-using SCQueryConnect.Common.Interfaces.DataValidation;
+using SCQueryConnect.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SCQueryConnect.Common.Helpers.DataValidation
 {
-    public class ResourceUrlsDataChecker : DataChecker, IResourceUrlsDataChecker
+    public class ResourceUrlsDataChecker : DataChecker
     {
         public const string ExternalIdHeader = "ExternalID";
         public const string ResourceNameHeader = "ResourceName";
@@ -24,6 +24,8 @@ namespace SCQueryConnect.Common.Helpers.DataValidation
         };
 
         private readonly ILog _logger;
+
+        public override QueryEntityType TargetEntity { get; } = QueryEntityType.ResourceUrls;
 
         public ResourceUrlsDataChecker(ILog logger)
         {

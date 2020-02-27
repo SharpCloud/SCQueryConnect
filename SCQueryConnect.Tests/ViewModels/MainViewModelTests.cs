@@ -23,31 +23,25 @@ namespace SCQueryConnect.Tests.ViewModels
             IDbConnectionFactory dbConnectionFactory = null,
             IEncryptionHelper encryptionHelper = null,
             IIOService ioService = null,
-            IItemsDataChecker itemsDataChecker = null,
             ILog log = null,
             IMessageService messageService = null,
-            IPanelsDataChecker panelsDataChecker = null,
             IPasswordStorage passwordStorage = null,
             IProxyViewModel proxyViewModel = null,
             IQueryConnectHelper queryConnectHelper = null,
-            IRelationshipsDataChecker relationshipsDataChecker = null,
-            IResourceUrlsDataChecker resourceUrlsDataChecker = null,
-            ISaveFileDialogService saveFileDialogService = null)
+            ISaveFileDialogService saveFileDialogService = null,
+            params IDataChecker[] dataCheckers)
         {
             var vm = new MainViewModel(
                 batchPublishHelper ?? Mock.Of<IBatchPublishHelper>(),
+                dataCheckers,
                 dbConnectionFactory ?? Mock.Of<IDbConnectionFactory>(),
                 encryptionHelper ?? Mock.Of<IEncryptionHelper>(),
                 ioService ?? Mock.Of<IIOService>(),
-                itemsDataChecker ?? Mock.Of<IItemsDataChecker>(),
                 log ?? new MultiDestinationLogger(),
                 messageService ?? Mock.Of<IMessageService>(),
-                panelsDataChecker ?? Mock.Of<IPanelsDataChecker>(),
                 passwordStorage ?? Mock.Of<IPasswordStorage>(),
                 proxyViewModel ?? Mock.Of<IProxyViewModel>(),
                 queryConnectHelper ?? Mock.Of<IQueryConnectHelper>(),
-                relationshipsDataChecker ?? Mock.Of<IRelationshipsDataChecker>(),
-                resourceUrlsDataChecker ?? Mock.Of<IResourceUrlsDataChecker>(),
                 saveFileDialogService ?? Mock.Of<ISaveFileDialogService>());
 
             return vm;
