@@ -117,7 +117,6 @@
                     <TreeView AllowDrop="True"
                               Background="{StaticResource QCBackground}"
                               BorderThickness="0"
-                              DataContext="{Binding Parent, ElementName=Root}"
                               DragOver="QueryItemTreeDragEnter"
                               Drop="QueryItemTreeDrop"
                               ItemsSource="{Binding MainViewModel.Connections, Source={StaticResource ViewModelLocator}}"
