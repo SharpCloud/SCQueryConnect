@@ -25,6 +25,7 @@
                                  AcceptsReturn="True"
                                  FontFamily="Courier New"
                                  Grid.Row="1"
+                                 IsInactiveSelectionHighlightEnabled="True"
                                  Margin="5"
                                  Text="{TemplateBinding QueryString}"
                                  TextWrapping="WrapWithOverflow">
