@@ -17,6 +17,12 @@
                         <Setter Property="Foreground" Value="White" />
                     </Style>
 
+                    <Style x:Key="DialogueFooterButton" BasedOn="{StaticResource DefaultButtonStyle}" TargetType="Button">
+                        <Setter Property="Height" Value="30" />
+                        <Setter Property="Margin" Value="5" />
+                        <Setter Property="Width" Value="80" />
+                    </Style>
+
                     <Style x:Key="Label" TargetType="TextBlock">
                         <Setter Property="Foreground" Value="{StaticResource QCBlue}" />
                         <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}" />

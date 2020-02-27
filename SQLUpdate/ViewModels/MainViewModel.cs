@@ -768,24 +768,29 @@ namespace SCQueryConnect.ViewModels
                         return;
                 }
 
-                await PreviewSql(
-                    SelectedQueryData,
-                    editor.SelectedQueryString,
-                    _dataCheckers[editor.TargetEntity],
-                    resultsSelector);
+                var queryData = SelectedQueryData;
 
-                ValidatePanelData(SelectedQueryData);
+                var dataTable = await PreviewSql(
+                    queryData,
+                    editor.SelectedQueryString,
+                    editor.TargetEntity);
+
+                var prop = (PropertyInfo)((MemberExpression)resultsSelector.Body).Member;
+                prop.SetValue(queryData, dataTable, null);
+
+                ValidatePanelData(queryData);
             }
         }
 
-        private async Task PreviewSql(
+        public async Task<DataTable> PreviewSql(
             QueryData queryData,
             string query,
-            IDataChecker dataChecker,
-            Expression<Func<QueryData, DataTable>> resultsSelector)
+            QueryEntityType targetEntity)
         {
             CanCancelUpdate = false;
             UpdateText = "Generating SQL Preview...";
+
+            DataTable dataTable;
 
             try
             {
@@ -801,24 +806,21 @@ namespace SCQueryConnect.ViewModels
 
                         using (var reader = command.ExecuteReader())
                         {
-                            await dataChecker.CheckData(reader, queryData);
+                            await _dataCheckers[targetEntity].CheckData(reader, queryData);
 
-                            var dt = new DataTable();
-                            dt.Load(reader);
-
-                            var regex = new Regex(Regex.Escape("#"));
-                            for (var c = 0; c < dt.Columns.Count; c++)
-                            {
-                                var col = dt.Columns[c];
-                                if (col.Caption.ToLower().StartsWith("tags#"))
-                                {
-                                    col.Caption = regex.Replace(col.Caption, ".", 1);
-                                }
-                            }
-
-                            var prop = (PropertyInfo)((MemberExpression)resultsSelector.Body).Member;
-                            prop.SetValue(queryData, dt, null);
+                            dataTable = new DataTable();
+                            dataTable.Load(reader);
                         }
+                    }
+                }
+
+                var regex = new Regex(Regex.Escape("#"));
+                for (var c = 0; c < dataTable.Columns.Count; c++)
+                {
+                    var col = dataTable.Columns[c];
+                    if (col.Caption.ToLower().StartsWith("tags#"))
+                    {
+                        col.Caption = regex.Replace(col.Caption, ".", 1);
                     }
                 }
 
@@ -829,6 +831,8 @@ namespace SCQueryConnect.ViewModels
                 UpdateText = string.Empty;
                 UpdateSubtext = string.Empty;
             }
+
+            return dataTable;
         }
 
         public async Task RunQueryData(QueryData queryData)

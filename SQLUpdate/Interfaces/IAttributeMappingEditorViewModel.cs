@@ -1,6 +1,15 @@
-﻿namespace SCQueryConnect.Interfaces
+﻿using SCQueryConnect.Models;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+
+namespace SCQueryConnect.Interfaces
 {
-    public interface IAttributeMappingEditorViewModel
+    public interface IAttributeMappingEditorViewModel : INotifyPropertyChanged
     {
+        List<AttributeDesignations> StoryAttributes { get; }
+        List<AttributeMapping> AttributeMappings { get; }
+
+        Task InitialiseEditor();
     }
 }

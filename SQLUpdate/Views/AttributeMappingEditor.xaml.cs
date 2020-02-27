@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using SCQueryConnect.Interfaces;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace SCQueryConnect.Views
 {
@@ -10,6 +12,15 @@ namespace SCQueryConnect.Views
         public AttributeMappingEditor()
         {
             InitializeComponent();
+        }
+
+        private void AttributeMappingEditorLoaded(object sender, RoutedEventArgs e)
+        {
+            if (Content is FrameworkElement fe &&
+                fe.DataContext is IAttributeMappingEditorViewModel vm)
+            {
+                Task.Run(() => vm.InitialiseEditor());
+            }
         }
     }
 }

@@ -40,6 +40,7 @@ namespace SCQueryConnect.Interfaces
         SharpCloudConfiguration GetApiConfiguration();
         IDbConnection GetDb(QueryData queryData);
         Task PreviewSql();
+        Task<DataTable> PreviewSql(QueryData queryData, string query, QueryEntityType targetEntity);
         Task RunQueryData(QueryData queryData);
         Task CancelStoryUpdate();
         void PublishBatchFolder();
