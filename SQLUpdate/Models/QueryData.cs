@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
@@ -203,6 +204,8 @@ namespace SCQueryConnect.Models
         public string SourceStoryPasswordEntropy { get; set; }
         
         public string SourceStoryServer { get; set; }
+
+        public Dictionary<string, string> AttributeMapping { get; set; }
 
         public bool BuildRelationships
         {

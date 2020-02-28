@@ -14,6 +14,7 @@ using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
@@ -44,8 +45,8 @@ namespace SCQueryConnect
         {
             get { return _qcHelper.AppName; }
         }
-        
-        
+
+        private readonly IAttributeMappingEditorViewModel _attributeMappingEditorViewModel;
         private readonly IBatchPublishHelper _batchPublishHelper;
         private readonly IQueryConnectHelper _qcHelper;
         private readonly IConnectionStringHelper _connectionStringHelper;
@@ -61,6 +62,7 @@ namespace SCQueryConnect
         private readonly RichTextBoxLoggingDestination _folderLoggingDestination;
 
         public MainWindow(
+            IAttributeMappingEditorViewModel attributeMappingEditorViewModel,
             IBatchPublishHelper batchPublishHelper,
             IConnectionStringHelper connectionStringHelper,
             IExcelWriter excelWriter,
@@ -77,6 +79,7 @@ namespace SCQueryConnect
             Loaded += MainWindow_Loaded;
             DataContext = this;
 
+            _attributeMappingEditorViewModel = attributeMappingEditorViewModel;
             _batchPublishHelper = batchPublishHelper;
             _connectionStringHelper = connectionStringHelper;
             _excelWriter = excelWriter;
@@ -624,12 +627,21 @@ namespace SCQueryConnect
 
         private void EditCustomAttributeMappingClick(object sender, RoutedEventArgs e)
         {
+            _attributeMappingEditorViewModel.Clear();
+
             var editor = new AttributeMappingEditor
             {
+                AttributeMapping = _mainViewModel.SelectedQueryData.AttributeMapping,
                 Owner = this
             };
-
-            editor.ShowDialog();
+            
+            var result = editor.ShowDialog();
+            
+            if (result == true)
+            {
+                _mainViewModel.SelectedQueryData.AttributeMapping =
+                    _attributeMappingEditorViewModel.ExtractMapping();
+            }
         }
 
         private void ShowHelpWindow<T>() where T : Window, new()

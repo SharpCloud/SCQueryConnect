@@ -11,5 +11,7 @@ namespace SCQueryConnect.Interfaces
         List<AttributeMapping> AttributeMappings { get; }
 
         Task InitialiseEditor(IDictionary<string, string> existingMapping);
+        Dictionary<string, string> ExtractMapping();
+        void Clear();
     }
 }

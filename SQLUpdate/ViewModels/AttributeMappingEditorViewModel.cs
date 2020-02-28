@@ -1,4 +1,5 @@
-﻿using SCQueryConnect.Interfaces;
+﻿using System;
+using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -82,6 +83,18 @@ namespace SCQueryConnect.ViewModels
 
             StoryAttributes = storyAttributes;
             AttributeMappings = generatedMappings;
+        }
+
+        public Dictionary<string, string> ExtractMapping()
+        {
+            var mapping = AttributeMappings.ToDictionary(m => m.SourceName, m => m.Target.Id);
+            return mapping;
+        }
+
+        public void Clear()
+        {
+            AttributeMappings = new List<AttributeMapping>();
+            StoryAttributes = new List<AttributeDesignations>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

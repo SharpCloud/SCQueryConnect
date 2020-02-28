@@ -1,4 +1,5 @@
 ﻿using SCQueryConnect.Interfaces;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -9,6 +10,8 @@ namespace SCQueryConnect.Views
     /// </summary>
     public partial class AttributeMappingEditor : Window
     {
+        public Dictionary<string, string> AttributeMapping { get; set; }
+
         public AttributeMappingEditor()
         {
             InitializeComponent();
@@ -20,8 +23,13 @@ namespace SCQueryConnect.Views
                 fe.DataContext is IAttributeMappingEditorViewModel vm)
             {
                 // Do not run on UI thread to maintain responsive UI
-                Task.Run(() => vm.InitialiseEditor(null));
+                Task.Run(() => vm.InitialiseEditor(AttributeMapping));
             }
+        }
+
+        private void OkButtonClick(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
         }
     }
 }

@@ -43,6 +43,7 @@
                             </TextBlock>
 
                             <ComboBox DisplayMemberPath="Name"
+                                      FontSize="{StaticResource DefaultFontSize}"
                                       Grid.Column="1"
                                       Height="30"
                                       ItemsSource="{Binding AttributeMappingEditorViewModel.StoryAttributes, Source={StaticResource ViewModelLocator}}"
@@ -57,11 +58,11 @@
         </ScrollViewer>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button Content="OK" IsDefault="True" Style="{StaticResource DialogueFooterButton}" />
+            <Button Content="OK" IsDefault="True" Style="{StaticResource DialogueFooterButton}" Click="OkButtonClick" />
             <Button Content="Cancel" IsCancel="True" Style="{StaticResource DialogueFooterButton}" />
         </StackPanel>
 
-        <controls:BusyOverlay CanCancelUpdate="{Binding CanCancelUpdate}"
+        <controls:BusyOverlay CanCancelUpdate="False"
                               DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
                               Grid.Row="0"
                               Grid.RowSpan="2"

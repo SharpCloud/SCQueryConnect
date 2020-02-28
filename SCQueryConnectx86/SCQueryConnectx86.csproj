@@ -363,13 +363,43 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="..\SQLUpdate\Controls\BusyOverlay.xaml">
-      <Link>Controls\BusyOverlay.xaml</Link>
+    <Page Include="..\SQLUpdate\Dictionaries\BusyOverlay.xaml">
+      <Link>Dictionaries\BusyOverlay.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\SQLUpdate\Controls\QueryEditor.xaml">
-      <Link>Controls\QueryEditor.xaml</Link>
+    <Page Include="..\SQLUpdate\Dictionaries\Button.xaml">
+      <Link>Dictionaries\Button.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Dictionaries\Converters.xaml">
+      <Link>Dictionaries\Converters.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Dictionaries\QueryEditor.xaml">
+      <Link>Dictionaries\QueryEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Dictionaries\Storyboards.xaml">
+      <Link>Dictionaries\Storyboards.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Dictionaries\TextBlock.xaml">
+      <Link>Dictionaries\TextBlock.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Dictionaries\TreeView.xaml">
+      <Link>Dictionaries\TreeView.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\SQLUpdate\Dictionaries\Window.xaml">
+      <Link>Dictionaries\Window.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
