@@ -34,23 +34,23 @@ namespace SCQueryConnect.Helpers
 
         public Task<List<AttributeDesignations>> GetStoryAttributes(AttributeDesignations unassigned)
         {
-            var sc = _scApiFactory.CreateSharpCloudApi(
-                _mainViewModel.Username,
-                _passwordStorage.LoadPassword(PasswordStorage.Password),
-                _mainViewModel.Url,
-                _proxyViewModel.Proxy,
-                _proxyViewModel.ProxyAnonymous,
-                _proxyViewModel.ProxyUserName,
-                _passwordStorage.LoadPassword(PasswordStorage.ProxyPassword));
-
-            if (sc == null)
-            {
-                _messageService.Show(InvalidCredentialsException.LoginFailed);
-                return null;
-            }
-
             var storyTask = Task.Run(() =>
             {
+                var sc = _scApiFactory.CreateSharpCloudApi(
+                    _mainViewModel.Username,
+                    _passwordStorage.LoadPassword(PasswordStorage.Password),
+                    _mainViewModel.Url,
+                    _proxyViewModel.Proxy,
+                    _proxyViewModel.ProxyAnonymous,
+                    _proxyViewModel.ProxyUserName,
+                    _passwordStorage.LoadPassword(PasswordStorage.ProxyPassword));
+
+                if (sc == null)
+                {
+                    _messageService.Show(InvalidCredentialsException.LoginFailed);
+                    return null;
+                }
+
                 var story = sc.LoadStory(_mainViewModel.SelectedQueryData.StoryId);
 
                 var attributes = story.Attributes
