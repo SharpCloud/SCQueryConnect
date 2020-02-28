@@ -146,6 +146,7 @@
     </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Commands\GoToUrl.cs" />
+    <Compile Include="Controls\BusyOverlay.cs" />
     <Compile Include="Controls\QueryEditor.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ConnectionTypeCollapsedConverter.cs" />
@@ -223,6 +224,10 @@
     <Compile Include="Views\UnpublishUnmatchedItemsHelp.xaml.cs">
       <DependentUpon>UnpublishUnmatchedItemsHelp.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\BusyOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\QueryEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

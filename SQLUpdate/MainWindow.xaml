@@ -24,24 +24,8 @@
 
     <Grid>
         <Grid.Resources>
-            <converters:BoolToVisibilityConverter x:Key="BoolVisibilityConverter" />
-            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
             <converters:UrlToStoryIdConverter x:Key="UrlToStoryIdConverter" />
             <viewModels:ViewModelLocator x:Key="ViewModelLocator" />
-
-            <Storyboard x:Key="FadeIn">
-                <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
-                    <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Visible}" />
-                </ObjectAnimationUsingKeyFrames>
-                <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="1" />
-            </Storyboard>
-
-            <Storyboard x:Key="FadeOut">
-                <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="Visibility">
-                    <DiscreteObjectKeyFrame KeyTime="00:00:00.150" Value="{x:Static Visibility.Collapsed}" />
-                </ObjectAnimationUsingKeyFrames>
-                <DoubleAnimation Duration="00:00:00.150" Storyboard.TargetProperty="Opacity" To="0" />
-            </Storyboard>
         </Grid.Resources>
 
         <Grid Background="Black">
@@ -1009,90 +993,12 @@
             </Grid>
         </Grid>
 
-        <Grid Background="#cc000000"
-              DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
-              Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
-
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding UpdateText}" Value="">
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource FadeOut}" />
-                            </DataTrigger.EnterActions>
-
-                            <DataTrigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource FadeIn}" />
-                            </DataTrigger.ExitActions>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-
-            <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center">
-
-                <StackPanel Orientation="Horizontal">
-                    <Border BorderBrush="White"
-                            BorderThickness="1"
-                            Margin="0,0,20,0"
-                            VerticalAlignment="Center"
-                            Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
-
-                        <Border.Triggers>
-                            <EventTrigger RoutedEvent="Border.Loaded">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation AutoReverse="True"
-                                                         Duration="00:00:01.500" 
-                                                         From="5"
-                                                         RepeatBehavior="Forever"
-                                                         Storyboard.TargetName="DropShadow" 
-                                                         Storyboard.TargetProperty="BlurRadius"
-                                                         To="20">
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </Border.Triggers>
-
-                        <Border.Effect>
-                            <DropShadowEffect ShadowDepth="0" Color="White" x:Name="DropShadow" />
-                        </Border.Effect>
-
-                        <Image Height="36" Source="Images/Connections/SharpCloud.png" Width="36" />
-                    </Border>
-
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Foreground="white"
-                               FontSize="30"
-                               HorizontalAlignment="Center"
-                               MaxWidth="500"
-                               Text="{Binding UpdateText}"
-                               TextWrapping="WrapWithOverflow">
-                        </TextBlock>
-
-                        <TextBlock Foreground="white"
-                               FontSize="18"
-                               HorizontalAlignment="Center"
-                               MaxWidth="500"
-                               Text="{Binding UpdateSubtext}"
-                               TextWrapping="WrapWithOverflow"
-                               Visibility="{Binding UpdateSubtext, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
-                        </TextBlock>
-                    </StackPanel>
-                </StackPanel>
-
-                <Button Click="CancelStoryUpdate"
-                        HorizontalAlignment="Center"
-                        Margin="0,20,0,0"
-                        Padding="30,5"
-                        Style="{StaticResource DefaultButtonStyle}"
-                        VerticalAlignment="Center"
-                        Visibility="{Binding CanCancelUpdate, Converter={StaticResource BoolVisibilityConverter}, ConverterParameter=true}">
-                    Cancel
-                </Button>
-            </StackPanel>
-        </Grid>
+        <controls:BusyOverlay CanCancelUpdate="{Binding CanCancelUpdate}"
+                              Cancel="CancelStoryUpdate"
+                              DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+                              UpdateText="{Binding UpdateText}"
+                              UpdateSubtext="{Binding UpdateSubtext}"
+                              Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+        </controls:BusyOverlay>
     </Grid>
 </Window>

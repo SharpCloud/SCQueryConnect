@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:SCQueryConnect.ViewModels"
+        xmlns:controls="clr-namespace:SCQueryConnect.Controls"
         mc:Ignorable="d"
         Loaded="AttributeMappingEditorLoaded"
         Height="450"
@@ -59,5 +60,14 @@
             <Button Content="OK" IsDefault="True" Style="{StaticResource DialogueFooterButton}" />
             <Button Content="Cancel" IsCancel="True" Style="{StaticResource DialogueFooterButton}" />
         </StackPanel>
+
+        <controls:BusyOverlay CanCancelUpdate="{Binding CanCancelUpdate}"
+                              DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+                              Grid.Row="0"
+                              Grid.RowSpan="2"
+                              UpdateText="{Binding UpdateText}"
+                              UpdateSubtext="{Binding UpdateSubtext}"
+                              Visibility="{Binding UpdateText, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+        </controls:BusyOverlay>
     </Grid>
 </Window>

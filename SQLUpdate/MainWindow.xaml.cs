@@ -593,7 +593,7 @@ namespace SCQueryConnect
             queryData.DragInto = false;
         }
 
-        private async void CancelStoryUpdate(object sender, RoutedEventArgs e)
+        private async void CancelStoryUpdate(object sender, EventArgs e)
         {
             await _mainViewModel.CancelStoryUpdate();
         }
