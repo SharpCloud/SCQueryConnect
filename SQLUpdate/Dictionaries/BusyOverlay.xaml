@@ -74,7 +74,8 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <Button HorizontalAlignment="Center"
+                            <Button Command="{TemplateBinding CancelUpdateCommand}"
+                                    HorizontalAlignment="Center"
                                     Margin="0,20,0,0"
                                     Name="PART_CancelButton"
                                     Padding="30,5"

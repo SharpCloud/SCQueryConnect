@@ -1,36 +1,22 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SCQueryConnect.Controls
 {
-    [TemplatePart(Name = "PART_CancelButton", Type = typeof(Button))]
     public class BusyOverlay : Control
     {
-        private Button _cancelButton;
-
-        private Button CancelButton
-        {
-            set
-            {
-                if (_cancelButton != null)
-                {
-                    _cancelButton.Click -= CancelButtonClick;
-                }
-
-                _cancelButton = value;
-
-                if (_cancelButton != null)
-                {
-                    _cancelButton.Click += CancelButtonClick;
-                }
-            }
-        }
-
         public bool CanCancelUpdate
         {
             get => (bool)GetValue(CanCancelUpdateProperty);
             set => SetValue(CanCancelUpdateProperty, value);
+        }
+
+        public ICommand CancelUpdateCommand
+        {
+            get => (ICommand)GetValue(CancelUpdateCommandProperty);
+            set => SetValue(CancelUpdateCommandProperty, value);
         }
 
         public string UpdateText
@@ -49,6 +35,10 @@ namespace SCQueryConnect.Controls
             DependencyProperty.Register("CanCancelUpdate", typeof(bool), typeof(BusyOverlay),
                 new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
+        public static readonly DependencyProperty CancelUpdateCommandProperty =
+            DependencyProperty.Register("CancelUpdateCommand", typeof(ICommand), typeof(BusyOverlay),
+                new FrameworkPropertyMetadata(null));
+
         public static readonly DependencyProperty UpdateSubtextProperty =
             DependencyProperty.Register("UpdateSubtext", typeof(string), typeof(BusyOverlay),
                 new FrameworkPropertyMetadata(string.Empty));
@@ -57,24 +47,10 @@ namespace SCQueryConnect.Controls
             DependencyProperty.Register("UpdateText", typeof(string), typeof(BusyOverlay),
                 new FrameworkPropertyMetadata(string.Empty));
 
-        public event EventHandler<EventArgs> Cancel;
-
         static BusyOverlay()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BusyOverlay),
                 new FrameworkPropertyMetadata(typeof(BusyOverlay)));
-        }
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            CancelButton = GetTemplateChild("PART_CancelButton") as Button;
-        }
-
-        private void CancelButtonClick(object sender, RoutedEventArgs e)
-        {
-            Cancel?.Invoke(this, EventArgs.Empty);
         }
     }
 }

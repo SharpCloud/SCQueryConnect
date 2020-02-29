@@ -122,6 +122,9 @@
     <Compile Include="..\SQLUpdate\Bootstrapper.cs">
       <Link>Bootstrapper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Commands\ActionCommand.cs">
+      <Link>Commands\ActionCommand.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Commands\GoToUrl.cs">
       <Link>Commands\GoToUrl.cs</Link>
     </Compile>
@@ -188,11 +191,17 @@
     <Compile Include="..\SQLUpdate\Helpers\StoryAttributesHelper.cs">
       <Link>Helpers\StoryAttributesHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\IActionCommand.cs">
+      <Link>Interfaces\IActionCommand.cs</Link>
+    </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IAttributeMappingEditorViewModel.cs">
       <Link>Interfaces\IAttributeMappingEditorViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IBatchPublishHelper.cs">
       <Link>Interfaces\IBatchPublishHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\Interfaces\ICommandsViewModel.cs">
+      <Link>Interfaces\ICommandsViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\Interfaces\IMainViewModel.cs">
       <Link>Interfaces\IMainViewModel.cs</Link>
@@ -271,6 +280,9 @@
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\AttributeMappingEditorViewModel.cs">
       <Link>ViewModels\AttributeMappingEditorViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\SQLUpdate\ViewModels\CommandsViewModel.cs">
+      <Link>ViewModels\CommandsViewModel.cs</Link>
     </Compile>
     <Compile Include="..\SQLUpdate\ViewModels\MainViewModel.cs">
       <Link>ViewModels\MainViewModel.cs</Link>

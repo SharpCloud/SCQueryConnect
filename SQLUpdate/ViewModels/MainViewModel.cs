@@ -711,7 +711,7 @@ namespace SCQueryConnect.ViewModels
             }
         }
 
-        public SharpCloudConfiguration GetApiConfiguration()
+        private SharpCloudConfiguration GetApiConfiguration()
         {
             return new SharpCloudConfiguration
             {
@@ -725,7 +725,7 @@ namespace SCQueryConnect.ViewModels
             };
         }
 
-        public IDbConnection GetDb(QueryData queryData)
+        private IDbConnection GetDb(QueryData queryData)
         {
             return _dbConnectionFactory.GetDb(
                 queryData.FormattedConnectionString,
@@ -952,6 +952,39 @@ namespace SCQueryConnect.ViewModels
             };
 
             _batchPublishHelper.PublishBatchFolder(settings);
+        }
+
+        public async Task TestConnection(QueryData queryData)
+        {
+            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel)
+            {
+                try
+                {
+                    await _qcHelper.InitialiseDatabase(
+                        GetApiConfiguration(),
+                        queryData.FormattedConnectionString,
+                        queryData.ConnectionType);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not connect to SharpCloud! {ex.Message}");
+                    return;
+                }
+            }
+
+            try
+            {
+                using (IDbConnection connection = GetDb(queryData))
+                {
+                    connection.Open();
+                    _messageService.Show("Hooray! It looks like it's worked!");
+                    SaveApplicationState();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not connect to database! " + ex.Message);
+            }
         }
 
         private bool ValidateCredentials()

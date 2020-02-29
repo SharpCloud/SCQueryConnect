@@ -175,44 +175,6 @@ namespace SCQueryConnect
             }
         }
 
-        private async void TestConnectionClick(object sender, RoutedEventArgs e)
-        {
-            await TestConnection(_mainViewModel.SelectedQueryData);
-        }
-
-        private async Task TestConnection(QueryData queryData)
-        {
-            if (queryData.ConnectionType == DatabaseType.SharpCloudExcel)
-            {
-                try
-                {
-                    await _qcHelper.InitialiseDatabase(
-                        _mainViewModel.GetApiConfiguration(),
-                        queryData.FormattedConnectionString,
-                        queryData.ConnectionType);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Could not connect to SharpCloud! {ex.Message}");
-                    return;
-                }
-            }
-
-            try
-            {
-                using (IDbConnection connection = _mainViewModel.GetDb(queryData))
-                {
-                    connection.Open();
-                    MessageBox.Show("Hooray! It looks like it's worked!");
-                    SaveSettings();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Could not connect to database! " + ex.Message);
-            }
-        }
-
         private void ReviewConnectionClick(object sender, RoutedEventArgs e)
         {
             var dlg = new ConnectionInfo(_mainViewModel.SelectedQueryData)
@@ -295,31 +257,6 @@ namespace SCQueryConnect
             }
 
             _mainViewModel.CreateNewConnection(newWnd.SelectedButton);
-        }
-
-        private void NewQueryFolderClick(object sender, RoutedEventArgs e)
-        {
-            _mainViewModel.CreateNewFolder();
-        }
-
-        private void MoveConnectionDown(object sender, RoutedEventArgs e)
-        {
-            _mainViewModel.MoveConnectionDown();
-        }
-
-        private void MoveConnectionUp(object sender, RoutedEventArgs e)
-        {
-            _mainViewModel.MoveConnectionUp();
-        }
-
-        private void CopyConnectionClick(object sender, RoutedEventArgs e)
-        {
-            _mainViewModel.CopyConnection();
-        }
-
-        private void DeleteConnectionClick(object sender, RoutedEventArgs e)
-        {
-            _mainViewModel.DeleteConnection();
         }
 
         private async void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -421,11 +358,6 @@ namespace SCQueryConnect
         private void QC_Data_Folder_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", _ioService.OutputRoot);
-        }
-
-        private void PublishBatchFolderClick(object sender, RoutedEventArgs e)
-        {
-            _mainViewModel.PublishBatchFolder();
         }
 
         private void QueryItemTreePreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -574,15 +506,6 @@ namespace SCQueryConnect
             return path;
         }
 
-        private async void RunQueryDataClick(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkElement fe &&
-                fe.DataContext is QueryData queryData)
-            {
-                await _mainViewModel.RunQueryData(queryData);
-            }
-        }
-
         private void QueryItemTreeDragLeave(object sender, DragEventArgs e)
         {
             if (sender is FrameworkElement fe &&
@@ -599,11 +522,6 @@ namespace SCQueryConnect
             queryData.DragAbove = false;
             queryData.DragBelow = false;
             queryData.DragInto = false;
-        }
-
-        private async void CancelStoryUpdate(object sender, EventArgs e)
-        {
-            await _mainViewModel.CancelStoryUpdate();
         }
 
         private void PasswordOnPasswordChanged(object sender, RoutedEventArgs e)

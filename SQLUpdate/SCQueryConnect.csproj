@@ -145,6 +145,7 @@
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\GoToUrl.cs" />
     <Compile Include="Controls\BusyOverlay.cs" />
     <Compile Include="Controls\QueryEditor.cs" />
@@ -165,8 +166,10 @@
     <Compile Include="Helpers\BatchPublishHelper.cs" />
     <Compile Include="Helpers\ConnectionNameValidator.cs" />
     <Compile Include="Helpers\StoryAttributesHelper.cs" />
+    <Compile Include="Interfaces\IActionCommand.cs" />
     <Compile Include="Interfaces\IAttributeMappingEditorViewModel.cs" />
     <Compile Include="Interfaces\IBatchPublishHelper.cs" />
+    <Compile Include="Interfaces\ICommandsViewModel.cs" />
     <Compile Include="Interfaces\IMainViewModel.cs" />
     <Compile Include="Interfaces\IMessageService.cs" />
     <Compile Include="Interfaces\IPasswordStorage.cs" />
@@ -189,6 +192,7 @@
     <Compile Include="Services\SaveFileDialogService.cs" />
     <Compile Include="Services\ZipService.cs" />
     <Compile Include="ViewModels\AttributeMappingEditorViewModel.cs" />
+    <Compile Include="ViewModels\CommandsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\AttributeMappingEditor.xaml.cs">

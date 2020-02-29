@@ -65,6 +65,7 @@ namespace SCQueryConnect
             builder.RegisterType<AttributeMappingEditorViewModel>().As<IAttributeMappingEditorViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<BatchPublishHelper>().As<IBatchPublishHelper>().InstancePerLifetimeScope();
             builder.RegisterType<CDataLicenceService>().As<ICDataLicenceService>().InstancePerLifetimeScope();
+            builder.RegisterType<CommandsViewModel>().As<ICommandsViewModel>().InstancePerLifetimeScope();
             builder.RegisterType<ConnectionStringHelper>().As<IConnectionStringHelper>().InstancePerLifetimeScope();
             builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DpapiHelper>().As<IEncryptionHelper>().InstancePerLifetimeScope();
