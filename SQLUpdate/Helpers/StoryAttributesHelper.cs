@@ -3,6 +3,7 @@ using SCQueryConnect.Common.Models;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using SCQueryConnect.Services;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -17,6 +18,28 @@ namespace SCQueryConnect.Helpers
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
         private readonly ISharpCloudApiFactory _scApiFactory;
+
+        private readonly HashSet<string> _nonCustomAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Category",
+            "ClickActionUrl",
+            "Description",
+            "Dislikes",
+            "Duration (Days)",
+            "Duration Days",
+            "Duration",
+            "External Id",
+            "ExternalId",
+            "Image",
+            "Internal Id",
+            "InternalId",
+            "Likes",
+            "Name",
+            "Published",
+            "RowId",
+            "Start",
+            "Tags"
+        };
 
         public StoryAttributesHelper(
             IMainViewModel mainViewModel,
@@ -76,14 +99,26 @@ namespace SCQueryConnect.Helpers
                 _mainViewModel.SelectedQueryData.QueryString,
                 QueryEntityType.Items);
 
-            var mappingList = sqlResultsTask.Columns.Cast<DataColumn>().Select(c =>
-                new AttributeMapping
+            var mappingList = sqlResultsTask.Columns
+                .Cast<DataColumn>()
+                .Select(c => c.Caption)
+                .Where(IsCustomAttribute)
+                .Select(a => new AttributeMapping
                 {
-                    SourceName = c.Caption,
+                    SourceName = a,
                     Target = unassigned
                 });
 
             return mappingList.OrderBy(a => a.SourceName).ToList();
+        }
+
+        private bool IsCustomAttribute(string name)
+        {
+            var isCustom =
+                !_nonCustomAttributes.Contains(name) &&
+                !name.StartsWith("Tags.", StringComparison.OrdinalIgnoreCase);
+
+            return isCustom;
         }
     }
 }
