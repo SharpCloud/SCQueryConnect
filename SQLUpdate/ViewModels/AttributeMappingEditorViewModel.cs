@@ -11,6 +11,8 @@ namespace SCQueryConnect.ViewModels
 {
     public class AttributeMappingEditorViewModel : IAttributeMappingEditorViewModel
     {
+        private readonly IMainViewModel _mainViewModel;
+        private readonly IMessageService _messageService;
         private readonly IStoryAttributesHelper _storyAttributesHelper;
 
         private readonly AttributeDesignations _unassigned = new AttributeDesignations
@@ -19,8 +21,23 @@ namespace SCQueryConnect.ViewModels
             Name = "- Unassigned -"
         };
 
+        private bool _isInitialised;
         private List<AttributeDesignations> _storyAttributes;
         private List<AttributeMapping> _attributeMappings;
+
+        public bool IsInitialised
+        {
+            get => _isInitialised;
+
+            set
+            {
+                if (_isInitialised != value)
+                {
+                    _isInitialised = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public List<AttributeDesignations> StoryAttributes
         {
@@ -51,25 +68,48 @@ namespace SCQueryConnect.ViewModels
         }
 
         public AttributeMappingEditorViewModel(
+            IMainViewModel mainViewModel,
+            IMessageService messageService,
             IStoryAttributesHelper storyAttributesHelper)
         {
+            _mainViewModel = mainViewModel;
+            _messageService = messageService;
             _storyAttributesHelper = storyAttributesHelper;
         }
 
         public async Task InitialiseEditor(IDictionary<string, string> existingMapping)
         {
+            _mainViewModel.UpdateText = "Loading attributes...";
+
             var attributesTask = _storyAttributesHelper.GetStoryAttributes(_unassigned);
             var mappingsTask = _storyAttributesHelper.GetAttributeMappings(_unassigned);
-            await Task.WhenAll(attributesTask, mappingsTask);
+            
+            try
+            {
+                await Task.WhenAll(attributesTask, mappingsTask);
+            }
+            catch (Exception e)
+            {
+                _messageService.Show(e.Message);
+            }
 
-            var storyAttributes = attributesTask.Result;
-            var generatedMappings = mappingsTask.Result;
+            _mainViewModel.UpdateText = string.Empty;
+
+            if (attributesTask.Status != TaskStatus.RanToCompletion ||
+                attributesTask.Result == null ||
+                mappingsTask.Status != TaskStatus.RanToCompletion ||
+                mappingsTask.Result == null)
+            {
+                OnInitialisationError();
+                _messageService.Show("Closing mapping editor: could not generate attributes mappings");
+                return;
+            }
 
             if (existingMapping != null)
             {
-                foreach (var mapping in generatedMappings)
+                foreach (var mapping in mappingsTask.Result)
                 {
-                    var attribute = storyAttributes.SingleOrDefault(a =>
+                    var attribute = attributesTask.Result.SingleOrDefault(a =>
                         existingMapping.ContainsKey(mapping.SourceName) &&
                         a.Id == existingMapping[mapping.SourceName]);
 
@@ -81,8 +121,9 @@ namespace SCQueryConnect.ViewModels
                 }
             }
 
-            StoryAttributes = storyAttributes;
-            AttributeMappings = generatedMappings;
+            StoryAttributes = attributesTask.Result;
+            AttributeMappings = mappingsTask.Result;
+            IsInitialised = StoryAttributes != null && AttributeMappings != null;
         }
 
         public Dictionary<string, string> ExtractMapping()
@@ -97,11 +138,17 @@ namespace SCQueryConnect.ViewModels
             StoryAttributes = new List<AttributeDesignations>();
         }
 
+        public event EventHandler InitialisationError;
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void OnInitialisationError()
+        {
+            InitialisationError?.Invoke(this, EventArgs.Empty);
         }
     }
 }

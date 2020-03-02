@@ -252,6 +252,11 @@ namespace SCQueryConnect
             {
                 ProcessRunException(e);
             }
+            finally
+            {
+                _mainViewModel.UpdateText = string.Empty;
+                _mainViewModel.UpdateSubtext = string.Empty;
+            }
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)

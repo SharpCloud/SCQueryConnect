@@ -57,7 +57,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right" IsEnabled="{Binding IsInitialised}" Orientation="Horizontal">
             <Button Content="OK" IsDefault="True" Style="{StaticResource DialogueFooterButton}" Click="OkButtonClick" />
             <Button Content="Cancel" IsCancel="True" Style="{StaticResource DialogueFooterButton}" />
         </StackPanel>

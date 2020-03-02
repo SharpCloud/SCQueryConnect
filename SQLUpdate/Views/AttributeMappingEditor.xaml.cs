@@ -1,4 +1,5 @@
 ﻿using SCQueryConnect.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,17 @@ namespace SCQueryConnect.Views
         public AttributeMappingEditor()
         {
             InitializeComponent();
+
+            if (Content is FrameworkElement fe &&
+                fe.DataContext is IAttributeMappingEditorViewModel vm)
+            {
+                vm.InitialisationError += ViewModelInitialisationError;
+            }
+        }
+
+        private void ViewModelInitialisationError(object sender, EventArgs e)
+        {
+            Application.Current?.Dispatcher?.Invoke(Close);
         }
 
         private void AttributeMappingEditorLoaded(object sender, RoutedEventArgs e)

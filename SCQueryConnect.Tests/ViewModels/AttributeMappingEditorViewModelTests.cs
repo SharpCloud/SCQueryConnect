@@ -49,7 +49,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 h.GetAttributeMappings(It.IsAny<AttributeDesignations>()) == Task.FromResult(fromSql) &&
                 h.GetStoryAttributes(It.IsAny<AttributeDesignations>()) == Task.FromResult(fromStory));
 
-            var vm = new AttributeMappingEditorViewModel(helper);
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                Mock.Of<IMessageService>(),
+                helper);
 
             // Act
 
@@ -90,7 +93,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 h.GetAttributeMappings(It.IsAny<AttributeDesignations>()) == Task.FromResult(fromSql) &&
                 h.GetStoryAttributes(It.IsAny<AttributeDesignations>()) == Task.FromResult(fromStory));
 
-            var vm = new AttributeMappingEditorViewModel(helper);
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                Mock.Of<IMessageService>(),
+                helper);
 
             // Act
 
@@ -134,7 +140,10 @@ namespace SCQueryConnect.Tests.ViewModels
                 h.GetAttributeMappings(It.IsAny<AttributeDesignations>()) == Task.FromResult(fromSql) &&
                 h.GetStoryAttributes(It.IsAny<AttributeDesignations>()) == Task.FromResult(fromStory));
 
-            var vm = new AttributeMappingEditorViewModel(helper);
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                Mock.Of<IMessageService>(),
+                helper);
 
             // Act
 
@@ -153,7 +162,11 @@ namespace SCQueryConnect.Tests.ViewModels
             // Arrange
 
             var helper = Mock.Of<IStoryAttributesHelper>();
-            var vm = new AttributeMappingEditorViewModel(helper)
+            
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                Mock.Of<IMessageService>(),
+                helper)
             {
                 AttributeMappings = new List<AttributeMapping>
                 {
@@ -195,7 +208,11 @@ namespace SCQueryConnect.Tests.ViewModels
             // Arrange
 
             var helper = Mock.Of<IStoryAttributesHelper>();
-            var vm = new AttributeMappingEditorViewModel(helper)
+            
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                Mock.Of<IMessageService>(),
+                helper)
             {
                 AttributeMappings = new List<AttributeMapping>
                 {
@@ -216,6 +233,92 @@ namespace SCQueryConnect.Tests.ViewModels
 
             Assert.AreEqual(0, vm.AttributeMappings.Count);
             Assert.AreEqual(0, vm.StoryAttributes.Count);
+        }
+
+        [Test]
+        public async Task ShowsMessageIfStoryAttributesFailToLoad()
+        {
+            // Arrange
+
+            var mappings = Task.FromResult(new List<AttributeMapping>());
+            var designations = Task.FromResult<List<AttributeDesignations>>(null);
+
+            var helper = Mock.Of<IStoryAttributesHelper>(h =>
+                h.GetAttributeMappings(It.IsAny<AttributeDesignations>()) == mappings &&
+                h.GetStoryAttributes(It.IsAny<AttributeDesignations>()) == designations);
+
+            var messageService = Mock.Of<IMessageService>();
+
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                messageService,
+                helper);
+
+            void OnInitialisationError(object sender, System.EventArgs e)
+            {
+                // Event should be raised before message service is invoked
+                Mock.Get(messageService).Verify(s =>
+                    s.Show(It.IsAny<string>()), Times.Never());
+            }
+
+            vm.InitialisationError += OnInitialisationError;
+
+            // Act
+
+            await vm.InitialiseEditor(null);
+
+            // Assert
+
+            vm.InitialisationError -= OnInitialisationError;
+
+            Mock.Get(messageService).Verify(s =>
+                s.Show("Closing mapping editor: could not generate attributes mappings"));
+
+            Assert.IsNull(vm.AttributeMappings);
+            Assert.IsNull(vm.StoryAttributes);
+        }
+
+        [Test]
+        public async Task ShowsMessageIfAttributeMappingsFailToLoad()
+        {
+            // Arrange
+
+            var mappings = Task.FromResult<List<AttributeMapping>>(null);
+            var designations = Task.FromResult(new List<AttributeDesignations>());
+
+            var helper = Mock.Of<IStoryAttributesHelper>(h =>
+                h.GetAttributeMappings(It.IsAny<AttributeDesignations>()) == mappings &&
+                h.GetStoryAttributes(It.IsAny<AttributeDesignations>()) == designations);
+
+            var messageService = Mock.Of<IMessageService>();
+
+            var vm = new AttributeMappingEditorViewModel(
+                Mock.Of<IMainViewModel>(),
+                messageService,
+                helper);
+
+            void OnInitialisationError(object sender, System.EventArgs e)
+            {
+                // Event should be raised before message service is invoked
+                Mock.Get(messageService).Verify(s =>
+                    s.Show(It.IsAny<string>()), Times.Never());
+            }
+
+            vm.InitialisationError += OnInitialisationError;
+
+            // Act
+
+            await vm.InitialiseEditor(null);
+
+            // Assert
+
+            vm.InitialisationError -= OnInitialisationError;
+
+            Mock.Get(messageService).Verify(s =>
+                s.Show("Closing mapping editor: could not generate attributes mappings"));
+
+            Assert.IsNull(vm.AttributeMappings);
+            Assert.IsNull(vm.StoryAttributes);
         }
     }
 }

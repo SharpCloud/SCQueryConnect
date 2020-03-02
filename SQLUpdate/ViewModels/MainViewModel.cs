@@ -768,9 +768,11 @@ namespace SCQueryConnect.ViewModels
                         return;
                 }
 
+                UpdateText = "Generating SQL Preview...";
                 var queryData = SelectedQueryData;
+                DataTable dataTable;
 
-                var dataTable = await PreviewSql(
+                dataTable = await PreviewSql(
                     queryData,
                     editor.SelectedQueryString,
                     editor.TargetEntity);
@@ -788,50 +790,39 @@ namespace SCQueryConnect.ViewModels
             QueryEntityType targetEntity)
         {
             CanCancelUpdate = false;
-            UpdateText = "Generating SQL Preview...";
-
             DataTable dataTable;
 
-            try
+            await InitialiseSharpCloudDataIfNeeded(queryData);
+
+            using (var connection = GetDb(queryData))
             {
-                await InitialiseSharpCloudDataIfNeeded(queryData);
-
-                using (var connection = GetDb(queryData))
+                connection.Open();
+                using (var command = connection.CreateCommand())
                 {
-                    connection.Open();
-                    using (var command = connection.CreateCommand())
+                    command.CommandText = query;
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        command.CommandText = query;
-                        command.CommandType = CommandType.Text;
+                        await _dataCheckers[targetEntity].CheckData(reader, queryData);
 
-                        using (var reader = command.ExecuteReader())
-                        {
-                            await _dataCheckers[targetEntity].CheckData(reader, queryData);
-
-                            dataTable = new DataTable();
-                            dataTable.Load(reader);
-                        }
+                        dataTable = new DataTable();
+                        dataTable.Load(reader);
                     }
                 }
-
-                var regex = new Regex(Regex.Escape("#"));
-                for (var c = 0; c < dataTable.Columns.Count; c++)
-                {
-                    var col = dataTable.Columns[c];
-                    if (col.Caption.ToLower().StartsWith("tags#"))
-                    {
-                        col.Caption = regex.Replace(col.Caption, ".", 1);
-                    }
-                }
-
-                SetLastUsedSharpCloudConnection(queryData);
             }
-            finally
+
+            var regex = new Regex(Regex.Escape("#"));
+            for (var c = 0; c < dataTable.Columns.Count; c++)
             {
-                UpdateText = string.Empty;
-                UpdateSubtext = string.Empty;
+                var col = dataTable.Columns[c];
+                if (col.Caption.ToLower().StartsWith("tags#"))
+                {
+                    col.Caption = regex.Replace(col.Caption, ".", 1);
+                }
             }
 
+            SetLastUsedSharpCloudConnection(queryData);
             return dataTable;
         }
 
