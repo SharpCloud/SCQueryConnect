@@ -8,8 +8,7 @@
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
-        Title="Internal Connection Info"
-        WindowStartupLocation="CenterOwner">
+        Title="Internal Connection Info">
     <Grid>
         <TextBox x:Name="txt"
                  Background="{StaticResource QCBackground}"

@@ -20,7 +20,8 @@
         Icon="QC.ico"
         ResizeMode="CanResizeWithGrip"
         UseLayoutRounding="True"
-        KeyUp="MainWindowOnKeyUp">
+        KeyUp="MainWindowOnKeyUp"
+        Loaded="MainWindow_Loaded">
 
     <Grid>
         <Grid.Resources>

@@ -8,7 +8,6 @@
         Width="400"
         Background="{StaticResource QCBackground}"
         Title="Source Story Settings"
-        WindowStartupLocation="CenterOwner"
         FontSize="{StaticResource DefaultFontSize}">
     
     <Grid Margin="10">

@@ -9,8 +9,7 @@
         Loaded="AttributeMappingEditorLoaded"
         Height="450"
         Title="Attribute Mapping Editor"
-        Width="460"
-        WindowStartupLocation="CenterOwner">
+        Width="460">
 
     <Window.Resources>
         <viewModels:ViewModelLocator x:Key="ViewModelLocator" />

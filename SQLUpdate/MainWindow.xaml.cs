@@ -1,11 +1,7 @@
 ﻿using Microsoft.Win32;
-using Newtonsoft.Json;
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Interfaces;
-using SCQueryConnect.Common.Interfaces.DataValidation;
 using SCQueryConnect.Common.Models;
-using SCQueryConnect.Controls;
-using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
@@ -14,17 +10,10 @@ using SCQueryConnect.ViewModels;
 using SCQueryConnect.Views;
 using SQLUpdate.Views;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -76,7 +65,6 @@ namespace SCQueryConnect
             IQueryConnectHelper qcHelper)
         {
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
             DataContext = this;
 
             _attributeMappingEditorViewModel = attributeMappingEditorViewModel;
@@ -85,7 +73,10 @@ namespace SCQueryConnect
             _excelWriter = excelWriter;
             _ioService = ioService;
             _mainViewModel = mainViewModel;
+            
             _messageService = messageService;
+            _messageService.Owner = this;
+            
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
             _sharpCloudApiFactory = sharpCloudApiFactory;
@@ -101,24 +92,7 @@ namespace SCQueryConnect
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _mainViewModel.LoadApplicationState();
-            }
-            catch (JsonReaderException ex)
-            {
-                var msg = $"Error occurred reading saved connections at {_ioService.V4ConnectionsPath}" +
-                          Environment.NewLine +
-                          Environment.NewLine +
-                          "Click OK to exit QueryConnect" +
-                          Environment.NewLine +
-                          Environment.NewLine +
-                          ex.Message;
-
-                _messageService.Show(msg);
-                throw;
-            }
-
+            _mainViewModel.LoadApplicationState();
             Password.Password = _passwordStorage.LoadPassword(PasswordStorage.Password);
 
             EventManager.RegisterClassHandler(
@@ -177,11 +151,7 @@ namespace SCQueryConnect
 
         private void ReviewConnectionClick(object sender, RoutedEventArgs e)
         {
-            var dlg = new ConnectionInfo(_mainViewModel.SelectedQueryData)
-            {
-                Owner = this
-            };
-            dlg.ShowDialog();
+            _messageService.Show(() => new ConnectionInfo(_mainViewModel.SelectedQueryData));
         }
 
         private void ProcessRunException(Exception e)
@@ -189,8 +159,7 @@ namespace SCQueryConnect
             switch (e)
             {
                 case InvalidOperationException ex when ex.Message.Contains(Constants.AccessDBEngineErrorMessage):
-                    var msgbox = new DatabaseErrorMessage { Owner = this };
-                    msgbox.ShowDialog();
+                    _messageService.Show<DatabaseErrorMessage>();
                     break;
 
                 default:
@@ -246,17 +215,14 @@ namespace SCQueryConnect
 
         private void NewConnectionClick(object sender, RoutedEventArgs e)
         {
-            var newWnd = new SelectDatabaseType
-            {
-                Owner = this
-            };
+            var result = _messageService.Show(() => new SelectDatabaseType(), out var window);
 
-            if (newWnd.ShowDialog() != true)
+            if (result != true)
             {
                 return;
             }
 
-            _mainViewModel.CreateNewConnection(newWnd.SelectedButton);
+            _mainViewModel.CreateNewConnection(window.SelectedButton);
         }
 
         private async void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -347,12 +313,7 @@ namespace SCQueryConnect
 
         private void StorySourceSettings_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new SourceStorySettings(_mainViewModel.SelectedQueryData)
-            {
-                Owner = this
-            };
-
-            dlg.ShowDialog();
+            _messageService.Show(() => new SourceStorySettings(_mainViewModel.SelectedQueryData));
         }
 
         private void QC_Data_Folder_Click(object sender, RoutedEventArgs e)
@@ -540,42 +501,28 @@ namespace SCQueryConnect
 
         private void BuildRelationshipsHelpClick(object sender, RoutedEventArgs e)
         {
-            ShowHelpWindow<BuildRelationshipsHelp>();
+            _messageService.Show<BuildRelationshipsHelp>();
         }
 
         private void UnpublishUnmatchedItemsHelpClick(object sender, RoutedEventArgs e)
         {
-            ShowHelpWindow<UnpublishUnmatchedItemsHelp>();
+            _messageService.Show<UnpublishUnmatchedItemsHelp>();
         }
 
         private void EditCustomAttributeMappingClick(object sender, RoutedEventArgs e)
         {
             _attributeMappingEditorViewModel.Clear();
 
-            var editor = new AttributeMappingEditor
+            var result = _messageService.Show(() => new AttributeMappingEditor
             {
-                AttributeMapping = _mainViewModel.SelectedQueryData.AttributeMapping,
-                Owner = this
-            };
-            
-            var result = editor.ShowDialog();
-            
+                AttributeMapping = _mainViewModel.SelectedQueryData.AttributeMapping
+            });
+
             if (result == true)
             {
                 _mainViewModel.SelectedQueryData.AttributeMapping =
                     _attributeMappingEditorViewModel.ExtractMapping();
             }
-        }
-
-        private void ShowHelpWindow<T>() where T : Window, new()
-        {
-            var help = new T
-            {
-                Owner = this,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            help.Show();
         }
 
         private async void MainWindowOnKeyUp(object sender, KeyEventArgs e)

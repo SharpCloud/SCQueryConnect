@@ -9,7 +9,6 @@
         Width="300"
         ResizeMode="NoResize"
         Background="{StaticResource QCBackground}"
-        WindowStartupLocation="CenterOwner"
         FontSize="{StaticResource DefaultFontSize}"
         UseLayoutRounding="True">
 

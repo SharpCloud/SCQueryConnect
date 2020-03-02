@@ -443,29 +443,45 @@ namespace SCQueryConnect.ViewModels
 
         public void LoadApplicationState()
         {
-            var migrate =
-                _ioService.FileExists(_ioService.V3ConnectionsPath) &&
-                !_ioService.FileExists(_ioService.V4ConnectionsPath);
-
-            string filePath;
-
-            if (migrate)
+            try
             {
-                if (_ioService.FileExists(_ioService.V3ConnectionsBackupPath))
+                var migrate =
+                    _ioService.FileExists(_ioService.V3ConnectionsPath) &&
+                    !_ioService.FileExists(_ioService.V4ConnectionsPath);
+
+                string filePath;
+
+                if (migrate)
                 {
-                    _ioService.DeleteFile(_ioService.V3ConnectionsBackupPath);
+                    if (_ioService.FileExists(_ioService.V3ConnectionsBackupPath))
+                    {
+                        _ioService.DeleteFile(_ioService.V3ConnectionsBackupPath);
+                    }
+
+                    _ioService.MoveFile(_ioService.V3ConnectionsPath, _ioService.V3ConnectionsBackupPath);
+                    filePath = _ioService.V3ConnectionsBackupPath;
+                }
+                else
+                {
+                    filePath = _ioService.V4ConnectionsPath;
                 }
 
-                _ioService.MoveFile(_ioService.V3ConnectionsPath, _ioService.V3ConnectionsBackupPath);
-                filePath = _ioService.V3ConnectionsBackupPath;
+                LoadAllConnections(migrate, filePath);
+                LoadGlobalSettings(migrate);
             }
-            else
+            catch (JsonReaderException ex)
             {
-                filePath = _ioService.V4ConnectionsPath;
-            }
+                var msg = $"Error occurred reading saved connections at {_ioService.V4ConnectionsPath}" +
+                          Environment.NewLine +
+                          Environment.NewLine +
+                          "Click OK to exit QueryConnect" +
+                          Environment.NewLine +
+                          Environment.NewLine +
+                          ex.Message;
 
-            LoadAllConnections(migrate, filePath);
-            LoadGlobalSettings(migrate);
+                _messageService.Show(msg);
+                throw;
+            }
         }
 
         private void LoadGlobalSettings(bool migrate)

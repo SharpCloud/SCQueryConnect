@@ -9,7 +9,6 @@
         Width="400"
         ResizeMode="NoResize"
         Background="{StaticResource QCBackground}"
-        WindowStartupLocation="CenterOwner"
         Foreground="White"
         FontSize="{StaticResource DefaultFontSize}">
     <Grid Margin="10">
