@@ -2,9 +2,13 @@
 using SCQueryConnect.Common;
 using SCQueryConnect.Common.Helpers;
 using SCQueryConnect.Common.Interfaces;
+using SCQueryConnect.Common.Interfaces.DataValidation;
+using SCQueryConnect.Common.Models;
 using SCQueryConnect.Common.Services;
+using SCQueryConnect.Controls;
 using SCQueryConnect.Helpers;
 using SCQueryConnect.Interfaces;
+using SCQueryConnect.Logging;
 using SCQueryConnect.Models;
 using SCQueryConnect.Services;
 using System;
@@ -25,11 +29,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using SCQueryConnect.Common.Interfaces.DataValidation;
-using SCQueryConnect.Common.Models;
-using SCQueryConnect.Controls;
-using SCQueryConnect.Logging;
-using SCQueryConnect.Views;
 using PanelType = SC.API.ComInterop.Models.Panel.PanelType;
 
 namespace SCQueryConnect.ViewModels

@@ -457,77 +457,12 @@ namespace SCQueryConnect.Common.Helpers
                         return;
                     }
 
-                    var tempArray = new List<List<string>>();
-                    while (reader.Read())
+                    var arrayValues = await GetArrayValues(reader, maxRowCount, unpublishItems);
+                    
+                    if (arrayValues == null)
                     {
-                        var objs = new object[reader.FieldCount];
-                        reader.GetValues(objs);
-                        var data = new List<string>();
-                        foreach (var o in objs)
-                        {
-                            if (o is DateTime?)
-                            {
-                                // definately date time
-                                var date = (DateTime)o;
-                                data.Add(date.ToString("yyyy MM dd"));
-                            }
-                            else
-                            {
-                                DateTime date;
-                                double dbl;
-                                var s = o.ToString();
-                                if (double.TryParse(s, out dbl))
-                                {
-                                    data.Add($"{dbl:0.##}");
-                                }
-                                else if (DateTime.TryParse(s, out date))
-                                {
-                                    data.Add(date.ToString("yyyy MM dd"));
-                                }
-                                else if (s.ToLower().Trim() == "null")
-                                {
-                                    data.Add("");
-                                }
-                                else
-                                {
-                                    data.Add(s);
-                                }
-                            }
-                        }
-                        tempArray.Add(data);
-                    }
-
-                    if (tempArray.Count > maxRowCount)
-                    {
-                        var s = $"Your item query contains too many records (more than {maxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
-                        await _logger.Log(s);
                         return;
                     }
-
-                    // create our string array
-                    var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
-                    // add the headers
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        var headerText = reader.GetName(i);
-                        var header = GetHeaderName(headerText);
-                        arrayValues[0, i] = header;
-                    }
-                    // add the data values
-                    int row = 1;
-                    foreach (var list in tempArray)
-                    {
-                        int col = 0;
-                        foreach (string s in list)
-                        {
-                            arrayValues[row, col++] = s;
-                        }
-                        row++;
-                    }
-
-                    await _logger.Log(
-                        $"Processing {row.ToString()} rows: unmatched items " +
-                        $"will {(unpublishItems ? "" : "NOT ")}be unpublished");
 
                     // pass the array to SharpCloud
                     string errorMessage;
@@ -575,6 +510,88 @@ namespace SCQueryConnect.Common.Helpers
                     }
                 }
             }
+        }
+
+        private async Task<string[,]> GetArrayValues(
+            IDataReader reader,
+            int maxRowCount,
+            bool unpublishItems)
+        {
+            var tempArray = new List<List<string>>();
+            while (reader.Read())
+            {
+                var objs = new object[reader.FieldCount];
+                reader.GetValues(objs);
+                var data = new List<string>();
+                foreach (var o in objs)
+                {
+                    if (o is DateTime?)
+                    {
+                        // definitely date time
+                        var date = (DateTime)o;
+                        data.Add(date.ToString("yyyy MM dd"));
+                    }
+                    else
+                    {
+                        DateTime date;
+                        double dbl;
+                        var s = o.ToString();
+                        if (double.TryParse(s, out dbl))
+                        {
+                            data.Add($"{dbl:0.##}");
+                        }
+                        else if (DateTime.TryParse(s, out date))
+                        {
+                            data.Add(date.ToString("yyyy MM dd"));
+                        }
+                        else if (s.ToLower().Trim() == "null")
+                        {
+                            data.Add("");
+                        }
+                        else
+                        {
+                            data.Add(s);
+                        }
+                    }
+                }
+                tempArray.Add(data);
+            }
+
+            if (tempArray.Count > maxRowCount)
+            {
+                var s = $"Your item query contains too many records (more than {maxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
+                await _logger.Log(s);
+                return null;
+            }
+
+            // create our string array
+            var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
+            
+            // add the headers
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                var headerText = reader.GetName(i);
+                var header = GetHeaderName(headerText);
+                arrayValues[0, i] = header;
+            }
+            
+            // add the data values
+            var row = 1;
+            foreach (var list in tempArray)
+            {
+                var col = 0;
+                foreach (string s in list)
+                {
+                    arrayValues[row, col++] = s;
+                }
+                row++;
+            }
+
+            await _logger.Log(
+                $"Processing {row} rows: unmatched items " +
+                $"will {(unpublishItems ? "" : "NOT ")}be unpublished");
+
+            return arrayValues;
         }
 
         private async Task GetResourceUrlMetadata(
