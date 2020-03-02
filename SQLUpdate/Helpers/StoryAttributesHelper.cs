@@ -3,7 +3,6 @@ using SCQueryConnect.Common.Models;
 using SCQueryConnect.Interfaces;
 using SCQueryConnect.Models;
 using SCQueryConnect.Services;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -17,41 +16,22 @@ namespace SCQueryConnect.Helpers
         private readonly IMessageService _messageService;
         private readonly IPasswordStorage _passwordStorage;
         private readonly IProxyViewModel _proxyViewModel;
+        private readonly IQueryConnectHelper _queryConnectHelper;
         private readonly ISharpCloudApiFactory _scApiFactory;
-
-        private readonly HashSet<string> _nonCustomAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "Category",
-            "ClickActionUrl",
-            "Description",
-            "Dislikes",
-            "Duration (Days)",
-            "Duration Days",
-            "Duration",
-            "External Id",
-            "ExternalId",
-            "Image",
-            "Internal Id",
-            "InternalId",
-            "Likes",
-            "Name",
-            "Published",
-            "RowId",
-            "Start",
-            "Tags"
-        };
 
         public StoryAttributesHelper(
             IMainViewModel mainViewModel,
             IMessageService messageService,
             IPasswordStorage passwordStorage,
             IProxyViewModel proxyViewModel,
+            IQueryConnectHelper queryConnectHelper,
             ISharpCloudApiFactory scApiFactory)
         {
             _mainViewModel = mainViewModel;
             _messageService = messageService;
             _passwordStorage = passwordStorage;
             _proxyViewModel = proxyViewModel;
+            _queryConnectHelper = queryConnectHelper;
             _scApiFactory = scApiFactory;
         }
 
@@ -77,6 +57,7 @@ namespace SCQueryConnect.Helpers
                 var story = sc.LoadStory(_mainViewModel.SelectedQueryData.StoryId);
 
                 var attributes = story.Attributes
+                    .Where(a => a.IsUserDefined)
                     .Select(a =>
                         new AttributeDesignations
                         {
@@ -102,7 +83,7 @@ namespace SCQueryConnect.Helpers
             var mappingList = sqlResultsTask.Columns
                 .Cast<DataColumn>()
                 .Select(c => c.Caption)
-                .Where(IsCustomAttribute)
+                .Where(_queryConnectHelper.IsCustomAttribute)
                 .Select(a => new AttributeMapping
                 {
                     SourceName = a,
@@ -110,15 +91,6 @@ namespace SCQueryConnect.Helpers
                 });
 
             return mappingList.OrderBy(a => a.SourceName).ToList();
-        }
-
-        private bool IsCustomAttribute(string name)
-        {
-            var isCustom =
-                !_nonCustomAttributes.Contains(name) &&
-                !name.StartsWith("Tags.", StringComparison.OrdinalIgnoreCase);
-
-            return isCustom;
         }
     }
 }

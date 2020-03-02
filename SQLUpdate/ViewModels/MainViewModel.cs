@@ -933,7 +933,8 @@ namespace SCQueryConnect.ViewModels
                 DBType = queryData.ConnectionType,
                 MaxRowCount = _maxRowCount,
                 UnpublishItems = queryData.UnpublishItems,
-                BuildRelationships = queryData.BuildRelationships
+                BuildRelationships = queryData.BuildRelationships,
+                AttributeMapping = queryData.UseAttributeMapping ? queryData.AttributeMapping : null
             };
 
             await _qcHelper.UpdateSharpCloud(config, settings, ct);

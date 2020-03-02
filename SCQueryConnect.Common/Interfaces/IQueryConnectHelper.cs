@@ -15,5 +15,6 @@ namespace SCQueryConnect.Common.Interfaces
         Task UpdateRelationships(IDbConnection connection, Story story, string sqlString);
         Task InitialiseDatabase(SharpCloudConfiguration config, string connectionString, DatabaseType dbType);
         Task UpdateSharpCloud(SharpCloudConfiguration config, UpdateSettings settings, CancellationToken ct);
+        bool IsCustomAttribute(string name);
     }
 }

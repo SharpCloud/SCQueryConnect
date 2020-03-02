@@ -1,4 +1,6 @@
-﻿namespace SCQueryConnect.Common.Models
+﻿using System.Collections.Generic;
+
+namespace SCQueryConnect.Common.Models
 {
     public class UpdateSettings
     {
@@ -12,5 +14,6 @@
         public int MaxRowCount { get; set; }
         public bool UnpublishItems { get; set; }
         public bool BuildRelationships { get; set; }
+        public IDictionary<string, string> AttributeMapping { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace SCQueryConnect.Common.Helpers
     {
         public const string MsAdeUrl = "https://www.microsoft.com/en-gb/download/details.aspx?id=13255";
 
-        private readonly IDictionary<PanelType, DefaultPanelValueSet> _defaultPanelValues =
+        private static readonly IDictionary<PanelType, DefaultPanelValueSet> DefaultPanelValues =
             new Dictionary<PanelType, DefaultPanelValueSet>
             {
                 [PanelType.RichText] = new DefaultPanelValueSet
@@ -55,6 +55,28 @@ namespace SCQueryConnect.Common.Helpers
                     Data = ""
                 }
             };
+
+        private static readonly HashSet<string> NonCustomAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Category",
+            "ClickActionUrl",
+            "Description",
+            "Dislikes",
+            "Duration (Days)",
+            "Duration Days",
+            "Duration",
+            "External Id",
+            "ExternalId",
+            "Image",
+            "Internal Id",
+            "InternalId",
+            "Likes",
+            "Name",
+            "Published",
+            "RowId",
+            "Start",
+            "Tags"
+        };
 
         private readonly IArchitectureDetector _architectureDetector;
         private readonly IConnectionStringHelper _connectionStringHelper;
@@ -364,7 +386,8 @@ namespace SCQueryConnect.Common.Helpers
                             story,
                             settings.QueryString,
                             settings.MaxRowCount,
-                            settings.UnpublishItems);
+                            settings.UnpublishItems,
+                            settings.AttributeMapping);
 
                         ct.ThrowIfCancellationRequested();
 
@@ -433,7 +456,8 @@ namespace SCQueryConnect.Common.Helpers
             Story story,
             string sqlString,
             int maxRowCount,
-            bool unpublishItems)
+            bool unpublishItems,
+            IDictionary<string, string> headerAliases)
         {
             if (string.IsNullOrWhiteSpace(sqlString))
             {
@@ -457,7 +481,19 @@ namespace SCQueryConnect.Common.Helpers
                         return;
                     }
 
-                    var arrayValues = await GetArrayValues(reader, maxRowCount, unpublishItems);
+                    var attributeIdToName = story
+                        .Attributes
+                        .Where(a => a.IsUserDefined)
+                        .ToDictionary(
+                            a => a.Id,
+                            a => a.Name);
+
+                    var arrayValues = await GetArrayValues(
+                        reader,
+                        maxRowCount,
+                        unpublishItems,
+                        headerAliases,
+                        attributeIdToName);
                     
                     if (arrayValues == null)
                     {
@@ -515,7 +551,9 @@ namespace SCQueryConnect.Common.Helpers
         private async Task<string[,]> GetArrayValues(
             IDataReader reader,
             int maxRowCount,
-            bool unpublishItems)
+            bool unpublishItems,
+            IDictionary<string, string> headerAliases,
+            IDictionary<string, string> attributeIdToName)
         {
             var tempArray = new List<List<string>>();
             while (reader.Read())
@@ -559,8 +597,9 @@ namespace SCQueryConnect.Common.Helpers
 
             if (tempArray.Count > maxRowCount)
             {
-                var s = $"Your item query contains too many records (more than {maxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.";
-                await _logger.Log(s);
+                await _logger.Log(
+                    $"Your item query contains too many records (more than {maxRowCount}). Updating large data sets into SharpCloud may result in stories that are too big to load or have poor performance. Please try refining you query by adding a WHERE clause.");
+                
                 return null;
             }
 
@@ -568,13 +607,57 @@ namespace SCQueryConnect.Common.Helpers
             var arrayValues = new string[tempArray.Count + 1, reader.FieldCount];
             
             // add the headers
+
+            var missingAliases = new List<string>();
+            var missingStoryAttributes = new List<string>();
+
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 var headerText = reader.GetName(i);
                 var header = GetHeaderName(headerText);
+
+                if (headerAliases != null && IsCustomAttribute(header))
+                {
+                    var aliasExists = headerAliases.ContainsKey(header);
+                    if (aliasExists)
+                    {
+                        var attributeExists = attributeIdToName.ContainsKey(headerAliases[header]);
+                        if (attributeExists)
+                        {
+                            header = attributeIdToName[headerAliases[header]];
+                        }
+                        else
+                        {
+                            missingStoryAttributes.Add(headerAliases[header]);
+                        }
+                    }
+                    else
+                    {
+                        missingAliases.Add(header);
+                    }
+                }
+
                 arrayValues[0, i] = header;
             }
-            
+
+            if (missingAliases.Count > 0)
+            {
+                var missing = string.Join(", ", missingAliases);
+                await _logger.LogWarning(
+                    $"Aborting items update - your attribute mapping is missing entries for the following attributes found in the story: {missing}");
+
+                return null;
+            }
+
+            if (missingStoryAttributes.Count > 0)
+            {
+                var missing = string.Join(", ", missingStoryAttributes);
+                await _logger.LogWarning(
+                    $"Aborting items update - story is missing attributes referenced in your attribute mapping: {missing}");
+
+                return null;
+            }
+
             // add the data values
             var row = 1;
             foreach (var list in tempArray)
@@ -667,12 +750,12 @@ namespace SCQueryConnect.Common.Helpers
 
                     if (string.IsNullOrWhiteSpace(title))
                     {
-                        title = _defaultPanelValues[panelType].Title;
+                        title = DefaultPanelValues[panelType].Title;
                     }
                     
                     if (string.IsNullOrWhiteSpace(data))
                     {
-                        data = _defaultPanelValues[panelType].Data;
+                        data = DefaultPanelValues[panelType].Data;
                     }
 
                     metadata = new PanelMetadata
@@ -810,6 +893,15 @@ namespace SCQueryConnect.Common.Helpers
 
             await _logger.Log($"Processed {description} Query: found {metadataList.Count} items");
             return metadataList;
+        }
+
+        public bool IsCustomAttribute(string name)
+        {
+            var isCustom =
+                !NonCustomAttributes.Contains(name) &&
+                !name.StartsWith("Tags.", StringComparison.OrdinalIgnoreCase);
+
+            return isCustom;
         }
     }
 }

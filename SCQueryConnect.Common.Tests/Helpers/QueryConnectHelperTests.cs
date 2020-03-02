@@ -116,5 +116,40 @@ namespace SCQueryConnect.Common.Tests.Helpers
             var suffixMatch = helper.AppName.EndsWith(expectedAppSuffix);
             Assert.IsTrue(suffixMatch);
         }
+
+        [TestCase("INTERNALID", false)]
+        [TestCase("INTERNAL ID", false)]
+        [TestCase("NAME", false)]
+        [TestCase("EXTERNALID", false)]
+        [TestCase("EXTERNAL ID", false)]
+        [TestCase("DESCRIPTION", false)]
+        [TestCase("START", false)]
+        [TestCase("CATEGORY", false)]
+        [TestCase("DURATION DAYS", false)]
+        [TestCase("DURATION (DAYS)", false)]
+        [TestCase("DURATION", false)]
+        [TestCase("CLICKACTIONURL", false)]
+        [TestCase("IMAGE", false)]
+        [TestCase("PUBLISHED", false)]
+        [TestCase("LIKES", false)]
+        [TestCase("DISLIKES", false)]
+        [TestCase("TAGS", false)]
+        [TestCase("TAGS.MyTag", false)]
+        [TestCase("ROWID", false)]
+        [TestCase("Attribute", true)]
+        public void CustomAttributesAreKnown(string name, bool expected)
+        {
+            // Arrange
+
+            var helper = CreateQueryConnectHelper();
+
+            // Act
+
+            var result = helper.IsCustomAttribute(name);
+
+            // Assert
+
+            Assert.AreEqual(expected, result);
+        }
     }
 }
